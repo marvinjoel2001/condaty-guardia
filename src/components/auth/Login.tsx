@@ -133,7 +133,7 @@ const Login = () => {
               }}
             />
           ) : ( */}
-      <Form behaviorAndroid hideKeyboard={true}>
+      <Form behaviorAndroid="height" hideKeyboard={true}>
         <ImageBackground
           source={require('../../images/ImageLogin.png')}
           style={{flex: 1, marginTop: -80}}

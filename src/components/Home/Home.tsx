@@ -7,11 +7,13 @@ import Button from '../../../mk/components/forms/Button/Button';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import {cssVar} from '../../../mk/styles/themes';
+import {useNavigation} from '@react-navigation/native';
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
+  const navigate: any = useNavigation();
   const {logout, user} = useAuth();
-  console.log(user);
+
   const customTitle = () => {
     return (
       <View>
@@ -19,6 +21,7 @@ const Home = () => {
           h={48}
           w={48}
           src={getUrlImages('/GUA-' + user?.id + '.png?d=' + user?.updated_at)}
+          onClick={() => navigate.navigate('Profile')}
         />
         <Text style={styles.title}>{getFullName(user)}</Text>
         <Text style={styles.client}>

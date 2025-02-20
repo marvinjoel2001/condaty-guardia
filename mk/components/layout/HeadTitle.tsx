@@ -60,7 +60,7 @@ const HeadTitle = ({
 
   return (
     <Animated.View style={{...theme.container, ...style}}>
-      {route.name == 'Home' && (
+      {route.name == 'Home' ? (
         <View
           style={{
             flexDirection: 'row',
@@ -72,11 +72,10 @@ const HeadTitle = ({
           onTouchEnd={() => togleDrawer()}>
           <Icon name={IconMenu} color={cssVar.cBlack} />
         </View>
-      )}
-      {back && (
+      ) : (
         <TouchableOpacity onPress={goBack} accessibilityLabel={'Volver atrás'}>
           <View style={theme.back}>
-            <Icon name={IconArrowLeft} color={theme?.back?.color} />
+            <Icon name={IconArrowLeft} color={cssVar.cWhite} />
           </View>
         </TouchableOpacity>
       )}
@@ -124,9 +123,10 @@ const theme: ThemeType = {
   },
   back: {
     justifyContent: 'center',
-    padding: cssVar.spXs,
     alignItems: 'center',
-    color: cssVar.cBlackV2,
+    // backgroundColor: cssVar.cWhite,
+    // borderRadius: '100%',
+    padding: 8,
   },
   customTitle: {
     flexGrow: 1,
@@ -139,7 +139,7 @@ const theme: ThemeType = {
     paddingLeft: cssVar.spM,
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
-    textAlign: 'center',
+    textAlign: 'left',
     fontSize: cssVar.sXl,
   },
   bage: {

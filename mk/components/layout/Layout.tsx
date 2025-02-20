@@ -85,43 +85,43 @@ const Layout = (props: PropsType) => {
     }
   }, [store?.scrollTop]);
 
-  const headerHide = (event: any) => {
-    const currentOffset = event.contentOffset.y;
-    if (Math.abs(currentOffset - previousOffset.value) < 10) {
-      return;
-    }
+  // const headerHide = (event: any) => {
+  //   const currentOffset = event.contentOffset.y;
+  //   if (Math.abs(currentOffset - previousOffset.value) < 10) {
+  //     return;
+  //   }
 
-    if (currentOffset <= 10 || currentOffset < previousOffset.value) {
-      // Mostrar header
-      headerHeight.value = withTiming(50, {
-        duration: 300,
-        easing: Easing.out(Easing.cubic),
-      });
-      toastPosition.value = withTiming(50, {
-        duration: 300,
-        easing: Easing.out(Easing.cubic),
-      });
-    } else {
-      // Ocultar header
-      headerHeight.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.inOut(Easing.cubic),
-      });
-      toastPosition.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.inOut(Easing.cubic),
-      });
-    }
+  //   if (currentOffset <= 10 || currentOffset < previousOffset.value) {
+  //     // Mostrar header
+  //     headerHeight.value = withTiming(50, {
+  //       duration: 300,
+  //       easing: Easing.out(Easing.cubic),
+  //     });
+  //     toastPosition.value = withTiming(50, {
+  //       duration: 300,
+  //       easing: Easing.out(Easing.cubic),
+  //     });
+  //   } else {
+  //     // Ocultar header
+  //     headerHeight.value = withTiming(0, {
+  //       duration: 300,
+  //       easing: Easing.inOut(Easing.cubic),
+  //     });
+  //     toastPosition.value = withTiming(0, {
+  //       duration: 300,
+  //       easing: Easing.inOut(Easing.cubic),
+  //     });
+  //   }
 
-    previousOffset.value = currentOffset;
-  };
-  const [onScrollOld, setOnScrollOld] = useState(0);
-  useEffect(() => {
-    if (store?.onScroll != onScrollOld) {
-      setOnScrollOld(store?.onScroll);
-      headerHide({contentOffset: {y: store?.onScroll || 0}});
-    }
-  }, [store?.onScroll]);
+  //   previousOffset.value = currentOffset;
+  // };
+  // const [onScrollOld, setOnScrollOld] = useState(0);
+  // useEffect(() => {
+  //   if (store?.onScroll != onScrollOld) {
+  //     setOnScrollOld(store?.onScroll);
+  //     headerHide({contentOffset: {y: store?.onScroll || 0}});
+  //   }
+  // }, [store?.onScroll]);
 
   const previousOffset = useSharedValue(0);
   // const scrollHandler = useAnimatedScrollHandler({
@@ -141,41 +141,41 @@ const Layout = (props: PropsType) => {
   // });
 
   const isRoute = () => {
-    if (route.name == 'home') {
+    if (route.name == 'Home') {
       return true;
     }
     return false;
   };
 
-  const animatedToastStyle = useAnimatedStyle(() => {
-    return {
-      position: 'absolute',
-      top: toastPosition.value,
-      width: '100%',
-      zIndex: 101,
-    };
-  });
+  // const animatedToastStyle = useAnimatedStyle(() => {
+  //   return {
+  //     position: 'absolute',
+  //     top: toastPosition.value,
+  //     width: '100%',
+  //     zIndex: 101,
+  //   };
+  // });
 
-  const animatedHeaderStyle = useAnimatedStyle(() => {
-    return {
-      height: headerHeight.value,
-      overflow: 'hidden',
-      position: 'absolute',
-      top: 0,
-      zIndex: 100,
-      backgroundColor: cssVar.cBlack,
-      width: '100%',
-    };
-  });
+  // const animatedHeaderStyle = useAnimatedStyle(() => {
+  //   return {
+  //     height: headerHeight.value,
+  //     overflow: 'hidden',
+  //     position: 'absolute',
+  //     top: 0,
+  //     zIndex: 100,
+  //     backgroundColor: cssVar.cBlack,
+  //     width: '100%',
+  //   };
+  // });
 
-  const animatedViewStyle = useAnimatedStyle(() => {
-    return {
-      paddingTop: headerHeight.value,
-      flex: 1,
-      // paddingTop: isRoute() ? 50 : 0,
-      paddingBottom: 80,
-    };
-  });
+  // const animatedViewStyle = useAnimatedStyle(() => {
+  //   return {
+  //     paddingTop: headerHeight.value,
+  //     flex: 1,
+  //     // paddingTop: isRoute() ? 50 : 0,
+  //     paddingBottom: 80,
+  //   };
+  // });
   // const setSearch = (v: string) => {
   //   setStore({searchNO: v});
   // };
@@ -192,19 +192,19 @@ const Layout = (props: PropsType) => {
   // }, [store?.onRefresh]);
 
   return (
-    <View style={[theme.layout, style]} onTouchEnd={onPress}>
-      <Animated.View style={isRoute() ? {...animatedHeaderStyle} : {}}>
-        <HeadTitle
-          title={title}
-          customTitle={customTitle}
-          back={back}
-          avatar={avatar}
-          style={styleHead}
-          right={rigth}
-          onBack={onBack}
-          backUrl={backUrl}
-        />
-      </Animated.View>
+    <View style={[theme.layout]} onTouchEnd={onPress}>
+      {/* <Animated.View style={isRoute() ? {...animatedHeaderStyle} : {}}> */}
+      <HeadTitle
+        title={title}
+        customTitle={customTitle}
+        back={back}
+        avatar={avatar}
+        style={styleHead}
+        right={rigth}
+        onBack={onBack}
+        backUrl={backUrl}
+      />
+      {/* </Animated.View> */}
 
       <View style={{flex: 1}}>
         {scroll ? (
@@ -212,9 +212,9 @@ const Layout = (props: PropsType) => {
             id="LayoutScrollview"
             testID="LayoutScrollview"
             nativeID="LayoutScrollview"
-            onScroll={({nativeEvent}: any) => {
-              headerHide(nativeEvent);
-            }}
+            // onScroll={({nativeEvent}: any) => {
+            //   headerHide(nativeEvent);
+            // }}
             scrollEventThrottle={16}
             showsVerticalScrollIndicator={false}
             ref={scrollViewRef}
@@ -223,11 +223,10 @@ const Layout = (props: PropsType) => {
             disableIntervalMomentum={true}
             style={{
               ...theme.scrollView,
-              paddingTop: isRoute() ? 50 : 0,
-              // borderColor: 'green',
-              // borderWidth: 1,
+              ...style,
+              // paddingTop: isRoute() ? 50 : 0,
             }}
-            contentContainerStyle={{paddingBottom: isRoute() ? 100 : 60}}
+            // contentContainerStyle={{paddingBottom: isRoute() ? 100 : 0}}
             // onScroll={scrollHandler}
             // scrollEventThrottle={16}
             refreshControl={
@@ -253,7 +252,7 @@ const Layout = (props: PropsType) => {
           </View>
         )}
       </View>
-      {route.name == 'home' && store?.nContents > 0 && (
+      {/* {route.name == 'home' && store?.nContents > 0 && (
         <Animated.View style={animatedToastStyle}>
           <ToastNotif
             list={store?.contentIds}
@@ -261,7 +260,7 @@ const Layout = (props: PropsType) => {
             count={store?.nContents}
           />
         </Animated.View>
-      )}
+      )} */}
 
       {route.name === 'Home' && <Footer />}
       {/* <Footer /> */}

@@ -42,6 +42,8 @@ export const validRule = (
       value != null && !/\S+@\S+\.\S+/.test(value)
         ? 'No es un email valido'
         : '',
+    phone: () =>
+      !/^\d{8,}$/.test(value) ? 'Debe tener al menos 8 números' : '',
     alpha: () =>
       !/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]+$/.test(value) ? 'No es un texto válido' : '',
     noSpaces: () => (!/^\S+$/.test(value) ? 'No debe tener espacios' : ''),
