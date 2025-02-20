@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>rnGuard</string>
+	<string>Condaty Guardia</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -32,7 +32,20 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Roboto-Black.ttf</string>
+		<string>Roboto-Bold.ttf</string>
+		<string>Roboto-ExtraBold.ttf</string>
+		<string>Roboto-Light.ttf</string>
+		<string>Roboto-Medium.ttf</string>
+		<string>Roboto-Regular.ttf</string>
+		<string>Roboto-SemiBold.ttf</string>
+		<string>Roboto-Thin.ttf</string>
+		<string>Roboto-ExtraLight.ttf</string>
+		<string>Roboto-Italic.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -45,6 +58,8 @@
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
@@ -56,18 +71,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Roboto-Black.ttf</string>
-		<string>Roboto-Bold.ttf</string>
-		<string>Roboto-ExtraBold.ttf</string>
-		<string>Roboto-ExtraLight.ttf</string>
-		<string>Roboto-Italic.ttf</string>
-		<string>Roboto-Light.ttf</string>
-		<string>Roboto-Medium.ttf</string>
-		<string>Roboto-Regular.ttf</string>
-		<string>Roboto-SemiBold.ttf</string>
-		<string>Roboto-Thin.ttf</string>
-	</array>
 </dict>
 </plist>
