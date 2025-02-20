@@ -261,8 +261,8 @@ const Layout = (props: PropsType) => {
           />
         </Animated.View>
       )} */}
-      {/* 
-      {route.name === 'Home' && <Footer />} */}
+
+      {route.name === 'Home' && <Footer />}
       {/* <Footer /> */}
 
       {/* {configApp.API_URL != configApp.API_URL_PROD && <PerformanceMonitor />} */}
