@@ -104,7 +104,7 @@ const theme: ThemeType = {
     paddingTop: 2,
   },
   label: {
-    color: cssVar.cWhiteV1,
+    color: cssVar.cWhiteV2,
     left: 16,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,

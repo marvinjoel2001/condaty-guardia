@@ -1,9 +1,10 @@
 import {useEffect, useState} from 'react';
 import {
-  Dimensions,
   ImageBackground,
+  Linking,
   SafeAreaView,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import Button from '../../../mk/components/forms/Button/Button';
@@ -11,10 +12,8 @@ import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
 import Form from '../../../mk/components/forms/Form/Form';
 import configApp from '../../config/config';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-import {IconEye, IconEyeOff, IconLogo} from '../../icons/IconLibrary';
+import {IconEye, IconEyeOff} from '../../icons/IconLibrary';
 import {OneSignal} from 'react-native-onesignal';
-import Title from '../../../mk/components/ui/Title';
-// import SignInModal from '../Register/Register';
 import useAuth from '../../../mk/hooks/useAuth';
 import {checkCI, checkPasswords} from '../../../mk/utils/validations';
 import Input from '../../../mk/components/forms/Input/Input';
@@ -22,7 +21,6 @@ import ForgotPass from './ForgotPass';
 // import Splash from '../Splash/Splash';
 import React from 'react';
 // import Loading from '../Animations/Loading';
-import {LogBox} from 'react-native';
 
 const Login = () => {
   const [formState, setFormState]: any = useState({});
@@ -117,7 +115,15 @@ const Login = () => {
     }, 3000);
   }, []);
 
-  LogBox.ignoreAllLogs(false);
+  const goTerminos = () => {
+    console.log('goTerminos');
+    Linking.openURL('https://www.condaty.com/terminos');
+  };
+
+  const goPoliticas = () => {
+    console.log('goPoliticas');
+    Linking.openURL('https://www.condaty.com/politicas');
+  };
 
   return (
     <SafeAreaView style={theme.safeAreaView}>
@@ -136,7 +142,10 @@ const Login = () => {
       <Form behaviorAndroid="height" hideKeyboard={true}>
         <ImageBackground
           source={require('../../images/ImageLogin.png')}
-          style={{flex: 1, marginTop: -80}}
+          style={{
+            flex: 1,
+            marginTop: -70,
+          }}
           resizeMode="cover"
         />
         <View style={theme.container}>
@@ -175,14 +184,14 @@ const Login = () => {
                 <Icon
                   onPress={() => togglePasswordVisibility()}
                   name={IconEyeOff}
-                  fillStroke={cssVar.cWhiteV1}
+                  fillStroke={cssVar.cWhiteV2}
                   color={'transparent'}
                 />
               ) : (
                 <Icon
                   onPress={() => togglePasswordVisibility()}
                   name={IconEye}
-                  color={cssVar.cWhiteV1}
+                  color={cssVar.cWhiteV2}
                 />
               )
             }
@@ -194,42 +203,70 @@ const Login = () => {
             disabled={!formState.email || !formState.password}>
             Iniciar sesión
           </Button>
-          <Button
+          <Text
             onPress={() => {
               setErrors('');
               setOnForgotPass(true);
             }}
-            variant="terciary"
-            style={{marginTop: cssVar.spL, marginBottom: cssVar.spL}}>
+            style={{
+              marginTop: cssVar.spL,
+              marginBottom: cssVar.spL,
+              textAlign: 'center',
+              color: cssVar.cWhite,
+              textDecorationLine: 'underline',
+            }}>
             Olvidé mi contraseña
-          </Button>
-          {/* <View style={theme.noAccountContainer}>
-                <Text style={theme.noAccountText}>
-           
-                </Text>
-                <Button
-                  variant="terciary"
-                  onPress={() => {
-                    setOnRegister(true);
-                    setErrors('');
-                  }}>
-                  <Text
-                    style={{
-                      color: cssVar.cWhite,
-                      fontSize: cssVar.sS,
-                      fontFamily: FONTS.medium,
-                    }}>
-                    Crear cuenta
-                  </Text>
-                </Button>
-              </View> */}
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            }}>
+            <Text
+              style={{
+                color: cssVar.cWhite,
+                fontSize: 10,
+              }}>
+              Al iniciar sesión aceptas los
+            </Text>
+            <TouchableOpacity onPress={goTerminos} style={{height: 48}}>
+              <Text
+                style={{
+                  color: cssVar.cAccent,
+                  fontSize: 10,
+                }}>
+                {' Términos y Condiciones '}
+              </Text>
+            </TouchableOpacity>
+
+            <Text
+              style={{
+                color: cssVar.cWhite,
+                fontSize: 10,
+              }}>
+              y nuestras
+            </Text>
+            <TouchableOpacity onPress={goPoliticas} style={{height: 20}}>
+              <Text
+                style={{
+                  color: cssVar.cAccent,
+                  fontSize: 10,
+                  marginBottom: 0,
+                  top: -30,
+                  fontFamily: 'Poppins Regular',
+                }}>
+                Políticas de Privacidad
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <ForgotPass
           open={onForgotPass}
           onClose={() => {
             setOnForgotPass(false);
           }}
-          mod="aff"
+          mod="guard"
         />
       </Form>
       {/* )}

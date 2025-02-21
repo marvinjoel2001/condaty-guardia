@@ -22,6 +22,7 @@ const Home = () => {
           w={48}
           src={getUrlImages('/GUA-' + user?.id + '.png?d=' + user?.updated_at)}
           onClick={() => navigate.navigate('Profile')}
+          name={getFullName(user)}
         />
         <Text style={styles.title}>{getFullName(user)}</Text>
         <Text style={styles.client}>

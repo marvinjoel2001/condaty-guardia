@@ -114,8 +114,10 @@ const theme: ThemeType = {
   container: {
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    borderBottomWidth: 1,
-    borderBottomColor: cssVar.cWhiteV1,
+    // borderBottomWidth: 1,
+    // borderBottomColor: cssVar.cWhiteV1,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
     padding: cssVar.spS,
     shadowColor: 'black',
     alignItems: 'center',

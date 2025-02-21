@@ -3,7 +3,7 @@ import {TextInput, View, Platform} from 'react-native';
 import {Text} from 'react-native';
 import Icon from './Icon/Icon';
 import {IconSearch, IconX} from '../../../src/icons/IconLibrary';
-import {cssVar, ThemeType, TypeStyles} from '../../styles/themes';
+import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
 import Input from '../forms/Input/Input';
 import ControlLabel from '../forms/ControlLabel/ControlLabel';
 import React from 'react';
@@ -54,13 +54,13 @@ const DataSearch = ({
           marginTop: 1,
         }}>
         {!searchBy && !value && (
-          <Icon name={IconSearch} size={20} color={cssVar.cBlackV2} />
+          <Icon name={IconSearch} size={20} color={cssVar.cWhiteV2} />
         )}
         {((searchBy && searchBy) || value !== '') && (
           <Icon
             name={IconX}
             size={20}
-            color={cssVar.cBlackV2}
+            color={cssVar.cWhiteV2}
             onPress={() => onSearch('')}
           />
         )}
@@ -88,7 +88,7 @@ const DataSearch = ({
         onChangeText={(e: string) => setSearchBy(e)}
         value={searchBy}
         placeholder="Buscar..."
-        placeholderTextColor={cssVar.cBlackV2}
+        placeholderTextColor={cssVar.cWhiteV2}
         onSubmitEditing={() => onSearch()}
       />
       <View style={theme.iconRight}>{iconRight()}</View>
@@ -105,13 +105,15 @@ const theme: ThemeType = {
     position: 'relative',
   },
   dataSearch: {
-    color: cssVar.cWhite,
-    backgroundColor: 'transparent',
-    borderRadius: cssVar.bRadiusS,
-    borderWidth: 1,
+    borderWidth: cssVar.bWidth,
     borderColor: cssVar.cBlackV2,
-    marginBottom: cssVar.spS,
-    fontSize: cssVar.sS,
+    borderRadius: cssVar.bRadiusS,
+    fontSize: cssVar.sM,
+    fontFamily: FONTS.regular,
+    backgroundColor: cssVar.cBlackV2,
+    color: cssVar.cWhite,
+    paddingVertical: 16,
+    paddingHorizontal: cssVar.spM,
   },
   iconLeft: {
     position: 'absolute',
@@ -122,7 +124,7 @@ const theme: ThemeType = {
   iconRight: {
     position: 'absolute',
     right: 6,
-    top: 9,
+    top: 14,
   },
   text: {
     fontSize: cssVar.sXs,

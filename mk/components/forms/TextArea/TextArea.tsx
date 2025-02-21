@@ -11,13 +11,13 @@ interface PropsType extends PropsTypeInputBase {
 }
 
 export const TextArea = (props: PropsType) => {
-  const {value = '', maxLength, multiline = true} = props;
-  const [isFocused, setIsFocused] = useState(true);
+  const {value, maxLength, multiline = true} = props;
+  const [isFocused, setIsFocused] = useState(false);
   const [textLength, setTextLength] = useState(value?.length || 0);
 
   const styleInput = {
     ...theme.default,
-    ...(isFocused && textLength !== maxLength ? theme.focusInput : {}),
+    ...(isFocused ? theme.focusInput : {}),
     ...(props.error && props.error[props.name] && !props.value
       ? theme.errorInput
       : {}),
@@ -40,7 +40,7 @@ export const TextArea = (props: PropsType) => {
   useEffect(() => {
     setTextLength(value?.length || 0);
   }, [value]);
-
+  console.log(isFocused);
   return (
     <ControlLabel
       {...props}
@@ -57,7 +57,7 @@ export const TextArea = (props: PropsType) => {
           returnKeyType="none"
           onChangeText={handleTextChange}
           value={value}
-          placeholder={isFocused ? undefined : props.placeholder || ''}
+          placeholder={props.placeholder || ''}
           placeholderTextColor={theme.form?.color}
           editable={!props.disabled && !props.readOnly}
           numberOfLines={props.lines || 8}
@@ -78,7 +78,7 @@ export const TextArea = (props: PropsType) => {
 
 const theme: ThemeType = {
   form: {
-    color: cssVar.cWhite,
+    color: cssVar.cWhiteV2,
   },
   default: {
     borderWidth: cssVar.bWidth,
@@ -87,15 +87,16 @@ const theme: ThemeType = {
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
     textAlignVertical: 'top',
-    backgroundColor: 'transparent',
+    backgroundColor: cssVar.cBlackV2,
     color: cssVar.cWhite,
-    paddingVertical: cssVar.spL,
+    // paddingVertical: cssVar.spL,
+    paddingTop: cssVar.spXl,
     paddingHorizontal: cssVar.spM,
     height: 120, // Limitar el tamaño del TextInput
   },
   errorInput: {borderColor: cssVar.cError},
   disabledInput: {opacity: 0.6, color: cssVar.cWhiteV3},
-  focusInput: {borderColor: cssVar.cWhite},
+  focusInput: {borderColor: cssVar.cAccent},
   counter: {
     fontSize: cssVar.spM,
     color: cssVar.cWhite,

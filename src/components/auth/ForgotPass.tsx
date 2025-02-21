@@ -152,29 +152,29 @@ const ForgotPass = ({open, onClose, mod}: any) => {
     }
   };
 
-  const OnCheckCI = async (ci: string) => {
-    const {data} = await execute(
-      'aff-exist',
-      'GET',
-      {
-        searchBy: ci,
-        _exist: 1,
-      },
-      false,
-      3,
-    );
-    if (data?.data == null) {
-      if (checkCI(ci)) {
-        setErrors({...errors, ci: checkCI(ci)});
-      } else {
-        setErrors({...errors, ci: ''});
-        showToast('Cédula no registrada', 'error');
-        setFormState({...formState, ci: ''});
-      }
-    } else {
-      setErrors({...errors, ci: ''});
-    }
-  };
+  // const OnCheckCI = async (ci: string) => {
+  //   const {data} = await execute(
+  //     'aff-exist',
+  //     'GET',
+  //     {
+  //       searchBy: ci,
+  //       _exist: 1,
+  //     },
+  //     false,
+  //     3,
+  //   );
+  //   if (data?.data == null) {
+  //     if (checkCI(ci)) {
+  //       setErrors({...errors, ci: checkCI(ci)});
+  //     } else {
+  //       setErrors({...errors, ci: ''});
+  //       showToast('Cédula no registrada', 'error');
+  //       setFormState({...formState, ci: ''});
+  //     }
+  //   } else {
+  //     setErrors({...errors, ci: ''});
+  //   }
+  // };
 
   const validatePasswords = (formState: any) => {
     let errors = {};
@@ -182,7 +182,7 @@ const ForgotPass = ({open, onClose, mod}: any) => {
     if (passwordError) errors = {...errors, newPassword: passwordError};
 
     if (formState.newPassword !== formState.repPassword)
-      errors = {...errors, repPassword: 'Los PIN no coinciden'};
+      errors = {...errors, repPassword: 'La contraseña no coincide'};
 
     setErrors(errors);
   };
@@ -240,8 +240,8 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       {formState.pinned != 1 ? (
         <>
           <SubTitle style={{fontSize: cssVar.sM}}>
-            Ingresa tu cédula de identidad y se enviará un código de
-            verificación a tu WhatsApp.
+            Se enviará un código PIN de verificación a su correo electrónico.
+            Ingresa tu carnet de identidad para continuar
           </SubTitle>
           {(minutos > 0 || segundos > 0) && (
             <Text
@@ -263,7 +263,7 @@ const ForgotPass = ({open, onClose, mod}: any) => {
             keyboardType="numeric"
             value={formState['ci']}
             // onBlur={() => OnCheckCI(formState['ci'])}
-            onBlur={() => validationCi(formState['ci'])}
+            // onBlur={() => validationCi(formState['ci'])}
             error={errors}
             onChange={(value: any) => handleInputChange('ci', value)}
           />
@@ -272,10 +272,10 @@ const ForgotPass = ({open, onClose, mod}: any) => {
         <>
           {buttonState ? (
             <>
-              <SubTitle style={{fontSize: cssVar.sM, marginBottom: cssVar.spL}}>
+              {/* <SubTitle style={{fontSize: cssVar.sM, marginBottom: cssVar.spL}}>
                 Enviamos un código de verificación a tu WhatsApp para que puedas
                 crear un nuevo PIN.
-              </SubTitle>
+              </SubTitle> */}
               <InputCode
                 label="Código de acceso"
                 name="code"

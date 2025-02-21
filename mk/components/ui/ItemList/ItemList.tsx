@@ -41,9 +41,9 @@ export const ItemList = (props: PropsType) => {
     <TouchableOpacity onPress={props.onPress ? props.onPress : onPressTitle}>
       <Card
         style={{
-          paddingHorizontal: 0,
-          borderRadius: 0,
-          marginBottom: 0,
+          // paddingHorizontal: 0,
+          // borderRadius: 0,
+          // marginBottom: 0,
           ...style,
         }}>
         <View style={theme.container}>
@@ -118,13 +118,13 @@ const theme: ThemeType = {
     fontFamily: FONTS.semiBold,
   },
   subtitle: {
-    color: cssVar.cBlackV2,
+    color: cssVar.cWhiteV2,
     fontSize: cssVar.sS,
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.medium,
     textAlign: 'left',
   },
   subtitle2: {
-    color: cssVar.cBlackV2,
+    color: cssVar.cWhiteV2,
     fontSize: cssVar.sS,
     fontFamily: FONTS.regular,
     textAlign: 'left',
@@ -138,7 +138,7 @@ const theme: ThemeType = {
   date: {
     alignItems: 'flex-end',
     textAlign: 'right',
-    color: cssVar.cWhiteV3,
+    color: cssVar.cWhiteV2,
     paddingTop: cssVar.spXs,
     fontFamily: FONTS.regular,
     fontSize: cssVar.sM,

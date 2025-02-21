@@ -33,7 +33,7 @@ const IconFloat = ({
         <Icon
           style={{alignSelf: 'center', margin: 2}}
           name={icon}
-          color={cssVar.cWhite}
+          color={cssVar.cBlack}
           viewBox={viewBox}
           size={size}
         />
@@ -62,7 +62,7 @@ const theme: ThemeType = {
     bottom: 80,
     right: 24,
     backgroundColor: cssVar.cAccent,
-    padding: cssVar.spXs,
+    padding: cssVar.spM,
     borderRadius: cssVar.bRadiusS,
     alignSelf: 'center',
     zIndex: 100,

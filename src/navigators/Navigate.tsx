@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from '../components/auth/Login';
 import Home from '../components/Home/Home';
 import Profile from '../components/Profile/Profile';
+import Alerts from '../components/Alerts/Alerts';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,13 +26,13 @@ const Navigate = () => {
           headerShown: false,
         }}
       />
-      {/* <Stack.Screen
-        name="activity"
-        component={Activity}
+      <Stack.Screen
+        name="Alerts"
+        component={Alerts}
         options={{
           headerShown: false,
         }}
-      /> */}
+      />
       <Stack.Screen
         name="Login"
         component={Login}

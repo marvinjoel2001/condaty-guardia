@@ -24,15 +24,21 @@ const Footer = ({styles}: any) => {
   // const {pusher, socketNew, socketEvent} = usePusher();
   const Render = ({children}: any) => {
     return (
-      <ImageBackground
-        source={require('../../images/ImageFooter.png')}
-        resizeMode="contain"
+      // <ImageBackground
+      //   source={require('../../images/ImageFooter.png')}
+      //   resizeMode="contain"
+      //   style={{
+      //     ...theme.container,
+      //     ...styles,
+      //   }}>
+      <View
         style={{
           ...theme.container,
           ...styles,
         }}>
         {children}
-      </ImageBackground>
+      </View>
+      // </ImageBackground>
     );
   };
 
@@ -72,7 +78,10 @@ const theme: ThemeType = {
   container: {
     flexDirection: 'row',
     paddingVertical: cssVar.spM,
+    backgroundColor: cssVar.cBlack,
     position: 'absolute',
+    // borderTopLeftRadius: 12,
+    // borderTopRightRadius: 12,
     width: '100%',
     bottom: 0,
   },

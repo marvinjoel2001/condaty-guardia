@@ -85,11 +85,11 @@ const theme: ThemeType = {
   },
   default: {
     borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cWhiteV2,
+    borderColor: cssVar.cBlackV2,
     borderRadius: cssVar.bRadiusS,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
-    backgroundColor: cssVar.cWhiteV2,
+    backgroundColor: cssVar.cBlackV2,
     color: cssVar.cWhite,
     paddingBottom: cssVar.spM,
     paddingHorizontal: cssVar.spM,

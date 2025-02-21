@@ -1,13 +1,14 @@
 const configApp = {
   API_URL: 'https://api.condaty.com/api',
   API_URL_PROD: 'https://api.condaty.com/api',
-  // API_URL_DEV: 'https://apiuydev.elekta.app/api',
+  API_URL_DEV: 'https://phplaravel-1214481-5270819.cloudwaysapps.com/api',
   // API_URL_TEST: 'https://apiuytest.elekta.app/api',
   APP_NAME: 'Condaty Guards',
   APP_DESCRIPTION: 'Guardias Control de Accesos',
   APP_LOGO: '/assets/images/logo/logo.svg',
   APP_LOGIN_USER: 'CI',
   APP_LOGIN_PASS: 'Password',
+  // APP_AUTH_LOGIN: '/grd-login',
   APP_AUTH_LOGIN: '/guard-login',
   APP_AUTH_REGISTER: '/guard-register',
   APP_AUTH_LOGOUT: '/guard-logout',
@@ -28,7 +29,8 @@ const configApp = {
 
 configApp.API_URL = configApp.API_URL_PROD;
 if (process.env.NODE_ENV == 'development') {
-  configApp.API_URL = configApp.API_URL_PROD; // Esto es para desarrollo
+  // configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo
+  configApp.API_URL = configApp.API_URL_PROD;
   configApp.APP_DEBUG = 0;
 }
 // configApp.APP_XORKEY = configApp.API_URL;
