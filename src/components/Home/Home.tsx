@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   client: {
-    color: cssVar.cWhiteV1,
+    color: cssVar.cWhiteV2,
     textAlign: 'center',
   },
 });

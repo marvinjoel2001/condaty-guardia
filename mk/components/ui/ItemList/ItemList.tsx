@@ -39,8 +39,9 @@ export const ItemList = (props: PropsType) => {
 
   return (
     <TouchableOpacity onPress={props.onPress ? props.onPress : onPressTitle}>
-      <Card
+      <View
         style={{
+          ...theme.itemList,
           // paddingHorizontal: 0,
           // borderRadius: 0,
           // marginBottom: 0,
@@ -92,12 +93,18 @@ export const ItemList = (props: PropsType) => {
             )}
           </View>
         )}
-      </Card>
+      </View>
     </TouchableOpacity>
   );
 };
 
 const theme: ThemeType = {
+  itemList: {
+    backgroundColor: cssVar.cBlackV2,
+    padding: 12,
+    borderRadius: 12,
+    marginVertical: 4,
+  },
   container: {
     overflow: 'hidden',
     flexDirection: 'row',

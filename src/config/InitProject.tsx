@@ -2,7 +2,8 @@ import {OneSignal} from 'react-native-onesignal';
 import {usePusher} from '../../mk/contexts/PusherContext';
 import {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {AlertDetail} from '../components/Alerts/AlertDetail';
+import AlertDetail from '../components/Alerts/AlertDetail';
+
 // import AlertDetails from "./AlertDetails";
 
 const InitProject = () => {

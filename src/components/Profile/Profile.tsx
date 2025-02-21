@@ -23,6 +23,7 @@ import AccessEdit from './AccessEdit';
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 import AvatarPreview from './AvatarPreview';
 import Br from './Br';
+import configApp from '../../config/config';
 
 const Profile = () => {
   const navigation: any = useNavigation();
@@ -114,9 +115,11 @@ const Profile = () => {
     };
 
     const {data, error: err} = await execute(
-      '/guards/' + user?.id,
+      configApp.APP_USER + user?.id,
       'PUT',
       newUser,
+      false,
+      3,
     );
     if (data?.success == true) {
       getUser();
@@ -185,7 +188,7 @@ const Profile = () => {
       {!isEdit && (
         <Button
           style={{
-            paddingVertical: 8,
+            marginVertical: 8,
           }}
           onPress={handleEdit}>
           Editar perfil
@@ -280,7 +283,7 @@ const Profile = () => {
                 <Icon name={IconArrowRight} color={cssVar.cWhiteV1} />
               </View>
               <View
-                style={styles.contentAccess}
+                style={{...styles.contentAccess, borderBottomWidth: 0}}
                 onTouchEnd={() => {
                   onOpenModal('P');
                 }}>
@@ -335,12 +338,12 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     padding: 12,
-    backgroundColor: cssVar.cBlackV1,
+    backgroundColor: cssVar.cBlackV2,
   },
   cardAccess: {
     borderRadius: 16,
     marginVertical: 8,
-    backgroundColor: cssVar.cBlackV1,
+    backgroundColor: cssVar.cBlackV2,
     marginBottom: 80,
   },
   contentAccess: {

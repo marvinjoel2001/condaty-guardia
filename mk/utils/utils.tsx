@@ -67,7 +67,7 @@ export const getActivePage = (navigation: any) => {
     }
   }
 
-  if (['Tabs', 'Pagina1'].includes(activeItem)) {
+  if (['Tabs', 'navigate'].includes(activeItem)) {
     activeItem = 'Home';
   }
 

@@ -64,7 +64,7 @@ const Input = (props: PropsType) => {
         value={props.value}
         returnKeyType={props.search}
         placeholder={isFocused ? '' : props.placeholder || ''}
-        placeholderTextColor={cssVar.cWhiteV1}
+        placeholderTextColor={cssVar.cWhiteV2}
         editable={!props.disabled && !props.readOnly}
         secureTextEntry={props.password || false}
         autoFocus={props.autoFocus || false}

@@ -1,12 +1,19 @@
 import {Alert, ScrollView, Text, View} from 'react-native';
 import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
-import {IconLogout, IconUser} from '../../icons/IconLibrary';
+import {
+  IconAlert,
+  IconHome,
+  IconLogout,
+  IconNovedades,
+  IconUser,
+} from '../../icons/IconLibrary';
 import useAuth from '../../../mk/hooks/useAuth';
 import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import ItemMenu from './ItemMenu';
 import {getActivePage} from '../../../mk/utils/utils';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
+import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 
 const MainMenu = ({navigation}: DrawerContentComponentProps) => {
   const {logout, user} = useAuth();
@@ -24,48 +31,56 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
 
   return (
     <View style={theme.container}>
-      <Text style={theme.title}>ELEKTA</Text>
-      <Avatar
-        name={getFullName(user)}
-        src={getUrlImages('/AFF-' + user?.id + '.webp?d=' + user?.updated_at)}
-        style={theme.avatar}
-        w={64}
-        h={64}
+      <ItemList
+        title={getFullName(user)}
+        subtitle={'Guardia'}
+        left={
+          <Avatar
+            name={getFullName(user)}
+            src={getUrlImages(
+              '/AFF-' + user?.id + '.webp?d=' + user?.updated_at,
+            )}
+            style={theme.avatar}
+            // w={64}
+            // h={64}
+          />
+        }
       />
-      <Text style={theme.name}>{getFullName(user)}</Text>
-      <Text style={theme.subtitle}>Afiliado</Text>
+
       <View style={theme.content}>
         <ScrollView>
           <ItemMenu
-            screen="home"
+            screen="Home"
             text="Inicio"
-            icon={IconUser}
+            icon={IconHome}
             activeItem={activeItem}
-            color={cssVar.cBlackV2}
+            color={cssVar.cWhiteV2}
+            reverse
           />
 
           <ItemMenu
-            screen="communication"
-            text="Comunicación"
-            icon={IconUser}
-            activeItem={activeItem}
-            color={cssVar.cBlackV2}
-          />
-
-          <ItemMenu
-            screen="red"
-            text="Mi red"
-            icon={IconUser}
-            activeItem={activeItem}
-            color={cssVar.cBlackV2}
-          />
-
-          <ItemMenu
-            screen="profile"
+            screen="Profile"
             text="Mi perfil"
             icon={IconUser}
             activeItem={activeItem}
-            color={cssVar.cBlackV2}
+            color={cssVar.cWhiteV2}
+          />
+          <ItemMenu
+            screen="Alerts"
+            text="Alertas"
+            icon={IconAlert}
+            activeItem={activeItem}
+            color={cssVar.cWhiteV2}
+            reverse
+          />
+
+          <ItemMenu
+            screen="Binnacle"
+            text="Bitácora"
+            icon={IconNovedades}
+            reverse
+            activeItem={activeItem}
+            color={cssVar.cWhiteV2}
           />
         </ScrollView>
       </View>

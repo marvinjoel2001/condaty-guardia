@@ -9,7 +9,6 @@ interface PropsType {
   onPress?: any;
   icon?: string;
   color?: string;
-  // iconFillStroke?: string | undefined;
   colorText?: string;
   activeItem?: string;
   reverse?: boolean;
@@ -20,7 +19,6 @@ const ItemMenu = ({
   onPress = null,
   icon = '',
   activeItem = '',
-  // iconFillStroke = undefined,
   reverse = false,
   colorText,
   color,
@@ -71,7 +69,7 @@ const ItemMenu = ({
               ? colorText
               : isActive
               ? cssVar.cWhite
-              : cssVar.cBlackV2,
+              : cssVar.cWhiteV2,
           }}>
           {text}
         </Text>

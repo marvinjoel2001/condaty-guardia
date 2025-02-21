@@ -36,16 +36,10 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       setErrors(error);
       return;
     }
-    const {data: alerts, error: err} = await execute(
-      '/alerts',
-      'POST',
-      {
-        level: formState.level,
-        descrip: formState.descrip,
-      },
-      false,
-      3,
-    );
+    const {data: alerts, error: err} = await execute('/alert', 'POST', {
+      level: formState.level,
+      descrip: formState.descrip,
+    });
     if (alerts?.success == true) {
       onClose();
       reload();
@@ -56,7 +50,6 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       showToast(err, 'error');
     }
   };
-  console.log(formState);
   return (
     <ModalFull
       open={open}

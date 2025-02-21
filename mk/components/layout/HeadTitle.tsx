@@ -11,7 +11,7 @@ import Avatar from '../ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../utils/strings';
 import useAuth from '../../hooks/useAuth';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
-import {getPercentajeUser} from '../../utils/utils';
+import {getPercentajeUser, navigate} from '../../utils/utils';
 import TextLog from '../ui/TextLog/TextLog';
 
 interface HeadTitleProps {
@@ -100,7 +100,7 @@ const HeadTitle = ({
             backgroundColor: cssVar.cWhite,
             borderRadius: '100%',
           }}
-          onTouchEnd={() => {}}>
+          onTouchEnd={() => navigation.navigate('Notifications')}>
           <Icon name={IconNotification} color={cssVar.cBlack} />
         </View>
       )}

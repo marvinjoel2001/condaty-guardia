@@ -12,6 +12,7 @@ import {getDateTimeStrMes} from '../../../mk/utils/dates';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
+import AlertDetail from './AlertDetail';
 
 const Alerts = () => {
   const [search, setSearch] = useState('');
@@ -21,10 +22,7 @@ const Alerts = () => {
   const [params, setParams]: any = useState({
     perPage: -1,
     page: 1,
-    sortBy: 'created_at',
-    orderBy: 'desc',
-    relations: 'guardia:id,ci,name,middle_name,last_name,mother_last_name',
-    searchBy: '',
+    fullType: 'L',
   });
 
   const {
@@ -32,8 +30,7 @@ const Alerts = () => {
     reload,
     execute,
     loaded,
-    waiting,
-  } = useApi('/alerts', 'GET', params);
+  } = useApi('/alert', 'GET', params, 2);
 
   const onSearch = (search: string) => {
     setSearch(search);
@@ -90,37 +87,37 @@ const Alerts = () => {
       return null;
 
     return (
-      <TouchableOpacity
+      <ItemList
         onPress={() => {
           setOpenView({open: true, id: alerta.id});
-        }}>
-        <ItemList
-          style={{backgroundColor: cssVar.cBlackV2}}
-          title={getFullName(alerta.guardia)}
-          subtitle="Guardia"
-          date={getDateTimeStrMes(alerta.created_at)}
-          left={
-            <Avatar
-              src={getUrlImages(
-                '/GUA-' + alerta.guardia?.id + '.png?d=' + alerta?.updated_at,
-              )}
-              name={getFullName(alerta.guardia)}
-            />
-          }
-          right={renderRight(alerta)}>
-          <View style={{paddingTop: 8}}>
-            <Text style={{color: cssVar.cWhite}}>Asunto</Text>
-            <Text
-              style={{
-                color: cssVar.cWhiteV2,
-                fontSize: 10,
-                fontWeight: '400',
-              }}>
-              {alerta.descrip}
-            </Text>
-          </View>
-        </ItemList>
-      </TouchableOpacity>
+        }}
+        title={getFullName(alerta.guard_assigned)}
+        subtitle="Guardia"
+        date={getDateTimeStrMes(alerta.created_at)}
+        left={
+          <Avatar
+            src={getUrlImages(
+              '/GUA-' +
+                alerta?.guard_id +
+                '.png?d=' +
+                alerta?.guard_assigned?.updated_at,
+            )}
+            name={getFullName(alerta.guard_assigned)}
+          />
+        }
+        right={renderRight(alerta)}>
+        <View style={{paddingTop: 8}}>
+          <Text style={{color: cssVar.cWhite}}>Asunto</Text>
+          <Text
+            style={{
+              color: cssVar.cWhiteV2,
+              fontSize: 10,
+              fontWeight: '400',
+            }}>
+            {alerta.descrip}
+          </Text>
+        </View>
+      </ItemList>
     );
   };
 
@@ -160,11 +157,20 @@ const Alerts = () => {
             />
           )}
         </View>
-        <AlertAdd
-          open={openAdd}
-          onClose={() => setOpenAdd(false)}
-          reload={reload}
-        />
+        {openAdd && (
+          <AlertAdd
+            open={openAdd}
+            onClose={() => setOpenAdd(false)}
+            reload={reload}
+          />
+        )}
+        {openView.open && (
+          <AlertDetail
+            open={openView.open}
+            onClose={() => setOpenView({open: false, id: null})}
+            id={openView.id}
+          />
+        )}
       </Layout>
       <IconFloat onPress={() => setOpenAdd(true)} />
     </>

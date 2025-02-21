@@ -74,7 +74,7 @@ const AvatarPreview = ({
               onTouchEnd={closeImage}
               style={[styles.animatedContainer]}>
               <Avatar
-                src={getUrlImages(`/${prefijo}-${id}.png?d=${updated_at}`)}
+                src={getUrlImages(`/${prefijo}-${id}..webp?d=${updated_at}`)}
                 w={w || 240}
                 h={h || 240}
                 name={name}

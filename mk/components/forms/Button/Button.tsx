@@ -109,8 +109,8 @@ const theme: ThemeType = {
   },
   secondary: {
     borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cBlackV2,
-    color: cssVar.cBlackV2,
+    borderColor: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV2,
   },
   terciary: {
     padding: 0,
