@@ -16,7 +16,7 @@ const MyDrawer = () => {
           // headerLeft: () => <Hamburguer onPress={navigation.toggleDrawer} />,
           drawerStyle: {backgroundColor: cssVar.cBlack},
           // headerTransparent: true,
-          swipeEnabled: false,
+          swipeEnabled: true,
           // headerStyle: theme.layout?.header,
           // headerBackgroundContainerStyle: theme.layout?.header,
           headerShown: false,

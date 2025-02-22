@@ -67,44 +67,45 @@ const Documents = () => {
     )
       return null;
     return (
-      <TouchableOpacity onPress={() => openDocument(document)}>
-        <ItemList
-          title={document?.name}
-          subtitle="Administración"
-          //date={document.created_at}
-          left={
-            <View
+      // <TouchableOpacity onPress={() => openDocument(document)}>
+      <ItemList
+        title={document?.name}
+        onPress={() => openDocument(document)}
+        subtitle="Administración"
+        //date={document.created_at}
+        left={
+          <View
+            style={{
+              backgroundColor: cssVar.cBlackV1,
+              padding: 8,
+              borderRadius: 100,
+            }}>
+            <Icon
               style={{
-                backgroundColor: cssVar.cBlackV1,
-                padding: 8,
-                borderRadius: 100,
-              }}>
-              <Icon
-                style={{
-                  justifyContent: 'center',
-                  marginLeft: 7,
-                  marginTop: 6,
-                }}
-                size={26}
-                name={
-                  document.ext == 'doc'
-                    ? IconDOC
-                    : document.ext == 'exe'
-                    ? IconEXE
-                    : document.ext == 'png'
-                    ? IconPNG
-                    : document.ext == 'zip'
-                    ? IconZIP
-                    : document.ext == 'jpg'
-                    ? IconJPG
-                    : IconPDF
-                }
-                color={cssVar.cWhite}
-              />
-            </View>
-          }
-        />
-      </TouchableOpacity>
+                justifyContent: 'center',
+                marginLeft: 7,
+                marginTop: 6,
+              }}
+              size={26}
+              name={
+                document.ext == 'doc'
+                  ? IconDOC
+                  : document.ext == 'exe'
+                  ? IconEXE
+                  : document.ext == 'png'
+                  ? IconPNG
+                  : document.ext == 'zip'
+                  ? IconZIP
+                  : document.ext == 'jpg'
+                  ? IconJPG
+                  : IconPDF
+              }
+              color={cssVar.cWhite}
+            />
+          </View>
+        }
+      />
+      // </TouchableOpacity>
     );
   };
   return (
