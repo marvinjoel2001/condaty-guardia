@@ -110,7 +110,7 @@ const Profile = () => {
       last_name: formState.last_name,
       mother_last_name: formState.mother_last_name,
       phone: formState.phone,
-      avatar: encodeURIComponent(formState.avatar),
+      avatar: {ext: 'webp', file: encodeURIComponent(formState.avatar)},
       address: formState.address,
     };
 

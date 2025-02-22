@@ -40,7 +40,7 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
           <Avatar
             name={getFullName(user)}
             src={getUrlImages(
-              '/AFF-' + user?.id + '.webp?d=' + user?.updated_at,
+              '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
             )}
             style={theme.avatar}
             // w={64}
