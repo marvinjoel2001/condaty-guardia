@@ -40,7 +40,7 @@ export const TextArea = (props: PropsType) => {
   useEffect(() => {
     setTextLength(value?.length || 0);
   }, [value]);
-  console.log(isFocused);
+
   return (
     <ControlLabel
       {...props}

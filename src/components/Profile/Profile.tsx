@@ -115,7 +115,7 @@ const Profile = () => {
     };
 
     const {data, error: err} = await execute(
-      configApp.APP_USER + user?.id,
+      configApp.APP_USER + '/' + user?.id,
       'PUT',
       newUser,
       false,
@@ -154,7 +154,9 @@ const Profile = () => {
           src={
             formState.avatar && isEdit
               ? 'data:image/jpg;base64,' + formState.avatar
-              : getUrlImages('/GUA-' + user?.id + '.png?d=' + user?.updated_at)
+              : getUrlImages(
+                  '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
+                )
           }
           w={112}
           h={112}
@@ -307,7 +309,7 @@ const Profile = () => {
         onClose={() => setImagePreview(false)}
         id={user.id}
         name={getFullName(user)}
-        prefijo="GUA"
+        prefijo="GUARD"
         updated_at={user?.updated_at}
       />
       <AccessEdit

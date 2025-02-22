@@ -46,7 +46,10 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
           style={{
             justifyContent: 'center',
           }}>
-          <RowData title="Fecha" value={getDateTimeStrMes(item.created_at)} />
+          <RowData
+            title="Fecha"
+            value={getDateTimeStrMes(item.created_at, true)}
+          />
           <RowData title="Descripción" value={item.descrip} />
         </View>
         {/* </Card> */}
@@ -62,7 +65,7 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
             <Image
               source={{
                 uri: getUrlImages(
-                  `/GNEW-${item?.id}.png?d=${item?.updated_at}`,
+                  `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
                 ),
               }}
               style={{height: '100%', width: '100%', borderRadius: 8}}

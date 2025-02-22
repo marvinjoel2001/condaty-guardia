@@ -6,6 +6,7 @@ import Profile from '../components/Profile/Profile';
 import Alerts from '../components/Alerts/Alerts';
 import Binnacle from '../components/Binnacle/Binnacle';
 import Notifications from '../components/Notifications/Notifications';
+import Documents from '../components/Documents/Documents';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,13 +58,13 @@ const Navigate = () => {
           headerShown: false,
         }}
       />
-      {/* <Stack.Screen
-        name="LoadSurveys"
-        component={SurveyList}
+      <Stack.Screen
+        name="Documents"
+        component={Documents}
         options={{
           headerShown: false,
         }}
-      /> */}
+      />
       {/* <Stack.Screen
         name="red"
         component={Red}

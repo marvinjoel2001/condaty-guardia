@@ -20,7 +20,9 @@ const Home = () => {
         <Avatar
           h={48}
           w={48}
-          src={getUrlImages('/GUA-' + user?.id + '.png?d=' + user?.updated_at)}
+          src={getUrlImages(
+            '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
+          )}
           onClick={() => navigate.navigate('Profile')}
           name={getFullName(user)}
         />
@@ -33,17 +35,7 @@ const Home = () => {
       </View>
     );
   };
-  return (
-    <Layout title="Home" customTitle={customTitle()}>
-      <Button onPress={() => logout()}>Logout</Button>
-      <Input
-        name="value"
-        value={formstate.value}
-        label="Carnet de identidad"
-        onChange={value => setFormState({value: value})}
-      />
-    </Layout>
-  );
+  return <Layout title="Home" customTitle={customTitle()}></Layout>;
 };
 
 export default Home;

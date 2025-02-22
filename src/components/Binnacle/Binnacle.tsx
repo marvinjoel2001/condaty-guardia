@@ -20,7 +20,7 @@ const Binnacle = () => {
     '/guardnews',
     'GET',
     {
-      fulType: 'L',
+      fullType: 'L',
     },
     3,
   );
@@ -34,7 +34,7 @@ const Binnacle = () => {
     return (
       <ItemList
         onPress={() => setOpenView({open: true, item: novedad})}
-        title={getFullName(novedad.guardia)}
+        title={getFullName(novedad?.guardia)}
         subtitle={'Bitácoras'}
         // right={
         //   <Icon
@@ -49,9 +49,12 @@ const Binnacle = () => {
         left={
           <Avatar
             src={getUrlImages(
-              '/GUA-' + novedad.guardia.id + '.png?d=' + novedad?.updated_at,
+              '/GUARD-' +
+                novedad?.guard_id +
+                '.webp?d=' +
+                novedad?.guardia?.updated_at,
             )}
-            name={getFullName(novedad.guardia)}
+            name={getFullName(novedad?.guardia)}
           />
         }>
         <View style={{paddingTop: 8}}>

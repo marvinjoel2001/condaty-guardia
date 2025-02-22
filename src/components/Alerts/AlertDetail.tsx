@@ -19,7 +19,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
   const {execute, loaded} = useApi();
 
   const getAlert = async () => {
-    const {data} = await execute('/alert', 'GET', {
+    const {data} = await execute('/alerts', 'GET', {
       fullType: 'DET',
       searchBy: id,
     });
@@ -71,7 +71,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 textAlign: 'center',
                 marginTop: 10,
               }}>
-              Reportó: {getFullName(details?.data?.guard_assigned)}
+              Reportó: {getFullName(details?.data?.guardia)}
             </Text>
             <Text
               style={{
@@ -79,7 +79,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 fontSize: 10,
                 textAlign: 'center',
               }}>
-              {getDateTimeStrMes(details?.data?.created_at)}
+              {getDateTimeStrMes(details?.data?.created_at, true)}
             </Text>
           </>
         )}

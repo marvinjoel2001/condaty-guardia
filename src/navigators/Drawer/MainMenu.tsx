@@ -2,6 +2,7 @@ import {Alert, ScrollView, Text, View} from 'react-native';
 import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
 import {
   IconAlert,
+  IconDocs,
   IconHome,
   IconLogout,
   IconNovedades,
@@ -33,6 +34,7 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
     <View style={theme.container}>
       <ItemList
         title={getFullName(user)}
+        style={{backgroundColor: 'transparent'}}
         subtitle={'Guardia'}
         left={
           <Avatar
@@ -79,6 +81,13 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             text="Bitácora"
             icon={IconNovedades}
             reverse
+            activeItem={activeItem}
+            color={cssVar.cWhiteV2}
+          />
+          <ItemMenu
+            screen="Documents"
+            text="Documentos"
+            icon={IconDocs}
             activeItem={activeItem}
             color={cssVar.cWhiteV2}
           />

@@ -30,7 +30,7 @@ const Alerts = () => {
     reload,
     execute,
     loaded,
-  } = useApi('/alert', 'GET', params, 2);
+  } = useApi('/alerts', 'GET', params, 2);
 
   const onSearch = (search: string) => {
     setSearch(search);
@@ -91,18 +91,18 @@ const Alerts = () => {
         onPress={() => {
           setOpenView({open: true, id: alerta.id});
         }}
-        title={getFullName(alerta.guard_assigned)}
+        title={getFullName(alerta.guardia)}
         subtitle="Guardia"
         date={getDateTimeStrMes(alerta.created_at)}
         left={
           <Avatar
             src={getUrlImages(
-              '/GUA-' +
+              '/GUARD-' +
                 alerta?.guard_id +
-                '.png?d=' +
-                alerta?.guard_assigned?.updated_at,
+                '.webp?d=' +
+                alerta?.guardia?.updated_at,
             )}
-            name={getFullName(alerta.guard_assigned)}
+            name={getFullName(alerta.guardia)}
           />
         }
         right={renderRight(alerta)}>

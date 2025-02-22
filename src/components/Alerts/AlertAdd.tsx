@@ -36,7 +36,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       setErrors(error);
       return;
     }
-    const {data: alerts, error: err} = await execute('/alert', 'POST', {
+    const {data: alerts, error: err} = await execute('/alerts', 'POST', {
       level: formState.level,
       descrip: formState.descrip,
     });
