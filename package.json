@@ -7,7 +7,12 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "debugapk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "releaseapk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
+    "apkandroid": "cd android && gradlew assembleRelease && cd ..",
+    "apkdebug": "cd android && ./gradlew assembleDebug && cd ..",
+    "abbstore": "cd android && npx react-native build-android --mode=release && cd .."
   },
   "dependencies": {
     "@bam.tech/react-native-image-resizer": "^3.0.11",
