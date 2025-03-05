@@ -1,18 +1,22 @@
 import {StyleSheet, Text, View} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
-import Input from '../../../mk/components/forms/Input/Input';
 import React, {useState} from 'react';
 import useAuth from '../../../mk/hooks/useAuth';
-import Button from '../../../mk/components/forms/Button/Button';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
-import {cssVar} from '../../../mk/styles/themes';
+import {cssVar, FONTS} from '../../../mk/styles/themes';
 import {useNavigation} from '@react-navigation/native';
+import Icon from '../../../mk/components/ui/Icon/Icon';
+import {IconGenericQr, IconNoQr} from '../../icons/IconLibrary';
+import DropdawnAccess from './DropdawnAccess/DropdawnAccess';
+import CameraQr from './CameraQr/CameraQr';
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
   const navigate: any = useNavigation();
   const {logout, user} = useAuth();
+  const [openCamera, setOpenCamera] = useState(false);
+  const [openCiNom, setOpenCiNom] = useState(false);
 
   const customTitle = () => {
     return (
@@ -35,7 +39,19 @@ const Home = () => {
       </View>
     );
   };
-  return <Layout title="Home" customTitle={customTitle()}></Layout>;
+  return (
+    <>
+      <Layout title="Home" style={{flex: 1}} customTitle={customTitle()}>
+        {openCamera && (
+          <CameraQr open={openCamera} onClose={() => setOpenCamera(false)} />
+        )}
+      </Layout>
+      <DropdawnAccess
+        onPressQr={() => setOpenCamera(true)}
+        onPressCiNom={() => {}}
+      />
+    </>
+  );
 };
 
 export default Home;

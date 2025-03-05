@@ -82,6 +82,8 @@ const theme: ThemeType = {
     position: 'absolute',
     // borderTopLeftRadius: 12,
     // borderTopRightRadius: 12,
+    borderTopColor: cssVar.cBlackV2,
+    borderTopWidth: 0.5,
     width: '100%',
     bottom: 0,
   },

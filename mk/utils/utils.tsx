@@ -177,3 +177,7 @@ export const openDocument = (data: any) => {
   // console.log(url);
   Linking.openURL(url);
 };
+
+export const isIos = () => {
+  return Platform.OS == 'ios';
+};
