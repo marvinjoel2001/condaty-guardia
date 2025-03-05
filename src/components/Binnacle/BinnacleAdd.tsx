@@ -35,7 +35,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
 
     const {data: novedad, error: err} = await execute('/guardnews', 'POST', {
       descrip: formState.descrip,
-      imageNew: formState.imageNew,
+      imageNew: encodeURIComponent(formState.imageNew),
     });
     if (novedad?.success == true) {
       onClose();
@@ -43,7 +43,8 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       setFormState({});
       showToast('Novedad agregada', 'success');
     } else {
-      showToast(err, 'error');
+      // showToast(err, 'error');
+      showToast('Ocurrió un error', 'error');
     }
   };
   return (

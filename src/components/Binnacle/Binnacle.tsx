@@ -5,7 +5,7 @@ import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import {cssVar} from '../../../mk/styles/themes';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
@@ -16,14 +16,9 @@ const Binnacle = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState({open: false, item: null});
   const [search, setSearch] = useState('');
-  const {data, reload, execute, loaded} = useApi(
-    '/guardnews',
-    'GET',
-    {
-      fullType: 'L',
-    },
-    3,
-  );
+  const {data, reload, loaded} = useApi('/guardnews', 'GET', {
+    fullType: 'L',
+  });
 
   const novedadList = (novedad: any) => {
     if (
