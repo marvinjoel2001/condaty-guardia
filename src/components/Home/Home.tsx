@@ -12,9 +12,12 @@ import DropdawnAccess from './DropdawnAccess/DropdawnAccess';
 import CameraQr from './CameraQr/CameraQr';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
 import { ThemeContext } from '../../../mk/contexts/ThemeContext';
+import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
+  const [openSlide, setOpenSlide] = useState(true);
+  const [typeSearch, setTypeSearch] = useState("I");
   const navigate: any = useNavigation();
   const {logout, user} = useAuth();
   const [openCamera, setOpenCamera] = useState(false);
@@ -36,7 +39,25 @@ const Home = () => {
   };
   return (
     <>
-      <Layout title="Home" style={{flex: 1}} customTitle={customTitle()}>
+    <Layout title="Home" customTitle={customTitle()}  style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}>
+
+          <TabsButtons
+              tabs={[
+                {value: "I", text: "Pendientes"},
+                {value: "A", text: "Accesos"},
+                {value: "P", text: "Pedidos"},
+              ]}
+              sel={typeSearch}
+              setSel={setTypeSearch}
+              contentContainerStyles={styles.contentContainerTab}
+              style={{
+                justifyContent: "center",
+                flex: 1,
+                alignContent: "center",
+              }}
+          
+            />
+        
 
 
         <Text>assa</Text>
@@ -55,6 +76,18 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
+  container: {
+   flex:1,
+   backgroundColor:'red',
+   justifyContent: 'center',
+   alignItems: 'center',
+   display:'flex'
+  },
+contentContainerTab:{
+  width: "100%",
+  alignSelf: "center",
+  justifyContent: "center",
+},
   title: {
     color: cssVar.cWhite,
     textAlign: 'center',

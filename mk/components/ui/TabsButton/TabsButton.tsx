@@ -14,9 +14,10 @@ interface TabsButtonsProps {
   tabs: Tab[];
   setSel: (value: string) => void;
   style?: TypeStyles;
+  contentContainerStyles?: TypeStyles;
 }
 
-const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
+const TabsButtons = ({sel, tabs, setSel, style = {} , contentContainerStyles={}}: TabsButtonsProps) => {
   return (
     <View
       style={{
@@ -39,6 +40,7 @@ const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
           alignItems: 'center',
           flexDirection: 'row',
           gap: 8,
+          ...contentContainerStyles
         }}>
         {tabs.map(tab => (
           <TouchableOpacity
