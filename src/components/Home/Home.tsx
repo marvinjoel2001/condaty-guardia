@@ -1,6 +1,6 @@
 import {StyleSheet, Text, View} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import useAuth from '../../../mk/hooks/useAuth';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
@@ -10,6 +10,8 @@ import Icon from '../../../mk/components/ui/Icon/Icon';
 import {IconGenericQr, IconNoQr} from '../../icons/IconLibrary';
 import DropdawnAccess from './DropdawnAccess/DropdawnAccess';
 import CameraQr from './CameraQr/CameraQr';
+import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
+import { ThemeContext } from '../../../mk/contexts/ThemeContext';
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
@@ -17,31 +19,27 @@ const Home = () => {
   const {logout, user} = useAuth();
   const [openCamera, setOpenCamera] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
-
+  const [setOpenDropdown] = useState(false);
+  let stop = false;
+  const {theme} = useContext(ThemeContext);
   const customTitle = () => {
     return (
       <View>
-        <Avatar
-          h={48}
-          w={48}
-          src={getUrlImages(
-            '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
-          )}
-          onClick={() => navigate.navigate('Profile')}
-          name={getFullName(user)}
-        />
-        <Text style={styles.title}>{getFullName(user)}</Text>
-        <Text style={styles.client}>
-          {user.client_id
-            ? user.clients.find((e: any) => e.id == user.client_id).name
-            : null}
-        </Text>
+       <HeadDashboardTitle
+            user={user}
+            setOpenDropdown={setOpenDropdown}
+            stop={stop}
+            theme={theme}
+          />
       </View>
     );
   };
   return (
     <>
       <Layout title="Home" style={{flex: 1}} customTitle={customTitle()}>
+
+
+        <Text>assa</Text>
         {openCamera && (
           <CameraQr open={openCamera} onClose={() => setOpenCamera(false)} />
         )}
