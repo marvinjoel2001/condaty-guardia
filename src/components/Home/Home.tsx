@@ -13,10 +13,12 @@ import CameraQr from './CameraQr/CameraQr';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
 import { ThemeContext } from '../../../mk/contexts/ThemeContext';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
+import Accesses from './Accesses/Accesses';
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
   const [openSlide, setOpenSlide] = useState(true);
+  const [apiPendientes, setApiPendientes] = useState<any>(null);
   const [typeSearch, setTypeSearch] = useState("I");
   const navigate: any = useNavigation();
   const {logout, user} = useAuth();
@@ -57,7 +59,20 @@ const Home = () => {
               }}
           
             />
-        
+            {typeSearch === "I" && apiPendientes?.data && (
+          <Accesses
+            parametros={paramsAccesos}
+            api={{
+              ...apiPendientes,
+              loaded: apiAccesos.loaded,
+              reload: apiAccesos.reload,
+            }}
+            screenParams={screenParams}
+            lista={apiAccesos?.data?.data}
+            isHome={true}
+            edit={true}
+          />
+        )}
 
 
         <Text>assa</Text>
