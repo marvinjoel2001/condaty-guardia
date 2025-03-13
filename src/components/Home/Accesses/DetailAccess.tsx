@@ -1,19 +1,26 @@
-import React, {useContext, useEffect, useState} from "react";
-import useAuth from "../../../../mk/hooks/useAuth";
-import ItemInfo, { ItemInfoType, TypeDetails } from "../../../../mk/components/ui/ItemInfo/ItemInfo";
-import useApi from "../../../../mk/hooks/useApi";
-import { getDateStrMes, getDateTimeStrMes } from "../../../../mk/utils/dates";
-import { getFullName } from "../../../../mk/utils/strings";
-import { cssVar, FONTS } from "../../../../mk/styles/themes";
-import Icon from "../../../../mk/components/ui/Icon/Icon";
-import { IconCheck, IconCheckOff } from "../../../icons/IconLibrary";
-import ItemListDate from "../ItemListDate/ItemListDate";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { ItemList } from "../../../../mk/components/ui/ItemList/ItemList";
-import Avatar from "../../../../mk/components/ui/Avatar/Avatar";
-import List from "../../../../mk/components/ui/List/List";
-import { TextArea } from "../../../../mk/components/forms/TextArea/TextArea";
-
+import React, {useContext, useEffect, useState} from 'react';
+import useAuth from '../../../../mk/hooks/useAuth';
+import ItemInfo, {
+  ItemInfoType,
+  TypeDetails,
+} from '../../../../mk/components/ui/ItemInfo/ItemInfo';
+import useApi from '../../../../mk/hooks/useApi';
+import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {getFullName} from '../../../../mk/utils/strings';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
+import {IconCheck, IconCheckOff} from '../../../icons/IconLibrary';
+import ItemListDate from './shares/ItemListDate';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
+import List from '../../../../mk/components/ui/List/List';
+import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 
 interface PropsType {
   open: boolean;
@@ -33,7 +40,7 @@ const DetailAccess = ({
   id,
   screenParams,
 }: PropsType) => {
-  const [details, setDetails] = useState<TypeDetails>({title: "", data: []});
+  const [details, setDetails] = useState<TypeDetails>({title: '', data: []});
   const [acompSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = React.useState({});
   // const {theme} = useContext(ThemeContext);
@@ -45,16 +52,16 @@ const DetailAccess = ({
 
   const getData = async (id: number) => {
     // console.log(id, "ID");
-    const {data, error} = await execute("/accesses", "GET", {
+    const {data, error} = await execute('/accesses', 'GET', {
       perPage: 1,
-      sortBy: "accesses.created_at,accesses.in_at",
-      orderBy: "desc,desc",
-      type_list: "AD",
+      sortBy: 'accesses.created_at,accesses.in_at',
+      orderBy: 'desc,desc',
+      type_list: 'AD',
       searchBy: id,
-      joins: "visits|owners",
-      cols: "accesses.*",
+      joins: 'visits|owners',
+      cols: 'accesses.*',
       relations:
-        "visit|owner|other:id,other_type_id|other.otherType:id,name|guardia|out_guard|invitation|accesses|accesses.visit",
+        'visit|owner|other:id,other_type_id|other.otherType:id,name|guardia|out_guard|invitation|accesses|accesses.visit',
     });
 
     if (data?.success) {
@@ -63,8 +70,8 @@ const DetailAccess = ({
       _onDetail(data.data);
       // console.log("DATAAAA", JSON.stringify(data.data, null, 5));
     } else {
-      showToast(data?.message, "error");
-      console.log("Error:", error);
+      showToast(data?.message, 'error');
+      console.log('Error:', error);
       return;
     }
   };
@@ -108,17 +115,17 @@ const DetailAccess = ({
       const paramsInitialA = {
         perPage: 1,
         page: 1,
-        sortBy: "accesses.created_at,in_at",
-        type_list: "AD",
-        cols: "accesses.*",
-        orderBy: "desc,desc",
-        joins: "visits|owners",
+        sortBy: 'accesses.created_at,in_at',
+        type_list: 'AD',
+        cols: 'accesses.*',
+        orderBy: 'desc,desc',
+        joins: 'visits|owners',
         relations:
-          "invitation|visit|owner|other:id,other_type_id|other.otherType:id,name|guardia|out_guard|accesses.visit",
+          'invitation|visit|owner|other:id,other_type_id|other.otherType:id,name|guardia|out_guard|accesses.visit',
         searchBy: _item?.access_id,
       };
 
-      const {data: row} = await execute("/accesses", "GET", paramsInitialA);
+      const {data: row} = await execute('/accesses', 'GET', paramsInitialA);
       if (row?.success == true) {
         item = row?.data;
         setFormState(item);
@@ -132,100 +139,97 @@ const DetailAccess = ({
     });
 
     const _data: ItemInfoType[] = [];
-    let v = "";
-    let buttonText = "";
+    let v = '';
+    let buttonText = '';
     // setFormState({...item, id: item?.id});
-    if (item?.type == "O") {
+    if (item?.type == 'O') {
       _data.push({
-        l: "Tipo de acceso",
-        v: "QR Llave Virtual",
+        l: 'Tipo de acceso',
+        v: 'QR Llave Virtual',
       });
       _data.push({
-        l: "Fecha de ingreso",
+        l: 'Fecha de ingreso',
         v: getDateTimeStrMes(item?.in_at),
       });
       _data.push({
-        l: "Residente",
+        l: 'Residente',
         v: getFullName(item?.owner),
       });
       _data.push({
-        l: "Guardia de entrada",
+        l: 'Guardia de entrada',
         v: getFullName(item?.guardia),
       });
     } else {
       v = item?.out_at
-        ? "Completado"
+        ? 'Completado'
         : !item?.confirm_at
-        ? "Por confirmar"
+        ? 'Por confirmar'
         : item?.in_at
-        ? "Por Salir"
-        : item?.confirm == "Y"
-        ? "Por Entrar"
-        : "Denegado";
+        ? 'Por Salir'
+        : item?.confirm == 'Y'
+        ? 'Por Entrar'
+        : 'Denegado';
       _data.push({
-        l: "Estado",
+        l: 'Estado',
         v: v,
         sv: {
-          color:
-            v == "Denegado"
-              ? cssVar.cError
-              : cssVar.cWhite,
+          color: v == 'Denegado' ? cssVar.cError : cssVar.cWhite,
         },
       });
 
       _data.push({
-        l: "Tipo de acceso",
+        l: 'Tipo de acceso',
         v:
-          item?.type == "P"
-            ? "Pedido-" + item?.other?.other_type.name
-            : item?.type == "I"
-            ? "QR Individual"
-            : item?.type == "C"
-            ? "Sin QR"
-            : item?.type == "G"
-            ? "QR Grupal"
-            : "QR Llave Virtual",
+          item?.type == 'P'
+            ? 'Pedido-' + item?.other?.other_type.name
+            : item?.type == 'I'
+            ? 'QR Individual'
+            : item?.type == 'C'
+            ? 'Sin QR'
+            : item?.type == 'G'
+            ? 'QR Grupal'
+            : 'QR Llave Virtual',
       });
-      if (item?.type === "I" || item?.type === "G") {
-        if (item?.type === "G") {
-          _data.push({l: "Evento", v: item?.invitation?.title});
+      if (item?.type === 'I' || item?.type === 'G') {
+        if (item?.type === 'G') {
+          _data.push({l: 'Evento', v: item?.invitation?.title});
         }
         _data.push({
-          l: "Fecha de invitación",
+          l: 'Fecha de invitación',
           v: getDateStrMes(item?.invitation?.date_event),
         });
 
         item?.invitation?.obs &&
-          _data.push({l: "Descripción", v: item?.invitation?.obs});
+          _data.push({l: 'Descripción', v: item?.invitation?.obs});
       }
-      if (item?.type == "P") {
-        _data.push({l: "Conductor", v: getFullName(item?.visit)});
+      if (item?.type == 'P') {
+        _data.push({l: 'Conductor', v: getFullName(item?.visit)});
       } else {
         // _data.push({l: "Visitante", v: item?.visit?.name});
       }
 
-      if (item?.plate && !item?.taxi) _data.push({l: "Placa", v: item?.plate});
+      if (item?.plate && !item?.taxi) _data.push({l: 'Placa', v: item?.plate});
 
       if (item?.in_at && item?.out_at) {
-        _data.push({l: "Visitó a", v: getFullName(item?.owner)});
+        _data.push({l: 'Visitó a', v: getFullName(item?.owner)});
       } else {
-        _data.push({l: "Visita a", v: getFullName(item?.owner)});
+        _data.push({l: 'Visita a', v: getFullName(item?.owner)});
       }
 
-      if (v == "Denegado") {
+      if (v == 'Denegado') {
         _data.push({
-          l: "Fecha de denegación",
+          l: 'Fecha de denegación',
           v: getDateStrMes(item?.confirm_at),
         });
-        _data.push({l: "Motivo", v: item?.obs_confirm});
+        _data.push({l: 'Motivo', v: item?.obs_confirm});
       }
 
       if (item?.out_at) {
-        _data.push({l: "Guardia de entrada", v: getFullName(item?.guardia)});
+        _data.push({l: 'Guardia de entrada', v: getFullName(item?.guardia)});
         item?.out_guard &&
           item?.guardia?.id != item?.out_guard?.id &&
           _data.push({
-            l: "Guardia de salida",
+            l: 'Guardia de salida',
             v: getFullName(item?.out_guard),
           });
         (item?.obs_in ||
@@ -234,33 +238,33 @@ const DetailAccess = ({
           item?.obs_guard) &&
           item?.obs_guard;
         item?.obs_guard &&
-          _data.push({l: "Obs. de solicitud", v: item?.obs_guard});
-        item?.obs_in && _data.push({l: "Obs. de entrada", v: item?.obs_in});
-        item?.obs_out && _data.push({l: "Obs. de salida", v: item?.obs_out});
+          _data.push({l: 'Obs. de solicitud', v: item?.obs_guard});
+        item?.obs_in && _data.push({l: 'Obs. de entrada', v: item?.obs_in});
+        item?.obs_out && _data.push({l: 'Obs. de salida', v: item?.obs_out});
       } else {
         (item?.obs_in || item?.obs_out || item?.obs_confirm) && item?.obs_in
-          ? _data.push({l: "Obs. de entrada", v: item?.obs_in})
+          ? _data.push({l: 'Obs. de entrada', v: item?.obs_in})
           : item?.obs_out
-          ? _data.push({l: "Obs. de salida", v: item?.obs_out})
-          : "";
+          ? _data.push({l: 'Obs. de salida', v: item?.obs_out})
+          : '';
       }
 
       if (item?.accesses) setAcompanantes(item?.accesses);
- 
+
       edit &&
         (buttonText = canS
-          ? "Dejar salir"
-          : item?.confirm_at && item?.confirm == "Y"
+          ? 'Dejar salir'
+          : item?.confirm_at && item?.confirm == 'Y'
           ? !item?.in_at
-            ? "Dejar entrar"
-            : ""
-          : "");
+            ? 'Dejar entrar'
+            : ''
+          : '');
     }
 
-    const buttonCancel = "";
+    const buttonCancel = '';
     setDetails({
       data: _data,
-      title: "Detalle de acceso",
+      title: 'Detalle de acceso',
       buttonText,
       buttonCancel,
     });
@@ -281,22 +285,22 @@ const DetailAccess = ({
   const RightItem = ({acompanante, isSelected}: any) => {
     return (
       <>
-        {details.buttonText != "" &&
+        {details.buttonText != '' &&
         !acompanante?.out_at &&
         acompanante?.in_at ? (
           <Icon
             name={isSelected ? IconCheck : IconCheckOff}
-            color={isSelected ? cssVar.cSuccess : "transparent"}
-            fillStroke={!isSelected ? cssVar.cWhite : ""}
+            color={isSelected ? cssVar.cSuccess : 'transparent'}
+            fillStroke={!isSelected ? cssVar.cWhite : ''}
           />
         ) : (
-          ""
+          ''
         )}
       </>
     );
   };
 
-  const Horas1 = ({acompanante, fecha = ""}: any) => {
+  const Horas1 = ({acompanante, fecha = ''}: any) => {
     return (
       <ItemListDate
         data1={acompanante?.in_at}
@@ -306,12 +310,12 @@ const DetailAccess = ({
     );
   };
 
-  let taxiAnt = "";
+  let taxiAnt = '';
   const acompanatesList = (acompanante: any) => {
-    let mensaje = "";
+    let mensaje = '';
     if (acompanante.taxi !== taxiAnt) {
       taxiAnt = acompanante.taxi;
-      if (acompanante.taxi == "C") {
+      if (acompanante.taxi == 'C') {
         mensaje = `Conductor`;
       } else {
         mensaje = `Acompañantes`;
@@ -321,16 +325,16 @@ const DetailAccess = ({
     const isSelected = acompSelect.some((a: any) => a.id === acompanante.id);
     return (
       <>
-        {mensaje !== "" && <Text style={styles.label}>{mensaje}</Text>}
+        {mensaje !== '' && <Text style={styles.label}>{mensaje}</Text>}
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => handleSelectAcomp(acompanante.id)}>
           <ItemList
             style={{backgroundColor: cssVar.cBlackV1}}
             title={getFullName(acompanante?.visit)}
-            subtitle={"C.I. " + acompanante.visit?.ci}
+            subtitle={'C.I. ' + acompanante.visit?.ci}
             subtitle2={
-              acompanante.taxi == "C" ? "Placa: " + acompanante.plate : ""
+              acompanante.taxi == 'C' ? 'Placa: ' + acompanante.plate : ''
             }
             left={<Avatar name={getFullName(acompanante.visit)} />}
             right={
@@ -349,16 +353,16 @@ const DetailAccess = ({
 
   const onIn = async (acceso: any) => {
     // console.log("acceso", acceso);
-    const {data: In, error: err} = await execute("/accesses/enter", "POST", {
+    const {data: In, error: err} = await execute('/accesses/enter', 'POST', {
       id: formState?.id,
       obs_in: formState?.obs_in,
     });
     if (In?.success == true) {
       reload();
       close();
-      showToast("El visitante ingresó", "success");
+      showToast('El visitante ingresó', 'success');
     } else {
-      showToast(err, "error");
+      showToast(err, 'error');
     }
   };
   const onOut = async (acceso: any) => {
@@ -368,12 +372,12 @@ const DetailAccess = ({
     });
 
     if (idAcom.length == 0) {
-      showToast("Necesita seleccionar", "warning");
+      showToast('Necesita seleccionar', 'warning');
       return;
     }
     const {data: In, error: err} = await execute(
-      "/accesses/exit",
-      "POST",
+      '/accesses/exit',
+      'POST',
       {
         ids: idAcom,
         obs_out: formState?.obs_out,
@@ -385,9 +389,9 @@ const DetailAccess = ({
       reload();
       close();
       setAcompSelect([]);
-      showToast("El visitante salió", "success");
+      showToast('El visitante salió', 'success');
     } else {
-      showToast(err, "error");
+      showToast(err, 'error');
     }
   };
 
@@ -395,9 +399,9 @@ const DetailAccess = ({
   return (
     <ItemInfo
       details={
-        formState?.id != _id ? {title: "Detalle de acceso", data: []} : details
+        formState?.id != _id ? {title: 'Detalle de acceso', data: []} : details
       }
-      onSave={details.buttonText == "Dejar entrar" ? onIn : onOut}
+      onSave={details.buttonText == 'Dejar entrar' ? onIn : onOut}
       onClose={() => {
         close();
         setAcompSelect([]);
@@ -413,7 +417,7 @@ const DetailAccess = ({
         </>
       ) : (
         <>
-          {details.buttonText != "" &&
+          {details.buttonText != '' &&
             formState?.accesses?.length > 0 &&
             formState?.in_at &&
             !formState?.out_at &&
@@ -421,13 +425,13 @@ const DetailAccess = ({
               <Text
                 style={{
                   color: cssVar.cWhiteV2,
-                  fontFamily: "Poppins Regular",
+                  fontFamily: 'Poppins Regular',
                   marginVertical: 6,
                 }}>
                 Seleccione para dejar salir:
               </Text>
             )}
-          {formState?.type != "O" && (
+          {formState?.type != 'O' && (
             <>
               <Text style={styles.label}>Visitante</Text>
               <TouchableOpacity
@@ -435,14 +439,14 @@ const DetailAccess = ({
                 onPress={() => handleSelectAcomp(formState?.id)}>
                 <ItemList
                   title={getFullName(formState?.visit)}
-                  subtitle={"C.I. " + formState?.visit?.ci}
+                  subtitle={'C.I. ' + formState?.visit?.ci}
                   style={{
                     backgroundColor: cssVar.cBlackV1,
                   }}
                   subtitle2={
                     formState?.accesses?.length == 0 && formState?.plate
-                      ? "Placa: " + formState?.plate
-                      : ""
+                      ? 'Placa: ' + formState?.plate
+                      : ''
                   }
                   left={<Avatar name={getFullName(formState?.visit)} />}
                   right={
@@ -458,7 +462,7 @@ const DetailAccess = ({
               </TouchableOpacity>
             </>
           )}
-          {formState?.type != "O" && (
+          {formState?.type != 'O' && (
             <List
               data={acompanantes}
               emptyLabel=""
@@ -466,21 +470,21 @@ const DetailAccess = ({
             />
           )}
 
-          {details.buttonText == "Dejar entrar" && (
+          {details.buttonText == 'Dejar entrar' && (
             <TextArea
               label="Observaciones de Entrada"
               name="obs_in"
               value={formState?.obs_in}
-              onChange={value => handleInputChange("obs_in", value)}
+              onChange={value => handleInputChange('obs_in', value)}
               style={{backgroundColor: cssVar.cBlack}}
             />
           )}
-          {details.buttonText == "Dejar salir" && (
+          {details.buttonText == 'Dejar salir' && (
             <TextArea
               label="Observaciones de Salida"
               name="obs_out"
               value={formState?.obs_out}
-              onChange={value => handleInputChange("obs_out", value)}
+              onChange={value => handleInputChange('obs_out', value)}
               style={{backgroundColor: cssVar.cBlack}}
             />
           )}
@@ -498,4 +502,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: FONTS.light,
   },
-})
+});
