@@ -1,19 +1,23 @@
 import {StyleSheet, Text, View} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import useAuth from '../../../mk/hooks/useAuth';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
 import {useNavigation} from '@react-navigation/native';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-import {IconGenericQr, IconNoQr} from '../../icons/IconLibrary';
+import {IconDelivery, IconGenericQr, IconNoQr, IconOther, IconTaxi} from '../../icons/IconLibrary';
 import DropdawnAccess from './DropdawnAccess/DropdawnAccess';
 import CameraQr from './CameraQr/CameraQr';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
 import { ThemeContext } from '../../../mk/contexts/ThemeContext';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import Accesses from './Accesses/Accesses';
+import ItemListDate from './ItemListDate/ItemListDate';
+import { ItemList } from '../../../mk/components/ui/ItemList/ItemList';
+import AccessList from './AccessList';
+import useApi from '../../../mk/hooks/useApi';
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
@@ -27,6 +31,24 @@ const Home = () => {
   const [setOpenDropdown] = useState(false);
   let stop = false;
   const {theme} = useContext(ThemeContext);
+  const {execute, loaded} = useApi();
+  const [data,setData] = useState([])
+
+
+  const getAccesses = async (search: any = '') => {
+    const {data} = await execute('/accesses', 'GET', {
+      fullType: 'AD',
+      searchBy: search || '',
+    },
+    // false,3
+  );
+     setData(data?.data || []);
+  };
+   
+
+
+ 
+
   const customTitle = () => {
     return (
       <View>
@@ -39,6 +61,22 @@ const Home = () => {
       </View>
     );
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getAccesses();
+    };
+  
+    fetchData();
+  }, [typeSearch]);
+
+  // useEffect(()=>{
+  //   const fetchData = async () => {
+  //     await getAccesses();
+  //   };
+  
+  //   fetchData();
+  // },[data])
   return (
     <>
     <Layout title="Home" customTitle={customTitle()}  style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}>
@@ -59,7 +97,7 @@ const Home = () => {
               }}
           
             />
-            {typeSearch === "I" && apiPendientes?.data && (
+            {/* {typeSearch === "I" && apiPendientes?.data && (
           <Accesses
             parametros={paramsAccesos}
             api={{
@@ -72,7 +110,9 @@ const Home = () => {
             isHome={true}
             edit={true}
           />
-        )}
+        )} */}
+    
+        {typeSearch === "A" &&   <Accesses  data={data}/>}
 
 
         <Text>assa</Text>
