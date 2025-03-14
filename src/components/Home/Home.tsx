@@ -37,7 +37,7 @@ const Home = () => {
   const [setOpenDropdown] = useState(false);
   let stop = false;
   const {theme} = useContext(ThemeContext);
-  const {execute, loaded} = useApi();
+  const {execute, loaded , reload} = useApi();
   const [data, setData] = useState([]);
 
   const getAccesses = async (search: any = '') => {
@@ -126,7 +126,7 @@ const Home = () => {
           />
         )} */}
 
-        {typeSearch === 'A' && <Accesses data={data} />}
+        {typeSearch === 'A' && <Accesses data={data} reload={reload} />}
 
         <Text>assa</Text>
         {openCamera && (

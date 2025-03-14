@@ -49,6 +49,7 @@ const DetailAccess = ({
   const {showToast, setStore} = useAuth();
   const {execute} = useApi();
   const [dataScreen, setDataScreen]: any = screenParams;
+  
 
   const getData = async (id: number) => {
     // console.log(id, "ID");

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Text, TouchableOpacity} from 'react-native';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
@@ -8,9 +8,25 @@ import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import ItemListDate from './shares/ItemListDate';
+import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
+import DetailAccess from './DetailAccess';
 
-const Accesses = ({data}: any) => {
-  return <List data={data} renderItem={renderItemAccess} />;
+const Accesses = ({data,reload}: any) => {
+  const [openDetail,setOpenDetail]= useState(false);
+  const [edit,setEdit] = useState(false);
+  const [formState,setFormState]:any = useState({});
+  const screenParams: any = useState(null);
+  return <> 
+  <List data={data} renderItem={(e)=>renderItemAccess(e,setOpenDetail)} />;
+{ openDetail &&  <DetailAccess
+        id={formState?.id}
+        open={openDetail}
+        close={() => setOpenDetail(false)}
+        reload={reload}
+        edit={edit}
+        screenParams={screenParams}
+      />}
+  </>
 };
 
 const title = (item: any) => {
@@ -182,8 +198,9 @@ const right = (item: any) => {
   return null;
 };
 
-const renderItemAccess = (item: any) => {
+const renderItemAccess = (item:any,setOpenDetail: any) => {
   return (
+
     <ItemList
       title={title(item)}
       subtitle={subtitle(item)}
@@ -191,6 +208,7 @@ const renderItemAccess = (item: any) => {
       right={right(item)}
       date={hours(item)}
       widthMain={150}
+      onPress={() => setOpenDetail(true)}
     />
   );
 };
