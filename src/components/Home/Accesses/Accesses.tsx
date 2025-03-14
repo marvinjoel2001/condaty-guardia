@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {Text, TouchableOpacity} from 'react-native';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
@@ -10,15 +10,25 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import ItemListDate from './shares/ItemListDate';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import DetailAccess from './DetailAccess';
+import { formToJSON } from 'axios';
 
-const Accesses = ({data,reload}: any) => {
+const Accesses = ({data,reload,setDataID}: any) => {
   const [openDetail,setOpenDetail]= useState(false);
   const [edit,setEdit] = useState(false);
   const [formState,setFormState]:any = useState({});
   const screenParams: any = useState(null);
+  useEffect(()=>{
+    setDataID(62)
+  },[openDetail])
+
+  const onPressDetail = ()=>{
+    setOpenDetail(true);
+    console.log(formState,'formstate')
+  }
   return <> 
-  <List data={data} renderItem={(e)=>renderItemAccess(e,setOpenDetail)} />;
+  <List data={data} renderItem={(e)=>renderItemAccess(e,onPressDetail)} />;
 { openDetail &&  <DetailAccess
+        data={data}
         id={formState?.id}
         open={openDetail}
         close={() => setOpenDetail(false)}
@@ -198,7 +208,7 @@ const right = (item: any) => {
   return null;
 };
 
-const renderItemAccess = (item:any,setOpenDetail: any) => {
+const renderItemAccess = (item:any,onPressDetail: any) => {
   return (
 
     <ItemList
@@ -208,7 +218,7 @@ const renderItemAccess = (item:any,setOpenDetail: any) => {
       right={right(item)}
       date={hours(item)}
       widthMain={150}
-      onPress={() => setOpenDetail(true)}
+      onPress={onPressDetail}
     />
   );
 };
