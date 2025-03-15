@@ -28,7 +28,7 @@ const Accesses = ({data,reload,setDataID}: any) => {
   return <> 
   <List data={data} renderItem={(e)=>renderItemAccess(e,onPressDetail)} />;
 { openDetail &&  <DetailAccess
-        data={data}
+     
         id={formState?.id}
         open={openDetail}
         close={() => setOpenDetail(false)}
