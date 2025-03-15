@@ -30,7 +30,7 @@ const Accesses = ({data,reload}: any) => {
 };
 
 const title = (item: any) => {
-  return item.type == 'O' ? getFullName(item.owner) : getFullName(item.visit);
+  return item.type == 'O' ?<Text> {getFullName(item.owner) }</Text> : <Text>{getFullName(item.visit)}</Text>;
 };
 
 const subtitle = (item: any) => {
@@ -59,7 +59,7 @@ const subtitle = (item: any) => {
     prefix = 'Visita a: ';
   }
 
-  return prefix + getFullName(item.owner);
+  return <Text>{prefix + getFullName(item.owner)}</Text>;
 };
 
 const hours = (item: any) => {

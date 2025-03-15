@@ -53,30 +53,29 @@ const DetailAccess = ({
 
   const getData = async (id: number) => {
     // console.log(id, "ID");
-    const {data, error} = await execute('/accesses', 'GET', {
-      perPage: 1,
-      sortBy: 'accesses.created_at,accesses.in_at',
-      orderBy: 'desc,desc',
-      type_list: 'AD',
-      searchBy: id,
-      joins: 'visits|owners',
-      cols: 'accesses.*',
-      relations:
-        'visit|owner|other:id,other_type_id|other.otherType:id,name|guardia|out_guard|invitation|accesses|accesses.visit',
-    });
+    const {data,error} = await execute(
+      '/accesses',
+      'GET',
+      {
+        fullType: 'DET',
+        searchBy: id,
+      },
+       false,2
+    );
 
     if (data?.success) {
       setFormState((old: any) => data.data);
 
       _onDetail(data.data);
-      // console.log("DATAAAA", JSON.stringify(data.data, null, 5));
+   
+      console.log("DATAAAA", JSON.stringify(data.data, null, 5));
     } else {
       showToast(data?.message, 'error');
       console.log('Error:', error);
       return;
     }
   };
-
+  console.log(formState,'sasasas')
   useEffect(() => {
     getData(id);
     setID(0);
@@ -125,8 +124,18 @@ const DetailAccess = ({
           'invitation|visit|owner|other:id,other_type_id|other.otherType:id,name|guardia|out_guard|accesses.visit',
         searchBy: _item?.access_id,
       };
-
-      const {data: row} = await execute('/accesses', 'GET', paramsInitialA);
+    
+      // const {data: row} = await execute('/accesses', 'GET', paramsInitialA);
+      
+      const {data:row} = await execute(
+        '/accesses',
+        'GET',
+        {
+          fullType: 'AD',
+          searchBy: _item?.access_id,
+        },
+      );
+      
       if (row?.success == true) {
         item = row?.data;
         setFormState(item);
@@ -304,9 +313,9 @@ const DetailAccess = ({
   const Horas1 = ({acompanante, fecha = ''}: any) => {
     return (
       <ItemListDate
-        data1={acompanante?.in_at}
-        data2={acompanante?.out_at}
-        date={fecha}
+        inDate={acompanante?.in_at}
+        outDate={acompanante?.out_at}
+        // date={fecha}
       />
     );
   };
