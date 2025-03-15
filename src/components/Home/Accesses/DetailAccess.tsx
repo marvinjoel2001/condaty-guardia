@@ -57,25 +57,24 @@ const DetailAccess = ({
       '/accesses',
       'GET',
       {
-        fullType: 'DET',
+        fullType: 'AD',
         searchBy: id,
       },
-       false,2
+      // false,3
     );
 
     if (data?.success) {
       setFormState((old: any) => data.data);
 
       _onDetail(data.data);
-   
-      console.log("DATAAAA", JSON.stringify(data.data, null, 5));
+      // console.log("DATAAAA", JSON.stringify(data.data, null, 5));
     } else {
       showToast(data?.message, 'error');
       console.log('Error:', error);
       return;
     }
   };
-  console.log(formState,'sasasas')
+
   useEffect(() => {
     getData(id);
     setID(0);

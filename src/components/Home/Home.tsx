@@ -39,6 +39,7 @@ const Home = () => {
   const {theme} = useContext(ThemeContext);
   const {execute, loaded , reload} = useApi();
   const [data, setData] = useState([]);
+  const [dataID,setDataID] = useState(0);
 
   const getAccesses = async (search: any = '') => {
     const {data} = await execute(
@@ -83,13 +84,15 @@ const Home = () => {
     }
   }, [typeSearch]);
 
-  // useEffect(()=>{
-  //   const fetchData = async () => {
-  //     await getAccesses();
-  //   };
-
-  //   fetchData();
-  // },[data])
+   useEffect(()=>{
+    console.log(dataID,'did')
+     const fetchData = async () => {
+       await getAccesses(dataID);
+     };
+     fetchData();
+     
+  
+   },[dataID])
   return (
     <>
       <Layout
@@ -126,7 +129,7 @@ const Home = () => {
           />
         )} */}
 
-        {typeSearch === 'A' && <Accesses data={data} reload={reload} />}
+        {typeSearch === 'A' && <Accesses data={data} reload={reload} setDataID={setDataID} />}
 
         <Text>assa</Text>
         {openCamera && (
