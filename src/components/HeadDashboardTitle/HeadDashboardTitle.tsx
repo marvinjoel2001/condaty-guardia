@@ -12,6 +12,7 @@ interface Props {
   theme: any;
 }
 const HeadDashboardTitle = ({user, stop, setOpenDropdown, theme}: Props) => {
+  console.log(user,'user 2')
   const navigation: any = useNavigation();
   if (!user) return null;
   return (
@@ -27,7 +28,7 @@ const HeadDashboardTitle = ({user, stop, setOpenDropdown, theme}: Props) => {
         }}
         accessibilityLabel="ir al Perfil">
         <Avatar
-          src={getUrlImages("/GUA-" + user?.id + ".png?d=" + user?.updated_at)}
+          src={getUrlImages("/GUARD-" + user?.id + ".webp?d=" + user?.updated_at)}
           name={getFullName(user)}
         />
       </TouchableOpacity>

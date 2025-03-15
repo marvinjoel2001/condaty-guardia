@@ -22,7 +22,7 @@ import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import Accesses from './Accesses/Accesses';
 import ItemListDate from './Accesses/shares/ItemListDate';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
-import AccessList from './AccessList';
+
 import useApi from '../../../mk/hooks/useApi';
 
 const Home = () => {
