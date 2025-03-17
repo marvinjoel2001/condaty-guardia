@@ -4,6 +4,7 @@ import {Image, Text, View} from 'react-native';
 import {getDateTimeStrMes} from '../../../mk/utils/dates';
 import {getUrlImages} from '../../../mk/utils/strings';
 import {cssVar} from '../../../mk/styles/themes';
+import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 type PropsType = {
   open: boolean;
   onClose: () => void;
@@ -11,6 +12,7 @@ type PropsType = {
 };
 
 const BinnacleDetail = ({open, onClose, item}: PropsType) => {
+  console.log(item,'ssss')
   const RowData = ({title, value}: any) => {
     return (
       <View style={{flexDirection: 'row', gap: 5}}>
@@ -61,16 +63,17 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
             }}>
             Imagen:
           </Text>
-          <View style={{justifyContent: 'center', marginTop: 16, height: 350}}>
-            <Image
-              source={{
-                uri: getUrlImages(
+          <View style={{flex:1,justifyContent: 'center', marginTop: 16,  borderRadius: 10, }}>
+            <Avatar
+              src={ getUrlImages(
                   `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
-                ),
-              }}
-              style={{height: '100%', width: '100%', borderRadius: 8}}
+                )}
+                w={300}
+                h={350}
+              style={{ flex:1,borderRadius:8,justifyContent:'center'}}
+              circle={false}
               // onError={() => setImageError(true)}
-              resizeMode="cover"
+              // resizeMode="cover"
             />
           </View>
         </>
