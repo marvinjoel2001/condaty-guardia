@@ -29,6 +29,7 @@ interface AvatarProps {
   bottomDiamond?: number;
   verify?: boolean;
   level?: any;
+  circle?: boolean;
   borderColor?: string; // Color del borde
   borderWidth?: number; // Grosor del borde
 }
@@ -48,6 +49,7 @@ const Avatar = ({
   sizeIconDiamond = 20,
   bottomDiamond = -6,
   level,
+  circle= true,
   borderColor = 'transparent', // Valor por defecto para el borde
   borderWidth = 0, // Valor por defecto para el grosor del borde
 }: AvatarProps) => {
@@ -67,13 +69,13 @@ const Avatar = ({
         activeOpacity={onClick ? 0.2 : 1}
         style={{
           ...theme.avatar,
-          ...style,
           width: w,
           height: h,
           backgroundColor: backgroundColor,
           borderColor: borderColor, // Agregar color del borde
           borderWidth: borderWidth, // Agregar grosor del borde
           borderRadius: w / 2, // Asegurar que el borde sea circular
+          ...style,
         }}
         onPress={() => onClick && onClick()}>
         {src && !imageError ? (
@@ -82,7 +84,7 @@ const Avatar = ({
             style={{
               width: w,
               height: h,
-              borderRadius: w / 2, // Asegurar que la imagen sea circular
+              borderRadius:circle ? w / 2 : 0, // Asegurar que la imagen sea circular
             }}
             resizeMode="cover"
             onError={e => {

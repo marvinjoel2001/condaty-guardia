@@ -21,12 +21,13 @@ const Accesses = ({data,reload,setDataID}: any) => {
     setDataID(62)
   },[openDetail])
 
-  const onPressDetail = ()=>{
+  const onPressDetail = (e)=>{
     setOpenDetail(true);
-    console.log(formState,'formstate')
+    console.log(e,'formstate')
+    setFormState({id:e.id})
   }
   return <> 
-  <List data={data} renderItem={(e)=>renderItemAccess(e,onPressDetail)} />;
+  <List data={data} renderItem={(e)=>renderItemAccess(e,(e)=>onPressDetail(e))} />;
 { openDetail &&  <DetailAccess
      
         id={formState?.id}
@@ -218,7 +219,7 @@ const renderItemAccess = (item:any,onPressDetail: any) => {
       right={right(item)}
       date={hours(item)}
       widthMain={150}
-      onPress={onPressDetail}
+      onPress={()=>onPressDetail(item)}
     />
   );
 };

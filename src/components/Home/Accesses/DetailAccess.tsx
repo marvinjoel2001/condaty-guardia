@@ -57,10 +57,10 @@ const DetailAccess = ({
       '/accesses',
       'GET',
       {
-        fullType: 'AD',
+        fullType: 'DET',
         searchBy: id,
       },
-      // false,3
+       false,3
     );
 
     if (data?.success) {

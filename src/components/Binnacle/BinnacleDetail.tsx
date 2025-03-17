@@ -12,7 +12,7 @@ type PropsType = {
 };
 
 const BinnacleDetail = ({open, onClose, item}: PropsType) => {
-  console.log(item,'ssss')
+  // console.log(item,'ssss')
   const RowData = ({title, value}: any) => {
     return (
       <View style={{flexDirection: 'row', gap: 5}}>

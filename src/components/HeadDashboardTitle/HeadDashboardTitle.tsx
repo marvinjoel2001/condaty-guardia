@@ -12,7 +12,7 @@ interface Props {
   theme: any;
 }
 const HeadDashboardTitle = ({user, stop, setOpenDropdown, theme}: Props) => {
-  console.log(user,'user 2')
+  // console.log(user,'user 2')
   const navigation: any = useNavigation();
   if (!user) return null;
   return (
