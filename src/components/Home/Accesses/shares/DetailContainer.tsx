@@ -54,9 +54,7 @@ export const AccessDetail: React.FC<DetailProps> = ({ data, edit, onChange }) =>
   );
 };
 
-//
-// (Opcional) Componente para el detalle de "Pedidos"
-//
+
 export const OrderDetail: React.FC<DetailProps> = ({ data, edit, onChange }) => {
   return (
     <>
@@ -105,18 +103,14 @@ export const PendingDetail: React.FC<DetailProps> = ({ data, edit, onChange }) =
   );
 };
 
-//
-// Contenedor genérico que se encarga de la carga de datos, armado del detalle y lógica común
-//
+
 interface DetailContainerProps {
   open: boolean;
   close: () => void;
   id: any;
   reload: () => void;
   edit?: boolean;
-  // Se recibe el componente detalle a renderizar
   detailComponent: React.FC<DetailProps>;
-  // Identifica el tipo: 'accesos', 'pedidos' o 'pendientes'
   type: 'accesos' | 'pedidos' | 'pendientes';
   screenParams?: any;
 }
@@ -135,15 +129,15 @@ const DetailContainer: React.FC<DetailContainerProps> = ({
   const { showToast } = useAuth();
   const { execute, waiting } = useApi();
 
-  // Estado para el manejo de selección de acompañantes
+
   const [acompSelect, setAcompSelect] = useState<any[]>([]);
 
-  // Helper para obtener el identificador único del acompañante
+ 
   const getCompanionId = (companion: any) => {
     return companion.id || companion.visit?.id;
   };
 
-  // Función para obtener datos del API según el tipo
+  
   const getData = async (id: number) => {
     let endpoint = '';
     let fullType = '';
@@ -203,7 +197,7 @@ const DetailContainer: React.FC<DetailContainerProps> = ({
   };
 
   const onOut = async () => {
-    // Si no se selecciona ningún acompañante, se añade el visitante principal
+   
     const idAcom =
       acompSelect.length > 0 ? acompSelect.map((acom: any) => acom.id) : [data[0]?.id];
     if (idAcom.length === 0) {
@@ -222,7 +216,7 @@ const DetailContainer: React.FC<DetailContainerProps> = ({
     }
   };
 
-  // Función que decide qué acción ejecutar en base al botón
+
   const handleSave = async () => {
     const assembledDetail =
       data && data.length > 0 ? assembleDetail(data[0], !!edit) : { buttonText: '' };
@@ -235,7 +229,7 @@ const DetailContainer: React.FC<DetailContainerProps> = ({
     }
   };
 
-  // Función mejorada que arma el objeto de detalles para ItemInfo
+ 
   const assembleDetail = (item: any, edit: boolean) => {
     const hasActiveAccess =
       (item?.in_at && !item?.out_at) ||
@@ -368,7 +362,7 @@ const DetailContainer: React.FC<DetailContainerProps> = ({
     return null;
   };
 
-  // Función para renderizar cada acompañante
+
   const renderCompanion = (companion: any) => {
     const id = getCompanionId(companion);
     const isSelected = acompSelect.some((a: any) => a.id === id);
