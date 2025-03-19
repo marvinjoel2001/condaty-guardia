@@ -41,9 +41,9 @@ const Home = () => {
   const [data, setData] = useState([]);
   const [dataID,setDataID] = useState(0);
 
-  const getAccesses = async (search: any = '') => {
+  const getAccesses = async ( search: any = '',endpoint:string ) => {
     const {data} = await execute(
-      '/accesses',
+      endpoint,
       'GET',
       {
         fullType: 'AD',
@@ -70,13 +70,13 @@ const Home = () => {
   useEffect(() => {
     switch (typeSearch) {
       case 'I':
-        getAccesses();
+        getAccesses('','/accesses');
         break;
       case 'A':
-        getAccesses();
+        getAccesses('','/accesses');
         break;
       case 'P':
-        getAccesses();
+        getAccesses('','/orders');
         break;
       default:
         console.log('typeSercg no valido', typeSearch);
@@ -84,15 +84,15 @@ const Home = () => {
     }
   }, [typeSearch]);
 
-   useEffect(()=>{
-    console.log(dataID,'did')
-     const fetchData = async () => {
-       await getAccesses(dataID);
-     };
-     fetchData();
+  //  useEffect(()=>{
+  //   console.log(dataID,'did')
+  //    const fetchData = async () => {
+  //      await getAccesses(dataID);
+  //    };
+  //    fetchData();
      
   
-   },[dataID])
+  //  },[dataID])
   return (
     <>
       <Layout

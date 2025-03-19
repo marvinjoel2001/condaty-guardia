@@ -50,7 +50,7 @@ const Profile = () => {
       [name]: value,
     });
   };
-
+ console.log(isEdit,'isEdit')
   const validate = (field = '') => {
     let errors: any = {};
 
@@ -149,7 +149,7 @@ const Profile = () => {
       title={'Perfil'}
       style={{paddingHorizontal: 16}}>
       <View>
-        <Avatar
+        {/* <Avatar
           onClick={() => setImagePreview(true)}
           src={
             formState.avatar && isEdit
@@ -162,7 +162,19 @@ const Profile = () => {
           h={112}
           name={getFullName(user)}
           style={{width: 112, height: 112}}
+        /> */}
+        {isEdit && (
+          <AvatarPreview
+          open={imagePreview}
+          onClose={() => setImagePreview(false)}
+          id={user.id}
+          name={getFullName(user)}
+          prefijo="GUARD"
+          updated_at={user?.updated_at}
+          w={112}
+          h={112}
         />
+        )}
         {isEdit && (
           <View
             style={{
@@ -304,14 +316,8 @@ const Profile = () => {
         )}
       </View>
 
-      <AvatarPreview
-        open={imagePreview}
-        onClose={() => setImagePreview(false)}
-        id={user.id}
-        name={getFullName(user)}
-        prefijo="GUARD"
-        updated_at={user?.updated_at}
-      />
+   
+      <Text>aaa</Text>
       <AccessEdit
         open={openModal}
         onClose={() => setOpenModal(false)}
