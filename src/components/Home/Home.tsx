@@ -24,6 +24,7 @@ import ItemListDate from './Accesses/shares/ItemListDate';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 
 import useApi from '../../../mk/hooks/useApi';
+import Orders from './Orders/Orders';
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
@@ -76,7 +77,7 @@ const Home = () => {
         getAccesses('','/accesses');
         break;
       case 'P':
-        getAccesses('','/orders');
+        getAccesses('','/others');
         break;
       default:
         console.log('typeSercg no valido', typeSearch);
@@ -130,6 +131,8 @@ const Home = () => {
         )} */}
 
         {typeSearch === 'A' && <Accesses data={data} reload={reload} setDataID={setDataID} />}
+        {typeSearch === 'P' && <Orders data={data} reload={reload} setDataID={setDataID} />}
+
 
         <Text>assa</Text>
         {openCamera && (
