@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Text, TouchableOpacity} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
-import { ItemList } from '../../../../mk/components/ui/ItemList/ItemList';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import ItemListDate from './shares/ItemListDate';
-import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
-import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import { IconDelivery, IconOther, IconTaxi } from '../../../icons/IconLibrary';
+import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import DetailContainer, { AccessDetail } from './shares/DetailContainer';
+import DetailContainer, {AccessDetail} from './shares/DetailContainer';
+import DetAccesses from './DetAccesses';
 
-const Accesses = ({ data, reload, setDataID }: any) => {
+const Accesses = ({data, reload, setDataID}: any) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [edit, setEdit] = useState(false);
   const [formState, setFormState]: any = useState({});
@@ -20,32 +21,25 @@ const Accesses = ({ data, reload, setDataID }: any) => {
     setDataID(62);
   }, [openDetail]);
 
-
   const onPressDetail = (item: any) => {
     setOpenDetail(true);
-    setFormState({ id: item.id });
+    setFormState({id: item.id});
   };
 
-
   const handleAction = (item: any) => {
-
     if (!item.in_at && item.confirm_at && item.confirm === 'Y') {
-
       onPressDetail(item);
     } else if (item.in_at && !item.out_at) {
-   
       onPressDetail(item);
     } else {
-
       onPressDetail(item);
     }
   };
 
-
   const allowIn = (item: any) => {
     return (
       <TouchableOpacity
-        style={{ borderRadius: 10 }}
+        style={{borderRadius: 10}}
         onPress={() => handleAction(item)}
         accessibilityLabel={`Dejar entrar a ${getFullName(item.visit)}`}>
         <Text
@@ -66,7 +60,7 @@ const Accesses = ({ data, reload, setDataID }: any) => {
   const allotOut = (item: any) => {
     return (
       <TouchableOpacity
-        style={{ borderRadius: 10 }}
+        style={{borderRadius: 10}}
         onPress={() => handleAction(item)}
         accessibilityLabel={`Dejar salir a ${getFullName(item.visit)}`}>
         <Text
@@ -85,16 +79,20 @@ const Accesses = ({ data, reload, setDataID }: any) => {
 
   const notAutorized = (item: any) => {
     return (
-      <Text style={{ fontSize: 10, fontFamily: FONTS.regular, color: cssVar.cError }}>
+      <Text
+        style={{fontSize: 10, fontFamily: FONTS.regular, color: cssVar.cError}}>
         No Autorizado
       </Text>
     );
   };
 
   const waitingConfirmation = (item: any) => {
-    return <Text style={{ fontSize: 10, fontFamily: FONTS.regular }}>Esperando Confirmación</Text>;
+    return (
+      <Text style={{fontSize: 10, fontFamily: FONTS.regular}}>
+        Esperando Confirmación
+      </Text>
+    );
   };
-
 
   const right = (item: any) => {
     if (!item?.in_at && !item?.confirm_at) {
@@ -114,7 +112,11 @@ const Accesses = ({ data, reload, setDataID }: any) => {
   };
 
   const title = (item: any) => {
-    return item.type === 'O' ? <Text>{getFullName(item.owner)}</Text> : <Text>{getFullName(item.visit)}</Text>;
+    return item.type === 'O' ? (
+      <Text>{getFullName(item.owner)}</Text>
+    ) : (
+      <Text>{getFullName(item.visit)}</Text>
+    );
   };
 
   const subtitle = (item: any) => {
@@ -186,9 +188,7 @@ const Accesses = ({ data, reload, setDataID }: any) => {
       <Avatar
         src={avatarSrc}
         name={
-          item.type === 'O'
-            ? getFullName(item.owner)
-            : getFullName(item.visit)
+          item.type === 'O' ? getFullName(item.owner) : getFullName(item.visit)
         }
       />
     );
@@ -210,18 +210,28 @@ const Accesses = ({ data, reload, setDataID }: any) => {
 
   return (
     <>
-      <List data={data} renderItem={(item) => renderItemAccess(item, onPressDetail)} />
+      <List
+        data={data}
+        renderItem={item => renderItemAccess(item, onPressDetail)}
+      />
       {openDetail && (
-        <DetailContainer
+        <DetAccesses
           id={formState?.id}
           open={openDetail}
           close={() => setOpenDetail(false)}
           reload={reload}
-          edit={edit}
-          type="accesos"
-          detailComponent={AccessDetail}
-          screenParams={screenParams}
+          // execute={execute}
         />
+        // <DetailContainer
+        //   id={formState?.id}
+        //   open={openDetail}
+        //   close={() => setOpenDetail(false)}
+        //   reload={reload}
+        //   edit={edit}
+        //   type="accesos"
+        //   detailComponent={AccessDetail}
+        //   screenParams={screenParams}
+        // />
       )}
     </>
   );
