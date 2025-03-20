@@ -13,11 +13,16 @@ import List from '../../../../mk/components/ui/List/List';
 import CompanionCheckItem from './shares/CompanionCheckItem';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import {ThemeContext} from '../../../../mk/contexts/ThemeContext';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
+import ItemListDate from './shares/ItemListDate';
+import {IconCheck, IconCheckOff} from '../../../icons/IconLibrary';
 
 const DetAccesses = ({id, open, close, reload}: any) => {
   const {execute, waiting} = useApi();
   const [data, setData]: any = useState(null);
-  const [acompanSelect, setAcompSelect]: any = useState([]);
+  const [acompanSelect, setAcompSelect]: any = useState({});
   const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
 
   useEffect(() => {
@@ -27,77 +32,15 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         searchBy: id,
       });
       if (data.success) {
+        if (data.data[0].access_id) return getData(data.data[0].access_id);
         setData(data?.data?.length > 0 ? data?.data[0] : null);
+        console.log('DET', data.data);
       }
     };
     if (id) {
       getData(id);
     }
   }, [id]);
-
-  // Determina un estado corto ("C": Completado, "I": Ingreso en proceso, "" si no aplica)
-  //
-  const getStatus = () => {
-    //status
-    // S=Solicitud de confirmacion
-    // Y = solicitud confirmada
-    // N = Solicitid rechazada
-    // I=Ingreso falta que salga
-    // C=completado
-    if (!data?.in_at && !data?.out_at && !data?.confirm) return 'S';
-    if (!data?.in_at && !data?.out_at && data.confirm) return data.confirm;
-    if (data?.in_at && !data?.out_at) return 'I';
-    if (data?.out_at) return 'C';
-    return '';
-  };
-
-  let status = getAccessStatus(data);
-  let accessType = getAccessType(data);
-
-  // Función para alternar la selección de un acompañante
-  const handleSelectAcomp = (id: number) => {
-    const isSelected = acompanSelect.some((a: any) => a.id === id);
-    if (isSelected) {
-      setAcompSelect(acompanSelect.filter((a: any) => a.id !== id));
-    } else {
-      setAcompSelect([...acompanSelect, {id}]);
-    }
-  };
-
-  // Función para armar la información de acción (buttonText) según la data
-  const assembleDetail = (item: any) => {
-    let buttonText = '';
-    // Si ya salió, no se muestra acción
-    if (item.out_at) {
-      buttonText = '';
-    } else if (item.in_at) {
-      buttonText = 'Dejar salir';
-    } else if (!item.in_at && item.confirm_at && item.confirm === 'Y') {
-      buttonText = 'Dejar entrar';
-    }
-    return {buttonText};
-  };
-
-  const assembledDetail = data ? assembleDetail(data) : {buttonText: ''};
-
-  // Actualiza formState para las observaciones
-  const handleInputChange = (name: string, value: string) => {
-    setFormState({...formState, [name]: value});
-  };
-
-  // Renderiza cada acompañante (suponiendo que companion.id o companion.visit.id es el identificador)
-  const renderCompanion = (companion: any) => {
-    const compId = companion.id || companion.visit?.id;
-    const isSelected = acompanSelect.some((a: any) => a.id === compId);
-    return (
-      <CompanionCheckItem
-        key={compId}
-        companion={companion}
-        isSelected={isSelected}
-        onToggle={handleSelectAcomp}
-      />
-    );
-  };
 
   const handleSave = async () => {
     const status = getStatus();
@@ -133,21 +76,43 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     }
   };
 
-  return (
-    <ModalFull
-      onClose={close}
-      open={open}
-      title={'Detalle'}
-      onSave={handleSave}
-      // buttonCancel={getStatus() === 'C' ? '' : 'cancelar'}
-      buttonText={
-        getStatus() === 'I'
-          ? 'Dejar salir'
-          : getStatus() === 'Y'
-          ? 'Dejar entrar'
-          : ''
-      }>
-      <Card>
+  const getStatus = (acceso: any = null) => {
+    const _data = acceso || data;
+    //status
+    // S=Solicitud de confirmacion
+    // Y = solicitud confirmada
+    // N = Solicitid rechazada
+    // I=Ingreso falta que salga
+    // C=completado
+    if (!_data?.in_at && !_data?.out_at && !_data?.confirm_at) return 'S';
+    if (!_data?.in_at && !_data?.out_at && _data.confirm) return _data.confirm;
+    if (_data?.in_at && !_data?.out_at) return 'I';
+    if (_data?.out_at) return 'C';
+    return '';
+  };
+
+  let accessType = getAccessType(data);
+
+  // Actualiza formState para las observaciones
+  const handleInputChange = (name: string, value: string) => {
+    setFormState({...formState, [name]: value});
+  };
+
+  const getButtonText = () => {
+    const status = getStatus();
+    const buttonTexts: Record<string, string> = {
+      I: 'Dejar salir',
+      Y: 'Dejar entrar',
+      S: 'Esperando Cnfirmacion',
+      C: 'Completado',
+    };
+    return buttonTexts[status] || '';
+  };
+
+  const cardDetail = () => {
+    const status = getStatus();
+    return (
+      <>
         <LineDetail label="Estado" value={status} />
         <LineDetail label="Tipo" value={accessType} />
         {(data?.type === 'I' || data?.type === 'G') && data?.invitation && (
@@ -214,37 +179,97 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             ) : null}
           </>
         )}
+      </>
+    );
+  };
 
+  const getCheckVisit = (visit: any, isSelected: boolean) => {
+    const status = getStatus(visit);
+
+    if (status == 'S')
+      return <Text style={{color: cssVar.cWhite}}>Sin confirmar</Text>;
+    if (status == 'N')
+      return <Text style={{color: cssVar.cError}}>No Autorizado</Text>;
+    if (status == 'C') return null;
+
+    return (
+      <Icon
+        name={isSelected ? IconCheck : IconCheckOff}
+        color={isSelected ? cssVar.cSuccess : 'transparent'}
+        fillStroke={isSelected ? undefined : 'white'}
+        onPress={() =>
+          setAcompSelect({
+            ...acompanSelect,
+            [visit?.id]: !acompanSelect[visit?.id],
+          })
+        }
+      />
+    );
+  };
+
+  const detailVisit = (data: any) => {
+    const isSelected = acompanSelect[data?.id || '0'];
+    return (
+      <ItemList
+        key={data?.visit?.id}
+        title={getFullName(data?.visit)}
+        subtitle={'C.I. ' + data?.visit?.ci}
+        left={<Avatar name={getFullName(data?.visit)} />}
+        right={getCheckVisit(data, isSelected)}
+        date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
+      />
+    );
+  };
+
+  const detailCompanions = () => {
+    if (data?.accesses?.length == 0) return null;
+    return (
+      <>
+        <Text style={{color: cssVar.cWhite, marginVertical: 10}}>Visitas</Text>
+        <List data={data?.accesses} renderItem={detailVisit} />
+      </>
+    );
+  };
+
+  const getObs = () => {
+    const status = getStatus();
+    if (status == 'Y')
+      return (
+        <TextArea
+          label="Observaciones de Entrada"
+          name="obs_in"
+          value={formState?.obs_in || ''}
+          onChange={e => handleInputChange('obs_in', e.target.value)}
+        />
+      );
+    if (status == 'I')
+      return (
+        <TextArea
+          label="Observaciones de Salida"
+          name="obs_out"
+          value={formState?.obs_out || ''}
+          onChange={e => handleInputChange('obs_out', e.target.value)}
+        />
+      );
+    return null;
+  };
+
+  return (
+    <ModalFull
+      onClose={close}
+      open={open}
+      title={'Detalle'}
+      onSave={handleSave}
+      // buttonCancel={getStatus() === 'C' ? '' : 'cancelar'}
+      buttonText={getButtonText()}>
+      <Card>
+        {cardDetail()}
+        {/* visita */}
+        {detailVisit(data)}
         {/* Lista de acompañantes */}
-        {data?.accesses &&
-          assembledDetail?.buttonText !== '' &&
-          data?.accesses?.length > 0 && (
-            <>
-              <Text style={{color: cssVar.cWhite, marginVertical: 10}}>
-                Visitas
-              </Text>
-              <List data={data.accesses} renderItem={renderCompanion} />
-            </>
-          )}
-
+        {detailCompanions()}
         {/* Mostrar textarea según la acción (botón) */}
-        {assembledDetail.buttonText === 'Dejar entrar' && (
-          <TextArea
-            label="Observaciones de Entrada"
-            name="obs_in"
-            value={formState?.obs_in || ''}
-            onChange={e => handleInputChange('obs_in', e.target.value)}
-          />
-        )}
-        {assembledDetail.buttonText === 'Dejar salir' && (
-          <TextArea
-            label="Observaciones de Salida"
-            name="obs_out"
-            value={formState?.obs_out || ''}
-            onChange={e => handleInputChange('obs_out', e.target.value)}
-            // style={{ backgroundColor: theme.form?.color }}
-          />
-        )}
+        {getObs()}
       </Card>
     </ModalFull>
   );
