@@ -93,7 +93,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
             ) : null}
           </>
         )}
-        <Text style={{ color: 'white' }}>{JSON.stringify(data)}</Text>
+        {/* <Text style={{ color: 'white' }}>{JSON.stringify(data)}</Text> */}
 
       </Card>
     </ModalFull>
