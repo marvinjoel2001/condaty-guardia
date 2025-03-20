@@ -181,3 +181,41 @@ export const openDocument = (data: any) => {
 export const isIos = () => {
   return Platform.OS == 'ios';
 };
+
+
+export const getAccessStatus = (data:any) => {
+  if (data?.out_at) {
+    return "Completado";
+  } else if (!data?.confirm_at) {
+    return "Por confirmar";
+  } else if (data?.in_at) {
+    return "Por Salir";
+  } else if (data?.confirm === "Y") {
+    return "Por Entrar";
+  } else {
+    return "Denegado";
+  }
+};
+export const getAccessType = (data: any) => {
+  // item?.type === "P"
+  // ? "Pedido-" + item?.other?.other_type.name
+  // : item?.type === "I"
+  // ? "QR Individual"
+  // : item?.type === "C"
+  // ? "Sin QR"
+  // : item?.type === "G"
+  // ? "QR Grupal"
+  // : "QR Llave Virtual",
+  if( data?.type === "P"){
+    return "Pedido-" + data?.other?.other_type.name
+    }else if(data?.type === "I"){
+      return "QR Individual"
+      }else if(data?.type === "C"){
+        return "Sin QR"
+        }else if(data?.type === "G"){
+          return "QR Grupal"
+          }else{
+            return "QR Llave Virtual"
+            }
+            };
+            
