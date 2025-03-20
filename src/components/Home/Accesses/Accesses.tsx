@@ -1,14 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import { ItemList } from '../../../../mk/components/ui/ItemList/ItemList';
 import ItemListDate from './shares/ItemListDate';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
+import { IconDelivery, IconOther, IconTaxi } from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import DetailContainer, {AccessDetail} from './shares/DetailContainer';
 import DetAccesses from './DetAccesses';
 
 const Accesses = ({data, reload, setDataID}: any) => {

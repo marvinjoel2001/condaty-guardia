@@ -1,23 +1,21 @@
 // DetAccesses.tsx
-import React, {useEffect, useState, useContext} from 'react';
-import {StyleSheet, Text} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text } from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import LineDetail from './shares/LineDetail';
 import useApi from '../../../../mk/hooks/useApi';
-import {getAccessStatus, getAccessType} from '../../../../mk/utils/utils';
-import {getDateStrMes} from '../../../../mk/utils/dates';
-import {getFullName} from '../../../../mk/utils/strings';
+import { getAccessType } from '../../../../mk/utils/utils';
+import { getDateStrMes } from '../../../../mk/utils/dates';
+import { getFullName } from '../../../../mk/utils/strings';
 import List from '../../../../mk/components/ui/List/List';
-import CompanionCheckItem from './shares/CompanionCheckItem';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
-import {ThemeContext} from '../../../../mk/contexts/ThemeContext';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
+import { ItemList } from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import ItemListDate from './shares/ItemListDate';
-import {IconCheck, IconCheckOff} from '../../../icons/IconLibrary';
+import { IconCheck, IconCheckOff } from '../../../icons/IconLibrary';
 
 const DetAccesses = ({id, open, close, reload}: any) => {
   const {execute, waiting} = useApi();
