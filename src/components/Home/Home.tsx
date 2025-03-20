@@ -50,7 +50,7 @@ const Home = () => {
         fullType: 'AD',
         searchBy: search || '',
       },
-      // false,3
+       false,3
     );
     setData(data?.data || []);
   };

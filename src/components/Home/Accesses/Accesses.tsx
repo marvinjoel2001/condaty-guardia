@@ -88,7 +88,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
 
   const waitingConfirmation = (item: any) => {
     return (
-      <Text style={{fontSize: 10, fontFamily: FONTS.regular}}>
+      <Text style={{fontSize: 10, fontFamily: FONTS.regular,color:cssVar.cWhite}}>
         Esperando Confirmación
       </Text>
     );
