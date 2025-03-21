@@ -106,6 +106,7 @@ console.log(acompanSelect,'acompanSelect')
 
   // Actualiza formState para las observaciones
   const handleInputChange = (name: string, value: string) => {
+    console.log(name,value,'name value')
     setFormState({...formState, [name]: value});
   };
 
@@ -250,8 +251,8 @@ console.log(acompanSelect,'acompanSelect')
         <TextArea
           label="Observaciones de Entrada"
           name="obs_in"
-          value={formState?.obs_in || ''}
-          onChange={e => handleInputChange('obs_in', e.target.value)}
+          value={formState?.obs_in}
+          onChange={(e:any) => handleInputChange('obs_in', e)}
         />
       );
     if (status == 'I')
@@ -259,8 +260,8 @@ console.log(acompanSelect,'acompanSelect')
         <TextArea
           label="Observaciones de Salida"
           name="obs_out"
-          value={formState?.obs_out || ''}
-          onChange={e => handleInputChange('obs_out', e.target.value)}
+          value={formState?.obs_out}
+          onChange={(e:any) => handleInputChange('obs_out', e)}
         />
       );
     return null;
