@@ -16,13 +16,15 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import ItemListDate from './shares/ItemListDate';
 import { IconCheck, IconCheckOff } from '../../../icons/IconLibrary';
+import useAuth from '../../../../mk/hooks/useAuth';
 
 const DetAccesses = ({id, open, close, reload}: any) => {
+  const {showToast} = useAuth();
   const {execute, waiting} = useApi();
   const [data, setData]: any = useState(null);
-  const [acompanSelect, setAcompSelect]: any = useState({});
+  const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
-
+console.log(acompanSelect,'acompanSelect')
   useEffect(() => {
     const getData = async (id: number) => {
       const {data} = await execute('/accesses', 'GET', {
@@ -42,23 +44,34 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
   const handleSave = async () => {
     const status = getStatus();
+
+    // console.log(ids,'status desde save',acompanSelect)
     if (status === 'I') {
-      if (acompanSelect.length === 0) {
-        console.log(
-          'Debe seleccionar al menos un acompañante para dejar salir',
-        );
-        return;
-      }
-      const ids = acompanSelect.map((item: any) => item.id);
+   
+        if (Object.values(acompanSelect).every(value => !value)) {
+          console.log(
+            'Debe seleccionar al menos un acompañante para dejar salir',
+          );
+          showToast('Debe seleccionar al menos un acompañante para dejar salir','error');
+          return;
+        }
+      // const ids = acompanSelect.map((item: any) => item.id);
+      const ids = Object.keys(acompanSelect)
+      .filter(id => acompanSelect[id])
+      .map(id => Number(id));
+
+      console.log(ids,'idsss')
       const {data: result, error} = await execute('/accesses/exit', 'POST', {
         ids,
         obs_out: formState?.obs_out || '',
-      });
+      },false,3);
       if (result?.success) {
         reload();
         close();
+        showToast("El visitante salió", "success");
       } else {
         console.log('Error en dejar salir:', error);
+        showToast("Error al dejar salir", "error");
       }
     } else {
       const {data: result, error} = await execute('/accesses/enter', 'POST', {
@@ -199,6 +212,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           setAcompSelect({
             ...acompanSelect,
             [visit?.id]: !acompanSelect[visit?.id],
+
           })
         }
       />

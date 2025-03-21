@@ -24,7 +24,9 @@ import ItemListDate from './Accesses/shares/ItemListDate';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 
 import useApi from '../../../mk/hooks/useApi';
+import DetOrders from './Orders/DetOrders';
 import Orders from './Orders/Orders';
+
 
 const Home = () => {
   const [formstate, setFormState]: any = useState({});
@@ -42,15 +44,15 @@ const Home = () => {
   const [data, setData] = useState([]);
   const [dataID,setDataID] = useState(0);
 
-  const getAccesses = async ( search: any = '',endpoint:string ) => {
+  const getAccesses = async ( search: any = '',endpoint:string, fullType:string  ) => {
     const {data} = await execute(
       endpoint,
       'GET',
       {
-        fullType: 'AD',
+        fullType,
         searchBy: search || '',
       },
-       false,3
+      //  false,3
     );
     setData(data?.data || []);
   };
@@ -71,13 +73,13 @@ const Home = () => {
   useEffect(() => {
     switch (typeSearch) {
       case 'I':
-        getAccesses('','/accesses');
+        getAccesses('','/accesses','AD');
         break;
       case 'A':
-        getAccesses('','/accesses');
+        getAccesses('','/accesses','AD');
         break;
       case 'P':
-        getAccesses('','/others');
+        getAccesses('','/others','P');
         break;
       default:
         console.log('typeSercg no valido', typeSearch);
@@ -129,12 +131,10 @@ const Home = () => {
             edit={true}
           />
         )} */}
-
+      <View style={styles.listContainer}>
         {typeSearch === 'A' && <Accesses data={data} reload={reload} setDataID={setDataID} />}
         {typeSearch === 'P' && <Orders data={data} reload={reload} setDataID={setDataID} />}
-
-
-        <Text>assa</Text>
+      </View>
         {openCamera && (
           <CameraQr open={openCamera} onClose={() => setOpenCamera(false)} />
         )}
@@ -169,5 +169,9 @@ const styles = StyleSheet.create({
   client: {
     color: cssVar.cWhiteV2,
     textAlign: 'center',
+  },
+  listContainer: {
+    width: '100%',
+    paddingHorizontal: cssVar.spL,
   },
 });
