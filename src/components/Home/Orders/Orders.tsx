@@ -10,7 +10,7 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import { IconDelivery, IconOther, IconTaxi } from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import ItemListDate from '../Accesses/shares/ItemListDate';
-import DetailContainer, { OrderDetail } from '../Accesses/shares/DetailContainer';
+
 
 
 const Orders = ({ data, reload, setDataID }: any) => {
@@ -91,18 +91,7 @@ const Orders = ({ data, reload, setDataID }: any) => {
   return (
     <>
       <List data={data} renderItem={(item) => renderItemOrder(item, onPressDetail)} />
-      {openDetail && (
-        <DetailContainer
-          id={formState?.id}
-          open={openDetail}
-          close={() => setOpenDetail(false)}
-          reload={reload}
-          edit={edit}
-          type="pedidos"
-          detailComponent={OrderDetail}
-          screenParams={screenParams}
-        />
-      )}
+ 
     </>
   );
 };
