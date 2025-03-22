@@ -70,7 +70,7 @@ const DetOrders = ({ id, open, close, reload }: any) => {
         return;
       }
       const ids = acompanSelect.map((item: any) => item.id);
-      const { data: result, error } = await execute('/others/exit', 'POST', {
+      const { data: result, error } = await execute('/accesses/exit', 'POST', {
         ids,
         obs_out: formState?.obs_out || '',
       });
@@ -82,9 +82,18 @@ const DetOrders = ({ id, open, close, reload }: any) => {
       }
     } else {
       // Acción: Dejar entrar
-      const { data: result, error } = await execute('/orders/enter', 'POST', {
-        id: data?.id,
-        obs_in: formState?.obs_in || '',
+      const { data: result, error } = await execute('/accesses', 'POST', {
+        pedido_id: data?.id,
+        // begin_at: item.begin_at,
+        type: "P",
+        // plate: item.plate,
+        // name: item.name,
+        // middle_name: item.middle_name,
+        // last_name: item.last_name,
+        // mother_last_name: item.mother_last_name,
+        // ci: item.ci,
+        // obs_in: formState.obs_in,
+        // acompanantes: formState.acompanantes,
       });
       if (result?.success) {
         reload();
@@ -140,7 +149,7 @@ const DetOrders = ({ id, open, close, reload }: any) => {
             label="Observaciones de Entrada"
             name="obs_in"
             value={formState?.obs_in || ''}
-            onChange={(e) => handleInputChange('obs_in', e.target.value)}
+            onChange={(e) => handleInputChange('obs_in', e)}
           />
         )}
         {getStatus() === 'I' && (
@@ -148,7 +157,7 @@ const DetOrders = ({ id, open, close, reload }: any) => {
             label="Observaciones de Salida"
             name="obs_out"
             value={formState?.obs_out || ''}
-            onChange={(e) => handleInputChange('obs_out', e.target.value)}
+            onChange={(e) => handleInputChange('obs_out', e)}
           />
         )}
       </Card>
