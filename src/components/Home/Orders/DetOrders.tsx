@@ -10,6 +10,7 @@ import { getFullName } from '../../../../mk/utils/strings';
 import { cssVar } from '../../../../mk/styles/themes';
 import LineDetail from '../Accesses/shares/LineDetail';
 import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
+import { getAccessStatus } from '../../../../mk/utils/utils';
 
 const DetOrders = ({ id, open, close, reload }: any) => {
   const { execute, waiting } = useApi();
@@ -53,6 +54,7 @@ const DetOrders = ({ id, open, close, reload }: any) => {
     };
     return mapping[status] || '';
   };
+  
 
   const handleInputChange = (name: string, value: string) => {
     setFormState({ ...formState, [name]: value });
@@ -98,7 +100,7 @@ const DetOrders = ({ id, open, close, reload }: any) => {
     const status = getStatus();
     return (
       <>
-        <LineDetail label="Estado" value={status} />
+        <LineDetail label="Estado" value={ getAccessStatus(data) } />
         <LineDetail
           label="Tipo de pedido"
           value={
