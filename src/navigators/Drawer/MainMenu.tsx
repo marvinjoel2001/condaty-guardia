@@ -43,8 +43,9 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
               '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
             )}
             style={theme.avatar}
-            // w={64}
-            // h={64}
+            circle={false}
+             w={62}
+             h={62}
           />
         }
       />

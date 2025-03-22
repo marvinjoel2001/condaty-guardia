@@ -13,8 +13,10 @@ import useApi from '../../../mk/hooks/useApi';
 import { cssVar } from '../../../mk/styles/themes';
 import { getFullName } from '../../../mk/utils/strings';
 import DataSearch from '../../../mk/components/ui/DataSearch';
+import useAuth from '../../../mk/hooks/useAuth';
 
 const Home = () => {
+  const { user } = useAuth();
   const [openSlide, setOpenSlide] = useState(true);
   const [data, setData]:any = useState([]);
   const [dataID, setDataID] = useState(0);
@@ -67,7 +69,7 @@ const Home = () => {
 
   const customTitle = () => (
     <View>
-      <HeadDashboardTitle user={{}} setOpenDropdown={() => {}} stop={false} theme={theme} />
+      <HeadDashboardTitle user={user} setOpenDropdown={() => {}} stop={false} theme={theme} />
     </View>
   );
 
