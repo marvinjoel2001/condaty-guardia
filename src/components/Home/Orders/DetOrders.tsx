@@ -20,9 +20,10 @@ const DetOrders = ({ id, open, close, reload }: any) => {
   useEffect(() => {
     const getData = async (id: number) => {
       // Suponiendo que para pedidos usas otro endpoint (o envías type "P")
-      const { data } = await execute('/orders', 'GET', {
+      const { data } = await execute('/others', 'GET', {
         fullType: 'DET',
         searchBy: id,
+        section: 'HOME',
       });
       if (data.success) {
         // Si el pedido tiene algún atributo que lo redirija a otro registro, podrías hacer una recursión similar a accesses
@@ -35,14 +36,8 @@ const DetOrders = ({ id, open, close, reload }: any) => {
   }, [id]);
 
   const getStatus = () => {
-    // Define el estado según la lógica del pedido:
-    // Por ejemplo:
-    // - Si no hay in_at ni confirm_at: "Solicitud"
-    // - Si confirmado pero sin in_at: "Por ingresar"
-    // - Si ya ingresó (in_at registrado) y sin out_at: "En proceso"
-    // - Si out_at existe: "Completado"
-    if (!data?.in_at && !data?.out_at && !data?.confirm_at) return 'S';
-    if (!data?.in_at && data?.confirm === 'Y') return 'Y';
+    
+    if (!data?.in_at) return 'Y';
     if (data?.in_at && !data?.out_at) return 'I';
     if (data?.out_at) return 'C';
     return '';
@@ -53,7 +48,7 @@ const DetOrders = ({ id, open, close, reload }: any) => {
     const mapping: Record<string, string> = {
       I: 'Dejar salir',
       Y: 'Dejar entrar',
-      S: 'Esperando confirmación',
+      // S: 'Esperando confirmación',
       C: 'Completado',
     };
     return mapping[status] || '';

@@ -9,6 +9,7 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import { IconDelivery, IconOther, IconTaxi } from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
+import { buttonPrimary, buttonSecondary } from './shares/styles';
 
 const Accesses = ({data, reload, setDataID}: any) => {
   const [openDetail, setOpenDetail] = useState(false);
@@ -42,14 +43,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
         onPress={() => handleAction(item)}
         accessibilityLabel={`Dejar entrar a ${getFullName(item.visit)}`}>
         <Text
-          style={{
-            fontSize: 10,
-            fontFamily: FONTS.regular,
-            color: cssVar.cAccent,
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            marginTop: 1,
-          }}>
+          style={buttonPrimary}>
           Dejar entrar
         </Text>
       </TouchableOpacity>
@@ -63,13 +57,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
         onPress={() => handleAction(item)}
         accessibilityLabel={`Dejar salir a ${getFullName(item.visit)}`}>
         <Text
-          style={{
-            fontSize: 10,
-            fontFamily: FONTS.regular,
-            paddingHorizontal: 10,
-            paddingVertical: 4,
-            color: cssVar.cWhiteV2,
-          }}>
+          style={buttonSecondary}>
           Dejar salir
         </Text>
       </TouchableOpacity>

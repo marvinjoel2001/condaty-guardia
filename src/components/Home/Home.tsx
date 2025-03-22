@@ -51,6 +51,7 @@ const Home = () => {
       {
         fullType,
         searchBy: search || '',
+        section: endpoint === '/others'? 'HOME' : ''
       },
       //  false,3
     );
@@ -73,13 +74,13 @@ const Home = () => {
   useEffect(() => {
     switch (typeSearch) {
       case 'I':
-        getAccesses('','/accesses','AD');
+        getAccesses('','/accesses','P');
         break;
       case 'A':
         getAccesses('','/accesses','AD');
         break;
       case 'P':
-        getAccesses('','/others','P');
+        getAccesses('','/others','L');
         break;
       default:
         console.log('typeSercg no valido', typeSearch);
@@ -132,7 +133,7 @@ const Home = () => {
           />
         )} */}
       <View style={styles.listContainer}>
-        {typeSearch === 'A' && <Accesses data={data} reload={reload} setDataID={setDataID} />}
+        {typeSearch === 'A' || typeSearch === 'I' && <Accesses data={data} reload={reload} setDataID={setDataID} />}
         {typeSearch === 'P' && <Orders data={data} reload={reload} setDataID={setDataID} />}
       </View>
         {openCamera && (

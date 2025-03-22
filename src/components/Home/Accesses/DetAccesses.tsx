@@ -24,7 +24,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
-console.log(acompanSelect,'acompanSelect')
+
+
   useEffect(() => {
     const getData = async (id: number) => {
       const {data} = await execute('/accesses', 'GET', {
@@ -34,18 +35,18 @@ console.log(acompanSelect,'acompanSelect')
       if (data.success) {
         if (data.data[0].access_id) return getData(data.data[0].access_id);
         setData(data?.data?.length > 0 ? data?.data[0] : null);
-        console.log('DET', data.data);
+        // console.log('DET', data.data);
       }
     };
     if (id) {
       getData(id);
     }
   }, [id]);
-
+// console.log(data,'data dataaaa')
   const handleSave = async () => {
     const status = getStatus();
 
-    // console.log(ids,'status desde save',acompanSelect)
+    //  console.log('status desde save',acompanSelect)
     if (status === 'I') {
    
         if (Object.values(acompanSelect).every(value => !value)) {
@@ -60,7 +61,7 @@ console.log(acompanSelect,'acompanSelect')
       .filter(id => acompanSelect[id])
       .map(id => Number(id));
 
-      console.log(ids,'idsss')
+      // console.log(ids,'idsss')
       const {data: result, error} = await execute('/accesses/exit', 'POST', {
         ids,
         obs_out: formState?.obs_out || '',
@@ -101,12 +102,13 @@ console.log(acompanSelect,'acompanSelect')
     if (_data?.out_at) return 'C';
     return '';
   };
+  // const status = getStatus();
 
   let accessType = getAccessType(data);
 
   // Actualiza formState para las observaciones
   const handleInputChange = (name: string, value: string) => {
-    console.log(name,value,'name value')
+
     setFormState({...formState, [name]: value});
   };
 
@@ -115,17 +117,19 @@ console.log(acompanSelect,'acompanSelect')
     const buttonTexts: Record<string, string> = {
       I: 'Dejar salir',
       Y: 'Dejar entrar',
-      S: 'Esperando Cnfirmacion',
+      S: 'Esperando Confirmacion',
       C: 'Completado',
     };
     return buttonTexts[status] || '';
   };
 
+  const statusText = getButtonText();
+
   const cardDetail = () => {
     const status = getStatus();
     return (
       <>
-        <LineDetail label="Estado" value={status} />
+        <LineDetail label="Estado" value={statusText} />
         <LineDetail label="Tipo" value={accessType} />
         {(data?.type === 'I' || data?.type === 'G') && data?.invitation && (
           <>
