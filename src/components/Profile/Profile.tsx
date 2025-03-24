@@ -47,7 +47,9 @@ const Profile = () => {
   const currentClient: any = user.clients?.find(
     (e: any) => e.pivot.client_id == user.client_id,
   );
+ 
 
+  console.log(isEdit,'is ediii')
   // Cuando el componente obtiene el foco
   useFocusEffect(
     React.useCallback(() => {
@@ -257,7 +259,9 @@ const Profile = () => {
           style={{
             marginVertical: 8,
           }}
-          onPress={handleEdit}>
+          onPress={handleEdit}
+          
+          >
           Editar perfil
         </Button>
       )}

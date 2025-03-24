@@ -42,14 +42,17 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
         borderColor: cssVar.cError,
         borderWidth: 1,
       }}
-      headerStyles={{color: cssVar.cError}}
+      headerStyles={
+        {color:details?.data?.level === 3 ? 
+          cssVar.cError : details?.data?.level ===2 ? 
+          cssVar.cWarning : cssVar.cSuccess}}
       title={
         details?.data?.id
           ? '¡Alerta nivel ' + nivelAlerta[details?.data?.level] + '!'
           : ''
       }
       overlayClose={true}
-      buttonCancel="Cerrar"
+      // buttonCancel="Cerrar"
       onClose={_onClose}>
       <View>
         {!loaded ? (
