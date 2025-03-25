@@ -17,7 +17,10 @@ import useAuth from '../../../mk/hooks/useAuth';
 
 const Home = () => {
   const {user} = useAuth();
-  const [openSlide, setOpenSlide] = useState(true);
+  // const [openSlide, setOpenSlide] = useState(true);
+  const [openQr, setOpenQr] = useState(false);
+  const [code, setCode] = useState('');
+  // const [openCiNom, setOpenCiNom] = useState(false);
   const [data, setData]: any = useState([]);
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
@@ -95,7 +98,8 @@ const Home = () => {
       <Layout
         title="Home"
         customTitle={customTitle()}
-        style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}>
+        // style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}
+      >
         <TabsButtons
           tabs={[
             {value: 'I', text: 'Pendientes'},
@@ -128,8 +132,18 @@ const Home = () => {
             <Orders data={filteredData} reload={reload} setDataID={setDataID} />
           )}
         </View>
+        {openQr && (
+          <CameraQr
+            open={openQr}
+            onClose={() => setOpenQr(false)}
+            setCode={setCode}
+          />
+        )}
       </Layout>
-      <DropdawnAccess onPressQr={() => {}} onPressCiNom={() => {}} />
+      <DropdawnAccess
+        onPressQr={() => setOpenQr(true)}
+        onPressCiNom={() => {}}
+      />
     </>
   );
 };
