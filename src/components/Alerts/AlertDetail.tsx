@@ -34,18 +34,22 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     onClose();
     setDetails({});
   };
+  const colorAlert =
+    details?.data?.level === 3
+      ? cssVar.cError
+      : details?.data?.level === 2
+      ? cssVar.cWarning
+      : cssVar.cSuccess;
 
   return (
     <Modal
       open={open}
       containerStyles={{
-        borderColor: cssVar.cError,
+        borderColor: colorAlert,
         borderWidth: 1,
       }}
       headerStyles={
-        {color:details?.data?.level === 3 ? 
-          cssVar.cError : details?.data?.level ===2 ? 
-          cssVar.cWarning : cssVar.cSuccess}}
+        {color:colorAlert}}
       title={
         details?.data?.id
           ? '¡Alerta nivel ' + nivelAlerta[details?.data?.level] + '!'
