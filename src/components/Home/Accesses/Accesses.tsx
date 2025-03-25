@@ -189,7 +189,6 @@ const Accesses = ({data, reload, setDataID}: any) => {
       />
     );
   };
-  console.log(openDetail);
   return (
     <>
       <List

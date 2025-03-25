@@ -24,19 +24,35 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
-
-  useEffect(() => {
-    const getData = async (id: number) => {
+  const getData = async (id: number) => {
+    try {
       const {data} = await execute('/accesses', 'GET', {
         fullType: 'DET',
         searchBy: id,
       });
-      if (data.success) {
-        if (data.data[0].access_id) return getData(data.data[0].access_id);
-        setData(data?.data?.length > 0 ? data?.data[0] : null);
-        // console.log('DET', data.data);
+
+      if (data.success && data.data.length > 0) {
+        // If there's a linked access_id, use that instead of the current data
+        const accessData = data.data[0];
+        if (accessData.access_id) {
+          const {data: linkedData} = await execute('/accesses', 'GET', {
+            fullType: 'DET',
+            searchBy: accessData.access_id,
+          });
+
+          if (linkedData.success && linkedData.data.length > 0) {
+            setData(linkedData.data[0]);
+          }
+        } else {
+          setData(accessData);
+        }
       }
-    };
+    } catch (error) {
+      console.error('Error fetching access data:', error);
+    }
+  };
+
+  useEffect(() => {
     if (id) {
       getData(id);
     }

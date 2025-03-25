@@ -32,6 +32,8 @@ const Home = () => {
     fullType: string,
   ) => {
     const {data} = await execute(endpoint, 'GET', {
+      perPage: -1,
+      page: 1,
       fullType,
       searchBy: searchParam || '',
       section: endpoint === '/others' ? 'HOME' : '',
@@ -44,12 +46,15 @@ const Home = () => {
     switch (typeSearch) {
       case 'I':
         getAccesses('', '/accesses', 'P');
+        setData([]);
         break;
       case 'A':
         getAccesses('', '/accesses', 'AD');
+        setData([]);
         break;
       case 'P':
         getAccesses('', '/others', 'L');
+        setData([]);
         break;
       default:
         console.log('Tipo de búsqueda no válido:', typeSearch);
@@ -140,5 +145,6 @@ const styles = StyleSheet.create({
   listContainer: {
     width: '100%',
     paddingHorizontal: cssVar.spL,
+    paddingBottom: 40,
   },
 });
