@@ -248,7 +248,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const detailVisit = (data: any) => {
     const isSelected = acompanSelect[data?.id || '0'];
     return (
-      <ItemList
+      <>      <ItemList
         key={data?.visit?.id}
         title={getFullName(data?.visit)}
         subtitle={'C.I. ' + data?.visit?.ci}
@@ -256,6 +256,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         right={getCheckVisit(data, isSelected)}
         date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
       />
+      </>
+
     );
   };
 
@@ -263,7 +265,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (data?.accesses?.length == 0) return null;
     return (
       <>
-        <Text style={{color: cssVar.cWhite, marginVertical: 10}}>Visitas</Text>
+        <Text style={{color: cssVar.cWhite, marginVertical: 10}}>Acompañantes</Text>
         <List data={data?.accesses} renderItem={detailVisit} />
       </>
     );
