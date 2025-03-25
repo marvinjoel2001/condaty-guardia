@@ -83,7 +83,7 @@ const theme: ThemeType = {
     // borderTopLeftRadius: 12,
     // borderTopRightRadius: 12,
     borderTopColor: cssVar.cBlackV2,
-    borderTopWidth: 0.5,
+    borderTopWidth: 11,
     width: '100%',
     bottom: 0,
   },

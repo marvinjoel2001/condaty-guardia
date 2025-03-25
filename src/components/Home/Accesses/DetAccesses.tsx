@@ -1,21 +1,21 @@
 // DetAccesses.tsx
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
-import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import LineDetail from './shares/LineDetail';
 import useApi from '../../../../mk/hooks/useApi';
-import { getAccessType } from '../../../../mk/utils/utils';
-import { getDateStrMes } from '../../../../mk/utils/dates';
-import { getFullName } from '../../../../mk/utils/strings';
+import {getAccessType} from '../../../../mk/utils/utils';
+import {getDateStrMes} from '../../../../mk/utils/dates';
+import {getFullName} from '../../../../mk/utils/strings';
 import List from '../../../../mk/components/ui/List/List';
-import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
-import { ItemList } from '../../../../mk/components/ui/ItemList/ItemList';
+import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import ItemListDate from './shares/ItemListDate';
-import { IconCheck, IconCheckOff } from '../../../icons/IconLibrary';
+import {IconCheck, IconCheckOff} from '../../../icons/IconLibrary';
 import useAuth from '../../../../mk/hooks/useAuth';
 
 const DetAccesses = ({id, open, close, reload}: any) => {
@@ -24,55 +24,78 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
-
-
-  useEffect(() => {
-    const getData = async (id: number) => {
+  const getData = async (id: number) => {
+    try {
       const {data} = await execute('/accesses', 'GET', {
         fullType: 'DET',
         searchBy: id,
       });
-      if (data.success) {
-        if (data.data[0].access_id) return getData(data.data[0].access_id);
-        setData(data?.data?.length > 0 ? data?.data[0] : null);
-        // console.log('DET', data.data);
+
+      if (data.success && data.data.length > 0) {
+        // If there's a linked access_id, use that instead of the current data
+        const accessData = data.data[0];
+        if (accessData.access_id) {
+          const {data: linkedData} = await execute('/accesses', 'GET', {
+            fullType: 'DET',
+            searchBy: accessData.access_id,
+          });
+
+          if (linkedData.success && linkedData.data.length > 0) {
+            setData(linkedData.data[0]);
+          }
+        } else {
+          setData(accessData);
+        }
       }
-    };
+    } catch (error) {
+      console.error('Error fetching access data:', error);
+    }
+  };
+
+  useEffect(() => {
     if (id) {
       getData(id);
     }
   }, [id]);
-// console.log(data,'data dataaaa')
+  // console.log(data,'data dataaaa')
   const handleSave = async () => {
     const status = getStatus();
 
     //  console.log('status desde save',acompanSelect)
     if (status === 'I') {
-   
-        if (Object.values(acompanSelect).every(value => !value)) {
-          console.log(
-            'Debe seleccionar al menos un acompañante para dejar salir',
-          );
-          showToast('Debe seleccionar al menos un acompañante para dejar salir','error');
-          return;
-        }
+      if (Object.values(acompanSelect).every(value => !value)) {
+        console.log(
+          'Debe seleccionar al menos un acompañante para dejar salir',
+        );
+        showToast(
+          'Debe seleccionar al menos un acompañante para dejar salir',
+          'error',
+        );
+        return;
+      }
       // const ids = acompanSelect.map((item: any) => item.id);
       const ids = Object.keys(acompanSelect)
-      .filter(id => acompanSelect[id])
-      .map(id => Number(id));
+        .filter(id => acompanSelect[id])
+        .map(id => Number(id));
 
       // console.log(ids,'idsss')
-      const {data: result, error} = await execute('/accesses/exit', 'POST', {
-        ids,
-        obs_out: formState?.obs_out || '',
-      },false,3);
+      const {data: result, error} = await execute(
+        '/accesses/exit',
+        'POST',
+        {
+          ids,
+          obs_out: formState?.obs_out || '',
+        },
+        false,
+        3,
+      );
       if (result?.success) {
         reload();
         close();
-        showToast("El visitante salió", "success");
+        showToast('El visitante salió', 'success');
       } else {
         console.log('Error en dejar salir:', error);
-        showToast("Error al dejar salir", "error");
+        showToast('Error al dejar salir', 'error');
       }
     } else {
       const {data: result, error} = await execute('/accesses/enter', 'POST', {
@@ -108,7 +131,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
   // Actualiza formState para las observaciones
   const handleInputChange = (name: string, value: string) => {
-
     setFormState({...formState, [name]: value});
   };
 
@@ -217,7 +239,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           setAcompSelect({
             ...acompanSelect,
             [visit?.id]: !acompanSelect[visit?.id],
-
           })
         }
       />
@@ -258,7 +279,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           label="Observaciones de Entrada"
           name="obs_in"
           value={formState?.obs_in}
-          onChange={(e:any) => handleInputChange('obs_in', e)}
+          onChange={(e: any) => handleInputChange('obs_in', e)}
         />
       );
     if (status == 'I')
@@ -267,7 +288,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           label="Observaciones de Salida"
           name="obs_out"
           value={formState?.obs_out}
-          onChange={(e:any) => handleInputChange('obs_out', e)}
+          onChange={(e: any) => handleInputChange('obs_out', e)}
         />
       );
     return null;
