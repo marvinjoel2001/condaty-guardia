@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Text, TouchableOpacity} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
-import { ItemList } from '../../../../mk/components/ui/ItemList/ItemList';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import ItemListDate from './shares/ItemListDate';
-import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
-import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import { IconDelivery, IconOther, IconTaxi } from '../../../icons/IconLibrary';
+import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
-import { buttonPrimary, buttonSecondary } from './shares/styles';
+import {buttonPrimary, buttonSecondary} from './shares/styles';
 
 const Accesses = ({data, reload, setDataID}: any) => {
   const [openDetail, setOpenDetail] = useState(false);
@@ -27,7 +27,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
   };
 
   const handleAction = (item: any) => {
-    if (!item.in_at && item.confirm_at && item.confirm === 'Y') {
+    if (!item?.in_at && item?.confirm_at && item?.confirm === 'Y') {
       onPressDetail(item);
     } else if (item.in_at && !item.out_at) {
       onPressDetail(item);
@@ -42,10 +42,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
         style={{borderRadius: 10}}
         onPress={() => handleAction(item)}
         accessibilityLabel={`Dejar entrar a ${getFullName(item.visit)}`}>
-        <Text
-          style={buttonPrimary}>
-          Dejar entrar
-        </Text>
+        <Text style={buttonPrimary}>Dejar entrar</Text>
       </TouchableOpacity>
     );
   };
@@ -56,10 +53,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
         style={{borderRadius: 10}}
         onPress={() => handleAction(item)}
         accessibilityLabel={`Dejar salir a ${getFullName(item.visit)}`}>
-        <Text
-          style={buttonSecondary}>
-          Dejar salir
-        </Text>
+        <Text style={buttonSecondary}>Dejar salir</Text>
       </TouchableOpacity>
     );
   };
@@ -75,7 +69,8 @@ const Accesses = ({data, reload, setDataID}: any) => {
 
   const waitingConfirmation = (item: any) => {
     return (
-      <Text style={{fontSize: 10, fontFamily: FONTS.regular,color:cssVar.cWhite}}>
+      <Text
+        style={{fontSize: 10, fontFamily: FONTS.regular, color: cssVar.cWhite}}>
         Esperando Confirmación
       </Text>
     );
@@ -194,7 +189,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
       />
     );
   };
-
+  console.log(openDetail);
   return (
     <>
       <List
