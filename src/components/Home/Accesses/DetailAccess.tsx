@@ -49,19 +49,13 @@ const DetailAccess = ({
   const {showToast, setStore} = useAuth();
   const {execute} = useApi();
   const [dataScreen, setDataScreen]: any = screenParams;
-  
 
   const getData = async (id: number) => {
     // console.log(id, "ID");
-    const {data,error} = await execute(
-      '/accesses',
-      'GET',
-      {
-        fullType: 'DET',
-        searchBy: id,
-      },
-       false,3
-    );
+    const {data, error} = await execute('/accesses', 'GET', {
+      fullType: 'DET',
+      searchBy: id,
+    });
 
     if (data?.success) {
       setFormState((old: any) => data.data);
@@ -123,18 +117,14 @@ const DetailAccess = ({
           'invitation|visit|owner|other:id,other_type_id|other.otherType:id,name|guardia|out_guard|accesses.visit',
         searchBy: _item?.access_id,
       };
-    
+
       // const {data: row} = await execute('/accesses', 'GET', paramsInitialA);
-      
-      const {data:row} = await execute(
-        '/accesses',
-        'GET',
-        {
-          fullType: 'AD',
-          searchBy: _item?.access_id,
-        },
-      );
-      
+
+      const {data: row} = await execute('/accesses', 'GET', {
+        fullType: 'AD',
+        searchBy: _item?.access_id,
+      });
+
       if (row?.success == true) {
         item = row?.data;
         setFormState(item);

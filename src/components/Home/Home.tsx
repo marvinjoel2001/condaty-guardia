@@ -92,7 +92,7 @@ const Home = () => {
       />
     </View>
   );
-
+  console.log(code);
   return (
     <>
       <Layout
