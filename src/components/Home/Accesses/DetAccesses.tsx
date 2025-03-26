@@ -60,7 +60,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   // console.log(data,'data dataaaa')
   const handleSave = async () => {
     const status = getStatus();
-
+   if(status === 'C' ){
+    // Si está completado, significa que todos han salido
+    close();
+    return;
+   }
     //  console.log('status desde save',acompanSelect)
     if (status === 'I') {
       if (Object.values(acompanSelect).every(value => !value)) {
@@ -122,7 +126,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (!_data?.in_at && !_data?.out_at && !_data?.confirm_at) return 'S';
     if (!_data?.in_at && !_data?.out_at && _data.confirm) return _data.confirm;
     if (_data?.in_at && !_data?.out_at) return 'I';
-    if (_data?.out_at) return 'C';
+    
+    // Verificar si el visitante principal y todos los acompañantes han salido
+    if (_data?.out_at) {
+      // Si no hay acompañantes, está completado
+      if (!_data?.accesses || _data.accesses.length === 0) return 'C';
+      
+      // Verificar que todos los acompañantes hayan salido
+      const todosHanSalido = _data.accesses.every((acomp: any) => acomp.out_at);
+      return todosHanSalido ? 'C' : 'I';
+    }
     return '';
   };
   // const status = getStatus();
@@ -253,7 +266,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         title={getFullName(data?.visit)}
         subtitle={'C.I. ' + data?.visit?.ci}
         left={<Avatar name={getFullName(data?.visit)} />}
-        right={getCheckVisit(data, isSelected)}
+        right={ data?.out_at ?null:  getCheckVisit(data, isSelected) }
         date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
       />
 
