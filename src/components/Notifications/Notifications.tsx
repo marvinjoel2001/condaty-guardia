@@ -29,13 +29,7 @@ const Notifications = () => {
   const [params, setParams]: any = useState({
     perPage: -1,
     page: 1,
-    sortBy: 'created_at',
-    orderBy: 'desc',
-    searchBy:
-      '|channel,=,' +
-      (configApp.APP_AUTH_IAM as string).replace('/', '') +
-      user?.id +
-      ',o,,|channel,=,guards,o,,|channel,=,alerts-1,o,,|channel,=,alerts-2,o,,|channel,=,alerts-3,',
+    fullType:"L"
   });
   const {
     data: notifs,
