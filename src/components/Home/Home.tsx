@@ -34,7 +34,7 @@ const Home = () => {
     endpoint: string,
     fullType: string,
   ) => {
-    const {data} = await execute(endpoint, 'GET', {
+    const {data,reload} = await execute(endpoint, 'GET', {
       perPage: -1,
       page: 1,
       fullType,
@@ -124,12 +124,12 @@ const Home = () => {
           {(typeSearch === 'A' || typeSearch === 'I') && (
             <Accesses
               data={filteredData}
-              reload={reload}
+              reload={()=>getAccesses(search, '/accesses', typeSearch === 'A'? 'AD' :'P')}
               setDataID={setDataID}
             />
           )}
           {typeSearch === 'P' && (
-            <Orders data={filteredData} reload={reload} setDataID={setDataID} />
+            <Orders data={filteredData} reload={()=>getAccesses(search, '/others', 'L')} setDataID={setDataID} />
           )}
         </View>
         {openQr && (
