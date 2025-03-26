@@ -162,7 +162,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
 
     const avatarSrc = getUrlImages(
       item.type === 'O'
-        ? `/OWN-${item.owner_id}.png?d=${item.updated_at}`
+        ? `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`
         : `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`,
     );
 
