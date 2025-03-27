@@ -8,7 +8,7 @@ import {Linking, TouchableOpacity, View} from 'react-native';
 import {getUrlImages} from '../../../mk/utils/strings';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-import {cssVar} from '../../../mk/styles/themes';
+
 import {
   IconDOC,
   IconEXE,
@@ -17,6 +17,7 @@ import {
   IconPNG,
   IconZIP,
 } from '../../icons/IconLibrary';
+import { cssVar } from '../../../mk/styles/themes';
 
 const Documents = () => {
   const [tab, setTab] = useState('TO');
@@ -29,6 +30,7 @@ const Documents = () => {
     perPage: -1,
     fullType: 'L',
   });
+
   const onSearch = (search: string) => {
     setSearch(search);
   };
@@ -47,27 +49,40 @@ const Documents = () => {
     });
   };
 
+  const getFileType = (ext: string) => {
+    // Normalizar las extensiones para manejar variaciones como 'docx', 'xlsx', etc.
+    if (ext.includes('pdf')) return 'pdf';
+    if (ext.includes('doc')) return 'doc';
+    if (ext.includes('xls')) return 'xls';
+    if (ext.includes('jpg') || ext.includes('jpeg') || ext.includes('webp') || ext.includes('png')) return 'jpg';
+    if (ext.includes('exe')) return 'exe';
+    return ext;
+  };
+
   const DocumentList = (document: any) => {
+    // Filtrar por búsqueda
     if (
-      search != '' &&
-      (document?.name + '').toLowerCase().indexOf(search.toLowerCase()) == -1
+      search !== '' &&
+      (document?.name + '').toLowerCase().indexOf(search.toLowerCase()) === -1
     )
       return null;
 
+    // Obtener el tipo de archivo normalizado
+    const fileType = getFileType(document.ext.toLowerCase());
+    
+    // Filtrar por tab seleccionado
     if (
       !(
-        tab === 'TO' ||
-        (tab === 'PD' && document.ext === 'pdf') ||
-        (tab === 'EX' && document.ext === 'exe') ||
-        (tab === 'PN' && document.ext === 'png') ||
-        (tab === 'DO' && document.ext === 'doc') ||
-        (tab === 'ZI' && document.ext === 'zip') ||
-        (tab === 'JP' && document.ext === 'jpg')
+        tab === 'TO' || // Todo
+        (tab === 'PD' && fileType === 'pdf') ||
+        (tab === 'EX' && fileType === 'xls') ||
+        (tab === 'DO' && fileType === 'doc') ||
+        (tab === 'JP' && fileType === 'jpg')
       )
     )
       return null;
+
     return (
-      // <TouchableOpacity onPress={() => openDocument(document)}>
       <ItemList
         title={document?.name}
         onPress={() => openDocument(document)}
@@ -88,15 +103,12 @@ const Documents = () => {
               }}
               size={26}
               name={
-                document.ext == 'doc'
+                fileType === 'doc'
                   ? IconDOC
-                  : document.ext == 'exe'
+                  : fileType === 'exe'
                   ? IconEXE
-                  : document.ext == 'png'
-                  ? IconPNG
-                  : document.ext == 'zip'
-                  ? IconZIP
-                  : document.ext == 'jpg'
+
+                  : fileType === 'jpg'
                   ? IconJPG
                   : IconPDF
               }
@@ -105,20 +117,20 @@ const Documents = () => {
           </View>
         }
       />
-      // </TouchableOpacity>
     );
   };
+
   return (
     <Layout title="Documentos" refresh={() => reload()}>
       <TabsButtons
         tabs={[
           {value: 'TO', text: 'Todo'},
           {value: 'PD', text: 'Pdf'},
-          {value: 'JP', text: 'Jpg'},
+          {value: 'JP', text: 'Imagenes'},
           {value: 'DO', text: 'Doc'},
           {value: 'EX', text: 'Xls'},
-          {value: 'ZI', text: 'Zip'},
-          {value: 'PN', text: 'Png'},
+     
+      
         ]}
         sel={tab}
         setSel={setTab}
