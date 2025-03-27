@@ -64,7 +64,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
         required
         name="level"
         options={[
-          {id: 1, name: 'bajo - Solo guardias'},
+          {id: 1, name: 'Bajo - Solo guardias'},
           {id: 2, name: 'Medio - Solo administradores y guardias'},
           {id: 3, name: 'Alto - Residentes, administradores y guardias'},
         ]}
