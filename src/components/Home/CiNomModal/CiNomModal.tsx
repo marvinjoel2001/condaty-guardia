@@ -10,6 +10,7 @@ import { ItemList } from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import { getFullName } from '../../../../mk/utils/strings';
 import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
+import InputNameCi from './shared/InputNameCi';
 
 
 
@@ -24,6 +25,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const [visit, setVisit]:any = useState([]);
   const [formState, setFormState]:any = useState({})
   const [errors, setErrors] = useState({});
+  const [steps,setSteps] = useState(0)
 
   const handleInputChange = (name: string, value: any) => {
     setFormState((prev:any) => ({
@@ -87,6 +89,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   };
   const getVisits = async () => {
     if (hasErrors(validate())) {
+
       return;
     }
  
@@ -95,8 +98,16 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
       page: 1,
       fullType:"L",
       searchBy: formState.ci,
-    },3);
+    },
+    // 3
+  );
     setVisit(visitData?.data);
+    if(visitData?.data.length === 0){
+      setSteps(2);
+      return;
+    }else{
+      setSteps(1);
+    }
     console.log(visitData,'visitData')
   }
 
@@ -119,7 +130,7 @@ console.log(formState,'formState')
           {visit.length > 0 &&
               <ItemList 
                title={getFullName(visit[0])}
-               subtitle={visit[0]?.ci}
+               subtitle={`CI: ${visit[0]?.ci}`}
                left={<Avatar name={getFullName(visit[0])}  />}
               />}
                 <Select
@@ -136,29 +147,32 @@ console.log(formState,'formState')
                   height={300}
                   search={true}
                 />
-               {
-                visit.length === 0 && 
-               
+               {visit.length === 0 &&  steps === 0 &&
                 <Input
                   label="Carnet de identidad"
                   type="date"
                   name="ci"
                   error={errors}
                   required={true}
-                  // readOnly={formState.type === "C" || existe === 3}
-                  // disabled={formState.type === "C" || existe === 3}
                   value={formState["ci"]}
                   maxLength={10}
                   onChange={(value: any) => handleChangeInput("ci", value)}
                 />
               }
-
-        <TextArea
+  {steps === 2 &&
+   <InputNameCi 
+       formStateName={formState}
+       formStateCi={formState.ci}
+       disabledCi={steps === 2}
+       handleInputChange={handleChangeInput}
+       errors={errors}
+       />}
+       {steps > 0 &&  <TextArea
           label="Observaciones de Entrada"
           name="obs_in"
           value={formState?.obs_in}
           onChange={(e: any) => handleInputChange('obs_in', e)}
-        />
+        />}
               </>
       </View>
     </ModalFull>

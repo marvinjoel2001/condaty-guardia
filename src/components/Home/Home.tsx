@@ -100,6 +100,7 @@ const Home = () => {
       <Layout
         title="Home"
         customTitle={customTitle()}
+        refresh={()=>reload()}
         // style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}
       >
         <TabsButtons
