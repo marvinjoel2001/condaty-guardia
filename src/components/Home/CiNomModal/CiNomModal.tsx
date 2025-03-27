@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
 import { checkRules } from '../../../../mk/utils/validate/Rules';
@@ -11,6 +11,10 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import { getFullName } from '../../../../mk/utils/strings';
 import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
+import Modal from '../../../../mk/components/ui/Modal/Modal';
+import { IconAlert } from '../../../icons/IconLibrary';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 
 
 
@@ -25,7 +29,8 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const [visit, setVisit]:any = useState([]);
   const [formState, setFormState]:any = useState({})
   const [errors, setErrors] = useState({});
-  const [steps,setSteps] = useState(0)
+  const [steps,setSteps] = useState(0);
+  const [openAlert, setOpenAlert] = useState(false);
 
   const handleInputChange = (name: string, value: any) => {
     setFormState((prev:any) => ({
@@ -104,6 +109,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     setVisit(visitData?.data);
     if(visitData?.data.length === 0){
       setSteps(2);
+      setOpenAlert(true);
       return;
     }else{
       setSteps(1);
@@ -175,8 +181,46 @@ console.log(formState,'formState')
         />}
               </>
       </View>
+      {openAlert && (
+        <Modal
+          open={openAlert}
+          onClose={onClose}
+          iconClose={false}
+          onSave={()=>setOpenAlert(false)}
+          buttonText="Registrar"
+          buttonCancel=""
+          headerStyles={{backgroundColor: "transparent"}}>
+          <View
+            style={styles.modalAlert}>
+            <Icon
+              name={IconAlert}
+              size={80}
+              color={cssVar.cWarning}
+            />
+            <Text
+              style={styles.modalAlertText}>
+              ¡Visita no registrada!
+            </Text>
+          </View>
+        </Modal>
+      )}
     </ModalFull>
+    
   );
 };
 
 export default CiNomModal;
+
+const styles = StyleSheet.create({
+  
+  modalAlert:{
+    alignItems: "center", 
+    justifyContent: "center", 
+    flex: 1
+  },
+  modalAlertText:{
+    fontSize: 20,
+    color: cssVar.cWhite,
+    fontFamily: FONTS.regular,
+  }
+});
