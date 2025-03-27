@@ -14,11 +14,13 @@ import {cssVar} from '../../../mk/styles/themes';
 import {getFullName} from '../../../mk/utils/strings';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import useAuth from '../../../mk/hooks/useAuth';
+import CiNomModal from './CiNomModal/CiNomModal';
 
 const Home = () => {
   const {user} = useAuth();
   // const [openSlide, setOpenSlide] = useState(true);
   const [openQr, setOpenQr] = useState(false);
+  const [openCiNom, setOpenCiNom] = useState(false);
   const [code, setCode] = useState('');
   // const [openCiNom, setOpenCiNom] = useState(false);
   const [data, setData]: any = useState([]);
@@ -139,10 +141,17 @@ const Home = () => {
             setCode={setCode}
           />
         )}
+        { openCiNom && (
+          <CiNomModal
+            open={openCiNom}
+            onClose={() => setOpenCiNom(false)}
+            // setCode={setCode}
+          />
+        )}
       </Layout>
       <DropdawnAccess
         onPressQr={() => setOpenQr(true)}
-        onPressCiNom={() => {}}
+        onPressCiNom={() => setOpenCiNom(true)}
       />
     </>
   );

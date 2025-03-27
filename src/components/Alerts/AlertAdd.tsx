@@ -36,6 +36,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       setErrors(error);
       return;
     }
+    console.log(error,formState,'errfst')
     const {data: alerts, error: err} = await execute('/alerts', 'POST', {
       level: formState.level,
       descrip: formState.descrip,
@@ -47,7 +48,8 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       formState.level = '';
       showToast('Alerta Enviada', 'success');
     } else {
-      showToast(err, 'error');
+      const errorMessage = typeof err === 'string' ? err : 'Error al enviar la alerta';
+      showToast(errorMessage, 'error');
     }
   };
   return (
@@ -64,7 +66,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
         required
         name="level"
         options={[
-          {id: 1, name: 'bajo - Solo guardias'},
+          {id: 1, name: 'Bajo - Solo guardias'},
           {id: 2, name: 'Medio - Solo administradores y guardias'},
           {id: 3, name: 'Alto - Residentes, administradores y guardias'},
         ]}
