@@ -59,6 +59,12 @@ export const validRule = (
         : !/^[A-Z]{3}\d{3,5}$/.test(value)
         ? 'Formato incorrecto. Debe tener 3 letras seguidas de 3 a 5 números'
         : '',
+    plate: () =>
+      value == null || value == ''
+        ? ''
+        : !/^[A-Z0-9]{3,4}[-][0-9]{3,4}$/.test(value)
+        ? 'Formato incorrecto. Ejemplo: ABC-123 o AB12-123'
+        : '',
     between: () =>
       Number(value) < Number(param[0]) || Number(value) > Number(param[1])
         ? `Debe estar entre ${param[0]} y ${param[1]}`

@@ -14,13 +14,15 @@ import {cssVar} from '../../../mk/styles/themes';
 import {getFullName} from '../../../mk/utils/strings';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import useAuth from '../../../mk/hooks/useAuth';
+import EntryQR from './EntryQR/EntryQR';
 
 const Home = () => {
   const {user} = useAuth();
   // const [openSlide, setOpenSlide] = useState(true);
   const [openQr, setOpenQr] = useState(false);
-  const [code, setCode] = useState('');
+  const [code, setCode]: any = useState(null);
   // const [openCiNom, setOpenCiNom] = useState(false);
+  const [showEntryQR, setShowEntryQR] = useState(false); // Add this state
   const [data, setData]: any = useState([]);
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
@@ -92,7 +94,16 @@ const Home = () => {
       />
     </View>
   );
-  console.log(code);
+  useEffect(() => {
+    if (code) {
+      setShowEntryQR(true);
+    }
+  }, [code]);
+  const handleEntryQRClose = () => {
+    setShowEntryQR(false);
+    setCode(null);
+  };
+
   return (
     <>
       <Layout
@@ -137,6 +148,14 @@ const Home = () => {
             open={openQr}
             onClose={() => setOpenQr(false)}
             setCode={setCode}
+          />
+        )}
+        {showEntryQR && (
+          <EntryQR
+            reload={() => getAccesses('', '/accesses', 'P')}
+            code={code}
+            open={showEntryQR}
+            onClose={handleEntryQRClose}
           />
         )}
       </Layout>
