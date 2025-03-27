@@ -22,11 +22,11 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const {user,showToast} = useAuth();
   const [exist, setExist] = useState(0);
   const [visit, setVisit]:any = useState([]);
-  const [formState, setFormState] = useState({})
+  const [formState, setFormState]:any = useState({})
   const [errors, setErrors] = useState({});
 
   const handleInputChange = (name: string, value: any) => {
-    setFormState(prev => ({
+    setFormState((prev:any) => ({
       ...prev,
       [name]: value
     }));
@@ -57,6 +57,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   
 
   const handleChangeInput = (name: string, value: string) => {
+
     setFormState({
       ...formState,
       [name]: value,
@@ -103,7 +104,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
      getVisits();
     
   }
-
+console.log(formState,'formState')
   return (
     <ModalFull
       open={open}
@@ -119,7 +120,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
               <ItemList 
                title={getFullName(visit[0])}
                subtitle={visit[0]?.ci}
-               left={<Avatar name={getFullName(visit[0])} size={40} />}
+               left={<Avatar name={getFullName(visit[0])}  />}
               />}
                 <Select
                   label="¿A quién visita?"
@@ -128,7 +129,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
                   required={true}
                   options={owners?.data || []}
                   value={formState.owner_id || ""}
-                  onChange={value => handleInputChange("owner_id", value)}
+                  onChange={value => handleInputChange("owner_id", value.target.value)}
                   optionValue="id"
                   error={errors}
                   optionLabel="name"
