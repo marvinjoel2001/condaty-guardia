@@ -129,8 +129,6 @@ const Documents = () => {
           {value: 'JP', text: 'Imagenes'},
           {value: 'DO', text: 'Doc'},
           {value: 'EX', text: 'Xls'},
-     
-      
         ]}
         sel={tab}
         setSel={setTab}
