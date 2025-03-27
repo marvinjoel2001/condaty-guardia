@@ -86,6 +86,7 @@ const SelectTransport = ({
                 // disabledCi={typeSearch === 'T'}
                 handleChangeInput={(value:any)=>handleChangeInput('ci_taxi', value)}
                 errors={errors}
+                 prefix="_taxi"
                 />
               <Input
                 label="Placa Taxi"

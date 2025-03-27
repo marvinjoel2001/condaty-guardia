@@ -7,6 +7,7 @@ interface InputNameCiProps {
   formStateName: any;
   formStateCi: any;
   nameCi?: string;
+  prefix?: string;
   errors: any;
   handleChangeInput: (name: string, value: any) => void;
   disabledCi?: boolean;
@@ -22,6 +23,7 @@ const InputNameCi = ({
   handleChangeInput,
   disabledCi = false,
   disabledName = false,
+  prefix,
   onCheckCI,
 }: InputNameCiProps) => {
     console.log(nameCi,'nameCi')
@@ -45,6 +47,7 @@ const InputNameCi = ({
         errors={errors}
         handleChangeInput={handleChangeInput}
         disabled={disabledName}
+        prefijo={prefix}
       />
     </View>
   );
