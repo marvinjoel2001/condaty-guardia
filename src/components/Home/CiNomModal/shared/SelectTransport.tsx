@@ -4,6 +4,7 @@ import Input from '../../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../../mk/components/forms/InputFullName/InputFullName';
 import {cssVar, FONTS} from '../../../../../mk/styles/themes';
 import TabsButtons from '../../../../../mk/components/ui/TabsButton/TabsButton';
+import InputNameCi from './InputNameCi';
 
 interface SelectTransportProps {
   typeSearch: string;
@@ -24,6 +25,7 @@ const SelectTransport = ({
   onCheckCI,
   disabledFields = false,
 }: SelectTransportProps) => {
+    console.log(formState,'fsttttt')
   return (
     <View>
       <TabsButtons
@@ -60,7 +62,7 @@ const SelectTransport = ({
                 }}>
                 Datos del conductor:
               </Text>
-              <Input
+              {/* <Input
                 label="Carnet de identidad"
                 type="date"
                 name="ci_taxi"
@@ -70,13 +72,21 @@ const SelectTransport = ({
                 value={formState['ci_taxi']}
                 onBlur={() => onCheckCI && onCheckCI(true)}
                 onChange={(value: any) => handleChangeInput('ci_taxi', value)}
-              />
-              <InputFullName
+              /> */}
+              {/* <InputFullName
                 formState={formState}
                 errors={errors}
                 handleChangeInput={handleChangeInput}
                 prefijo="_taxi"
-              />
+              />*/}
+                <InputNameCi
+                formStateName={formState}
+                formStateCi={formState.ci_taxi}
+                nameCi='ci_taxi'
+                // disabledCi={typeSearch === 'T'}
+                handleChangeInput={(value:any)=>handleChangeInput('ci_taxi', value)}
+                errors={errors}
+                />
               <Input
                 label="Placa Taxi"
                 type="text"
@@ -85,7 +95,10 @@ const SelectTransport = ({
                 required={typeSearch === 'T'}
                 value={formState['plate']}
                 onChange={(value: any) => handleChangeInput('plate', value)}
-              />
+              /> 
+
+            
+            
             </>
           )}
         </>

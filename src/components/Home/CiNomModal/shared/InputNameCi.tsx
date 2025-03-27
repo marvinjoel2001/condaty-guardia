@@ -6,38 +6,44 @@ import InputFullName from '../../../../../mk/components/forms/InputFullName/Inpu
 interface InputNameCiProps {
   formStateName: any;
   formStateCi: any;
+  nameCi?: string;
   errors: any;
-  handleInputChange: (name: string, value: any) => void;
+  handleChangeInput: (name: string, value: any) => void;
   disabledCi?: boolean;
   disabledName?: boolean;
+  onCheckCI?: (isTaxi?: boolean) => void;
 }
 
 const InputNameCi = ({
   formStateName,
   formStateCi,
+  nameCi = 'ci',
   errors,
-  handleInputChange,
+  handleChangeInput,
   disabledCi = false,
   disabledName = false,
+  onCheckCI,
 }: InputNameCiProps) => {
+    console.log(nameCi,'nameCi')
   return (
     <View style={{gap: 16}}>
       <Input
         label="Carnet de identidad"
         type="text"
-        name="ci"
+        name={nameCi}
         error={errors}
         required={true}
         disabled={disabledCi}
         readOnly={disabledCi}
         value={formStateCi}
         maxLength={10}
-        onChange={(value: any) => handleInputChange('ci', value)}
+        onChange={(value: any) => handleChangeInput(value,nameCi)}
+        onBlur={() => onCheckCI && onCheckCI()}
       />
       <InputFullName
         formState={formStateName}
         errors={errors}
-        handleChangeInput={handleInputChange}
+        handleChangeInput={handleChangeInput}
         disabled={disabledName}
       />
     </View>

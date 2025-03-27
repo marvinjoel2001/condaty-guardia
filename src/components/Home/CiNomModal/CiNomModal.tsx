@@ -11,6 +11,7 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import { getFullName } from '../../../../mk/utils/strings';
 import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
+import SelectTransport from './shared/SelectTransport';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import { IconAlert } from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
@@ -31,13 +32,8 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const [errors, setErrors] = useState({});
   const [steps,setSteps] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
+  const [typeSearch, setTypeSearch] = useState('P');
 
-  const handleInputChange = (name: string, value: any) => {
-    setFormState((prev:any) => ({
-      ...prev,
-      [name]: value
-    }));
-  }
 
 
   const hasErrors = (errors: any) => {
@@ -146,7 +142,7 @@ console.log(formState,'formState')
                   required={true}
                   options={owners?.data || []}
                   value={formState.owner_id || ""}
-                  onChange={value => handleInputChange("owner_id", value.target.value)}
+                  onChange={value => handleChangeInput("owner_id", value.target.value)}
                   optionValue="id"
                   error={errors}
                   optionLabel="name"
@@ -170,14 +166,21 @@ console.log(formState,'formState')
        formStateName={formState}
        formStateCi={formState.ci}
        disabledCi={steps === 2}
-       handleInputChange={handleChangeInput}
+       handleChangeInput={handleChangeInput}
        errors={errors}
        />}
        {steps > 0 &&  <TextArea
           label="Observaciones de Entrada"
           name="obs_in"
           value={formState?.obs_in}
-          onChange={(e: any) => handleInputChange('obs_in', e)}
+          onChange={(e: any) => handleChangeInput('obs_in', e)}
+        />}
+       {steps > 0 && <SelectTransport
+          typeSearch={typeSearch}
+          setTypeSearch={setTypeSearch}
+          formState={formState}
+          errors={errors}
+          handleChangeInput={handleChangeInput}
         />}
               </>
       </View>
