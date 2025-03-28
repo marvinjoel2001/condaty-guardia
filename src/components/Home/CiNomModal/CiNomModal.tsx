@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
-import {pallete} from '../../../../mk/styles/themes';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
 import { checkRules } from '../../../../mk/utils/validate/Rules';
@@ -15,7 +14,7 @@ import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
 import SelectTransport from './shared/SelectTransport';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
-import { IconAlert } from '../../../icons/IconLibrary';
+import { IconAlert, IconX } from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import { onExist } from '../../../../mk/utils/dbtools';
@@ -32,7 +31,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const {user, showToast,} = useAuth();
   const [exist, setExist] = useState(0);
   const [visit, setVisit]:any = useState([]);
-  const [formState, setFormState]:any = useState({})
+  const [ formState, setFormState]:any = useState({})
   const [formStateA, setFormStateA]:any = useState({})
   const [errors, setErrors] = useState({});
   const [errorsA, setErrorsA] = useState({});
@@ -124,6 +123,8 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     }
   };
 
+
+  
   const onCheckCI = async (taxi: boolean = false) => {
     setErrors({});
     let ci = formStateA.ci;
@@ -278,9 +279,18 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     if(visitData?.data.length === 0){
       setSteps(2);
       setOpenAlert(true);
+
       return;
     }else{
       setSteps(1);
+      setFormState({
+        ...formState,
+        name: visitData?.data[0].name,
+        middle_name: visitData?.data[0].middle_name,
+        last_name: visitData?.data[0].last_name,
+        mother_last_name: visitData?.data[0].mother_last_name,
+        ci: visitData?.data[0].ci
+      })
     }
     console.log(visitData,'visitData')
   }
@@ -289,13 +299,25 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     getVisits();
   }
 
-  const acompanantesList = ({item}: any) => {
+  const acompanantesList = (item: any) => {
+    console.log(item,'item',formState.acompanantes,'formState.acompanantes')
     return (
+      <TouchableOpacity
+        onPress={() => handleEditAcompanante(item.ci)}>
+      
       <ItemList
         title={getFullName(item)}
         subtitle={`CI: ${item.ci}`}
         left={<Avatar name={getFullName(item)} />}
+        right={
+          <Icon
+          name={IconX}
+          color={cssVar.cWhiteV2}
+          onPress={() => handleDeleteAcompanante(item.ci)}
+        />
+        }
       />
+      </TouchableOpacity>
     );
   };
   return (
