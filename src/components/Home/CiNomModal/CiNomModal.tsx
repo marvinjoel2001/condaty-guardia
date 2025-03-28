@@ -16,6 +16,7 @@ import Modal from '../../../../mk/components/ui/Modal/Modal';
 import { IconAlert } from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { onExist } from '../../../../mk/utils/dbtools';
 
 
 
@@ -29,10 +30,85 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const [exist, setExist] = useState(0);
   const [visit, setVisit]:any = useState([]);
   const [formState, setFormState]:any = useState({})
+  const [formStateA, setFormStateA]:any = useState({})
   const [errors, setErrors] = useState({});
+  const [errorsA, setErrorsA] = useState({});
   const [steps,setSteps] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
+
+  const onCheckCI = async (taxi: boolean = false) => {
+    setErrors({});
+    let ci = formStateA.ci;
+    if (taxi) {
+      ci = formState.ci_taxi;
+    }
+    const acomList = formState.acompanantes || [];
+    const result = await onExist({
+      execute,
+      field: "ci",
+      value: ci,
+      module: "visits",
+      cols: "id,name,middle_name,last_name,mother_last_name,ci",
+    });
+
+    if (taxi) {
+      if (formState.ci_taxi == formState.ci) {
+        setErrors({ci_taxi: "CI del  invitado"});
+        return;
+      }
+    }
+    if (formState.ci == result.ci) {
+      setErrorsA({ci: "CI del  invitado"});
+      return;
+    }
+    if (formState.ci == formStateA.ci) {
+      setErrorsA({ci: "Este ci ya está en la lista"});
+      return;
+    }
+
+    if (typeSearch == "T" && formState.ci_taxi == formStateA.ci) {
+      setErrorsA({ci: "CI ya fue añadido"});
+      return;
+    }
+    let ciList = acomList.find((acom: any) => acom.ci == ci);
+
+    if (ciList) {
+      setErrorsA({ci: "El ci ya fue añadido"});
+      return;
+    }
+    setErrorsA({});
+    if (result !== false) {
+      if (taxi) {
+        setFormState({
+          ...formState,
+          name_taxi: result.name,
+          middle_name_taxi: result.middle_name,
+          last_name_taxi: result.last_name,
+          mother_last_name_taxi: result.mother_last_name,
+          nameTaxiDisabled: true,
+        });
+      } else {
+        setFormStateA({
+          ...formStateA,
+          name: result.name,
+          middle_name: result.middle_name,
+          last_name: result.last_name,
+          mother_last_name: result.mother_last_name,
+          nameDisabled: true,
+        });
+      }
+    } else {
+      setFormStateA({
+        ...formStateA,
+        name: "",
+        middle_name: "",
+        last_name: "",
+        mother_last_name: "",
+        nameDisabled: false,
+      });
+    }
+  };
 
 
 
