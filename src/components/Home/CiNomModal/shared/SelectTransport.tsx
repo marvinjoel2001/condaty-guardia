@@ -9,6 +9,7 @@ import InputNameCi from './InputNameCi';
 interface SelectTransportProps {
   typeSearch: string;
   setTypeSearch: (value: string) => void;
+  tabs: any;
   formState: any;
   errors: any;
   handleChangeInput: (name: string, value: any) => void;
@@ -24,16 +25,13 @@ const SelectTransport = ({
   handleChangeInput,
   onCheckCI,
   disabledFields = false,
+  tabs,
 }: SelectTransportProps) => {
     console.log(formState,'fsttttt')
   return (
     <View>
       <TabsButtons
-        tabs={[
-          {value: 'P', text: 'A pie'},
-          {value: 'V', text: 'En vehículo'},
-          {value: 'T', text: 'En taxi'},
-        ]}
+        tabs={tabs}
         sel={typeSearch}
         setSel={setTypeSearch}
       />

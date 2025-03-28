@@ -19,12 +19,13 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import { onExist } from '../../../../mk/utils/dbtools';
 import { TouchableOpacity } from 'react-native';
+import { AccompaniedAdd } from '../EntryQR/AccompaniedAdd';
 
 
 
 interface CiNomModalProps {
   open: boolean;
-  onClose: (value: any) => void;
+  onClose: () => void;
 }
 
 const CiNomModal = ({open, onClose}: CiNomModalProps) => {
@@ -38,7 +39,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const [steps,setSteps] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
-  const [add, setAdd] = useState(false);
+  const [addCompanion, setAddCompanion] = useState(false);
   const [edit, setEdit] = useState(false);
 
 
@@ -101,7 +102,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
       setFormState((old: any) => ({...old, acompanantes}));
     }
     setFormStateA({});
-    setAdd(false);
+    setAddCompanion(false);
   };
   const handleDeleteAcompanante = (ci: any) => {
     const newAcompanante = formState.acompanantes.filter(
@@ -119,7 +120,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
 
     if (!disabled) {
       setEdit(true);
-      setAdd(true);
+      setAddCompanion(true);
     }
   };
 
@@ -230,37 +231,10 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
       [name]: value,
     });
   };
-  const handleChangeInputA = (name: string, value: string ) => {
-    console.log(formStateA,'fstA&fst',formState,'name value')
-
-    setFormStateA({
-      ...formStateA,
-      [name]: value,
-    });
-  };
 
 
 
-  const validate = () => {
-    let errors: any = {};
 
-    errors = checkRules({
-      value: formState.ci,
-      rules: ['required', 'min:5', 'max:10'],
-      key: 'ci',
-      errors,
-    });
-
-    // errors = checkRules({
-    //   value: formState.owner_id,
-    //   rules: ['required'],
-    //   key: 'owner_id',
-    //   errors,
-    // });
-
-    setErrors(errors);
-    return errors;
-  };
   const getVisits = async () => {
     if (hasErrors(validate())) {
 
@@ -295,12 +269,60 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     console.log(visitData,'visitData')
   }
 
+  const validate = () => {
+    let errors: any = {};
+    errors = checkRules({
+      value: formState.ci,
+      rules: ['required','min:5','max:10'],
+      key: 'ci',
+      errors,
+    });
+    if(steps > 0){
+        if(typeSearch === 'T'){
+              errors = checkRules({
+                value: formState.ci_taxi,
+                rules: ['required','min:5','max:10'],
+                key: 'ci_taxi',
+                errors,
+              });
+            }
+        if(typeSearch === 'V'){
+              errors = checkRules({
+                value: formState.plate,
+                rules: ['required','min:5','max:10'],
+                key: 'plate',
+                errors,
+              });
+            }
+    }    
+    setErrors(errors);
+    return errors;
+  };
+
+
   const onSave = async () => {
     getVisits();
+    if(steps > 0){
+      if (hasErrors(validate())) {
+        return;
+      }
+      const url = "/accesses";
+      let method = "POST";
+  
+      const {data, error: err} = await execute(url, method, formState, false, 0);
+  
+      if (data?.success === true) {
+        onClose();
+        // Removed reload call since reload is not defined in the component scope
+        showToast("Notificación enviada", "success");
+      } else {
+        showToast(data?.message, "error");
+      }
+    }
   }
 
   const acompanantesList = (item: any) => {
-    console.log(item,'item',formState.acompanantes,'formState.acompanantes')
+    // console.log(item,'item',formState.acompanantes,'formState.acompanantes')
     return (
       <TouchableOpacity
         onPress={() => handleEditAcompanante(item.ci)}>
@@ -324,8 +346,8 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     <ModalFull
       open={open}
       onClose={onClose}
-      title="Visitante sin qr"
-      buttonText="Validar"
+      title={steps  > 0 ? "Registrar sin qr" : "Visitante sin qr"}
+      buttonText={ steps > 0 ? "Notificar al residente" : steps <= 0 ? "Buscar" : ""}
       // buttonCancel="Cancelar"
       onSave={onSave}
       >
@@ -384,6 +406,11 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           formState={formState}
           errors={errors}
           handleChangeInput={handleChangeInput}
+          tabs={[
+            {value: 'P', text: 'A pie'},
+            {value: 'V', text: 'En vehículo'},
+            {value: 'T', text: 'En taxi'},
+          ]}
         />}
             {formState.acompanantes?.length > 0 && (
           <>
@@ -421,7 +448,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           }}
           disabled={!formState.owner_id || !formState.ci || !formState.name}
           onPress={() => {
-            setAdd(true);
+            setAddCompanion(true);
             setFormStateA({});
             setEdit(false);
           }}>
@@ -465,27 +492,16 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
         </Modal>
       )}
 
-<Modal
-        title="Agregar acompañante"
-        open={add}
-        onClose={() => {
-          setAdd(false);
-          setErrorsA({});
-        }}
-        buttonText="Guardar"
-        onSave={handleChangeCompanion}
-        disabled={!formStateA.ci || !formStateA.name || !formStateA.last_name}
-        headerStyles={{backgroundColor: "transparent"}}>
-        <InputNameCi
-          formStateName={formStateA}
-          formStateCi={formStateA.ci}
-          // disabledCi={true}
-          handleChangeInput={handleChangeInputA}
-          errors={errorsA}
-          onCheckCI={onCheckCI}
-          // p refix="_a"
-        />
-      </Modal>
+      <AccompaniedAdd
+      open={addCompanion}
+      onClose={() => {
+        setAddCompanion(false);
+
+      }}
+      item={formState}
+      setItem={setFormState}
+      />
+
     </ModalFull>
     
   );

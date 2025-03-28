@@ -86,7 +86,8 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
     setErrors(errors);
     return errors;
   };
-
+// console.log(formState,'fst aad')
+// console.log(item,'item aad')
   const onSave = async () => {
     let acompanantes = item?.acompanantes || [];
     if (acompanantes?.length > 0) {
@@ -152,6 +153,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
         // name_prefijo="_a"
         handleChangeInput={handleChange}
         disabled={formState?.disabled}
+        inputGrid={false}
       />
     </Modal>
   );
