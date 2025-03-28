@@ -4,6 +4,7 @@ import InputFullName from '../../../../mk/components/forms/InputFullName/InputFu
 import Input from '../../../../mk/components/forms/Input/Input';
 import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
+import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 type TypeProps = {
   open: boolean;
   onClose: () => void;
@@ -48,6 +49,44 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
       });
     }
   };
+  const validate = () => {
+    let errors: any = {};
+
+    errors = checkRules({
+      value: formState.ci,
+      rules: ['required'],
+      key: 'ci',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.name,
+      rules: ['required'],
+      key: 'name',
+      errors,
+    });
+    // errors = checkRules({
+    //   value: formState.middle_name,
+    //   rules: [''],
+    //   key: 'middle_name',
+    //   errors,
+    // });
+    errors = checkRules({
+      value: formState.last_name,
+      rules: ['required'],
+      key: 'last_name',
+      errors,
+    });
+    // errors = checkRules({
+    //   value: formState.mother_last_name,
+    //   rules: ['required'],
+    //   key: 'mother_last_name',
+    //   errors,
+    // });
+
+    setErrors(errors);
+    return errors;
+  };
+
   const onSave = async () => {
     let acompanantes = item?.acompanantes || [];
     if (acompanantes?.length > 0) {
@@ -61,6 +100,10 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
     }
     if (item?.ci === formState.ci || item?.ci_taxi === formState.ci) {
       showToast('El ci ya esta en la lista', 'error');
+      return;
+    }
+
+    if (hasErrors(validate())) {
       return;
     }
 
