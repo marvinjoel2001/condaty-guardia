@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
 import { checkRules } from '../../../../mk/utils/validate/Rules';
@@ -11,6 +11,12 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import { getFullName } from '../../../../mk/utils/strings';
 import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
+import SelectTransport from './shared/SelectTransport';
+import Modal from '../../../../mk/components/ui/Modal/Modal';
+import { IconAlert } from '../../../icons/IconLibrary';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { onExist } from '../../../../mk/utils/dbtools';
 
 
 
@@ -24,15 +30,86 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const [exist, setExist] = useState(0);
   const [visit, setVisit]:any = useState([]);
   const [formState, setFormState]:any = useState({})
+  const [formStateA, setFormStateA]:any = useState({})
   const [errors, setErrors] = useState({});
-  const [steps,setSteps] = useState(0)
+  const [errorsA, setErrorsA] = useState({});
+  const [steps,setSteps] = useState(0);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [typeSearch, setTypeSearch] = useState('P');
 
-  const handleInputChange = (name: string, value: any) => {
-    setFormState((prev:any) => ({
-      ...prev,
-      [name]: value
-    }));
-  }
+  const onCheckCI = async (taxi: boolean = false) => {
+    setErrors({});
+    let ci = formStateA.ci;
+    if (taxi) {
+      ci = formState.ci_taxi;
+    }
+    const acomList = formState.acompanantes || [];
+    const result = await onExist({
+      execute,
+      field: "ci",
+      value: ci,
+      module: "visits",
+      cols: "id,name,middle_name,last_name,mother_last_name,ci",
+    });
+
+    if (taxi) {
+      if (formState.ci_taxi == formState.ci) {
+        setErrors({ci_taxi: "CI del  invitado"});
+        return;
+      }
+    }
+    if (formState.ci == result.ci) {
+      setErrorsA({ci: "CI del  invitado"});
+      return;
+    }
+    if (formState.ci == formStateA.ci) {
+      setErrorsA({ci: "Este ci ya está en la lista"});
+      return;
+    }
+
+    if (typeSearch == "T" && formState.ci_taxi == formStateA.ci) {
+      setErrorsA({ci: "CI ya fue añadido"});
+      return;
+    }
+    let ciList = acomList.find((acom: any) => acom.ci == ci);
+
+    if (ciList) {
+      setErrorsA({ci: "El ci ya fue añadido"});
+      return;
+    }
+    setErrorsA({});
+    if (result !== false) {
+      if (taxi) {
+        setFormState({
+          ...formState,
+          name_taxi: result.name,
+          middle_name_taxi: result.middle_name,
+          last_name_taxi: result.last_name,
+          mother_last_name_taxi: result.mother_last_name,
+          nameTaxiDisabled: true,
+        });
+      } else {
+        setFormStateA({
+          ...formStateA,
+          name: result.name,
+          middle_name: result.middle_name,
+          last_name: result.last_name,
+          mother_last_name: result.mother_last_name,
+          nameDisabled: true,
+        });
+      }
+    } else {
+      setFormStateA({
+        ...formStateA,
+        name: "",
+        middle_name: "",
+        last_name: "",
+        mother_last_name: "",
+        nameDisabled: false,
+      });
+    }
+  };
+
 
 
   const hasErrors = (errors: any) => {
@@ -104,6 +181,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     setVisit(visitData?.data);
     if(visitData?.data.length === 0){
       setSteps(2);
+      setOpenAlert(true);
       return;
     }else{
       setSteps(1);
@@ -140,7 +218,7 @@ console.log(formState,'formState')
                   required={true}
                   options={owners?.data || []}
                   value={formState.owner_id || ""}
-                  onChange={value => handleInputChange("owner_id", value.target.value)}
+                  onChange={value => handleChangeInput("owner_id", value.target.value)}
                   optionValue="id"
                   error={errors}
                   optionLabel="name"
@@ -164,19 +242,64 @@ console.log(formState,'formState')
        formStateName={formState}
        formStateCi={formState.ci}
        disabledCi={steps === 2}
-       handleInputChange={handleChangeInput}
+       handleChangeInput={handleChangeInput}
        errors={errors}
        />}
        {steps > 0 &&  <TextArea
           label="Observaciones de Entrada"
           name="obs_in"
           value={formState?.obs_in}
-          onChange={(e: any) => handleInputChange('obs_in', e)}
+          onChange={(e: any) => handleChangeInput('obs_in', e)}
+        />}
+       {steps > 0 && <SelectTransport
+          typeSearch={typeSearch}
+          setTypeSearch={setTypeSearch}
+          formState={formState}
+          errors={errors}
+          handleChangeInput={handleChangeInput}
         />}
               </>
       </View>
+      {openAlert && (
+        <Modal
+          open={openAlert}
+          onClose={onClose}
+          iconClose={false}
+          onSave={()=>setOpenAlert(false)}
+          buttonText="Registrar"
+          buttonCancel=""
+          headerStyles={{backgroundColor: "transparent"}}>
+          <View
+            style={styles.modalAlert}>
+            <Icon
+              name={IconAlert}
+              size={80}
+              color={cssVar.cWarning}
+            />
+            <Text
+              style={styles.modalAlertText}>
+              ¡Visita no registrada!
+            </Text>
+          </View>
+        </Modal>
+      )}
     </ModalFull>
+    
   );
 };
 
 export default CiNomModal;
+
+const styles = StyleSheet.create({
+  
+  modalAlert:{
+    alignItems: "center", 
+    justifyContent: "center", 
+    flex: 1
+  },
+  modalAlertText:{
+    fontSize: 20,
+    color: cssVar.cWhite,
+    fontFamily: FONTS.regular,
+  }
+});
