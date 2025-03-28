@@ -14,6 +14,7 @@ import {cssVar} from '../../../mk/styles/themes';
 import {getFullName} from '../../../mk/utils/strings';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import useAuth from '../../../mk/hooks/useAuth';
+import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
 
 const Home = () => {
@@ -21,8 +22,9 @@ const Home = () => {
   // const [openSlide, setOpenSlide] = useState(true);
   const [openQr, setOpenQr] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
-  const [code, setCode] = useState('');
+  const [code, setCode]: any = useState(null);
   // const [openCiNom, setOpenCiNom] = useState(false);
+  const [showEntryQR, setShowEntryQR] = useState(false); // Add this state
   const [data, setData]: any = useState([]);
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
@@ -36,7 +38,7 @@ const Home = () => {
     endpoint: string,
     fullType: string,
   ) => {
-    const {data,reload} = await execute(endpoint, 'GET', {
+    const {data, reload} = await execute(endpoint, 'GET', {
       perPage: -1,
       page: 1,
       fullType,
@@ -94,13 +96,22 @@ const Home = () => {
       />
     </View>
   );
-  console.log(code);
+  useEffect(() => {
+    if (code) {
+      setShowEntryQR(true);
+    }
+  }, [code]);
+  const handleEntryQRClose = () => {
+    setShowEntryQR(false);
+    setCode(null);
+  };
+
   return (
     <>
       <Layout
         title="Home"
         customTitle={customTitle()}
-        refresh={()=>reload()}
+        refresh={() => reload()}
         // style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}
       >
         <TabsButtons
@@ -127,12 +138,22 @@ const Home = () => {
           {(typeSearch === 'A' || typeSearch === 'I') && (
             <Accesses
               data={filteredData}
-              reload={()=>getAccesses(search, '/accesses', typeSearch === 'A'? 'AD' :'P')}
+              reload={() =>
+                getAccesses(
+                  search,
+                  '/accesses',
+                  typeSearch === 'A' ? 'AD' : 'P',
+                )
+              }
               setDataID={setDataID}
             />
           )}
           {typeSearch === 'P' && (
-            <Orders data={filteredData} reload={()=>getAccesses(search, '/others', 'L')} setDataID={setDataID} />
+            <Orders
+              data={filteredData}
+              reload={() => getAccesses(search, '/others', 'L')}
+              setDataID={setDataID}
+            />
           )}
         </View>
         {openQr && (
@@ -142,7 +163,15 @@ const Home = () => {
             setCode={setCode}
           />
         )}
-        { openCiNom && (
+        {showEntryQR && (
+          <EntryQR
+            reload={() => getAccesses('', '/accesses', 'P')}
+            code={code}
+            open={showEntryQR}
+            onClose={handleEntryQRClose}
+          />
+        )}
+        {openCiNom && (
           <CiNomModal
             open={openCiNom}
             onClose={() => setOpenCiNom(false)}

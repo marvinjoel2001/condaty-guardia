@@ -75,7 +75,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
         data[3] = data[3].slice(0, -12);
       }
       console.log('codes03', data[3]);
-      await setCode(data[3]);
+      await setCode(data);
       onClose();
     } else {
       isActive = true;
