@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import List from '../../../../mk/components/ui/List/List';
+import {pallete} from '../../../../mk/styles/themes';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
 import { checkRules } from '../../../../mk/utils/validate/Rules';
@@ -17,6 +19,7 @@ import { IconAlert } from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import { onExist } from '../../../../mk/utils/dbtools';
+import { TouchableOpacity } from 'react-native';
 
 
 
@@ -26,7 +29,7 @@ interface CiNomModalProps {
 }
 
 const CiNomModal = ({open, onClose}: CiNomModalProps) => {
-  const {user,showToast} = useAuth();
+  const {user, showToast,} = useAuth();
   const [exist, setExist] = useState(0);
   const [visit, setVisit]:any = useState([]);
   const [formState, setFormState]:any = useState({})
@@ -36,6 +39,90 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   const [steps,setSteps] = useState(0);
   const [openAlert, setOpenAlert] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
+  const [add, setAdd] = useState(false);
+  const [edit, setEdit] = useState(false);
+
+
+  const handleChangeCompanion = async () => {
+    let err = {};
+    let acompanantes = formState["acompanantes"] || [];
+
+    if (Object.keys(errorsA).length >= 1) {
+      setErrorsA(errorsA);
+      return;
+    }
+
+    if (edit) {
+      const updatedAcompanantes = acompanantes.map((acom: any) => {
+        if (acom.ci === formStateA.ci) {
+          return {
+            ...acom,
+            name: formStateA.name,
+            middle_name: formStateA.middle_name,
+            last_name: formStateA.last_name,
+            mother_last_name: formStateA.mother_last_name,
+            obs_in: formStateA.obs_in,
+            nameDisabled: formStateA.nameDisabled,
+          };
+        }
+        return acom;
+      });
+      setFormState((old: any) => ({
+        ...old,
+        acompanantes: updatedAcompanantes,
+      }));
+      setEdit(false);
+    } else {
+      if (!formStateA.name) {
+        err = {...err, name: "Primer nombre es Requerido"};
+      }
+      if (!formStateA.last_name) {
+        err = {...err, last_name: "Apellido paterno es Requerido"};
+      }
+
+      console.log(err);
+      console.log("====================================");
+      console.log(formStateA);
+      console.log("====================================");
+
+      if (Object.keys(err).length > 0) {
+        setErrorsA(err);
+        return;
+      }
+      acompanantes.push({
+        ci: formStateA.ci,
+        name: formStateA.name,
+        middle_name: formStateA.middle_name,
+        last_name: formStateA.last_name,
+        mother_last_name: formStateA.mother_last_name,
+        obs_in: formStateA.obs_in,
+        nameDisabled: formStateA.nameDisabled,
+      });
+
+      setFormState((old: any) => ({...old, acompanantes}));
+    }
+    setFormStateA({});
+    setAdd(false);
+  };
+  const handleDeleteAcompanante = (ci: any) => {
+    const newAcompanante = formState.acompanantes.filter(
+      (acomDelete: any) => acomDelete.ci !== ci,
+    );
+    setFormState((old: any) => ({...old, acompanantes: newAcompanante}));
+  };
+
+  const handleEditAcompanante = (ci: any) => {
+    const acompananteToEdit = formState.acompanantes.find(
+      (acom: any) => acom.ci === ci,
+    );
+    setFormStateA(acompananteToEdit);
+    let disabled = acompananteToEdit.nameDisabled;
+
+    if (!disabled) {
+      setEdit(true);
+      setAdd(true);
+    }
+  };
 
   const onCheckCI = async (taxi: boolean = false) => {
     setErrors({});
@@ -135,13 +222,22 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   );
   
 
-  const handleChangeInput = (name: string, value: string) => {
+  const handleChangeInput = (name: string, value: string ) => {
 
     setFormState({
       ...formState,
       [name]: value,
     });
   };
+  const handleChangeInputA = (name: string, value: string ) => {
+    console.log(formStateA,'fstA&fst',formState,'name value')
+
+    setFormStateA({
+      ...formStateA,
+      [name]: value,
+    });
+  };
+
 
 
   const validate = () => {
@@ -190,10 +286,18 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   }
 
   const onSave = async () => {
-     getVisits();
-    
+    getVisits();
   }
-console.log(formState,'formState')
+
+  const acompanantesList = ({item}: any) => {
+    return (
+      <ItemList
+        title={getFullName(item)}
+        subtitle={`CI: ${item.ci}`}
+        left={<Avatar name={getFullName(item)} />}
+      />
+    );
+  };
   return (
     <ModalFull
       open={open}
@@ -205,6 +309,7 @@ console.log(formState,'formState')
       >
       <View style={{padding: 16}}>
       <>
+    
           {visit.length > 0 &&
               <ItemList 
                title={getFullName(visit[0])}
@@ -258,6 +363,60 @@ console.log(formState,'formState')
           errors={errors}
           handleChangeInput={handleChangeInput}
         />}
+            {formState.acompanantes?.length > 0 && (
+          <>
+            <Text
+              style={{
+                fontSize: 16,
+                fontFamily: FONTS.medium,
+                marginBottom: 4,
+                color: cssVar.cWhiteV2,
+              }}>
+              {formState.acompanantes?.length > 1 ? "Acompañantes:" : "Acompañante:"}
+            </Text>
+            <List
+              data={formState.acompanantes}
+              renderItem={acompanantesList}
+              refreshing={!loaded}
+            />
+          </>
+        )}
+
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            paddingVertical: 6,
+            paddingHorizontal: 8,
+            gap: 4,
+            borderRadius: 8,
+            width: "60%",
+            alignItems: "center",
+            marginVertical: 12,
+            opacity:
+              !formState.owner_id || !formState.ci || !formState.name
+                ? 0.2
+                : undefined,
+          }}
+          disabled={!formState.owner_id || !formState.ci || !formState.name}
+          onPress={() => {
+            setAdd(true);
+            setFormStateA({});
+            setEdit(false);
+          }}>
+          <Text
+            style={{
+              fontSize: 12,
+              color: cssVar.cWhite,
+              fontFamily: FONTS.medium,
+              borderBottomColor:cssVar.cWhiteV2,
+              borderBottomWidth:
+                !formState.owner_id || !formState.ci || !formState.name ? 0 : 2,
+            }}>
+            {formState.acompanantes?.length >= 1
+              ? "Agregar más acompañantes"
+              : "Agregar acompañante"}
+          </Text>
+        </TouchableOpacity>
               </>
       </View>
       {openAlert && (
@@ -283,6 +442,28 @@ console.log(formState,'formState')
           </View>
         </Modal>
       )}
+
+<Modal
+        title="Agregar acompañante"
+        open={add}
+        onClose={() => {
+          setAdd(false);
+          setErrorsA({});
+        }}
+        buttonText="Guardar"
+        onSave={handleChangeCompanion}
+        disabled={!formStateA.ci || !formStateA.name || !formStateA.last_name}
+        headerStyles={{backgroundColor: "transparent"}}>
+        <InputNameCi
+          formStateName={formStateA}
+          formStateCi={formStateA.ci}
+          // disabledCi={true}
+          handleChangeInput={handleChangeInputA}
+          errors={errorsA}
+          onCheckCI={onCheckCI}
+          // p refix="_a"
+        />
+      </Modal>
     </ModalFull>
     
   );

@@ -39,7 +39,7 @@ const InputNameCi = ({
         readOnly={disabledCi}
         value={formStateCi}
         maxLength={10}
-        onChange={(value: any) => handleChangeInput(value,nameCi)}
+        onChange={(value: any) => handleChangeInput(nameCi,value)}
         onBlur={() => onCheckCI && onCheckCI()}
       />
       <InputFullName
