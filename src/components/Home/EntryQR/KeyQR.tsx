@@ -66,7 +66,15 @@ const KeyQR = ({formState, setFormState, handleChange, data}: PropsType) => {
   return (
     <View style={{marginTop: 20, gap: 20}}>
       {!data?.invitation ? (
-        <Text>Cargando...</Text>
+        <Text
+          style={{
+            textAlign: 'center',
+            color: cssVar.cWhite,
+            fontSize: 16,
+            fontWeight: 'bold',
+          }}>
+          Cargando...
+        </Text>
       ) : (
         <>
           <Avatar

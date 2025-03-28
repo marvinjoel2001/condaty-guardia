@@ -16,6 +16,7 @@ interface TypeProps {
 
 const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
+  const [openSelected, setOpenSelected] = useState(false);
   const [errors, setErrors] = useState({});
   const [data, setData]: any = useState([]);
   const {execute} = useApi();
@@ -39,10 +40,16 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     let id = codeId.replace(ltime, '');
     id = id.replace(ltime - 4, '');
 
-    const {data: QR} = await execute('/owners', 'GET', {
-      searchBy: id,
-      fullType: 'KEY',
-    });
+    const {data: QR} = await execute(
+      '/owners',
+      'GET',
+      {
+        searchBy: id,
+        fullType: 'KEY',
+      },
+      false,
+      3,
+    );
     if (QR?.success == true) {
       setData({
         invitation: QR?.data[0],
@@ -79,12 +86,18 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   }, []);
 
   const onOut = async () => {
-    const {data: In, error: err} = await execute('/accesses/exit', 'POST', {
-      id: formState.invitation?.access[0].id,
-      obs_out: formState.obs_out,
-    });
+    const {data: In, error: err} = await execute(
+      '/accesses/exit',
+      'POST',
+      {
+        id: formState.access_id,
+        obs_out: formState.obs_out,
+      },
+      false,
+      3,
+    );
     if (In?.success == true) {
-      //   if (reload) reload();
+      if (reload) reload();
       onClose();
       showToast('El visitante salió', 'success');
     } else {
@@ -152,6 +165,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       parms = {
         type: type,
         owner_id: data?.invitation?.id,
+        begin_at: formState?.begin_at || getUTCNow(),
       };
     }
     if (type == 'I' || type == 'G') {
@@ -172,6 +186,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         middle_name_taxi: formState?.middle_name_taxi,
         last_name_taxi: formState?.last_name_taxi,
         mother_last_name_taxi: formState?.mother_last_name_taxi,
+        visit_id: formState?.visit_id,
       };
       if (hasErrors(validate())) {
         return;
@@ -198,7 +213,8 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       onClose();
     }
   };
-  console.log(errors);
+
+  console.log(formState);
   return (
     <ModalFull
       title={
@@ -206,9 +222,11 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       }
       open={open}
       onClose={onClose}
-      onSave={onSaveAccess}
+      onSave={() => {
+        formState?.access_id ? onOut() : onSaveAccess();
+      }}
       buttonCancel=""
-      buttonText="Continuar">
+      buttonText={!openSelected && type == 'G' ? '' : 'Continuar'}>
       {type === 'I' && (
         <IndividualQR
           setFormState={setFormState}
@@ -219,7 +237,18 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           setErrors={setErrors}
         />
       )}
-      {type === 'G' && <GroupQR />}
+      {type === 'G' && (
+        <GroupQR
+          setFormState={setFormState}
+          formState={formState}
+          handleChange={handleChange}
+          data={data}
+          errors={errors}
+          setErrors={setErrors}
+          setOpenSelected={setOpenSelected}
+          openSelected={openSelected}
+        />
+      )}
       {type === 'O' && (
         <KeyQR
           setFormState={setFormState}

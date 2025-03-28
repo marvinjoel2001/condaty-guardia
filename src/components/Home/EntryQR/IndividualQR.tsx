@@ -116,7 +116,8 @@ const IndividualQR = ({
       name: visit?.name,
       middle_name: visit?.middle_name,
       last_name: visit?.last_name,
-      middle_last_name: visit?.middle_last_name,
+      mother_last_name: visit?.mother_last_name,
+      access_id: access?.[0]?.id,
     });
   }, [data]);
 
@@ -141,6 +142,13 @@ const IndividualQR = ({
     setFormState({
       ...formState,
       tab: tab,
+      ci_taxi: '',
+      name_taxi: '',
+      middle_name_taxi: '',
+      last_name_taxi: '',
+      mother_last_name_taxi: '',
+      plate: '',
+      disbledTaxi: false,
     });
   }, [tab]);
 
@@ -189,7 +197,9 @@ const IndividualQR = ({
         ...formState,
         ci_taxi: exist?.data.ci,
         name_taxi: exist?.data.name,
+        middle_name_taxi: exist?.data.middle_name,
         last_name_taxi: exist?.data.last_name,
+        mother_last_name_taxi: exist?.data.mother_last_name,
         plate: exist?.data.plate,
         disbledTaxi: true,
       });
