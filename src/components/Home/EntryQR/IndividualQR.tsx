@@ -107,7 +107,7 @@ const IndividualQR = ({
 
     setDetails({data: data});
   };
-  console.log(data);
+  // console.log(data);
   useEffect(() => {
     _onDetail(data);
     setFormState({

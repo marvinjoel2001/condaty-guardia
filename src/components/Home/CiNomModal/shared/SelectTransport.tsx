@@ -27,7 +27,7 @@ const SelectTransport = ({
   disabledFields = false,
   tabs,
 }: SelectTransportProps) => {
-    console.log(formState,'fsttttt')
+    // console.log(formState,'fsttttt')
   return (
     <View>
       <TabsButtons

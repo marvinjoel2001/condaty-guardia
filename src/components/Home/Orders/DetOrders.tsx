@@ -129,7 +129,7 @@ const DetOrders = ({ id, open, close, reload }: any) => {
             <LineDetail label="Observación" value={data?.obs_confirm} />
           </>
         )}
-        {/* Puedes agregar más detalles según lo que necesites */}
+      
       </>
     );
   };

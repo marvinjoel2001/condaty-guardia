@@ -26,7 +26,7 @@ const InputNameCi = ({
   prefix,
   onCheckCI,
 }: InputNameCiProps) => {
-    console.log(nameCi,'nameCi')
+    // console.log(nameCi,'nameCi')
   return (
     <View style={{gap: 16}}>
       <Input
