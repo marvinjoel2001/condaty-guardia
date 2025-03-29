@@ -182,18 +182,17 @@ export const isIos = () => {
   return Platform.OS == 'ios';
 };
 
-
-export const getAccessStatus = (data:any) => {
-  if (data?.out_at) {
-    return "Completado";
-  } else if (!data?.confirm_at) {
-    return "Por confirmar";
-  } else if (data?.in_at) {
-    return "Por Salir";
-  } else if (data?.confirm === "Y") {
-    return "Por Entrar";
+export const getAccessStatus = (data: any) => {
+  if (data?.access?.out_at) {
+    return 'Completado';
+  } else if (!data?.access?.confirm_at) {
+    return 'Por confirmar';
+  } else if (data?.access?.in_at) {
+    return 'Por Salir';
+  } else if (data?.access?.confirm === 'Y') {
+    return 'Por Entrar';
   } else {
-    return "Denegado";
+    return 'Denegado';
   }
 };
 export const getAccessType = (data: any) => {
@@ -206,16 +205,15 @@ export const getAccessType = (data: any) => {
   // : item?.type === "G"
   // ? "QR Grupal"
   // : "QR Llave Virtual",
-  if( data?.type === "P"){
-    return "Pedido-" + data?.other?.other_type.name
-    }else if(data?.type === "I"){
-      return "QR Individual"
-      }else if(data?.type === "C"){
-        return "Sin QR"
-        }else if(data?.type === "G"){
-          return "QR Grupal"
-          }else{
-            return "QR Llave Virtual"
-            }
-            };
-            
+  if (data?.type === 'P') {
+    return 'Pedido-' + data?.other?.other_type.name;
+  } else if (data?.type === 'I') {
+    return 'QR Individual';
+  } else if (data?.type === 'C') {
+    return 'Sin QR';
+  } else if (data?.type === 'G') {
+    return 'QR Grupal';
+  } else {
+    return 'QR Llave Virtual';
+  }
+};

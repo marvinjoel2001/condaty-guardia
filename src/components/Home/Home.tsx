@@ -140,7 +140,11 @@ const Home = () => {
             />
           )}
           {typeSearch === 'P' && (
-            <Orders data={filteredData} reload={reload} setDataID={setDataID} />
+            <Orders
+              data={filteredData}
+              reload={() => getAccesses('', '/others', 'L')}
+              setDataID={setDataID}
+            />
           )}
         </View>
         {openQr && (
