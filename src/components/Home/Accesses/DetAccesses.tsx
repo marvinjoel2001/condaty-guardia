@@ -138,7 +138,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     }
     return '';
   };
-  // const status = getStatus();
+  const status = getStatus();
 
   let accessType = getAccessType(data);
 
@@ -266,7 +266,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         title={getFullName(data?.visit)}
         subtitle={'C.I. ' + data?.visit?.ci}
         left={<Avatar name={getFullName(data?.visit)} />}
-        right={ data?.out_at ?null:  getCheckVisit(data, isSelected) }
+        right={ data?.out_at || status === 'Y' ?null:  getCheckVisit(data, isSelected) }
         date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
       />
 
