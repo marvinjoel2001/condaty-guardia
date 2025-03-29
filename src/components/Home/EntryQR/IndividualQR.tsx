@@ -208,6 +208,8 @@ const IndividualQR = ({
         ...formState,
         name_taxi: '',
         last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
         plate: '',
         disbledTaxi: false,
       });
