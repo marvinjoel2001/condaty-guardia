@@ -30,7 +30,7 @@ const Home = () => {
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('I');
   const {theme} = useContext(ThemeContext);
-  const {execute, loaded, reload} = useApi();
+  const {execute, loaded} = useApi();
 
   // Función que obtiene la data según el tipo de búsqueda
   const getAccesses = async (
@@ -111,7 +111,13 @@ const Home = () => {
       <Layout
         title="Home"
         customTitle={customTitle()}
-        refresh={() => reload()}
+        refresh={() =>
+          typeSearch == 'I'
+            ? getAccesses('', '/accesses', 'P')
+            : typeSearch == 'A'
+            ? getAccesses('', '/accesses', 'AD')
+            : getAccesses('', '/others', 'L')
+        }
         // style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}
       >
         <TabsButtons
