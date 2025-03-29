@@ -62,8 +62,8 @@ export const validRule = (
     plate: () =>
       value == null || value == ''
         ? ''
-        : !/^[A-Z0-9]{3,4}[-][0-9]{3,4}$/.test(value)
-        ? 'Formato incorrecto. Ejemplo: ABC-123 o AB12-123'
+        : !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9-]{5,8}$/.test(value.toUpperCase())
+        ? 'La placa debe contener letras y números (5-8 caracteres)'
         : '',
     between: () =>
       Number(value) < Number(param[0]) || Number(value) > Number(param[1])
