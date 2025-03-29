@@ -352,12 +352,20 @@ const DetOrders = ({id, open, close, reload}: any) => {
                 </>
               )}
               {getStatus() === 'I' && (
-                <TextArea
-                  label="Observaciones de Salida"
-                  name="obs_out"
-                  value={formState?.obs_out || ''}
-                  onChange={e => handleInputChange('obs_out', e)}
-                />
+                <>
+                  <ItemList
+                    title={getFullName(data?.access?.visit)}
+                    subtitle={'C.I.' + data?.access?.visit?.ci}
+                    subtitle2={'Placa: ' + data?.access?.plate || 'A pie'}
+                    left={<Avatar name={getFullName(data?.access?.visit)} />}
+                  />
+                  <TextArea
+                    label="Observaciones de Salida"
+                    name="obs_out"
+                    value={formState?.obs_out || ''}
+                    onChange={e => handleInputChange('obs_out', e)}
+                  />
+                </>
               )}
             </View>
           </>
