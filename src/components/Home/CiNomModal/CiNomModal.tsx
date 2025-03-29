@@ -20,6 +20,7 @@ import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import { onExist } from '../../../../mk/utils/dbtools';
 import { TouchableOpacity } from 'react-native';
 import { AccompaniedAdd } from '../EntryQR/AccompaniedAdd';
+import { getUTCNow } from '../../../../mk/utils/dates';
 
 
 
@@ -309,7 +310,9 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
       const url = "/accesses";
       let method = "POST";
   
-      const {data, error: err} = await execute(url, method, formState, false, 0);
+      const {data, error: err} = await execute(url, method, 
+        {...formState, begin_at: formState?.begin_at || getUTCNow(),}
+        , false, 0);
   
       if (data?.success === true) {
         onClose();
@@ -412,7 +415,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
             {value: 'T', text: 'En taxi'},
           ]}
         />}
-            {formState.acompanantes?.length > 0 && (
+            {formState.acompanantes?.length > 0 &&  (
           <>
             <Text
               style={{
@@ -431,7 +434,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           </>
         )}
 
-        <TouchableOpacity
+      { steps > 0 && <TouchableOpacity
           style={{
             flexDirection: "row",
             paddingVertical: 6,
@@ -465,7 +468,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
               ? "Agregar más acompañantes"
               : "Agregar acompañante"}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
               </>
       </View>
       {openAlert && (
