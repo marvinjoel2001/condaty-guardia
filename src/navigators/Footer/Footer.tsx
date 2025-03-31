@@ -64,7 +64,12 @@ const Footer = ({styles}: any) => {
         isActived={(store?.nSurveys || 0) > 0}
       />
 
-      <ItemFoot path="feedback" text="Feedback" icon={IconFeedBack} />
+      <ItemFoot 
+      path="Feedback" 
+      text="Feedback" 
+      icon={IconFeedBack} 
+      
+      />
       {/* <ItemFoot
         path="activity"
         text="Actividades"
