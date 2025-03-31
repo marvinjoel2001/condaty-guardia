@@ -17,7 +17,7 @@ import {
   IconSesionDel,
   IconTaxi,
 } from '../../icons/IconLibrary';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import {getDateTimeStrMes, getNow} from '../../../mk/utils/dates';
@@ -172,9 +172,11 @@ const Notifications = () => {
         sel={tab}
         setSel={setTab}
       />
+      <View style={{padding:cssVar.spL,gap:cssVar.spL}} >
       <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
       <List data={notifs?.data} renderItem={NotifisList} refreshing={!loaded} />
+      </View>
     </Layout>
   );
 };

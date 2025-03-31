@@ -34,6 +34,7 @@ export const cssVar = {
   cWhiteV1: '#EEEEEE',
   cWhiteV2: '#A7A7A7',
   cWhiteV3: '#FFFFFF0D',
+  cWhiteV4: '#D8D8D8',
   cBlack: '#212121',
   cBlackV1: '#292929',
   cBlackV2: '#333536',
