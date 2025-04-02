@@ -9,6 +9,7 @@ import useApi from '../../../../mk/hooks/useApi';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DateAccess from '../DateAccess/DateAccess';
+import Loading from '../../../../mk/components/ui/Loading/Loading';
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -78,13 +79,19 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
 
   return (
     <ModalFull title={'Detalle de pedido'} open={open} onClose={onClose}>
-      <ItemInfo type="C" details={details} />
-      <ItemList
-        title={getFullName(data?.access?.visit)}
-        subtitle={'C.I. ' + data?.access?.visit?.ci}
-        left={<Avatar name={getFullName(data?.access?.visit)} />}
-        children={<DateAccess access={data?.access} />}
-      />
+      {!data ? (
+        <Loading />
+      ) : (
+        <>
+          <ItemInfo type="C" details={details} />
+          <ItemList
+            title={getFullName(data?.access?.visit)}
+            subtitle={'C.I. ' + data?.access?.visit?.ci}
+            left={<Avatar name={getFullName(data?.access?.visit)} />}
+            children={<DateAccess access={data?.access} />}
+          />
+        </>
+      )}
     </ModalFull>
   );
 };

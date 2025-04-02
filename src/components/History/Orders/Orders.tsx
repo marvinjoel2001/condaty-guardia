@@ -7,11 +7,13 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
 import {cssVar} from '../../../../mk/styles/themes';
 import OrdersDetail from './OrdersDetail';
+import useApi from '../../../../mk/hooks/useApi';
 type Props = {
   data: any;
+  loaded: boolean;
 };
 
-export const Orders = ({data}: Props) => {
+export const Orders = ({data, loaded}: Props) => {
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const left = (item: any) => {
     let icon = IconOther;
@@ -39,8 +41,8 @@ export const Orders = ({data}: Props) => {
     );
   };
   return (
-    <View>
-      <List data={data} renderItem={renderItem} />
+    <View style={{paddingHorizontal: 16}}>
+      <List data={data} renderItem={renderItem} refreshing={loaded} />
       {openDetail.open && (
         <OrdersDetail
           open={openDetail.open}

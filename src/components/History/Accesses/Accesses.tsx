@@ -6,11 +6,13 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
+import useApi from '../../../../mk/hooks/useApi';
 
 type Props = {
   data: any;
+  loaded: boolean;
 };
-const Accesses = ({data}: Props) => {
+const Accesses = ({data, loaded}: Props) => {
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const renderItem = (item: any) => {
     return (
@@ -32,7 +34,12 @@ const Accesses = ({data}: Props) => {
 
   return (
     <View style={{paddingHorizontal: 16}}>
-      <List data={data} renderItem={renderItem} />
+      <List
+        data={data}
+        renderItem={renderItem}
+        refreshing={loaded}
+        skeletonType="access"
+      />
       {openDetail?.open && (
         <AccessDetail
           open={openDetail?.open}

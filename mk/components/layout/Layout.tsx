@@ -71,7 +71,8 @@ const Layout = (props: PropsType) => {
     if (
       route.name === 'Home' ||
       route.name === 'Alerts' ||
-      route.name === 'History'
+      route.name === 'History' ||
+      route.name === 'Binnacle'
     ) {
       return true;
     }

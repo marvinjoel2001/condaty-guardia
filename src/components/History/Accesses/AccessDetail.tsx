@@ -12,6 +12,8 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {cssVar} from '../../../../mk/styles/themes';
 import DateAccess from '../DateAccess/DateAccess';
+import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
+import Loading from '../../../../mk/components/ui/Loading/Loading';
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -157,44 +159,50 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
   return (
     <ModalFull title={'Detalle de acceso'} open={open} onClose={onClose}>
-      <ItemInfo type="C" details={details} />
-      <Text
-        style={{
-          fontSize: 16,
-          fontWeight: 'bold',
-          marginVertical: 10,
-          color: cssVar.cWhite,
-        }}>
-        Visitante
-      </Text>
-      <ItemList
-        title={getFullName(data?.visit)}
-        subtitle={'C.I. ' + data?.visit?.ci}
-        left={<Avatar name={getFullName(data?.visit)} />}
-        children={<DateAccess access={data} />}
-      />
-      {data?.accesses?.length > 0 && (
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginVertical: 10,
-            color: cssVar.cWhite,
-          }}>
-          Acompañantes
-        </Text>
-      )}
-      {data?.accesses?.map((item: any, index: number) => {
-        return (
+      {!data ? (
+        <Loading />
+      ) : (
+        <>
+          <ItemInfo type="C" details={details} />
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+              marginVertical: 10,
+              color: cssVar.cWhite,
+            }}>
+            Visitante
+          </Text>
           <ItemList
-            key={index}
-            title={getFullName(item?.visit)}
-            left={<Avatar name={getFullName(item?.visit)} />}
-            subtitle={'C.I.' + item?.visit?.ci}
-            children={<DateAccess access={item} />}
+            title={getFullName(data?.visit)}
+            subtitle={'C.I. ' + data?.visit?.ci}
+            left={<Avatar name={getFullName(data?.visit)} />}
+            children={<DateAccess access={data} />}
           />
-        );
-      })}
+          {data?.accesses?.length > 0 && (
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: 'bold',
+                marginVertical: 10,
+                color: cssVar.cWhite,
+              }}>
+              Acompañantes
+            </Text>
+          )}
+          {data?.accesses?.map((item: any, index: number) => {
+            return (
+              <ItemList
+                key={index}
+                title={getFullName(item?.visit)}
+                left={<Avatar name={getFullName(item?.visit)} />}
+                subtitle={'C.I.' + item?.visit?.ci}
+                children={<DateAccess access={item} />}
+              />
+            );
+          })}
+        </>
+      )}
     </ModalFull>
   );
 };

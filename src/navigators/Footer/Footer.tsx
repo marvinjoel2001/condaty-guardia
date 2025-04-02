@@ -10,6 +10,7 @@ import {
   // IconEvent,
   IconHome,
   IconKey,
+  IconNovedades,
   IconPending,
   // IconRed,
   // IconSurveys,
@@ -64,12 +65,7 @@ const Footer = ({styles}: any) => {
         isActived={(store?.nSurveys || 0) > 0}
       />
 
-      <ItemFoot 
-      path="Feedback" 
-      text="Feedback" 
-      icon={IconFeedBack} 
-      
-      />
+      <ItemFoot path="Binnacle" text="Bitácora" icon={IconNovedades} />
       {/* <ItemFoot
         path="activity"
         text="Actividades"

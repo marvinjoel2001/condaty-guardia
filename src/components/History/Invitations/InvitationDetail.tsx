@@ -12,6 +12,7 @@ import ItemInfo, {
   TypeDetails,
 } from '../../../../mk/components/ui/ItemInfo/ItemInfo';
 import DateAccess from '../DateAccess/DateAccess';
+import Loading from '../../../../mk/components/ui/Loading/Loading';
 
 type Props = {
   open: boolean;
@@ -108,72 +109,78 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
   };
   return (
     <ModalFull title={'Detalle de invitación'} open={open} onClose={onClose}>
-      <ItemInfo type="C" details={details} />
-      {data?.type == 'G' && (
-        <View style={{padding: 10}}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: 'bold',
-              marginBottom: 10,
-              color: cssVar.cWhite,
-            }}>
-            Invitados que ingresaron:
-          </Text>
-          {enteredGuests.map((guest: any, index: any) => (
-            <ItemList
-              key={index}
-              left={<Avatar name={getFullName(guest.visit)} />}
-              title={getFullName(guest.visit)}
-              subtitle={`CI: ${guest.visit.ci}`}
-              children={<DateAccess access={guest?.access} />}
-            />
-          ))}
-          {notEnteredGuests.length > 0 && (
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                marginVertical: 10,
-                color: cssVar.cWhite,
-              }}>
-              Invitados pendientes de ingreso:
-            </Text>
+      {!data ? (
+        <Loading />
+      ) : (
+        <>
+          <ItemInfo type="C" details={details} />
+          {data?.type == 'G' && (
+            <View style={{padding: 10}}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  marginBottom: 10,
+                  color: cssVar.cWhite,
+                }}>
+                Invitados que ingresaron:
+              </Text>
+              {enteredGuests.map((guest: any, index: any) => (
+                <ItemList
+                  key={index}
+                  left={<Avatar name={getFullName(guest.visit)} />}
+                  title={getFullName(guest.visit)}
+                  subtitle={`CI: ${guest.visit.ci}`}
+                  children={<DateAccess access={guest?.access} />}
+                />
+              ))}
+              {notEnteredGuests.length > 0 && (
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    marginVertical: 10,
+                    color: cssVar.cWhite,
+                  }}>
+                  Invitados pendientes de ingreso:
+                </Text>
+              )}
+              {notEnteredGuests.map((guest: any, index: any) => (
+                <ItemList
+                  key={index}
+                  left={<Avatar name={getFullName(guest.visit)} />}
+                  title={getFullName(guest.visit)}
+                  subtitle={`CI: ${guest.visit.ci}`}
+                  //   children={
+                  //     <View style={{marginTop: 10}}>
+                  //       <Text>Fecha de invitación: {guest.in_at}</Text>
+                  //       <Text>Fecha de vencimiento: {guest.out_at}</Text>
+                  //     </View>
+                  //   }
+                />
+              ))}
+            </View>
           )}
-          {notEnteredGuests.map((guest: any, index: any) => (
-            <ItemList
-              key={index}
-              left={<Avatar name={getFullName(guest.visit)} />}
-              title={getFullName(guest.visit)}
-              subtitle={`CI: ${guest.visit.ci}`}
-              //   children={
-              //     <View style={{marginTop: 10}}>
-              //       <Text>Fecha de invitación: {guest.in_at}</Text>
-              //       <Text>Fecha de vencimiento: {guest.out_at}</Text>
-              //     </View>
-              //   }
-            />
-          ))}
-        </View>
-      )}
-      {data?.type == 'I' && (
-        <View style={{padding: 10}}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: 'bold',
-              marginBottom: 10,
-              color: cssVar.cWhite,
-            }}>
-            Invitado que ingresó:
-          </Text>
-          <ItemList
-            left={<Avatar name={getFullName(data?.visit)} />}
-            title={getFullName(data?.visit)}
-            subtitle={`CI: ${data?.visit?.ci}`}
-            children={<DateAccess access={data.access[0]} />}
-          />
-        </View>
+          {data?.type == 'I' && (
+            <View style={{padding: 10}}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  marginBottom: 10,
+                  color: cssVar.cWhite,
+                }}>
+                Invitado que ingresó:
+              </Text>
+              <ItemList
+                left={<Avatar name={getFullName(data?.visit)} />}
+                title={getFullName(data?.visit)}
+                subtitle={`CI: ${data?.visit?.ci}`}
+                children={<DateAccess access={data.access[0]} />}
+              />
+            </View>
+          )}
+        </>
       )}
     </ModalFull>
   );

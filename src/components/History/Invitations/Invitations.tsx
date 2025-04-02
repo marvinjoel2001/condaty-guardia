@@ -7,12 +7,14 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconGroupsQr, IconSingleQr} from '../../../icons/IconLibrary';
 import {cssVar} from '../../../../mk/styles/themes';
 import InvitationDetail from './InvitationDetail';
+import useApi from '../../../../mk/hooks/useApi';
 
 type Props = {
   data: any;
+  loaded: boolean;
 };
 
-const Invitations = ({data}: Props) => {
+const Invitations = ({data, loaded}: Props) => {
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const left = (item: any) => {
     let name = IconSingleQr;
@@ -51,7 +53,7 @@ const Invitations = ({data}: Props) => {
   };
   return (
     <View style={{paddingHorizontal: 16}}>
-      <List data={data} renderItem={renderItem} />
+      <List data={data} renderItem={renderItem} refreshing={loaded} />
       {openDetail?.open && (
         <InvitationDetail
           open={openDetail.open}

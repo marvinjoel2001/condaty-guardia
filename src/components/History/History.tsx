@@ -5,38 +5,47 @@ import useApi from '../../../mk/hooks/useApi';
 import Accesses from './Accesses/Accesses';
 import Invitations from './Invitations/Invitations';
 import {Orders} from './Orders/Orders';
+import {useFocusEffect} from '@react-navigation/native';
 
 const History = () => {
   const [tab, setTab] = useState('A');
-  const [data, setData] = useState([]);
+  const [data, setData]: any = useState([]);
   const {execute} = useApi();
+  const [loaded, setLoaded] = useState(false);
+
   const getHistory = async (
     searchParam: any = '',
     endpoint: string,
     fullType: string,
   ) => {
-    const {data} = await execute(endpoint, 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType,
-      section: 'ACT',
-    });
-    setData(data?.data || []);
+    setLoaded(true);
+    setData([]);
+    try {
+      const {data} = await execute(endpoint, 'GET', {
+        perPage: -1,
+        page: 1,
+        fullType,
+        section: 'ACT',
+      });
+      setData(data?.data || []);
+    } catch (error) {
+      console.error(error);
+      setData([]);
+    } finally {
+      setLoaded(false);
+    }
   };
 
   useEffect(() => {
     switch (tab) {
       case 'A':
         getHistory('', '/accesses', 'L');
-        setData([]);
         break;
       case 'I':
         getHistory('', '/invitations', 'L');
-        setData([]);
         break;
       case 'P':
         getHistory('', '/others', 'L');
-        setData([]);
         break;
       default:
         console.log('Tipo de búsqueda no válido:', tab);
@@ -64,9 +73,10 @@ const History = () => {
         sel={tab}
         setSel={setTab}
       />
-      {tab === 'A' && <Accesses data={data} />}
-      {tab === 'I' && <Invitations data={data} />}
-      {tab === 'P' && <Orders data={data} />}
+
+      {tab === 'A' && <Accesses data={data} loaded={loaded} />}
+      {tab === 'I' && <Invitations data={data} loaded={loaded} />}
+      {tab === 'P' && <Orders data={data} loaded={loaded} />}
     </Layout>
   );
 };
