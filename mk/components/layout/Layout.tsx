@@ -68,7 +68,11 @@ const Layout = (props: PropsType) => {
   }, [store?.scrollTop]);
 
   const isRoute = () => {
-    if (route.name === 'Home' || route.name === 'Alerts') {
+    if (
+      route.name === 'Home' ||
+      route.name === 'Alerts' ||
+      route.name === 'History'
+    ) {
       return true;
     }
     return false;
@@ -109,7 +113,7 @@ const Layout = (props: PropsType) => {
               ...style,
               // paddingTop: isRoute() ? 50 : 0,
             }}
-            contentContainerStyle={{paddingBottom: isRoute() ? 70 : 0}}
+            contentContainerStyle={{paddingBottom: isRoute() ? 60 : 0}}
             // onScroll={scrollHandler}
             // scrollEventThrottle={16}
             refreshControl={

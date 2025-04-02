@@ -44,8 +44,8 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             )}
             style={theme.avatar}
             circle={false}
-             w={62}
-             h={62}
+            w={62}
+            h={62}
           />
         }
       />
@@ -82,6 +82,13 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             text="Bitácora"
             icon={IconNovedades}
             reverse
+            activeItem={activeItem}
+            color={cssVar.cWhiteV2}
+          />
+          <ItemMenu
+            screen="History"
+            text="Historial"
+            icon={IconDocs}
             activeItem={activeItem}
             color={cssVar.cWhiteV2}
           />
