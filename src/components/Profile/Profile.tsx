@@ -5,7 +5,14 @@ import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import useAuth from '../../../mk/hooks/useAuth';
 import Button from '../../../mk/components/forms/Button/Button';
-import {ScrollView, StyleSheet, Text, View, BackHandler, Dimensions} from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  BackHandler,
+  Dimensions,
+} from 'react-native';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {
   IconArrowRight,
@@ -39,7 +46,7 @@ const Profile = () => {
   const lDpto: any = {C: 'Casa', L: 'Lote', D: 'Departamento'};
   const lCondo: any = {C: 'Condominio', E: 'Edificio', U: 'Urbanizacion'};
   const screen = Dimensions.get('window');
-  
+
   const client: any = user?.clients?.find((e: any) => e.id == user.client_id);
   const dpto: any = user?.dpto?.find(
     (e: any) => e.client_id == user?.client_id,
@@ -47,9 +54,8 @@ const Profile = () => {
   const currentClient: any = user.clients?.find(
     (e: any) => e.pivot.client_id == user.client_id,
   );
- 
 
-  console.log(isEdit,'is ediii')
+  console.log(isEdit, 'is ediii');
   // Cuando el componente obtiene el foco
   useFocusEffect(
     React.useCallback(() => {
@@ -58,9 +64,9 @@ const Profile = () => {
       if (!isEdit) {
         setIsEdit(false);
       }
-    
+
       if (!formState.avatar) {
-        setFormState((prevState:any) => ({
+        setFormState((prevState: any) => ({
           ...prevState,
           avatar: null,
         }));
@@ -87,15 +93,18 @@ const Profile = () => {
   const init = async () => {
     try {
       const userData = await getUser();
-      if (userData) {  
-        setFormState((prevState:any) => ({
+      if (userData) {
+        setFormState((prevState: any) => ({
           ...prevState,
-          ...(userData || {}),  
-          avatar: (prevState && prevState.avatar) || (userData && userData.avatar) || null
+          ...(userData || {}),
+          avatar:
+            (prevState && prevState.avatar) ||
+            (userData && userData.avatar) ||
+            null,
         }));
       }
     } catch (error) {
-      console.error("Error al obtener datos de usuario:", error);
+      console.error('Error al obtener datos de usuario:', error);
       showToast('Error al cargar datos del perfil', 'error');
     }
   };
@@ -166,7 +175,7 @@ const Profile = () => {
     if (hasErrors(validate())) {
       return;
     }
-    
+
     const newUser: any = {
       ci: formState.ci,
       name: formState.name,
@@ -174,7 +183,9 @@ const Profile = () => {
       last_name: formState.last_name,
       mother_last_name: formState.mother_last_name,
       phone: formState.phone,
-      avatar: formState.avatar ? {ext: 'webp', file: encodeURIComponent(formState.avatar)} : undefined,
+      avatar: formState.avatar
+        ? {ext: 'webp', file: encodeURIComponent(formState.avatar)}
+        : undefined,
       address: formState.address,
     };
 
@@ -185,7 +196,7 @@ const Profile = () => {
       false,
       3,
     );
-    
+
     if (data?.success === true) {
       getUser();
       showToast('Perfil Actualizado', 'success');
@@ -202,13 +213,13 @@ const Profile = () => {
   const onOpenModal = (type: any) => {
     setType(type);
     // Reinicia completamente el estado del formulario para el modal
-    setFormState((prevState:any) => ({
+    setFormState((prevState: any) => ({
       ...prevState,
-      newEmail: '',  // Usa string vacío en lugar de null
+      newEmail: '', // Usa string vacío en lugar de null
       password: '',
       pinned: 0,
       code: '',
-      enableButton: false,  // Asegúrate de resetear este flag
+      enableButton: false, // Asegúrate de resetear este flag
     }));
     setOpenModal(true);
   };
@@ -230,21 +241,22 @@ const Profile = () => {
           src={
             formState.avatar && isEdit
               ? 'data:image/jpg;base64,' + formState.avatar
-              : getUrlImages('/GUARD-' + user?.id + '.webp?d=' + user?.updated_at)
+              : getUrlImages(
+                  '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
+                )
           }
           w={112}
           h={112}
           name={getFullName(user)}
           style={{width: 112, height: 112}}
         />
-        
+
         {isEdit && (
           <View
             style={styles.cameraButton}
             onTouchEnd={() => {
               uploadImage({formState, setFormState, showToast});
-            }}
-          >
+            }}>
             <Icon
               name={IconCamera}
               fillStroke={cssVar.cBlackV1}
@@ -253,23 +265,21 @@ const Profile = () => {
           </View>
         )}
       </View>
-      
+
       {!isEdit && (
         <Button
           style={{
             marginVertical: 8,
           }}
-          onPress={handleEdit}
-          
-          >
+          onPress={handleEdit}>
           Editar perfil
         </Button>
       )}
-      
+
       <Text style={styles.title}>
         {isEdit ? 'Editar perfil' : 'Datos personales'}
       </Text>
-      
+
       {isEdit ? (
         <ScrollView
           style={{flex: 1}}
@@ -279,12 +289,13 @@ const Profile = () => {
           keyboardShouldPersistTaps="handled">
           <Form behaviorIos="position" keyboardVerticalOffset={200}>
             <InputFullName
+              inputGrid={false}
               formState={formState}
               errors={errors}
               handleChangeInput={handleInputChange}
               disabled={false}
             />
-             <Input
+            <Input
               label="Dirección"
               value={formState['address'] || ''}
               name="address"
@@ -340,7 +351,9 @@ const Profile = () => {
             {!user?.dpto || user?.dpto.length === 0 ? (
               <>
                 <Text style={styles.label}>Dirección</Text>
-                <Text style={styles.text}>{user.address || 'Sin dirección'}</Text>
+                <Text style={styles.text}>
+                  {user.address || 'Sin dirección'}
+                </Text>
               </>
             ) : null}
           </View>
@@ -388,9 +401,7 @@ const Profile = () => {
       {/* Sección de Cuentas Dependientes */}
       {!currentClient?.pivot?.titular_id && user?.dpto?.length > 0 && (
         <View style={styles.dependentSection}>
-          <Text style={styles.title}>
-            Cuentas dependientes
-          </Text>
+          <Text style={styles.title}>Cuentas dependientes</Text>
           <View style={styles.cardDependent}>
             <View
               style={styles.contentDependent}
@@ -415,7 +426,7 @@ const Profile = () => {
         prefijo="GUARD"
         updated_at={user?.updated_at}
       />
-      
+
       <AccessEdit
         open={openModal}
         onClose={() => setOpenModal(false)}
