@@ -10,7 +10,11 @@ type Props = {
 
 const DateAccess = ({access}: Props) => {
   return (
-    <View style={{marginTop: 4}}>
+    <View
+      style={{
+        marginTop: 4,
+        // marginLeft: 44
+      }}>
       <View
         style={{
           alignItems: 'center',
