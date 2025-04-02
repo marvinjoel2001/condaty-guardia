@@ -20,10 +20,9 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   const {showToast} = useAuth();
   const {execute} = useApi();
 
-
-useEffect(()=>{
-  console.log(encodeURIComponent(formState?.avatar))
-},[formState])
+  useEffect(() => {
+    console.log(encodeURIComponent(formState?.avatar));
+  }, [formState]);
   const handleInputChange = (name: string, value: any) => {
     const v = value?.target?.value ? value.target.value : value;
     setFormState({
@@ -40,7 +39,7 @@ useEffect(()=>{
     const {data: novedad, error: err} = await execute('/guardnews', 'POST', {
       descrip: formState.descrip,
       imageNew: {file: encodeURIComponent(formState.avatar), ext: 'webp'},
-    },false ,3);
+    });
     if (novedad?.success == true) {
       onClose();
       reload();
@@ -59,7 +58,7 @@ useEffect(()=>{
       onClose={onClose}
       buttonText="Guardar"
       buttonCancel="">
-      <View>
+      <View style={{marginTop: 12}}>
         <TextArea
           label="Descripción"
           name="descrip"

@@ -13,6 +13,7 @@ type PropsType = {
 
 const BinnacleDetail = ({open, onClose, item}: PropsType) => {
   // console.log(item,'ssss')
+  const [imageError, setImageError] = useState(false);
   const RowData = ({title, value}: any) => {
     return (
       <View style={{flexDirection: 'row', gap: 5}}>
@@ -54,30 +55,63 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
           />
           <RowData title="Descripción" value={item.descrip} />
         </View>
-        {/* </Card> */}
-        {/* {!imageError && ( */}
+
         <>
-          <Text
-            style={{
-              color: cssVar.cWhite,
-            }}>
-            Imagen:
-          </Text>
-          <View style={{flex:1,justifyContent: 'center', marginTop: 16,  borderRadius: 10, }}>
-            <Avatar
-              src={ getUrlImages(
-                  `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
-                )}
-                w={300}
-                h={350}
-              style={{ flex:1,borderRadius:8,justifyContent:'center'}}
-              circle={false}
-              // onError={() => setImageError(true)}
-              // resizeMode="cover"
-            />
-          </View>
+          {imageError ? (
+            <Text
+              style={{
+                color: cssVar.cWhiteV2,
+                textAlign: 'center',
+                marginVertical: 16,
+                fontSize: 14,
+              }}>
+              No se encontró la imagen
+            </Text>
+          ) : (
+            <>
+              <Text
+                style={{
+                  color: cssVar.cWhite,
+                }}>
+                Imagen:
+              </Text>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  marginTop: 16,
+                  borderRadius: 10,
+                }}>
+                <Image
+                  source={{
+                    uri: getUrlImages(
+                      `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
+                    ),
+                  }}
+                  style={{
+                    flex: 1,
+                    borderRadius: 8,
+                    justifyContent: 'center',
+                    width: 300,
+                    height: 350,
+                  }}
+                  onError={() => setImageError(true)}
+                />
+                {/* <Avatar
+            src={ getUrlImages(
+                `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
+              )}
+              w={300}
+              h={350}
+            style={{ flex:1,borderRadius:8,justifyContent:'center'}}
+            circle={false}
+            onError={() => setImageError(true)}
+            resizeMode="cover"
+          /> */}
+              </View>
+            </>
+          )}
         </>
-        {/* )} */}
       </View>
     </ModalFull>
   );
