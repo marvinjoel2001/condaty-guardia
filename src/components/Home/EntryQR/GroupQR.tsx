@@ -22,7 +22,6 @@ type PropsType = {
   formState: any;
   openSelected: any;
   setOpenSelected: any;
-
   handleChange: any;
   data: any;
   errors: any;
@@ -61,7 +60,7 @@ const GroupQR = ({
             visit_id: item.visit_id,
             access_id: item.access_id,
           }));
-          if (data?.status !== 'X') {
+          if (data?.status !== 'X' && !item.access?.out_at) {
             setOpenSelected(true);
           }
         }}
@@ -73,7 +72,9 @@ const GroupQR = ({
           data?.status !== 'X' &&
           (item.status !== 'A' ? (
             item.access?.out_at ? (
-              <Text>Completado</Text>
+              <Text style={{color: cssVar.cAccent, fontSize: 10}}>
+                Completado
+              </Text>
             ) : (
               <View
                 style={{
