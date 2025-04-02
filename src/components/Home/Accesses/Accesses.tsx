@@ -11,7 +11,7 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
 import {buttonPrimary, buttonSecondary} from './shares/styles';
 
-const Accesses = ({data, reload, setDataID}: any) => {
+const Accesses = ({data, reload, setDataID, loaded}: any) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [edit, setEdit] = useState(false);
   const [formState, setFormState]: any = useState({});
@@ -194,6 +194,7 @@ const Accesses = ({data, reload, setDataID}: any) => {
       <List
         data={data}
         renderItem={item => renderItemAccess(item, onPressDetail)}
+        refreshing={loaded}
       />
       {openDetail && (
         <DetAccesses

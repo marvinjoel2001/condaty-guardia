@@ -19,18 +19,17 @@ import CiNomModal from './CiNomModal/CiNomModal';
 
 const Home = () => {
   const {user} = useAuth();
-  // const [openSlide, setOpenSlide] = useState(true);
   const [openQr, setOpenQr] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
   const [code, setCode]: any = useState(null);
-  // const [openCiNom, setOpenCiNom] = useState(false);
   const [showEntryQR, setShowEntryQR] = useState(false); // Add this state
   const [data, setData]: any = useState([]);
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('I');
   const {theme} = useContext(ThemeContext);
-  const {execute, loaded} = useApi();
+  const {execute} = useApi();
+  const [loaded, setLoaded] = useState(false);
 
   // Función que obtiene la data según el tipo de búsqueda
   const getAccesses = async (
@@ -38,6 +37,8 @@ const Home = () => {
     endpoint: string,
     fullType: string,
   ) => {
+    setData([]);
+    setLoaded(true);
     const {data, reload} = await execute(endpoint, 'GET', {
       perPage: -1,
       page: 1,
@@ -45,23 +46,22 @@ const Home = () => {
       searchBy: searchParam || '',
       section: endpoint === '/others' ? 'HOME' : '',
     });
+    setLoaded(false);
     setData(data?.data || []);
   };
 
   // Actualizar data cuando cambia el tipo de búsqueda
   useEffect(() => {
+    setData([]);
     switch (typeSearch) {
       case 'I':
         getAccesses('', '/accesses', 'P');
-        setData([]);
         break;
       case 'A':
         getAccesses('', '/accesses', 'AD');
-        setData([]);
         break;
       case 'P':
         getAccesses('', '/others', 'L');
-        setData([]);
         break;
       default:
         console.log('Tipo de búsqueda no válido:', typeSearch);
@@ -152,6 +152,7 @@ const Home = () => {
                 )
               }
               setDataID={setDataID}
+              loaded={loaded}
             />
           )}
           {typeSearch === 'P' && (
@@ -159,6 +160,7 @@ const Home = () => {
               data={filteredData}
               reload={() => getAccesses(search, '/others', 'L')}
               setDataID={setDataID}
+              loaded={loaded}
             />
           )}
         </View>
