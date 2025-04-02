@@ -20,9 +20,6 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   const {showToast} = useAuth();
   const {execute} = useApi();
 
-  useEffect(() => {
-    console.log(encodeURIComponent(formState?.avatar));
-  }, [formState]);
   const handleInputChange = (name: string, value: any) => {
     const v = value?.target?.value ? value.target.value : value;
     setFormState({
@@ -31,7 +28,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
     });
   };
   const onSaveNovedades = async () => {
-    if (formState.descrip == '') {
+    if (!formState?.descrip) {
       setErrors({descrip: 'Ingrese una descripcion'});
       return;
     }
@@ -50,6 +47,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       showToast('Ocurrió un error', 'error');
     }
   };
+  console.log(errors);
   return (
     <ModalFull
       open={open}
