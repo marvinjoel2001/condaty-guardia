@@ -15,7 +15,7 @@ const History = () => {
     endpoint: string,
     fullType: string,
   ) => {
-    const {data, reload} = await execute(endpoint, 'GET', {
+    const {data} = await execute(endpoint, 'GET', {
       perPage: -1,
       page: 1,
       fullType,
@@ -44,7 +44,17 @@ const History = () => {
     }
   }, [tab]);
   return (
-    <Layout title="Historial">
+    <Layout
+      title="Historial"
+      refresh={() =>
+        tab == 'A'
+          ? getHistory('', '/accesses', 'L')
+          : tab == 'I'
+          ? getHistory('', '/invitations', 'L')
+          : tab == 'P'
+          ? getHistory('', '/others', 'L')
+          : console.log('Tipo de búsqueda no válido:', tab)
+      }>
       <TabsButtons
         tabs={[
           {value: 'A', text: 'Accesos'},
