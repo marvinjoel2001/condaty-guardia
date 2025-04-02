@@ -47,7 +47,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       showToast('Ocurrió un error', 'error');
     }
   };
-  console.log(errors);
+
   return (
     <ModalFull
       open={open}
