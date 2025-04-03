@@ -287,6 +287,7 @@ const GroupQR = ({
                   formState={formState}
                   errors={errors}
                   handleChangeInput={handleChange}
+                  inputGrid={false}
                 />
               </>
             )}

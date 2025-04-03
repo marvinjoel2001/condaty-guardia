@@ -250,6 +250,7 @@ const IndividualQR = ({
               formState={formState}
               errors={errors}
               handleChangeInput={handleChange}
+              inputGrid={false}
             />
           </>
         )}
