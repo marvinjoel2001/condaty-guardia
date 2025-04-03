@@ -15,10 +15,15 @@ import {getActivePage} from '../../../mk/utils/utils';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import {useNavigation} from '@react-navigation/native';
 
 const MainMenu = ({navigation}: DrawerContentComponentProps) => {
   const {logout, user} = useAuth();
   const activeItem = getActivePage(navigation);
+
+  // const navigateTo = (screen: string) => {
+  //   navigation.navigate(screen);
+  // };
   const handleLogout = () => {
     Alert.alert('', '¿Cerrar la sesión de tu cuenta?', [
       {
@@ -29,27 +34,33 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
       {text: 'Salir', style: 'destructive', onPress: () => logout()},
     ]);
   };
-
-  return (
-    <View style={theme.container}>
+  const Head = () => {
+    const navigationn: any = useNavigation();
+    return (
       <ItemList
         title={getFullName(user)}
+        onPress={() => navigationn.navigate('Profile')}
         style={{backgroundColor: 'transparent'}}
         subtitle={'Guardia'}
         left={
           <Avatar
             name={getFullName(user)}
+            onClick={() => navigationn.navigate('Profile')}
             src={getUrlImages(
               '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
             )}
             style={theme.avatar}
-            circle={false}
             w={62}
             h={62}
           />
         }
       />
+    );
+  };
 
+  return (
+    <View style={theme.container}>
+      <Head />
       <View style={theme.content}>
         <ScrollView>
           <ItemMenu

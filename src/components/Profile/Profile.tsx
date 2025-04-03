@@ -45,8 +45,6 @@ const Profile = () => {
   const {execute} = useApi();
   const lDpto: any = {C: 'Casa', L: 'Lote', D: 'Departamento'};
   const lCondo: any = {C: 'Condominio', E: 'Edificio', U: 'Urbanizacion'};
-  const screen = Dimensions.get('window');
-
   const client: any = user?.clients?.find((e: any) => e.id == user.client_id);
   const dpto: any = user?.dpto?.find(
     (e: any) => e.client_id == user?.client_id,
@@ -55,8 +53,6 @@ const Profile = () => {
     (e: any) => e.pivot.client_id == user.client_id,
   );
 
-  console.log(isEdit, 'is ediii');
-  // Cuando el componente obtiene el foco
   useFocusEffect(
     React.useCallback(() => {
       init();
