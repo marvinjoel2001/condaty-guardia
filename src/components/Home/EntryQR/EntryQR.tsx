@@ -201,11 +201,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     );
     if (In?.success == true) {
       if (reload) reload();
-      // if (formState.contactsSelectedOut?.length > 0) {
-      //   showToast('El visitante salió', 'success');
-      // } else {
       showToast('Registrado con éxito', 'success');
-      // }
       setFormState({});
       onClose();
     } else {
@@ -214,7 +210,6 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     }
   };
 
-  console.log(formState);
   return (
     <ModalFull
       title={
