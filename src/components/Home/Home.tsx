@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useMemo} from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View, Text, Keyboard} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
@@ -16,6 +16,7 @@ import DataSearch from '../../../mk/components/ui/DataSearch';
 import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
+import {isAndroid} from '../../../mk/utils/utils';
 
 const Home = () => {
   const {user} = useAuth();
@@ -106,6 +107,26 @@ const Home = () => {
     setCode(null);
   };
 
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(isAndroid());
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
   return (
     <>
       <Layout
@@ -187,10 +208,12 @@ const Home = () => {
           />
         )}
       </Layout>
-      <DropdawnAccess
-        onPressQr={() => setOpenQr(true)}
-        onPressCiNom={() => setOpenCiNom(true)}
-      />
+      {!isKeyboardVisible && (
+        <DropdawnAccess
+          onPressQr={() => setOpenQr(true)}
+          onPressCiNom={() => setOpenCiNom(true)}
+        />
+      )}
     </>
   );
 };

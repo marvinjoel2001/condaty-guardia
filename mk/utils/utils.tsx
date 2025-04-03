@@ -181,6 +181,9 @@ export const openDocument = (data: any) => {
 export const isIos = () => {
   return Platform.OS == 'ios';
 };
+export const isAndroid = () => {
+  return Platform.OS == 'android';
+};
 
 export const getAccessStatus = (data: any) => {
   if (data?.access?.out_at) {

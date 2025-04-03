@@ -60,7 +60,7 @@ const Footer = ({styles}: any) => {
       />
       <ItemFoot
         path="History"
-        text="Actividad"
+        text="Historial"
         icon={IconHistorial}
         isActived={(store?.nSurveys || 0) > 0}
       />

@@ -62,6 +62,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           name="descrip"
           placeholder="Describe alguna novedad o incidente ocurrido en tu jornada laboral."
           error={errors}
+          maxLength={250}
           required={true}
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}

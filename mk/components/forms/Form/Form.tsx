@@ -5,6 +5,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import {TypeStyles} from '../../../styles/themes';
 
@@ -15,6 +16,7 @@ interface PropsType {
   hideKeyboard?: boolean;
   keyboardVerticalOffset?: number;
   behaviorIos?: 'position' | 'padding';
+  contentContainerStyle?: TypeStyles;
 }
 
 const Form = ({
@@ -23,22 +25,29 @@ const Form = ({
   behaviorAndroid = undefined,
   hideKeyboard = false,
   behaviorIos = 'padding',
-  keyboardVerticalOffset,
+  keyboardVerticalOffset = 0,
+  contentContainerStyle = {},
 }: PropsType) => {
   return (
     <KeyboardAvoidingView
-      keyboardVerticalOffset={
-        Platform.OS === 'ios' ? keyboardVerticalOffset : 0
-      }
+      keyboardVerticalOffset={keyboardVerticalOffset}
       behavior={Platform.OS === 'ios' ? behaviorIos : behaviorAndroid}
       style={{flex: 1, ...style}}>
-      {hideKeyboard ? (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          ...contentContainerStyle,
+        }}>
+        {hideKeyboard ? (
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={{flex: 1}}>{children}</View>
+          </TouchableWithoutFeedback>
+        ) : (
           <View style={{flex: 1}}>{children}</View>
-        </TouchableWithoutFeedback>
-      ) : (
-        <View style={{flex: 1}}>{children}</View>
-      )}
+        )}
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
