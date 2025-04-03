@@ -1,7 +1,5 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
-
-import {useContext} from 'react';
 import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
 
 interface Tab {
@@ -31,28 +29,20 @@ const TabsButtons = ({
         flexDirection: 'row',
         justifyContent: 'center',
         marginVertical: 8,
-        paddingLeft: 16,
         ...style,
       }}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        // contentContainerStyle={{
-        //   gap: style.gap || theme.TabsButtons?.container.gap,
-        //   backgroundColor: "red",
-        //   flex: 1,
-        // }}
         contentContainerStyle={{
           alignItems: 'center',
           flexDirection: 'row',
           gap: 8,
+          paddingHorizontal: 16,
           ...contentContainerStyles,
         }}>
         {tabs.map(tab => (
-          <TouchableOpacity
-            key={tab.value}
-            onPress={() => setSel(tab?.value)}
-            style={{}}>
+          <TouchableOpacity key={tab.value} onPress={() => setSel(tab?.value)}>
             <View
               style={{
                 borderRadius: 18,
