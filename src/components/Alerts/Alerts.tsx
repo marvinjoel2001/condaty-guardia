@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
@@ -19,6 +19,7 @@ const Alerts = () => {
   const [typeSearch, setTypeSearch] = useState('T');
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState({open: false, id: null});
+  const [dataFilter, setDataFilter] = useState([]);
   const [params, setParams]: any = useState({
     perPage: -1,
     page: 1,
@@ -76,15 +77,15 @@ const Alerts = () => {
         .indexOf(search.toLowerCase()) == -1
     )
       return null;
-    if (
-      !(
-        typeSearch === 'T' ||
-        (typeSearch === 'NA' && alerta.level === 3) ||
-        (typeSearch === 'NM' && alerta.level === 2) ||
-        (typeSearch === 'NB' && alerta.level === 1)
-      )
-    )
-      return null;
+    // if (
+    //   !(
+    //     typeSearch === 'T' ||
+    //     (typeSearch === 'NA' && alerta.level === 3) ||
+    //     (typeSearch === 'NM' && alerta.level === 2) ||
+    //     (typeSearch === 'NB' && alerta.level === 1)
+    //   )
+    // )
+    //   return null;
 
     return (
       <ItemList
@@ -120,6 +121,20 @@ const Alerts = () => {
       </ItemList>
     );
   };
+  useEffect(() => {
+    if (typeSearch === 'T') {
+      setDataFilter(alertas?.data);
+    }
+    if (typeSearch === 'NA') {
+      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 3));
+    }
+    if (typeSearch === 'NM') {
+      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 2));
+    }
+    if (typeSearch === 'NB') {
+      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 1));
+    }
+  }, [typeSearch, alertas?.data]);
 
   return (
     <>
@@ -137,25 +152,12 @@ const Alerts = () => {
         <View style={{paddingHorizontal: 16}}>
           <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
-          {alertas?.data.length == 0 ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text style={{color: cssVar.cWhiteV1}}>
-                Aquí se verá tu lista
-              </Text>
-            </View>
-          ) : (
-            <List
-              style={{marginTop: 8}}
-              data={alertas?.data}
-              renderItem={alertList}
-              refreshing={!loaded}
-            />
-          )}
+          <List
+            style={{marginTop: 8}}
+            data={dataFilter}
+            renderItem={alertList}
+            refreshing={!loaded}
+          />
         </View>
         {openAdd && (
           <AlertAdd
