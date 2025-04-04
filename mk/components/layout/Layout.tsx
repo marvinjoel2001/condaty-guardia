@@ -50,7 +50,7 @@ const Layout = (props: PropsType) => {
   const scrollViewRef: any = useRef(null);
 
   const onNotif = useCallback((data: any) => {
-    console.log('onNotif**********', data);
+    // console.log('onNotif**********', data);
     if (data?.event === 'ping') {
       showToast('se recibio Ping');
     }

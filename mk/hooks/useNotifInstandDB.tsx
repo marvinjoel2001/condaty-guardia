@@ -76,6 +76,7 @@ const useNotifInstandDB = (channels: {channel: string}[] = []): NotifType => {
         last = stored && stored != 'undefined' ? Number(stored) : 0;
         setLastNotif(last);
       } catch (err) {
+        setLastNotif(0);
         console.error('Error loading lastNotifInstantDB', err);
       }
       // console.log('lastNotif efeft*****', last);
@@ -87,13 +88,13 @@ const useNotifInstandDB = (channels: {channel: string}[] = []): NotifType => {
     if (data?.notif?.length > 0) {
       const latestNotif = data.notif[0];
       // console.log(
-      //   'latestNotif',
+      //   'latestNotif2',
       //   latestNotif,
       //   lastNotif,
-      //   lastNotif && latestNotif.created_at > lastNotif,
+      //   JSON.stringify(lastNotif && latestNotif.created_at > lastNotif),
       //   latestNotif.created_at,
       // );
-      if (lastNotif && latestNotif.created_at > lastNotif) {
+      if (lastNotif !== null && latestNotif.created_at > lastNotif) {
         // console.log('notif enviada', data);
         dispatch(latestNotif);
         last = latestNotif.created_at;
