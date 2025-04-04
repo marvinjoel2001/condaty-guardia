@@ -172,7 +172,7 @@ const Login = () => {
             password={showPassword}
             error={errors}
             value={formState['password']}
-            keyboardType="numeric"
+            // keyboardType="numeric"
             onBlur={() => {
               setErrors({
                 ...errors,

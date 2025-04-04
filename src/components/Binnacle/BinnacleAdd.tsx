@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
@@ -20,6 +20,10 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   const {showToast} = useAuth();
   const {execute} = useApi();
 
+
+useEffect(()=>{
+  console.log(encodeURIComponent(formState?.avatar))
+},[formState])
   const handleInputChange = (name: string, value: any) => {
     const v = value?.target?.value ? value.target.value : value;
     setFormState({
@@ -35,8 +39,8 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
 
     const {data: novedad, error: err} = await execute('/guardnews', 'POST', {
       descrip: formState.descrip,
-      imageNew: encodeURIComponent(formState.imageNew),
-    });
+      imageNew: {file: encodeURIComponent(formState.avatar), ext: 'webp'},
+    },false ,3);
     if (novedad?.success == true) {
       onClose();
       reload();

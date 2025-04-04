@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {
   Camera,
@@ -27,10 +27,28 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
   const {hasPermission, requestPermission} = useCameraPermission();
   const [codeQr, setCodeQr]: any = useState('');
   const device: any = useCameraDevice('back');
+  const [isPermissionRequested, setIsPermissionRequested] = useState(false);
 
-  if (!hasPermission) {
-    requestPermission();
-  }
+  useEffect(() => {
+    const checkPermission = async () => {
+      if (!hasPermission && !isPermissionRequested) {
+        setIsPermissionRequested(true);
+        try {
+          await requestPermission();
+        } catch (error) {
+          console.error('Error requesting camera permission:', error);
+          onMsg &&
+            onMsg(
+              'Camera Permission Required',
+              'Please enable camera access in your device settings to scan QR codes.',
+              'error',
+            );
+        }
+      }
+    };
+
+    checkPermission();
+  }, [hasPermission, requestPermission, isPermissionRequested]);
 
   const codeLoaded = async (_codes: any) => {
     if (isActive == false) return;
@@ -57,7 +75,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
         data[3] = data[3].slice(0, -12);
       }
       console.log('codes03', data[3]);
-      await setCode(data[3]);
+      await setCode(data);
       onClose();
     } else {
       isActive = true;
@@ -109,6 +127,9 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
           isActive={open}
           codeScanner={codeScanner}
           ref={camera}
+          enableZoomGesture
+          photo={false}
+          video={false}
         />
         <AnimationQr />
       </View>

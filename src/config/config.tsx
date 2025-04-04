@@ -29,7 +29,7 @@ const configApp = {
   APP_DEBUG: 0,
 };
 
-configApp.API_URL = configApp.API_URL_PROD;
+configApp.API_URL = configApp.API_URL_DEV; // Cambiar a produccion
 if (process.env.NODE_ENV == 'development') {
   configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEV;

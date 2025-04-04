@@ -159,7 +159,12 @@ const ItemInfo = ({
     );
   if (type == 'C')
     return (
-      <Card style={{flex: 1, flexDirection: 'column'}}>
+      <Card
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+          backgroundColor: cssVar.cBlackV1,
+        }}>
         <ListItem />
         {children}
       </Card>
@@ -197,7 +202,7 @@ const theme: ThemeType = {
     width: '50%',
     textAlign: 'right',
     paddingRight: cssVar.spXs,
-    color: cssVar.cWhiteV3,
+    color: cssVar.cWhiteV2,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
   },

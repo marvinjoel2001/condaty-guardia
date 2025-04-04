@@ -59,6 +59,12 @@ export const validRule = (
         : !/^[A-Z]{3}\d{3,5}$/.test(value)
         ? 'Formato incorrecto. Debe tener 3 letras seguidas de 3 a 5 números'
         : '',
+    plate: () =>
+      value == null || value == ''
+        ? ''
+        : !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9-]{5,8}$/.test(value.toUpperCase())
+        ? 'La placa debe contener letras y números (5-8 caracteres)'
+        : '',
     between: () =>
       Number(value) < Number(param[0]) || Number(value) > Number(param[1])
         ? `Debe estar entre ${param[0]} y ${param[1]}`
