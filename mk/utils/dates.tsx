@@ -14,7 +14,7 @@ export const MONTHS = [
   'diciembre',
 ];
 
-export const GMT = -3;
+export const GMT = -4;
 
 export const DAYS_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
@@ -23,10 +23,10 @@ export const getDateStr = (dateStr: string | null): string =>
 
 export const getUTCNow = (dias = 0) => {
   let d = new Date();
-  if (dias != 0) d.setDate(d.getDate() + dias);
-  return d.toISOString().slice(0, 19).replace(/-/g, '-').replace('T', ' ');
+  if (dias !== 0) d.setDate(d.getDate() + dias);
+  d.setHours(d.getHours() - GMT);
+  return d.toISOString().slice(0, 19).replace('T', ' ');
 };
-
 export const resetTime = (dateStr: any | null) => {
   const newDate = new Date(dateStr);
   newDate.setHours(0, 0, 0, 0); // Resetea las horas, minutos, segundos y milisegundos
@@ -63,16 +63,24 @@ export const getDateTimeStrMes = (
   // Convierte la fecha de UTC a la hora local o la toma como es
   if (esFormatoISO8601(dateStr) || utc) {
     fechaLocal = convertirFechaUTCaLocal(dateStr);
+    console.log('Entro 1');
   } else {
+    console.log('Entro 2');
     fechaLocal = new Date(dateStr.replace(' ', 'T'));
   }
+  console.log(fechaLocal, 'fechaLocal');
 
   const diaSemana = DAYS_SHORT[fechaLocal.getDay()];
   const dia = fechaLocal.getDate();
   const mes = MONTHS[fechaLocal.getMonth() + 1];
 
   // Ajuste para la hora
-  let hora = fechaLocal.getHours() - GMT;
+  let hora;
+  if (esFormatoISO8601(dateStr)) {
+    hora = fechaLocal.getHours() - GMT;
+  } else {
+    hora = fechaLocal.getHours();
+  }
   let minutos = fechaLocal.getMinutes();
 
   // Si la hora es exactamente las 24:00 horas, se ajusta a las 23:59 horas

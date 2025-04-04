@@ -17,6 +17,7 @@ import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
 import {isAndroid} from '../../../mk/utils/utils';
+import {getUTCNow} from '../../../mk/utils/dates';
 
 const Home = () => {
   const {user} = useAuth();
@@ -127,6 +128,7 @@ const Home = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
+  console.log(new Date().toISOString(), 'getUTCNow()');
   return (
     <>
       <Layout

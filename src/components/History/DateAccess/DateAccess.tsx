@@ -27,7 +27,7 @@ const DateAccess = ({access}: Props) => {
             color: cssVar.cWhiteV2,
             fontSize: 12,
           }}>
-          {getDateTimeStrMes(access?.in_at)}
+          {getDateTimeStrMes(access?.in_at, true)}
         </Text>
       </View>
       <View
@@ -43,7 +43,7 @@ const DateAccess = ({access}: Props) => {
             color: cssVar.cWhiteV2,
             fontSize: 12,
           }}>
-          {getDateTimeStrMes(access?.out_at) || 'No ha salido'}
+          {getDateTimeStrMes(access?.out_at, true) || 'No ha salido'}
         </Text>
       </View>
     </View>
