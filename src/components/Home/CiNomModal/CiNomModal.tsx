@@ -133,51 +133,53 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
       key: 'ci',
       errors,
     });
-    errors = checkRules({
-      value: formState.name,
-      rules: ['required'],
-      key: 'name',
-      errors,
-    });
-    errors = checkRules({
-      value: formState.last_name,
-      rules: ['required'],
-      key: 'last_name',
-      errors,
-    });
-    errors = checkRules({
-      value: formState.mother_last_name,
-      rules: ['alpha'],
-      key: 'mother_last_name',
-      errors,
-    });
-
-    if (typeSearch == 'V' || typeSearch == 'T') {
+    if (steps > 0) {
       errors = checkRules({
-        value: formState.plate,
-        rules: ['required', 'plate'],
-        key: 'plate',
+        value: formState.name,
+        rules: ['required'],
+        key: 'name',
         errors,
       });
-      if (typeSearch == 'T') {
+      errors = checkRules({
+        value: formState.last_name,
+        rules: ['required'],
+        key: 'last_name',
+        errors,
+      });
+      errors = checkRules({
+        value: formState.mother_last_name,
+        rules: ['alpha'],
+        key: 'mother_last_name',
+        errors,
+      });
+
+      if (typeSearch == 'V' || typeSearch == 'T') {
         errors = checkRules({
-          value: formState.ci_taxi,
-          rules: ['required', 'ci'],
-          key: 'ci_taxi',
+          value: formState.plate,
+          rules: ['required', 'plate'],
+          key: 'plate',
           errors,
         });
-        errors = checkRules({
-          value: formState.name_taxi,
-          rules: ['required'],
-          key: 'name_taxi',
-          errors,
-        });
-        errors = checkRules({
-          value: formState.last_name_taxi,
-          rules: ['required'],
-          key: 'last_name_taxi',
-          errors,
-        });
+        if (typeSearch == 'T') {
+          errors = checkRules({
+            value: formState.ci_taxi,
+            rules: ['required', 'ci'],
+            key: 'ci_taxi',
+            errors,
+          });
+          errors = checkRules({
+            value: formState.name_taxi,
+            rules: ['required'],
+            key: 'name_taxi',
+            errors,
+          });
+          errors = checkRules({
+            value: formState.last_name_taxi,
+            rules: ['required'],
+            key: 'last_name_taxi',
+            errors,
+          });
+        }
       }
     }
 
@@ -186,11 +188,11 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
   };
 
   const onSave = async () => {
-    if (steps === 0) {
-      getVisits();
+    if (hasErrors(validate())) {
       return;
     }
-    if (hasErrors(validate())) {
+    if (steps === 0) {
+      getVisits();
       return;
     }
     const url = '/accesses';
