@@ -54,6 +54,8 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     return false;
   };
 
+  const [dataOwners, setDataOwners] = useState([]);
+
   const {
     data: owners,
     loaded,
@@ -70,6 +72,16 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     3,
     true,
   );
+
+  useEffect(() => {
+    if (owners?.data) {
+      const newOwners = owners?.data.map((owner: any) => ({
+        ...owner,
+        name: getFullName(owner),
+      }));
+      setDataOwners(newOwners);
+    }
+  }, [owners?.data]);
 
   const handleChangeInput = (name: string, value: string) => {
     setFormState({
@@ -111,7 +123,6 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
         ci: visitData?.data[0].ci,
       });
     }
-    console.log(visitData, 'visitData');
   };
 
   const validate = () => {
@@ -284,7 +295,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           placeholder="¿A quién visita?"
           name="owner_id"
           required={true}
-          options={owners?.data || []}
+          options={dataOwners || []}
           value={formState.owner_id || ''}
           onChange={value => handleChangeInput('owner_id', value.target.value)}
           optionValue="id"
