@@ -221,7 +221,9 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         formState?.access_id ? onOut() : onSaveAccess();
       }}
       buttonCancel=""
-      buttonText={!openSelected && type == 'G' ? '' : 'Continuar'}>
+      buttonText={
+        (!openSelected && type == 'G') || data?.status == 'X' ? '' : 'Continuar'
+      }>
       {type === 'I' && (
         <IndividualQR
           setFormState={setFormState}

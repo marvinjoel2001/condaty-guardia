@@ -254,23 +254,24 @@ const IndividualQR = ({
             />
           </>
         )}
-        {!access?.[0]?.in_at ? (
-          <TextArea
-            label="Observaciones de entrada"
-            placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
-            name="obs_in"
-            value={formState?.obs_in}
-            onChange={value => handleChange('obs_in', value)}
-          />
-        ) : (
-          <TextArea
-            label="Observaciones de salida"
-            placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
-            name="obs_out"
-            value={formState?.obs_out}
-            onChange={value => handleChange('obs_out', value)}
-          />
-        )}
+        {data?.status != 'X' &&
+          (!access?.[0]?.in_at ? (
+            <TextArea
+              label="Observaciones de entrada"
+              placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
+              name="obs_in"
+              value={formState?.obs_in}
+              onChange={value => handleChange('obs_in', value)}
+            />
+          ) : (
+            <TextArea
+              label="Observaciones de salida"
+              placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
+              name="obs_out"
+              value={formState?.obs_out}
+              onChange={value => handleChange('obs_out', value)}
+            />
+          ))}
         {!access?.[0]?.in_at && data?.status !== 'X' && (
           <TabsButtons
             tabs={[
