@@ -253,15 +253,15 @@ const Login = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <ForgotPass
-            open={onForgotPass}
-            onClose={() => {
-              setOnForgotPass(false);
-            }}
-            mod="guard"
-          />
         </Form>
       )}
+      <ForgotPass
+        open={onForgotPass}
+        onClose={() => {
+          setOnForgotPass(false);
+        }}
+        mod="guard"
+      />
     </SafeAreaView>
   );
 };
