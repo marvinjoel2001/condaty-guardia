@@ -27,14 +27,10 @@ const SelectTransport = ({
   disabledFields = false,
   tabs,
 }: SelectTransportProps) => {
-    // console.log(formState,'fsttttt')
+  // console.log(formState,'fsttttt')
   return (
     <View>
-      <TabsButtons
-        tabs={tabs}
-        sel={typeSearch}
-        setSel={setTypeSearch}
-      />
+      <TabsButtons tabs={tabs} sel={typeSearch} setSel={setTypeSearch} />
 
       {!disabledFields && (
         <>
@@ -60,32 +56,17 @@ const SelectTransport = ({
                 }}>
                 Datos del conductor:
               </Text>
-              {/* <Input
-                label="Carnet de identidad"
-                type="date"
-                name="ci_taxi"
-                error={errors}
-                required={true}
-                maxLength={10}
-                value={formState['ci_taxi']}
-                onBlur={() => onCheckCI && onCheckCI(true)}
-                onChange={(value: any) => handleChangeInput('ci_taxi', value)}
-              /> */}
-              {/* <InputFullName
-                formState={formState}
-                errors={errors}
-                handleChangeInput={handleChangeInput}
-                prefijo="_taxi"
-              />*/}
-                <InputNameCi
+
+              <InputNameCi
                 formStateName={formState}
                 formStateCi={formState.ci_taxi}
-                nameCi='ci_taxi'
-                // disabledCi={typeSearch === 'T'}
-                handleChangeInput={(value:any)=>handleChangeInput('ci_taxi', value)}
+                handleChangeInput={handleChangeInput}
                 errors={errors}
-                 prefix="_taxi"
-                />
+                prefix="_taxi"
+                onCheckCI={onCheckCI}
+                disabledCi={disabledFields}
+                disabledName={disabledFields}
+              />
               <Input
                 label="Placa Taxi"
                 type="text"
@@ -94,10 +75,7 @@ const SelectTransport = ({
                 required={typeSearch === 'T'}
                 value={formState['plate']}
                 onChange={(value: any) => handleChangeInput('plate', value)}
-              /> 
-
-            
-            
+              />
             </>
           )}
         </>

@@ -19,6 +19,7 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconX} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
 import {onExist} from '../../../../mk/utils/dbtools';
+import Loading from '../../../../mk/components/ui/Loading/Loading';
 
 type PropsType = {
   setFormState: any;
@@ -215,164 +216,170 @@ const IndividualQR = ({
       });
     }
   };
+  console.log(data);
   return (
     <>
-      <View>
-        <ItemInfo type="C" details={details} />
-        <Text
-          style={{
-            fontSize: 16,
-            fontFamily: FONTS.semiBold,
-            marginBottom: 4,
-            color: cssVar.cWhiteV2,
-          }}>
-          Invitado:
-        </Text>
-        <ItemList
-          title={getFullName(visit)}
-          left={<Avatar name={getFullName(visit)} />}
-          subtitle={'CI:' + (visit?.ci || 'Sin registro')}
-        />
-        {!visit?.ci && data?.status !== 'X' && (
-          <>
-            <Input
-              label="Carnet de identidad"
-              type="date"
-              name="ci"
-              required={true}
-              maxLength={10}
-              value={formState?.ci}
-              error={errors}
-              onChange={(value: any) => handleChange('ci', value)}
-              onBlur={() => onExistVisits()}
-            />
-            <InputFullName
-              formState={formState}
-              errors={errors}
-              handleChangeInput={handleChange}
-              inputGrid={false}
-            />
-          </>
-        )}
-        {!access?.[0]?.in_at ? (
-          <TextArea
-            label="Observaciones de entrada"
-            placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
-            name="obs_in"
-            value={formState?.obs_in}
-            onChange={value => handleChange('obs_in', value)}
+      {!data ? (
+        <Loading />
+      ) : (
+        <View>
+          <ItemInfo type="C" details={details} />
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: FONTS.semiBold,
+              marginBottom: 4,
+              color: cssVar.cWhiteV2,
+            }}>
+            Invitado:
+          </Text>
+          <ItemList
+            title={getFullName(visit)}
+            left={<Avatar name={getFullName(visit)} />}
+            subtitle={'CI:' + (visit?.ci || 'Sin registro')}
           />
-        ) : (
-          <TextArea
-            label="Observaciones de salida"
-            placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
-            name="obs_out"
-            value={formState?.obs_out}
-            onChange={value => handleChange('obs_out', value)}
-          />
-        )}
-        {!access?.[0]?.in_at && data?.status !== 'X' && (
-          <TabsButtons
-            tabs={[
-              {value: 'P', text: 'A pie'},
-              {value: 'V', text: 'En vehículo'},
-              {value: 'T', text: 'En taxi'},
-            ]}
-            sel={tab}
-            setSel={setTab}
-          />
-        )}
-        {access?.length == 0 && (
-          <>
-            {tab == 'V' && (
+          {!visit?.ci && data?.status !== 'X' && (
+            <>
               <Input
-                label="Placa"
-                type="text"
-                name="plate"
+                label="Carnet de identidad"
+                type="date"
+                name="ci"
+                required={true}
+                maxLength={10}
+                value={formState?.ci}
                 error={errors}
-                required={tab == 'V'}
-                value={formState['plate']}
-                onChange={(value: any) => handleChange('plate', value)}
+                onChange={(value: any) => handleChange('ci', value)}
+                onBlur={() => onExistVisits()}
               />
-            )}
-            {tab == 'T' && (
-              <>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    marginBottom: 4,
-                    color: cssVar.cWhiteV2,
-                  }}>
-                  Datos del conductor:
-                </Text>
-                <Input
-                  label="Carnet de identidad"
-                  type="date"
-                  name="ci_taxi"
-                  maxLength={10}
-                  error={errors}
-                  required
-                  value={formState['ci_taxi']}
-                  onBlur={() => onExistTaxi()}
-                  // onBlur={() => onCheckCI(true)}
-                  onChange={(value: any) => handleChange('ci_taxi', value)}
-                />
-                <InputFullName
-                  formState={formState}
-                  errors={errors}
-                  disabled={formState?.disbledTaxi}
-                  prefijo="_taxi"
-                  handleChangeInput={handleChange}
-                />
+              <InputFullName
+                formState={formState}
+                errors={errors}
+                handleChangeInput={handleChange}
+                inputGrid={false}
+              />
+            </>
+          )}
+          {data?.status != 'X' &&
+            (!access?.[0]?.in_at ? (
+              <TextArea
+                label="Observaciones de entrada"
+                placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
+                name="obs_in"
+                value={formState?.obs_in}
+                onChange={value => handleChange('obs_in', value)}
+              />
+            ) : (
+              <TextArea
+                label="Observaciones de salida"
+                placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
+                name="obs_out"
+                value={formState?.obs_out}
+                onChange={value => handleChange('obs_out', value)}
+              />
+            ))}
+          {!access?.[0]?.in_at && data?.status !== 'X' && (
+            <TabsButtons
+              tabs={[
+                {value: 'P', text: 'A pie'},
+                {value: 'V', text: 'En vehículo'},
+                {value: 'T', text: 'En taxi'},
+              ]}
+              sel={tab}
+              setSel={setTab}
+            />
+          )}
+          {access?.length == 0 && (
+            <>
+              {tab == 'V' && (
                 <Input
                   label="Placa"
                   type="text"
                   name="plate"
                   error={errors}
-                  disabled={formState?.disbledTaxi}
-                  required={tab == 'T'}
+                  required={tab == 'V'}
                   value={formState['plate']}
                   onChange={(value: any) => handleChange('plate', value)}
                 />
-              </>
-            )}
-            {access?.length == 0 && data?.status != 'X' && (
-              <TouchableOpacity
-                style={{
-                  alignSelf: 'flex-start',
-                  marginVertical: 4,
-                }}
-                onPress={() => setOpenAcom(true)}>
-                <Text
+              )}
+              {tab == 'T' && (
+                <>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                      marginBottom: 4,
+                      color: cssVar.cWhiteV2,
+                    }}>
+                    Datos del conductor:
+                  </Text>
+                  <Input
+                    label="Carnet de identidad"
+                    type="date"
+                    name="ci_taxi"
+                    maxLength={10}
+                    error={errors}
+                    required
+                    value={formState?.ci_taxi}
+                    onBlur={() => onExistTaxi()}
+                    // onBlur={() => onCheckCI(true)}
+                    onChange={(value: any) => handleChange('ci_taxi', value)}
+                  />
+                  <InputFullName
+                    formState={formState}
+                    errors={errors}
+                    disabled={formState?.disbledTaxi}
+                    prefijo="_taxi"
+                    handleChangeInput={handleChange}
+                  />
+                  <Input
+                    label="Placa"
+                    type="text"
+                    name="plate"
+                    error={errors}
+                    // disabled={formState?.disbledTaxi}
+                    required={tab == 'T'}
+                    value={formState['plate']}
+                    onChange={(value: any) => handleChange('plate', value)}
+                  />
+                </>
+              )}
+              {access?.length == 0 && data?.status != 'X' && (
+                <TouchableOpacity
                   style={{
-                    color: cssVar.cWhite,
-                    textDecorationLine: 'underline',
-                  }}>
-                  Agregar acompañante
-                </Text>
-              </TouchableOpacity>
-            )}
-            {formState?.acompanantes?.length > 0 && (
-              <>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontFamily: FONTS.semiBold,
+                    alignSelf: 'flex-start',
                     marginVertical: 4,
-                    color: cssVar.cWhiteV2,
-                  }}>
-                  Acompañantes:
-                </Text>
-                <List
-                  data={formState?.acompanantes}
-                  renderItem={acompanantesList}
-                />
-              </>
-            )}
-          </>
-        )}
-      </View>
+                  }}
+                  onPress={() => setOpenAcom(true)}>
+                  <Text
+                    style={{
+                      color: cssVar.cWhite,
+                      textDecorationLine: 'underline',
+                    }}>
+                    Agregar acompañante
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {formState?.acompanantes?.length > 0 && (
+                <>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: FONTS.semiBold,
+                      marginVertical: 4,
+                      color: cssVar.cWhiteV2,
+                    }}>
+                    Acompañantes:
+                  </Text>
+                  <List
+                    data={formState?.acompanantes}
+                    renderItem={acompanantesList}
+                  />
+                </>
+              )}
+            </>
+          )}
+        </View>
+      )}
       <AccompaniedAdd
         open={openAcom}
         onClose={() => setOpenAcom(false)}
