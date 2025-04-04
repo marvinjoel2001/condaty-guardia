@@ -18,7 +18,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
   const [openSelected, setOpenSelected] = useState(false);
   const [errors, setErrors] = useState({});
-  const [data, setData]: any = useState([]);
+  const [data, setData]: any = useState(null);
   const {execute} = useApi();
   const {showToast} = useAuth();
   const type = code[2];

@@ -25,7 +25,7 @@ const InputFullName = ({
   disabled = false,
   styleInputs = {},
   style = {},
-  inputGrid = true,
+  inputGrid = false,
   onBlur = (e: any) => {},
 }: PropsType) => {
   const _onChange = (name: string, value: any) => {
@@ -35,13 +35,12 @@ const InputFullName = ({
 
   const container = inputGrid ? styles.container : {};
   const input1 = inputGrid ? styles.input1 : {};
-  const input2 = inputGrid? styles.input2 : {};
-
+  const input2 = inputGrid ? styles.input2 : {};
 
   return (
     <>
-    <View  style={container}>
-          <View style={input1}>    
+      <View style={container}>
+        <View style={input1}>
           <Input
             label="Primer nombre"
             type="text"
@@ -72,43 +71,43 @@ const InputFullName = ({
               handleChangeInput('middle_name' + prefijo, value)
             }
           />
-          </View>
+        </View>
       </View>
       <View style={container}>
-          <View style={input1}>
-              <Input
-                label="Apellido paterno"
-                type="text"
-                style={styleInputs}
-                name={'last_name' + (name_prefijo || prefijo)}
-                error={errors}
-                required={true}
-                autoCapitalize="words"
-                onBlur={() => onBlur('last_name' + prefijo)}
-                disabled={disabled}
-                value={formState['last_name' + prefijo]}
-                onChange={(value: any) =>
-                  handleChangeInput('last_name' + prefijo, value)
-                }
-              />
-              </View>
-   <View style={input2}>
-      <Input
-        label="Apellido materno (opcional)"
-        type="text"
-        style={styleInputs}
-        name={'mother_last_name' + (name_prefijo || prefijo)}
-        required={false}
-        error={errors}
-        autoCapitalize="words"
-        onBlur={() => onBlur('mother_last_name' + prefijo)}
-        disabled={disabled}
-        value={formState['mother_last_name' + prefijo]}
-        onChange={(value: any) =>
-          handleChangeInput('mother_last_name' + prefijo, value)
-        }
-      />
-      </View>
+        <View style={input1}>
+          <Input
+            label="Apellido paterno"
+            type="text"
+            style={styleInputs}
+            name={'last_name' + (name_prefijo || prefijo)}
+            error={errors}
+            required={true}
+            autoCapitalize="words"
+            onBlur={() => onBlur('last_name' + prefijo)}
+            disabled={disabled}
+            value={formState['last_name' + prefijo]}
+            onChange={(value: any) =>
+              handleChangeInput('last_name' + prefijo, value)
+            }
+          />
+        </View>
+        <View style={input2}>
+          <Input
+            label="Apellido materno (opcional)"
+            type="text"
+            style={styleInputs}
+            name={'mother_last_name' + (name_prefijo || prefijo)}
+            required={false}
+            error={errors}
+            autoCapitalize="words"
+            onBlur={() => onBlur('mother_last_name' + prefijo)}
+            disabled={disabled}
+            value={formState['mother_last_name' + prefijo]}
+            onChange={(value: any) =>
+              handleChangeInput('mother_last_name' + prefijo, value)
+            }
+          />
+        </View>
       </View>
     </>
   );
@@ -116,7 +115,7 @@ const InputFullName = ({
 
 export default InputFullName;
 
-const styles=StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -127,6 +126,5 @@ const styles=StyleSheet.create({
   },
   input2: {
     width: '47%',
-  }
-
+  },
 });

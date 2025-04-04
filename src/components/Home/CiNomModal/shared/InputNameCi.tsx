@@ -28,7 +28,7 @@ const InputNameCi = ({
 }: InputNameCiProps) => {
   // console.log(nameCi,'nameCi')
   return (
-    <View style={{gap: 16}}>
+    <View>
       <Input
         label="Carnet de identidad"
         type="date"
