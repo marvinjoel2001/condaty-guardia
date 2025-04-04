@@ -29,7 +29,8 @@ const InputFullName = ({
   onBlur = (e: any) => {},
 }: PropsType) => {
   const _onChange = (name: string, value: any) => {
-    value = (value + ' ').split(' ')[0];
+    // Eliminar todos los espacios del valor ingresado
+    value = value.replace(/\s+/g, '');
     handleChangeInput(name, value);
   };
 
@@ -68,9 +69,7 @@ const InputFullName = ({
             disabled={disabled}
             onBlur={() => onBlur('middle_name' + prefijo)}
             value={formState['middle_name' + prefijo]}
-            onChange={(value: any) =>
-              handleChangeInput('middle_name' + prefijo, value)
-            }
+            onChange={(value: any) => _onChange('middle_name' + prefijo, value)}
           />
           </View>
       </View>
@@ -87,9 +86,7 @@ const InputFullName = ({
                 onBlur={() => onBlur('last_name' + prefijo)}
                 disabled={disabled}
                 value={formState['last_name' + prefijo]}
-                onChange={(value: any) =>
-                  handleChangeInput('last_name' + prefijo, value)
-                }
+                onChange={(value: any) => _onChange('last_name' + prefijo, value)}
               />
               </View>
    <View style={input2}>
@@ -104,9 +101,7 @@ const InputFullName = ({
         onBlur={() => onBlur('mother_last_name' + prefijo)}
         disabled={disabled}
         value={formState['mother_last_name' + prefijo]}
-        onChange={(value: any) =>
-          handleChangeInput('mother_last_name' + prefijo, value)
-        }
+        onChange={(value: any) => _onChange('mother_last_name' + prefijo, value)}
       />
       </View>
       </View>
