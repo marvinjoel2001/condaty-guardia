@@ -13,10 +13,11 @@ import {StatusBar, Text} from 'react-native';
 import {cssVar} from './mk/styles/themes';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import SplashScreen from 'react-native-splash-screen';
+import ActiveNotificationDB from './mk/hooks/ActiveNotificationDB';
 
 function App() {
-  Text.defaultProps = Text.defaultProps || {};
-  Text.defaultProps.allowFontScaling = false;
+  // Text.defaultProps = Text.defaultProps || {};
+  // Text.defaultProps.allowFontScaling = false;
 
   // useEffect(() => {
   //   // setTimeout(() => {
@@ -30,11 +31,12 @@ function App() {
         <StatusBar animated={true} backgroundColor={cssVar.cBlack} />
         <NavigationContainer>
           <AuthProvider>
+            <ActiveNotificationDB />
             <OneSignalContextProvider>
-              <PusherContextProvider>
-                <InitProject />
-                <MyDrawer />
-              </PusherContextProvider>
+              {/* <PusherContextProvider> */}
+              <InitProject />
+              <MyDrawer />
+              {/* </PusherContextProvider> */}
             </OneSignalContextProvider>
           </AuthProvider>
         </NavigationContainer>

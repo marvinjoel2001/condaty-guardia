@@ -14,7 +14,7 @@ export const MONTHS = [
   'diciembre',
 ];
 
-export const GMT = -3;
+export const GMT = -4;
 
 export const DAYS_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 

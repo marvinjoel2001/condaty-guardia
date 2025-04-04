@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View, RefreshControl, Text} from 'react-native';
 import Animated from 'react-native-reanimated';
 import HeadTitle from './HeadTitle';
@@ -7,6 +7,7 @@ import {useRoute} from '@react-navigation/native';
 import useAuth from '../../hooks/useAuth';
 import {logPerformance} from '../../utils/utils';
 import Footer from '../../../src/navigators/Footer/Footer';
+import {useEvent} from '../../hooks/useEvent';
 
 type PropsType = {
   title?: string;
@@ -43,10 +44,18 @@ const Layout = (props: PropsType) => {
     scroll = true,
   } = props;
 
-  const {setStore, store, user} = useAuth();
+  const {setStore, store, user, showToast} = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const route = useRoute();
   const scrollViewRef: any = useRef(null);
+
+  const onNotif = useCallback((data: any) => {
+    console.log('onNotif**********', data);
+    if (data?.event === 'ping') {
+      showToast('se recibio Ping');
+    }
+  }, []);
+  useEvent('onNotif', onNotif);
 
   const onRefresh = () => {
     setRefreshing(true);
