@@ -26,20 +26,20 @@ const InputNameCi = ({
   prefix,
   onCheckCI,
 }: InputNameCiProps) => {
-    // console.log(nameCi,'nameCi')
+  // console.log(nameCi,'nameCi')
   return (
     <View style={{gap: 16}}>
       <Input
         label="Carnet de identidad"
-        type="text"
+        type="date"
         name={nameCi}
         error={errors}
         required={true}
         disabled={disabledCi}
-        readOnly={disabledCi}
+        // readOnly={disabledCi}
         value={formStateCi}
         maxLength={10}
-        onChange={(value: any) => handleChangeInput(nameCi,value)}
+        onChange={(value: any) => handleChangeInput(nameCi + prefix, value)}
         onBlur={() => onCheckCI && onCheckCI()}
       />
       <InputFullName

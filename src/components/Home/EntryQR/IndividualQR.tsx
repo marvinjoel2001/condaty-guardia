@@ -313,7 +313,7 @@ const IndividualQR = ({
                   maxLength={10}
                   error={errors}
                   required
-                  value={formState['ci_taxi']}
+                  value={formState?.ci_taxi}
                   onBlur={() => onExistTaxi()}
                   // onBlur={() => onCheckCI(true)}
                   onChange={(value: any) => handleChange('ci_taxi', value)}
@@ -330,7 +330,7 @@ const IndividualQR = ({
                   type="text"
                   name="plate"
                   error={errors}
-                  disabled={formState?.disbledTaxi}
+                  // disabled={formState?.disbledTaxi}
                   required={tab == 'T'}
                   value={formState['plate']}
                   onChange={(value: any) => handleChange('plate', value)}

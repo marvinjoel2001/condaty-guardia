@@ -17,6 +17,7 @@ import InputFullName from '../../../../mk/components/forms/InputFullName/InputFu
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import {AccompaniedAdd} from './AccompaniedAdd';
+import useApi from '../../../../mk/hooks/useApi';
 type PropsType = {
   setFormState: any;
   formState: any;
@@ -37,6 +38,7 @@ const GroupQR = ({
   openSelected,
   setOpenSelected,
 }: PropsType) => {
+  const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [selectedVisit, setSelectedVisit]: any = useState(null);
   const [openAcom, setOpenAcom] = useState(false);
@@ -216,6 +218,37 @@ const GroupQR = ({
       </TouchableOpacity>
     );
   };
+  const onExistTaxi = async () => {
+    const {data: exist} = await execute('/visits', 'GET', {
+      perPage: 1,
+      page: 1,
+      exist: '1',
+      fullType: 'L',
+      ci_visit: formState?.ci_taxi,
+    });
+    if (exist?.data) {
+      setFormState({
+        ...formState,
+        ci_taxi: exist?.data.ci,
+        name_taxi: exist?.data.name,
+        middle_name_taxi: exist?.data.middle_name,
+        last_name_taxi: exist?.data.last_name,
+        mother_last_name_taxi: exist?.data.mother_last_name,
+        plate: exist?.data.plate,
+        disbledTaxi: true,
+      });
+    } else {
+      setFormState({
+        ...formState,
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      });
+    }
+  };
   return (
     <>
       <View>
@@ -353,25 +386,14 @@ const GroupQR = ({
                       error={errors}
                       value={formState['ci_taxi']}
                       // onBlur={() => onCheckCI(true)}
+                      onBlur={() => onExistTaxi()}
                       onChange={(value: any) => handleChange('ci_taxi', value)}
                     />
-                    {/* <Input
-                  label="Nombre completo"
-                  type="text"
-                  name="name_taxi"
-                  error={errors}
-                  required
-                  disabled={formState["nameTaxiDisabled"]}
-                  value={formState["name_taxi"]}
-                  onChange={(value: any) =>
-                    handleInputChange("name_taxi", value)
-                  }
-                /> */}
                     <InputFullName
                       formState={formState}
                       errors={errors}
                       handleChangeInput={handleChange}
-                      disabled={formState['nameTaxiDisabled']}
+                      disabled={formState?.disbledTaxi}
                       prefijo={'_taxi'}
                     />
                     <Input
