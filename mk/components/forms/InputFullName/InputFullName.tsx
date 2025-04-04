@@ -85,9 +85,7 @@ const InputFullName = ({
                 onBlur={() => onBlur('last_name' + prefijo)}
                 disabled={disabled}
                 value={formState['last_name' + prefijo]}
-                onChange={(value: any) =>
-                  handleChangeInput('last_name' + prefijo, value)
-                }
+                onChange={(value: any) => _onChange('last_name' + prefijo, value)}
               />
               </View>
    <View style={input2}>
@@ -102,9 +100,7 @@ const InputFullName = ({
         onBlur={() => onBlur('mother_last_name' + prefijo)}
         disabled={disabled}
         value={formState['mother_last_name' + prefijo]}
-        onChange={(value: any) =>
-          handleChangeInput('mother_last_name' + prefijo, value)
-        }
+        onChange={(value: any) => _onChange('mother_last_name' + prefijo, value)}
       />
       </View>
       </View>
