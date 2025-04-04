@@ -63,12 +63,9 @@ export const getDateTimeStrMes = (
   // Convierte la fecha de UTC a la hora local o la toma como es
   if (esFormatoISO8601(dateStr) || utc) {
     fechaLocal = convertirFechaUTCaLocal(dateStr);
-    console.log('Entro 1');
   } else {
-    console.log('Entro 2');
     fechaLocal = new Date(dateStr.replace(' ', 'T'));
   }
-  console.log(fechaLocal, 'fechaLocal');
 
   const diaSemana = DAYS_SHORT[fechaLocal.getDay()];
   const dia = fechaLocal.getDate();

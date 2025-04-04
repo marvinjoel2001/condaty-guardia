@@ -128,7 +128,6 @@ const Home = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
-  console.log(new Date().toISOString(), 'getUTCNow()');
   return (
     <>
       <Layout
