@@ -128,17 +128,27 @@ const Documents = () => {
     }
     if (tab === 'DO') {
       setDataFilter(
-        documents?.data.filter((document: any) => document.ext === 'doc'),
+        documents?.data.filter(
+          (document: any) => document.ext === 'doc' || document.ext === 'docx',
+        ),
       );
     }
     if (tab === 'EX') {
       setDataFilter(
-        documents?.data.filter((document: any) => document.ext === 'xls'),
+        documents?.data.filter(
+          (document: any) => document.ext === 'xls' || document.ext === 'xlsx',
+        ),
       );
     }
     if (tab === 'JP') {
       setDataFilter(
-        documents?.data.filter((document: any) => document.ext === 'jpg'),
+        documents?.data.filter(
+          (document: any) =>
+            document.ext === 'jpg' ||
+            document.ext === 'jpeg' ||
+            document.ext === 'webp' ||
+            document.ext === 'png',
+        ),
       );
     }
   }, [tab, documents?.data]);
