@@ -154,7 +154,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       I: 'Dejar salir',
       Y: 'Dejar entrar',
       S: 'Esperando Confirmacion',
-      C: 'Completado',
+      C: '',
     };
     return buttonTexts[status] || '';
   };

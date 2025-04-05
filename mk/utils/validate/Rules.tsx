@@ -42,6 +42,10 @@ export const validRule = (
       value != null && !/\S+@\S+\.\S+/.test(value)
         ? 'No es un email valido'
         : '',
+    password: () =>
+      value != null && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value)
+        ? 'Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número'
+        : '',
     phone: () =>
       !/^\d{8,}$/.test(value) ? 'Debe tener al menos 8 números' : '',
     alpha: () =>
