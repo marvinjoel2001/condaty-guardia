@@ -29,6 +29,7 @@ const Home = () => {
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('I');
+  const [_typeSearch, set_TypeSearch] = useState('I');
   const {theme} = useContext(ThemeContext);
   const {execute} = useApi();
   const [loaded, setLoaded] = useState(false);
@@ -69,6 +70,7 @@ const Home = () => {
         console.log('Tipo de búsqueda no válido:', typeSearch);
         break;
     }
+    set_TypeSearch(typeSearch);
   }, [typeSearch]);
 
   // Filtrar la data según el término de búsqueda
@@ -163,7 +165,7 @@ const Home = () => {
             value={search}
             style={{marginBottom: 8}}
           />
-          {(typeSearch === 'A' || typeSearch === 'I') && (
+          {(_typeSearch === 'A' || _typeSearch === 'I') && (
             <Accesses
               data={filteredData}
               reload={() =>
@@ -177,7 +179,7 @@ const Home = () => {
               loaded={loaded}
             />
           )}
-          {typeSearch === 'P' && (
+          {_typeSearch === 'P' && (
             <Orders
               data={filteredData}
               reload={() => getAccesses(search, '/others', 'L')}
