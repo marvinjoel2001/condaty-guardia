@@ -50,18 +50,16 @@ const Home = () => {
 
   // Actualizar data cuando cambia el tipo de búsqueda
   useEffect(() => {
+    setData([]);
     switch (typeSearch) {
       case 'I':
         getAccesses('', '/accesses', 'P');
-        setData([]);
         break;
       case 'A':
         getAccesses('', '/accesses', 'AD');
-        setData([]);
         break;
       case 'P':
         getAccesses('', '/others', 'L');
-        setData([]);
         break;
       default:
         console.log('Tipo de búsqueda no válido:', typeSearch);
