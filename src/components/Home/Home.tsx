@@ -22,7 +22,7 @@ const Home = () => {
   const [openQr, setOpenQr] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
   const [code, setCode]: any = useState(null);
-  const [showEntryQR, setShowEntryQR] = useState(false); // Add this state
+  const [showEntryQR, setShowEntryQR] = useState(false);
   const [data, setData]: any = useState([]);
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');

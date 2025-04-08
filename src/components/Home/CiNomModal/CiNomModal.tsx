@@ -293,6 +293,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           />
         )}
         <Select
+          filter
           label="¿A quién visita?"
           placeholder="¿A quién visita?"
           name="owner_id"
