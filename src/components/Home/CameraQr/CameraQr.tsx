@@ -9,7 +9,6 @@ import {
 import AnimationQr from './AnimationQr';
 import {Dimensions, View} from 'react-native';
 import useAuth from '../../../../mk/hooks/useAuth';
-import {isValidTimeTemp} from '../../../../mk/utils/utils';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 
 interface CameraQrProps {
