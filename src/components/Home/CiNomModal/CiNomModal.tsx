@@ -133,6 +133,12 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     });
     if (steps > 0) {
       errors = checkRules({
+        value: formState.owner_id,
+        rules: ['required'],
+        key: 'owner_id',
+        errors,
+      })
+      errors = checkRules({
         value: formState.name,
         rules: ['required'],
         key: 'name',
@@ -304,6 +310,9 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           optionLabel="name"
           height={300}
           search={true}
+          style={{
+            paddingTop:cssVar.spM
+          }}
         />
         {visit.length === 0 && steps === 0 && (
           <Input
