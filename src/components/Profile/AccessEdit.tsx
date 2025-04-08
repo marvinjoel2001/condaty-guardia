@@ -67,7 +67,13 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
     if (type == 'P') {
       errors = checkRules({
         value: formState.newPassword,
-        rules: ['required', 'password'],
+        rules: ['required'],
+        key: 'newPassword',
+        errors,
+      });
+      errors = checkRules({
+        value: formState.newPassword,
+        rules: ['password'],
         key: 'newPassword',
         errors,
       });
@@ -76,13 +82,13 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
         rules: ['required', 'same:newPassword'],
         key: 'repPassword',
         errors,
+        data: formState,
       });
     }
 
     setErrors(errors);
     return errors;
   };
-
   const onChangeData = async () => {
     if (hasErrors(validate())) {
       return;
@@ -114,8 +120,13 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
       setErrors({});
       getUser();
     } else {
-      showToast(error?.data?.message || error?.message, 'error');
-      setErrors(error?.data?.errors);
+      // showToast(error?.data?.message || error?.message, 'error');
+      // setErrors(error?.data?.errors);
+      if (data?.message) {
+        setErrors({newPassword: data?.message});
+      } else {
+        setErrors({newPassword: 'Ocurrió un error'});
+      }
     }
   };
 
@@ -195,7 +206,7 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
                 placeholder="Nueva contraseña"
                 password={showPassword}
                 error={errors}
-                value={formState['newPassword']}
+                value={formState?.newPassword}
                 onChange={(value: any) =>
                   handleInputChange('newPassword', value)
                 }

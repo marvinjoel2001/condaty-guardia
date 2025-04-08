@@ -12,6 +12,7 @@ import Title from '../../../mk/components/ui/Title';
 import SubTitle from '../../../mk/components/ui/SubTitle';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import React from 'react';
+import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 
 const ForgotPass = ({open, onClose, mod}: any) => {
   const [formState, setFormState]: any = useState({});
@@ -24,9 +25,6 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       ...formState,
       [name]: value,
     });
-    if (name === 'newPassword' || name === 'repPassword') {
-      validatePasswords({...formState, [name]: value});
-    }
   };
 
   const {execute} = useApi();
@@ -67,21 +65,18 @@ const ForgotPass = ({open, onClose, mod}: any) => {
     return intervalo;
   };
 
-  const validationCi = (ci: string) => {
-    let err = {};
+  const validationCi = () => {
+    let errors: any = {};
 
-    if (!ci) {
-      err = {...err, ci: 'Debe indicar su cédula de identidad'};
-    } else if (ci.length < 5) {
-      err = {...err, ci: 'Debe tener al menos 5 números'};
-    } else if (ci.length > 10) {
-      err = {...err, ci: 'Debe tener como máximo 10 números'};
-    }
+    errors = checkRules({
+      value: formState.ci,
+      rules: ['required', 'ci'],
+      key: 'ci',
+      errors,
+    });
 
-    setErrors(err);
-
-    // Retornar true si hay errores, de lo contrario false
-    return Object.keys(err).length > 0;
+    setErrors(errors);
+    return errors;
   };
 
   const onGetCode = async () => {
@@ -89,20 +84,7 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       showToast('Espere 2 minutos para volver a solicitar el código.', 'info');
       return;
     }
-
-    // let err = {};
-    // if (!formState.ci)
-    //   err = {...err, ci: 'Debe indicar su cédula de identidad'};
-    //   if (formState.ci.length < 5)
-    //   err = {...err, ci: 'Debe tener al menos 5 números'};
-
-    // if (Object.keys(err).length > 0) {
-    //   setErrors(err);
-    //   return;
-    // }
-    const hasErrors = validationCi(formState.ci);
-
-    if (hasErrors) {
+    if (hasErrors(validationCi())) {
       return;
     }
 
@@ -122,33 +104,60 @@ const ForgotPass = ({open, onClose, mod}: any) => {
     }
   };
 
+  const validate = () => {
+    let errors: any = {};
+    errors = checkRules({
+      value: formState.code,
+      rules: ['required', 'min:4'],
+      key: 'code',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.newPassword,
+      rules: ['required'],
+      key: 'newPassword',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.newPassword,
+      rules: ['password'],
+      key: 'newPassword',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.repPassword,
+      rules: ['required', 'same:newPassword'],
+      key: 'repPassword',
+      errors,
+      data: formState,
+    });
+    setErrors(errors);
+    return errors;
+  };
+
   const onChangePass = async () => {
-    let err = {};
+    if (hasErrors(validate())) {
+      return;
+    }
     let url = '/' + mod + '-setpassreset';
 
     let param: any = {code: formState.code};
 
-    const passwordError = checkPasswords(formState.newPassword);
-    if (passwordError) err = {...err, newPassword: passwordError};
-
-    if (formState.newPassword != formState.repPassword)
-      err = {...err, repPassword: 'Los PIN no coinciden'};
-
-    if (Object.keys(err).length > 0) {
-      setErrors(err);
-      return;
-    }
     param = {...param, password: formState.newPassword, ci: formState.ci};
     const {data, error} = await execute(url, 'POST', param, false, 3);
-
+    console.log(error);
     if (data?.success == true) {
       showToast(data.message, 'success');
       setFormState({pinned: 0});
       setErrors({});
       onClose(false);
     } else {
-      showToast('Codigo de verificación no válido', 'error');
-      // setErrors(error?.data?.errors);
+      // showToast('Codigo de verificación no válido', 'error');
+      if (data?.errors?.token) {
+        setErrors({...errors, newPassword: data?.errors?.token});
+      } else {
+        setErrors({...errors, newPassword: 'Ocurrió un error'});
+      }
     }
   };
 
@@ -176,37 +185,35 @@ const ForgotPass = ({open, onClose, mod}: any) => {
   //   }
   // };
 
-  const validatePasswords = (formState: any) => {
-    let errors = {};
-    const passwordError = checkPasswords(formState.newPassword);
-    if (passwordError) errors = {...errors, newPassword: passwordError};
+  // const validatePasswords = (formState: any) => {
+  //   let errors = {};
+  //   const passwordError = checkPasswords(formState.newPassword);
+  //   if (passwordError) errors = {...errors, newPassword: passwordError};
 
-    if (formState.newPassword !== formState.repPassword)
-      errors = {...errors, repPassword: 'La contraseña no coincide'};
+  //   if (formState.newPassword !== formState.repPassword)
+  //     errors = {...errors, repPassword: 'La contraseña no coincide'};
 
-    setErrors(errors);
-  };
+  //   setErrors(errors);
+  // };
 
-  const buttonDisabled = () => {
-    if (formState.pinned != 1) {
-      return !!errors.ci || !formState.ci;
-    } else if (buttonState) {
-      return !isCodeFilled;
-    } else {
-      return (
-        !!errors.newPassword ||
-        !!errors.repPassword ||
-        !formState.newPassword ||
-        !formState.repPassword
-      );
-    }
-  };
+  // const buttonDisabled = () => {
+  //   if (formState.pinned != 1) {
+  //     return !!errors.ci || !formState.ci;
+  //   } else if (buttonState) {
+  //     return !isCodeFilled;
+  //   } else {
+  //     return (
+  //       !!errors.newPassword ||
+  //       !!errors.repPassword ||
+  //       !formState.newPassword ||
+  //       !formState.repPassword
+  //     );
+  //   }
+  // };
 
   const onSave = () => {
     if (formState.pinned != 1) {
       onGetCode();
-    } else if (buttonState) {
-      setButtonState(false);
     } else {
       onChangePass();
     }
@@ -221,23 +228,15 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       onClose={(e: string) => onClose(e)}
       title={
         formState.pinned != 1
-          ? '¿Olvidaste tu PIN?'
-          : !buttonState
-          ? 'Crea otro PIN'
+          ? '¿Olvidaste tu contraseña?'
           : 'Introduce el código de 4 dígitos'
       }
-      buttonText={
-        formState.pinned != 1
-          ? 'Obtener código'
-          : buttonState
-          ? 'Continuar'
-          : 'Guardar cambios'
-      }
-      disabled={buttonDisabled()}
+      buttonText={formState.pinned != 1 ? 'Obtener código' : 'Guardar cambios'}
+      // disabled={buttonDisabled()}
       buttonCancel=""
       onSave={onSave}
       style={{padding: 20}}>
-      {formState.pinned != 1 ? (
+      {formState?.pinned != 1 ? (
         <>
           <SubTitle style={{fontSize: cssVar.sM}}>
             Se enviará un código PIN de verificación a su correo electrónico.
@@ -270,50 +269,22 @@ const ForgotPass = ({open, onClose, mod}: any) => {
         </>
       ) : (
         <>
-          {buttonState ? (
-            <>
-              {/* <SubTitle style={{fontSize: cssVar.sM, marginBottom: cssVar.spL}}>
-                Enviamos un código de verificación a tu WhatsApp para que puedas
-                crear un nuevo PIN.
-              </SubTitle> */}
-              <InputCode
-                label="Código de acceso"
-                name="code"
-                type="number"
-                keyboardType="numeric"
-                value={formState['code']}
-                error={errors}
-                onCodeFilled={isFilled => setIsCodeFilled(isFilled)}
-                onChange={(value: any) => handleInputChange('code', value)}
-              />
+          <InputCode
+            label="Código de acceso"
+            name="code"
+            type="number"
+            keyboardType="numeric"
+            value={formState['code']}
+            error={errors}
+            onCodeFilled={isFilled => setIsCodeFilled(isFilled)}
+            onChange={(value: any) => handleInputChange('code', value)}
+          />
 
-              {/* <SubTitle>
-                Si no encuentras el código en tu buzón, busca en la carpeta de
-                spam o correos no deseados. Si el código no está allí, es
-                posible que tu correo electrónico indicado no exista o es
-                incorrecto.
-              </SubTitle> */}
-            </>
-          ) : (
-            <>
-              {/* <Title
-                style={{
-                  fontSize: cssVar.sXl,
-                  marginTop: cssVar.spXl,
-                  marginBottom: cssVar.spS,
-                }}>
-                Crea otro PIN
-              </Title> */}
-              <SubTitle style={{fontSize: cssVar.sM, marginBottom: cssVar.spL}}>
-                Para proteger tu cuenta crea un PIN de 4 dígitos{' '}
-              </SubTitle>
-              <InputPassworAndRepeat
-                errors={errors}
-                formState={formState}
-                handleInputChange={handleInputChange}
-              />
-            </>
-          )}
+          <InputPassworAndRepeat
+            errors={errors}
+            formState={formState}
+            handleInputChange={handleInputChange}
+          />
         </>
       )}
     </Modal>

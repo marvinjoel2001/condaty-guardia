@@ -21,6 +21,7 @@ import ForgotPass from './ForgotPass';
 // import Splash from '../Splash/Splash';
 import React from 'react';
 import Splash from '../Splash/Splash';
+import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 // import Loading from '../Animations/Loading';
 
 const Login = () => {
@@ -39,27 +40,27 @@ const Login = () => {
     });
   };
 
-  const validaciones = () => {
-    let errors = {};
+  // const validaciones = () => {
+  //   let errors = {};
 
-    const emailError = checkCI(formState.email);
+  //   const emailError = checkCI(formState.email);
 
-    if (emailError) {
-      errors = {...errors, email: emailError};
-    }
+  //   if (emailError) {
+  //     errors = {...errors, email: emailError};
+  //   }
 
-    const passwordError = checkPasswords(formState.password);
+  //   const passwordError = checkPasswords(formState.password);
 
-    if (passwordError) {
-      errors = {...errors, password: passwordError};
-    }
+  //   if (passwordError) {
+  //     errors = {...errors, password: passwordError};
+  //   }
 
-    if (!formState.password) {
-      errors = {...errors, password: 'Campo requerido'};
-    }
+  //   if (!formState.password) {
+  //     errors = {...errors, password: 'Campo requerido'};
+  //   }
 
-    return errors;
-  };
+  //   return errors;
+  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -81,10 +82,29 @@ const Login = () => {
     signalInit();
   }, []);
 
+  const validate = () => {
+    let errors: any = {};
+    errors = checkRules({
+      value: formState.email,
+      rules: ['required', 'ci'],
+      key: 'email',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.password,
+      rules: ['required'],
+      key: 'password',
+      errors,
+    });
+
+    setErrors(errors);
+    return errors;
+  };
+
   const handleSubmit = async () => {
-    const valid = validaciones();
-    setErrors(valid);
-    if (Object.keys(valid).length > 0) return;
+    if (hasErrors(validate())) {
+      return;
+    }
     login(formState)
       .then((data: any) => {
         if (!(user || data?.user)) {
