@@ -40,22 +40,18 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     let id = codeId.replace(ltime, '');
     id = id.replace(ltime - 4, '');
 
-    const {data: QR} = await execute(
-      '/owners',
-      'GET',
-      {
-        searchBy: id,
-        fullType: 'KEY',
-      },
-      false,
-      3,
-    );
+    const {data: QR} = await execute('/owners', 'GET', {
+      searchBy: id,
+      fullType: 'KEY',
+    });
     if (QR?.success == true) {
       setData({
         invitation: QR?.data[0],
         type: 'O',
         status,
       });
+    } else {
+      onClose();
     }
   };
   const getInvitation = async () => {

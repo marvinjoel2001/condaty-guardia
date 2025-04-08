@@ -194,7 +194,7 @@ const Skeleton = ({type = 'list', style}: Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
+    paddingVertical: 4,
   },
   skeletonItem: {
     backgroundColor: cssVar.cBlackV2,
