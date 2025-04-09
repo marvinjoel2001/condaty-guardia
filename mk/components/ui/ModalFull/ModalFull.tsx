@@ -233,43 +233,45 @@ const ModalFull = ({
             }}>
             {children}
           </ScrollView>
-
-          <View
-            style={{
-              ...theme.footer,
-              borderTopWidth: buttonText ? cssVar.bWidth : 0,
-              borderTopColor: cssVar.cBlackV3,
-            }}>
-            {buttonText && (
-              <View style={{paddingHorizontal: cssVar.spM}}>
-                <Button
-                  variant="primary"
-                  disabled={disabled}
-                  onPress={() => {
-                    Keyboard.dismiss();
-                    onSave(id);
-                  }}>
-                  {buttonText}
-                </Button>
-              </View>
-            )}
-            {buttonCancel && (
-              <View style={{paddingHorizontal: cssVar.spM}}>
-                <Button
-                  variant="secondary"
-                  onPress={(e: any) => {
-                    e.stopPropagation();
-                    Keyboard.dismiss();
-                    onClose('cancel');
-                  }}>
-                  {buttonCancel}
-                </Button>
-              </View>
-            )}
-            {buttonExtra && (
-              <View style={{paddingHorizontal: cssVar.spM}}>{buttonExtra}</View>
-            )}
-          </View>
+          {(buttonText || buttonCancel || buttonExtra) && (
+            <View
+              style={{
+                ...theme.footer,
+                borderTopWidth: buttonText ? cssVar.bWidth : 0,
+              }}>
+              {buttonText && (
+                <View style={{paddingHorizontal: cssVar.spM}}>
+                  <Button
+                    variant="primary"
+                    disabled={disabled}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      onSave(id);
+                    }}>
+                    {buttonText}
+                  </Button>
+                </View>
+              )}
+              {buttonCancel && (
+                <View style={{paddingHorizontal: cssVar.spM}}>
+                  <Button
+                    variant="secondary"
+                    onPress={(e: any) => {
+                      e.stopPropagation();
+                      Keyboard.dismiss();
+                      onClose('cancel');
+                    }}>
+                    {buttonCancel}
+                  </Button>
+                </View>
+              )}
+              {buttonExtra && (
+                <View style={{paddingHorizontal: cssVar.spM}}>
+                  {buttonExtra}
+                </View>
+              )}
+            </View>
+          )}
           <Toast toast={toast} showToast={showToast} />
         </Form>
       </SafeAreaView>
@@ -305,9 +307,11 @@ const theme: ThemeType = {
   },
   footer: {
     width: '100%',
+    // backgroundColor: 'red',
     gap: cssVar.spS,
     paddingBottom: cssVar.spM,
     paddingTop: cssVar.spS,
+    borderTopColor: cssVar.cBlackV3,
     backgroundColor: cssVar.cBlack,
   },
 };
