@@ -165,7 +165,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     const status = getStatus();
     return (
       <>
-        <LineDetail label="Estado" value={statusText} />
+        <LineDetail label="Estado" value={statusText || 'Completado'} />
         <LineDetail label="Tipo" value={accessType} />
         {(data?.type === 'I' || data?.type === 'G') && data?.invitation && (
           <>
