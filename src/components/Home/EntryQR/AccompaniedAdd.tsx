@@ -60,34 +60,34 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
     });
     errors = checkRules({
       value: formState.name,
-      rules: ['required'],
+      rules: ['required', 'alpha'],
       key: 'name',
       errors,
     });
-    // errors = checkRules({
-    //   value: formState.middle_name,
-    //   rules: [''],
-    //   key: 'middle_name',
-    //   errors,
-    // });
+    errors = checkRules({
+      value: formState.middle_name,
+      rules: ['alpha'],
+      key: 'middle_name',
+      errors,
+    });
     errors = checkRules({
       value: formState.last_name,
-      rules: ['required'],
+      rules: ['required', 'alpha'],
       key: 'last_name',
       errors,
     });
-    // errors = checkRules({
-    //   value: formState.mother_last_name,
-    //   rules: ['required'],
-    //   key: 'mother_last_name',
-    //   errors,
-    // });
+    errors = checkRules({
+      value: formState.mother_last_name,
+      rules: ['alpha'],
+      key: 'mother_last_name',
+      errors,
+    });
 
     setErrors(errors);
     return errors;
   };
-// console.log(formState,'fst aad')
-// console.log(item,'item aad')
+  // console.log(formState,'fst aad')
+  // console.log(item,'item aad')
   const onSave = async () => {
     let acompanantes = item?.acompanantes || [];
     if (acompanantes?.length > 0) {
