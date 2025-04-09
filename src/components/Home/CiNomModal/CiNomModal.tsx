@@ -127,7 +127,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     let errors: any = {};
     errors = checkRules({
       value: formState.ci,
-      rules: ['required'],
+      rules: ['required', 'ci'],
       key: 'ci',
       errors,
     });

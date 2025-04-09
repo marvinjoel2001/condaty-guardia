@@ -106,7 +106,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     if (type == 'I' || type == 'G') {
       errors = checkRules({
         value: formState.ci,
-        rules: ['required'],
+        rules: ['required', 'ci'],
         key: 'ci',
         errors,
       });

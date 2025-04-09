@@ -54,7 +54,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
 
     errors = checkRules({
       value: formState.ci,
-      rules: ['required'],
+      rules: ['required', 'ci'],
       key: 'ci',
       errors,
     });
