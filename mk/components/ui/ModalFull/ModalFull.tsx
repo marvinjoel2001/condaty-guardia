@@ -306,7 +306,7 @@ const theme: ThemeType = {
   footer: {
     width: '100%',
     gap: cssVar.spS,
-    marginBottom: cssVar.spM,
+    paddingBottom: cssVar.spM,
     paddingTop: cssVar.spS,
     backgroundColor: cssVar.cBlack,
   },
