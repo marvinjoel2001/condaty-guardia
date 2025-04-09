@@ -88,9 +88,15 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       return;
     }
 
-    const {data, error} = await execute('/' + mod + '-getpinreset', 'POST', {
-      ci: formState.ci,
-    });
+    const {data, error} = await execute(
+      '/' + mod + '-getpinreset',
+      'POST',
+      {
+        ci: formState.ci,
+      },
+      false,
+      3,
+    );
 
     if (data?.success === true) {
       showToast(data?.message, 'success', 10000);

@@ -80,14 +80,28 @@ const DetOrders = ({id, open, close, reload}: any) => {
     });
     errors = checkRules({
       value: formState.name,
-      rules: ['required'],
+      rules: ['required', 'alpha'],
       key: 'name',
       errors,
     });
+
+    errors = checkRules({
+      value: formState.middle_name,
+      rules: ['alpha'],
+      key: 'middle_name',
+      errors,
+    });
+
     errors = checkRules({
       value: formState.last_name,
-      rules: ['required'],
+      rules: ['required', 'alpha'],
       key: 'last_name',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.mother_last_name,
+      rules: ['alpha'],
+      key: 'mother_last_name',
       errors,
     });
     if (formState?.tab == 'V') {
@@ -179,7 +193,6 @@ const DetOrders = ({id, open, close, reload}: any) => {
             <LineDetail label="Observación" value={data?.obs_confirm} />
           </>
         )}
-      
       </>
     );
   };

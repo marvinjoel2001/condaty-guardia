@@ -309,7 +309,7 @@ export default Select;
 
 const styles = StyleSheet.create({
   select: {
-    flex: 1,
+    // flex: 1,
     zIndex: 2,
     position: 'relative',
   },

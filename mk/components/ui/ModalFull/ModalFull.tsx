@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   BackHandler,
   Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import Icon from '../Icon/Icon';
 import {IconArrowLeft, IconSearch} from '../../../../src/icons/IconLibrary';
@@ -74,8 +75,6 @@ const ModalFull = ({
   const [iconButtonColor, setIconButtonColor] = useState('transparent');
   const scrollViewRef: any = useRef(null);
   const [refreshing, setRefreshing] = useState(false);
-  const {store, setStore} = useAuth();
-  const [openMedal, setOpenMedal] = useState(false);
 
   // Creamos el valor animado
   const translateX = useRef(new Animated.Value(500)).current; // Valor inicial fuera de la pantalla (derecha)
@@ -124,17 +123,6 @@ const ModalFull = ({
     await reload();
     setRefreshing(false);
   };
-  useEffect(() => {
-    if (store?.nMedals) {
-      setOpenMedal(true);
-    }
-  }, [store?.nMedals]);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     console.log('ModalFull', open);
-  //   }, []),
-  // );
 
   return (
     <ModalRN
@@ -147,170 +135,149 @@ const ModalFull = ({
       }}>
       <SafeAreaView style={{flex: 1}}>
         <Form>
-          <Animated.View
+          <View
             style={{
-              ...theme.container,
-              transform: typeAnimation === 'book' ? [{translateX}] : [], // Aplicamos la animación de deslizamiento
+              ...theme.header,
+              paddingHorizontal: !iconClose ? cssVar.spM : 0,
+              paddingBottom: !iconClose ? cssVar.spS : 0,
+              borderBottomWidth: iconClose ? cssVar.bWidth : 0,
             }}>
-            <View
-              style={{
-                ...theme.header,
-                paddingHorizontal: !iconClose ? cssVar.spM : 0,
-                paddingBottom: !iconClose ? cssVar.spS : 0,
-                borderBottomWidth: iconClose ? cssVar.bWidth : 0,
-              }}>
-              {((!isSearchActive && iconClose) ||
-                (iconClose && rightIconV2)) && (
-                <TouchableOpacity
+            {((!isSearchActive && iconClose) || (iconClose && rightIconV2)) && (
+              <TouchableOpacity
+                onPress={() => onClose('x')}
+                onPressIn={() => setIconButtonColor(cssVar.cHover)}
+                onPressOut={() => setIconButtonColor('transparent')}
+                style={{
+                  height: Platform.OS === 'android' ? 36 : 44,
+                  width: 48,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: iconButtonColor,
+                  borderRadius: 8,
+                }}>
+                <Icon
+                  name={IconArrowLeft}
+                  color={cssVar.cWhite}
                   onPress={() => onClose('x')}
-                  onPressIn={() => setIconButtonColor(cssVar.cHover)}
-                  onPressOut={() => setIconButtonColor('transparent')}
-                  style={{
-                    height: Platform.OS === 'android' ? 36 : 44,
-                    width: 48,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: iconButtonColor,
-                    borderRadius: 8,
-                  }}>
+                  accessibilityLabel="Cerrar"
+                />
+              </TouchableOpacity>
+            )}
+
+            {!isSearchActive && <Text style={theme.headerText}>{title}</Text>}
+
+            {isSearchActive && !rightIconV2 && (
+              <DataSearch
+                setSearch={setSearchQuery}
+                focus={true}
+                name="Buscar"
+                style={{
+                  flexGrow: 1,
+                  marginHorizontal: cssVar.spM,
+                }}
+                value={searchQuery}
+                iconLeft={
                   <Icon
                     name={IconArrowLeft}
                     color={cssVar.cWhite}
-                    onPress={() => onClose('x')}
-                    accessibilityLabel="Cerrar"
+                    onPress={() => setIsSearchActive(false)}
                   />
-                </TouchableOpacity>
-              )}
+                }
+              />
+            )}
 
-              {!isSearchActive && <Text style={theme.headerText}>{title}</Text>}
-
-              {isSearchActive && !rightIconV2 && (
-                <DataSearch
-                  setSearch={setSearchQuery}
-                  focus={true}
-                  name="Buscar"
-                  style={{
-                    flexGrow: 1,
-                    marginHorizontal: cssVar.spM,
-                  }}
-                  value={searchQuery}
-                  iconLeft={
-                    <Icon
-                      name={IconArrowLeft}
-                      color={cssVar.cWhite}
-                      onPress={() => setIsSearchActive(false)}
-                    />
-                  }
-                />
-              )}
-
-              {rightIcon && !isSearchActive && !rightIconV2 && (
-                <TouchableOpacity
+            {rightIcon && !isSearchActive && !rightIconV2 && (
+              <TouchableOpacity
+                onPress={() => setIsSearchActive(true)}
+                onPressIn={() => setSearchButtonColor(cssVar.cHover)}
+                onPressOut={() => setSearchButtonColor('transparent')}
+                style={{
+                  height: Platform.OS === 'android' ? 48 : 44,
+                  width: 48,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: searchButtonColor,
+                  borderRadius: 8,
+                }}>
+                <Icon
+                  name={IconSearch}
+                  color={cssVar.cWhiteV1}
+                  accessibilityLabel="Buscar"
                   onPress={() => setIsSearchActive(true)}
-                  onPressIn={() => setSearchButtonColor(cssVar.cHover)}
-                  onPressOut={() => setSearchButtonColor('transparent')}
-                  style={{
-                    height: Platform.OS === 'android' ? 48 : 44,
-                    width: 48,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: searchButtonColor,
-                    borderRadius: 8,
+                />
+              </TouchableOpacity>
+            )}
+
+            {rightIconV2 && rightIconV2}
+          </View>
+
+          <ScrollView
+            ref={scrollViewRef}
+            automaticallyAdjustContentInsets
+            automaticallyAdjustKeyboardInsets={true}
+            automaticallyAdjustsScrollIndicatorInsets
+            refreshControl={
+              reload ? (
+                <RefreshControl
+                  progressBackgroundColor={cssVar.cBlack}
+                  colors={[cssVar.cAccent]}
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  tintColor={cssVar.cAccent}
+                />
+              ) : undefined
+            }
+            style={{
+              ...theme.body,
+              ...style,
+            }}>
+            {children}
+          </ScrollView>
+
+          <View
+            style={{
+              ...theme.footer,
+              borderTopWidth: buttonText ? cssVar.bWidth : 0,
+              borderTopColor: cssVar.cBlackV3,
+            }}>
+            {buttonText && (
+              <View style={{paddingHorizontal: cssVar.spM}}>
+                <Button
+                  variant="primary"
+                  disabled={disabled}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    onSave(id);
                   }}>
-                  <Icon
-                    name={IconSearch}
-                    color={cssVar.cWhiteV1}
-                    accessibilityLabel="Buscar"
-                    onPress={() => setIsSearchActive(true)}
-                  />
-                </TouchableOpacity>
-              )}
-
-              {rightIconV2 && rightIconV2}
-            </View>
-
-            <ScrollView
-              ref={scrollViewRef}
-              automaticallyAdjustContentInsets
-              automaticallyAdjustKeyboardInsets={true}
-              automaticallyAdjustsScrollIndicatorInsets
-              refreshControl={
-                reload ? (
-                  <RefreshControl
-                    progressBackgroundColor={cssVar.cBlack}
-                    colors={[cssVar.cAccent]}
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    tintColor={cssVar.cAccent}
-                  />
-                ) : undefined
-              }
-              style={{
-                ...theme.body,
-                ...style,
-              }}>
-              {children}
-            </ScrollView>
-
-            <View
-              style={{
-                ...theme.footer,
-                borderTopWidth: buttonText ? cssVar.bWidth : 0,
-                borderTopColor: cssVar.cBlackV3,
-              }}>
-              {buttonText && (
-                <View style={{paddingHorizontal: cssVar.spM}}>
-                  <Button
-                    variant="primary"
-                    disabled={disabled}
-                    onPress={() => {
-                      Keyboard.dismiss();
-                      onSave(id);
-                    }}>
-                    {buttonText}
-                  </Button>
-                </View>
-              )}
-              {buttonCancel && (
-                <View style={{paddingHorizontal: cssVar.spM}}>
-                  <Button
-                    variant="secondary"
-                    onPress={(e: any) => {
-                      e.stopPropagation();
-                      Keyboard.dismiss();
-                      onClose('cancel');
-                    }}>
-                    {buttonCancel}
-                  </Button>
-                </View>
-              )}
-              {buttonExtra && (
-                <View style={{paddingHorizontal: cssVar.spM}}>
-                  {buttonExtra}
-                </View>
-              )}
-            </View>
-          </Animated.View>
+                  {buttonText}
+                </Button>
+              </View>
+            )}
+            {buttonCancel && (
+              <View style={{paddingHorizontal: cssVar.spM}}>
+                <Button
+                  variant="secondary"
+                  onPress={(e: any) => {
+                    e.stopPropagation();
+                    Keyboard.dismiss();
+                    onClose('cancel');
+                  }}>
+                  {buttonCancel}
+                </Button>
+              </View>
+            )}
+            {buttonExtra && (
+              <View style={{paddingHorizontal: cssVar.spM}}>{buttonExtra}</View>
+            )}
+          </View>
+          <Toast toast={toast} showToast={showToast} />
         </Form>
-        <Toast toast={toast} showToast={showToast} />
       </SafeAreaView>
     </ModalRN>
   );
 };
 
 const theme: ThemeType = {
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    backgroundColor: cssVar.cBlack,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 10,
-    overflow: 'hidden',
-    alignItems: 'center',
-    width: '100%',
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -326,16 +293,22 @@ const theme: ThemeType = {
     flexGrow: 1,
   },
   body: {
-    flexGrow: 1,
     paddingHorizontal: cssVar.spM,
     color: cssVar.cWhiteV3,
     width: '100%',
+    flex: 1,
+    backgroundColor: cssVar.cBlack,
+    // shadowOffset: {width: 0, height: 2},
+    // shadowOpacity: 0.1,
+    // shadowRadius: 2,
+    // elevation: 10,
   },
   footer: {
     width: '100%',
     gap: cssVar.spS,
     marginBottom: cssVar.spM,
     paddingTop: cssVar.spS,
+    backgroundColor: cssVar.cBlack,
   },
 };
 

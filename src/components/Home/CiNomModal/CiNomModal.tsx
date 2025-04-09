@@ -137,16 +137,22 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
         rules: ['required'],
         key: 'owner_id',
         errors,
-      })
+      });
       errors = checkRules({
         value: formState.name,
-        rules: ['required'],
+        rules: ['required', 'alpha'],
         key: 'name',
         errors,
       });
       errors = checkRules({
+        value: formState.middle_name,
+        rules: ['alpha'],
+        key: 'middle_name',
+        errors,
+      });
+      errors = checkRules({
         value: formState.last_name,
-        rules: ['required'],
+        rules: ['required', 'alpha'],
         key: 'last_name',
         errors,
       });
@@ -173,14 +179,28 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           });
           errors = checkRules({
             value: formState.name_taxi,
-            rules: ['required'],
+            rules: ['required', 'alpha'],
             key: 'name_taxi',
             errors,
           });
+
+          errors = checkRules({
+            value: formState.middle_name_taxi,
+            rules: ['alpha'],
+            key: 'middle_name_taxi',
+            errors,
+          });
+
           errors = checkRules({
             value: formState.last_name_taxi,
-            rules: ['required'],
+            rules: ['required', 'alpha'],
             key: 'last_name_taxi',
+            errors,
+          });
+          errors = checkRules({
+            value: formState.mother_last_name_taxi,
+            rules: ['alpha'],
+            key: 'mother_last_name_taxi',
             errors,
           });
         }
@@ -311,7 +331,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           height={300}
           search={true}
           style={{
-            paddingTop:cssVar.spM
+            paddingTop: cssVar.spM,
           }}
         />
         {visit.length === 0 && steps === 0 && (
