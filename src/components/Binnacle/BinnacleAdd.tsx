@@ -20,10 +20,6 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   const {showToast} = useAuth();
   const {execute} = useApi();
 
-
-useEffect(()=>{
-  console.log(encodeURIComponent(formState?.avatar))
-},[formState])
   const handleInputChange = (name: string, value: any) => {
     const v = value?.target?.value ? value.target.value : value;
     setFormState({
@@ -32,7 +28,7 @@ useEffect(()=>{
     });
   };
   const onSaveNovedades = async () => {
-    if (formState.descrip == '') {
+    if (!formState?.descrip) {
       setErrors({descrip: 'Ingrese una descripcion'});
       return;
     }
@@ -40,7 +36,7 @@ useEffect(()=>{
     const {data: novedad, error: err} = await execute('/guardnews', 'POST', {
       descrip: formState.descrip,
       imageNew: {file: encodeURIComponent(formState.avatar), ext: 'webp'},
-    },false ,3);
+    });
     if (novedad?.success == true) {
       onClose();
       reload();
@@ -51,6 +47,7 @@ useEffect(()=>{
       showToast('Ocurrió un error', 'error');
     }
   };
+
   return (
     <ModalFull
       open={open}
@@ -59,12 +56,13 @@ useEffect(()=>{
       onClose={onClose}
       buttonText="Guardar"
       buttonCancel="">
-      <View>
+      <View style={{marginTop: 12}}>
         <TextArea
           label="Descripción"
           name="descrip"
           placeholder="Describe alguna novedad o incidente ocurrido en tu jornada laboral."
           error={errors}
+          maxLength={250}
           required={true}
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}

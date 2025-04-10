@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
@@ -17,7 +17,7 @@ import {
   IconSesionDel,
   IconTaxi,
 } from '../../icons/IconLibrary';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import {getDateTimeStrMes, getNow} from '../../../mk/utils/dates';
@@ -25,11 +25,12 @@ import {getDateTimeStrMes, getNow} from '../../../mk/utils/dates';
 const Notifications = () => {
   const [tab, setTab] = useState('T');
   const [search, setSearch] = useState('');
+  const [dataFilter, setDataFilter] = useState([]);
   const {user} = useAuth();
   const [params, setParams]: any = useState({
     perPage: -1,
     page: 1,
-    fullType:"L"
+    fullType: 'L',
   });
   const {
     data: notifs,
@@ -38,26 +39,25 @@ const Notifications = () => {
   } = useApi('/notifications', 'GET', params);
 
   const NotifisList = (notifi: any) => {
-    // const read: boolean = readed[notifi.id] || false;
     let data = JSON.parse(notifi.message);
     if (
       search != '' &&
       (data.msg?.body + '').toLowerCase().indexOf(search.toLowerCase()) == -1
     )
       return null;
-    if (
-      !(
-        tab === 'T' ||
-        (tab === 'Y' &&
-          notifi.channel ===
-            (configApp.APP_AUTH_IAM as string).replace('/', '') + user?.id) ||
-        (tab === 'G' && notifi.channel === 'guards') ||
-        (tab === 'A1' && notifi.channel === 'alerts-1') ||
-        (tab === 'A2' && notifi.channel === 'alerts-2') ||
-        (tab === 'A3' && notifi.channel === 'alerts-3')
-      )
-    )
-      return null;
+    // if (
+    //   !(
+    //     tab === 'T' ||
+    //     (tab === 'Y' &&
+    //       notifi.channel ===
+    //         (configApp.APP_AUTH_IAM as string).replace('/', '') + user?.id) ||
+    //     (tab === 'G' && notifi.channel === 'guards') ||
+    //     (tab === 'A1' && notifi.channel === 'alerts-1') ||
+    //     (tab === 'A2' && notifi.channel === 'alerts-2') ||
+    //     (tab === 'A3' && notifi.channel === 'alerts-3')
+    //   )
+    // )
+    //   return null;
 
     const left = (data: any) => {
       let image = '';
@@ -135,7 +135,6 @@ const Notifications = () => {
           />
         );
       }
-      // console.log('data',name,image,JSON.stringify(data.info,null,5));
       return <Avatar src={image} name={name} />;
     };
     return (
@@ -158,6 +157,34 @@ const Notifications = () => {
     setSearch(search);
   };
 
+  useEffect(() => {
+    const channelMap: {[key: string]: string} = {
+      G: 'guards',
+      A1: 'alerts-1',
+      A2: 'alerts-2',
+      A3: 'alerts-3',
+    };
+
+    if (tab === 'T') {
+      setDataFilter(notifs?.data);
+      return;
+    }
+
+    if (tab === 'Y') {
+      setDataFilter(
+        notifs?.data?.filter(
+          (notif: any) =>
+            notif.channel ===
+            `${(configApp.APP_AUTH_IAM as string).replace('/', '')}${user?.id}`,
+        ),
+      );
+      return;
+    }
+    setDataFilter(
+      notifs?.data?.filter((notif: any) => notif.channel === channelMap[tab]),
+    );
+  }, [tab, notifs?.data]);
+
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
       <TabsButtons
@@ -172,9 +199,11 @@ const Notifications = () => {
         sel={tab}
         setSel={setTab}
       />
-      <DataSearch setSearch={onSearch} name="Novedades" value={search} />
+      <View style={{padding: cssVar.spL, gap: cssVar.spL}}>
+        <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
-      <List data={notifs?.data} renderItem={NotifisList} refreshing={!loaded} />
+        <List data={dataFilter} renderItem={NotifisList} refreshing={!loaded} />
+      </View>
     </Layout>
   );
 };

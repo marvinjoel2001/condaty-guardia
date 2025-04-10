@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useMemo} from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View, Text, Keyboard} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
@@ -16,21 +16,23 @@ import DataSearch from '../../../mk/components/ui/DataSearch';
 import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
+import {isAndroid} from '../../../mk/utils/utils';
+import {getUTCNow} from '../../../mk/utils/dates';
 
 const Home = () => {
   const {user} = useAuth();
-  // const [openSlide, setOpenSlide] = useState(true);
   const [openQr, setOpenQr] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
   const [code, setCode]: any = useState(null);
-  // const [openCiNom, setOpenCiNom] = useState(false);
   const [showEntryQR, setShowEntryQR] = useState(false); // Add this state
   const [data, setData]: any = useState([]);
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('I');
+  const [_typeSearch, set_TypeSearch] = useState('I');
   const {theme} = useContext(ThemeContext);
-  const {execute, loaded} = useApi();
+  const {execute} = useApi();
+  const [loaded, setLoaded] = useState(false);
 
   // Función que obtiene la data según el tipo de búsqueda
   const getAccesses = async (
@@ -38,6 +40,8 @@ const Home = () => {
     endpoint: string,
     fullType: string,
   ) => {
+    setData([]);
+    setLoaded(true);
     const {data, reload} = await execute(endpoint, 'GET', {
       perPage: -1,
       page: 1,
@@ -45,28 +49,28 @@ const Home = () => {
       searchBy: searchParam || '',
       section: endpoint === '/others' ? 'HOME' : '',
     });
+    setLoaded(false);
     setData(data?.data || []);
   };
 
   // Actualizar data cuando cambia el tipo de búsqueda
   useEffect(() => {
+    setData([]);
     switch (typeSearch) {
       case 'I':
         getAccesses('', '/accesses', 'P');
-        setData([]);
         break;
       case 'A':
         getAccesses('', '/accesses', 'AD');
-        setData([]);
         break;
       case 'P':
         getAccesses('', '/others', 'L');
-        setData([]);
         break;
       default:
         console.log('Tipo de búsqueda no válido:', typeSearch);
         break;
     }
+    set_TypeSearch(typeSearch);
   }, [typeSearch]);
 
   // Filtrar la data según el término de búsqueda
@@ -106,6 +110,26 @@ const Home = () => {
     setCode(null);
   };
 
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(isAndroid());
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
   return (
     <>
       <Layout
@@ -141,7 +165,7 @@ const Home = () => {
             value={search}
             style={{marginBottom: 8}}
           />
-          {(typeSearch === 'A' || typeSearch === 'I') && (
+          {(_typeSearch === 'A' || _typeSearch === 'I') && (
             <Accesses
               data={filteredData}
               reload={() =>
@@ -152,13 +176,15 @@ const Home = () => {
                 )
               }
               setDataID={setDataID}
+              loaded={loaded}
             />
           )}
-          {typeSearch === 'P' && (
+          {_typeSearch === 'P' && (
             <Orders
               data={filteredData}
               reload={() => getAccesses(search, '/others', 'L')}
               setDataID={setDataID}
+              loaded={loaded}
             />
           )}
         </View>
@@ -185,10 +211,12 @@ const Home = () => {
           />
         )}
       </Layout>
-      <DropdawnAccess
-        onPressQr={() => setOpenQr(true)}
-        onPressCiNom={() => setOpenCiNom(true)}
-      />
+      {!isKeyboardVisible && (
+        <DropdawnAccess
+          onPressQr={() => setOpenQr(true)}
+          onPressCiNom={() => setOpenCiNom(true)}
+        />
+      )}
     </>
   );
 };

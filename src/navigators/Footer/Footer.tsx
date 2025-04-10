@@ -10,6 +10,7 @@ import {
   // IconEvent,
   IconHome,
   IconKey,
+  IconNovedades,
   IconPending,
   // IconRed,
   // IconSurveys,
@@ -59,12 +60,12 @@ const Footer = ({styles}: any) => {
       />
       <ItemFoot
         path="History"
-        text="Actividad"
+        text="Historial"
         icon={IconHistorial}
         isActived={(store?.nSurveys || 0) > 0}
       />
 
-      <ItemFoot path="feedback" text="Feedback" icon={IconFeedBack} />
+      <ItemFoot path="Binnacle" text="Bitácora" icon={IconNovedades} />
       {/* <ItemFoot
         path="activity"
         text="Actividades"
@@ -83,7 +84,7 @@ const theme: ThemeType = {
     // borderTopLeftRadius: 12,
     // borderTopRightRadius: 12,
     borderTopColor: cssVar.cBlackV2,
-    borderTopWidth: 11,
+    borderTopWidth: 2,
     width: '100%',
     bottom: 0,
   },

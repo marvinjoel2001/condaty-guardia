@@ -3,22 +3,35 @@ import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
 import {
   IconAlert,
   IconDocs,
+  IconFacebook,
+  IconHistorial,
   IconHome,
+  IconInstagram,
+  IconLinkedin,
   IconLogout,
+  IconNotification,
   IconNovedades,
+  IconTikTok,
   IconUser,
+  IconYoutube,
 } from '../../icons/IconLibrary';
 import useAuth from '../../../mk/hooks/useAuth';
 import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import ItemMenu from './ItemMenu';
-import {getActivePage} from '../../../mk/utils/utils';
+import {getActivePage, openLink} from '../../../mk/utils/utils';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import {useNavigation} from '@react-navigation/native';
+import Icon from '../../../mk/components/ui/Icon/Icon';
 
 const MainMenu = ({navigation}: DrawerContentComponentProps) => {
   const {logout, user} = useAuth();
   const activeItem = getActivePage(navigation);
+
+  // const navigateTo = (screen: string) => {
+  //   navigation.navigate(screen);
+  // };
   const handleLogout = () => {
     Alert.alert('', '¿Cerrar la sesión de tu cuenta?', [
       {
@@ -29,27 +42,33 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
       {text: 'Salir', style: 'destructive', onPress: () => logout()},
     ]);
   };
-
-  return (
-    <View style={theme.container}>
+  const Head = () => {
+    const navigationn: any = useNavigation();
+    return (
       <ItemList
         title={getFullName(user)}
+        onPress={() => navigationn.navigate('Profile')}
         style={{backgroundColor: 'transparent'}}
         subtitle={'Guardia'}
         left={
           <Avatar
             name={getFullName(user)}
+            onClick={() => navigationn.navigate('Profile')}
             src={getUrlImages(
               '/GUARD-' + user?.id + '.webp?d=' + user?.updated_at,
             )}
             style={theme.avatar}
-            circle={false}
-             w={62}
-             h={62}
+            w={62}
+            h={62}
           />
         }
       />
+    );
+  };
 
+  return (
+    <View style={theme.container}>
+      <Head />
       <View style={theme.content}>
         <ScrollView>
           <ItemMenu
@@ -86,21 +105,75 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             color={cssVar.cWhiteV2}
           />
           <ItemMenu
+            screen="Notifications"
+            text="Notificaciones"
+            icon={IconNotification}
+            activeItem={activeItem}
+            reverse
+            color={cssVar.cWhiteV2}
+          />
+          <ItemMenu
+            screen="History"
+            text="Historial"
+            icon={IconHistorial}
+            activeItem={activeItem}
+            reverse
+            color={cssVar.cWhiteV2}
+          />
+          <ItemMenu
             screen="Documents"
             text="Documentos"
             icon={IconDocs}
             activeItem={activeItem}
             color={cssVar.cWhiteV2}
           />
+          <ItemMenu
+            text="Cerrar sesión"
+            onPress={() => handleLogout()}
+            icon={IconLogout}
+            color={cssVar.cError}
+            colorText={cssVar.cError}
+          />
         </ScrollView>
       </View>
-      <ItemMenu
-        text="Cerrar sesión"
-        onPress={() => handleLogout()}
-        icon={IconLogout}
-        color={cssVar.cError}
-        colorText={cssVar.cError}
-      />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          paddingVertical: cssVar.spM,
+          borderTopWidth: 1,
+          borderTopColor: cssVar.cBlackV2,
+        }}>
+        <Icon
+          name={IconFacebook}
+          color={cssVar.cWhiteV2}
+          onPress={() => openLink('https://www.facebook.com/condaty.bo')}
+        />
+        <Icon
+          name={IconInstagram}
+          color={cssVar.cWhiteV2}
+          onPress={() => openLink('https://www.instagram.com/condaty.bo')}
+        />
+        <Icon
+          name={IconTikTok}
+          color={cssVar.cWhiteV2}
+          onPress={() => openLink('https://www.tiktok.com/@condaty.bo')}
+        />
+        <Icon
+          name={IconYoutube}
+          color={cssVar.cWhiteV2}
+          onPress={() =>
+            openLink('https://www.youtube.com/channel/UCoMKYylu7j4gg9hoyHexV-A')
+          }
+        />
+        <Icon
+          name={IconLinkedin}
+          color={cssVar.cWhiteV2}
+          onPress={() =>
+            openLink('https://www.linkedin.com/in/condaty-by-fos-54a58627a/')
+          }
+        />
+      </View>
     </View>
   );
 };

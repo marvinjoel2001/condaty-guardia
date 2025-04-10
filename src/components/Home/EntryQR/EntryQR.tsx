@@ -18,7 +18,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
   const [openSelected, setOpenSelected] = useState(false);
   const [errors, setErrors] = useState({});
-  const [data, setData]: any = useState([]);
+  const [data, setData]: any = useState(null);
   const {execute} = useApi();
   const {showToast} = useAuth();
   const type = code[2];
@@ -201,11 +201,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     );
     if (In?.success == true) {
       if (reload) reload();
-      // if (formState.contactsSelectedOut?.length > 0) {
-      //   showToast('El visitante salió', 'success');
-      // } else {
       showToast('Registrado con éxito', 'success');
-      // }
       setFormState({});
       onClose();
     } else {
@@ -214,7 +210,6 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     }
   };
 
-  console.log(formState);
   return (
     <ModalFull
       title={
@@ -226,7 +221,9 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         formState?.access_id ? onOut() : onSaveAccess();
       }}
       buttonCancel=""
-      buttonText={!openSelected && type == 'G' ? '' : 'Continuar'}>
+      buttonText={
+        (!openSelected && type == 'G') || data?.status == 'X' ? '' : 'Continuar'
+      }>
       {type === 'I' && (
         <IndividualQR
           setFormState={setFormState}

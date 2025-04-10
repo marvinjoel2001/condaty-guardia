@@ -3,6 +3,7 @@ import {Text, View, ScrollView, Dimensions, Platform} from 'react-native';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
 // import Loading from '../../../../src/components/Animations/Loading';
 import React from 'react';
+import Skeleton from '../Skeleton/Skeleton';
 
 interface PropsType {
   data: any;
@@ -14,8 +15,8 @@ interface PropsType {
   refreshing?: boolean;
   style?: TypeStyles;
   emptyLabel?: React.ReactNode; // Puede ser string, componente o elemento JSX
-  typeLoading?: 'loading' | 'skeleton';
-  skeletonType?: 'media' | 'survey' | 'event' | 'activity';
+  // typeLoading?: 'access' | 'list'|"detail";
+  skeletonType?: 'access' | 'list' | 'detail';
 }
 
 const List = (props: PropsType) => {
@@ -29,8 +30,8 @@ const List = (props: PropsType) => {
     refreshing,
     style,
     emptyLabel = 'No hay datos', // valor por defecto
-    typeLoading = 'loading',
-    skeletonType = 'media',
+    // typeLoading = '',
+    skeletonType = 'list',
   } = props;
 
   const screen = Dimensions.get('window');
@@ -54,7 +55,10 @@ const List = (props: PropsType) => {
       //   skeletonType={skeletonType}
       //   title="Cargando..."
       // />
-      <Text>Cargando...</Text>
+      <Skeleton
+        type={skeletonType}
+        // skeletonType={skeletonType}
+      />
     );
   }
 

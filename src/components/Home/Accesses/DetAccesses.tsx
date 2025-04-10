@@ -17,6 +17,7 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import ItemListDate from './shares/ItemListDate';
 import {IconCheck, IconCheckOff} from '../../../icons/IconLibrary';
 import useAuth from '../../../../mk/hooks/useAuth';
+import Loading from '../../../../mk/components/ui/Loading/Loading';
 
 const DetAccesses = ({id, open, close, reload}: any) => {
   const {showToast} = useAuth();
@@ -60,11 +61,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   // console.log(data,'data dataaaa')
   const handleSave = async () => {
     const status = getStatus();
-   if(status === 'C' ){
-    // Si está completado, significa que todos han salido
-    close();
-    return;
-   }
+    if (status === 'C') {
+      // Si está completado, significa que todos han salido
+      close();
+      return;
+    }
     //  console.log('status desde save',acompanSelect)
     if (status === 'I') {
       if (Object.values(acompanSelect).every(value => !value)) {
@@ -126,12 +127,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (!_data?.in_at && !_data?.out_at && !_data?.confirm_at) return 'S';
     if (!_data?.in_at && !_data?.out_at && _data.confirm) return _data.confirm;
     if (_data?.in_at && !_data?.out_at) return 'I';
-    
+
     // Verificar si el visitante principal y todos los acompañantes han salido
     if (_data?.out_at) {
       // Si no hay acompañantes, está completado
       if (!_data?.accesses || _data.accesses.length === 0) return 'C';
-      
+
       // Verificar que todos los acompañantes hayan salido
       const todosHanSalido = _data.accesses.every((acomp: any) => acomp.out_at);
       return todosHanSalido ? 'C' : 'I';
@@ -261,15 +262,18 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const detailVisit = (data: any) => {
     const isSelected = acompanSelect[data?.id || '0'];
     return (
-       <ItemList
+      <ItemList
         key={data?.visit?.id}
         title={getFullName(data?.visit)}
         subtitle={'C.I. ' + data?.visit?.ci}
         left={<Avatar name={getFullName(data?.visit)} />}
-        right={ data?.out_at || status === 'Y' ?null:  getCheckVisit(data, isSelected) }
+        right={
+          data?.out_at || status === 'Y'
+            ? null
+            : getCheckVisit(data, isSelected)
+        }
         date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
       />
-
     );
   };
 
@@ -314,16 +318,20 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       onSave={handleSave}
       // buttonCancel={getStatus() === 'C' ? '' : 'cancelar'}
       buttonText={getButtonText()}>
-      <Card>
-        {cardDetail()}
-        {/* visita */}
-        <Text style={styles.labelAccess}>Visita</Text>
-        {detailVisit(data)}
-        {/* Lista de acompañantes */}
-        {detailCompanions()}
-        {/* Mostrar textarea según la acción (botón) */}
-        {getObs()}
-      </Card>
+      {!data ? (
+        <Loading />
+      ) : (
+        <Card>
+          {cardDetail()}
+          {/* visita */}
+          <Text style={styles.labelAccess}>Visita</Text>
+          {detailVisit(data)}
+          {/* Lista de acompañantes */}
+          {detailCompanions()}
+          {/* Mostrar textarea según la acción (botón) */}
+          {getObs()}
+        </Card>
+      )}
     </ModalFull>
   );
 };
@@ -335,11 +343,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: FONTS.light,
   },
-  labelAccess:{
-    color: cssVar.cWhite, 
-    marginVertical: 10
-  }
-  
+  labelAccess: {
+    color: cssVar.cWhite,
+    marginVertical: 10,
+  },
 });
 
 export default DetAccesses;

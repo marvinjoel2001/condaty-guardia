@@ -25,23 +25,23 @@ const InputFullName = ({
   disabled = false,
   styleInputs = {},
   style = {},
-  inputGrid = true,
+  inputGrid = false,
   onBlur = (e: any) => {},
 }: PropsType) => {
   const _onChange = (name: string, value: any) => {
-    value = (value + ' ').split(' ')[0];
+    // Eliminar todos los espacios del valor ingresado
+    value = value.replace(/\s+/g, '');
     handleChangeInput(name, value);
   };
 
   const container = inputGrid ? styles.container : {};
   const input1 = inputGrid ? styles.input1 : {};
-  const input2 = inputGrid? styles.input2 : {};
-
+  const input2 = inputGrid ? styles.input2 : {};
 
   return (
     <>
-    <View  style={container}>
-          <View style={input1}>    
+      <View style={container}>
+        <View style={input1}>
           <Input
             label="Primer nombre"
             type="text"
@@ -68,11 +68,9 @@ const InputFullName = ({
             disabled={disabled}
             onBlur={() => onBlur('middle_name' + prefijo)}
             value={formState['middle_name' + prefijo]}
-            onChange={(value: any) =>
-              handleChangeInput('middle_name' + prefijo, value)
-            }
+            onChange={(value: any) => _onChange('middle_name' + prefijo, value)}
           />
-          </View>
+        </View>
       </View>
       <View style={container}>
           <View style={input1}>
@@ -87,9 +85,7 @@ const InputFullName = ({
                 onBlur={() => onBlur('last_name' + prefijo)}
                 disabled={disabled}
                 value={formState['last_name' + prefijo]}
-                onChange={(value: any) =>
-                  handleChangeInput('last_name' + prefijo, value)
-                }
+                onChange={(value: any) => _onChange('last_name' + prefijo, value)}
               />
               </View>
    <View style={input2}>
@@ -104,9 +100,7 @@ const InputFullName = ({
         onBlur={() => onBlur('mother_last_name' + prefijo)}
         disabled={disabled}
         value={formState['mother_last_name' + prefijo]}
-        onChange={(value: any) =>
-          handleChangeInput('mother_last_name' + prefijo, value)
-        }
+        onChange={(value: any) => _onChange('mother_last_name' + prefijo, value)}
       />
       </View>
       </View>
@@ -116,7 +110,7 @@ const InputFullName = ({
 
 export default InputFullName;
 
-const styles=StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -127,6 +121,5 @@ const styles=StyleSheet.create({
   },
   input2: {
     width: '47%',
-  }
-
+  },
 });

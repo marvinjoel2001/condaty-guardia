@@ -46,10 +46,7 @@ const Avatar = ({
   fontSize = cssVar.sM,
   sizeIconVerify = 16,
   verify = false,
-  sizeIconDiamond = 20,
-  bottomDiamond = -6,
-  level,
-  circle= true,
+  circle = true,
   borderColor = 'transparent', // Valor por defecto para el borde
   borderWidth = 0, // Valor por defecto para el grosor del borde
 }: AvatarProps) => {
@@ -84,7 +81,7 @@ const Avatar = ({
             style={{
               width: w,
               height: h,
-              borderRadius:circle ? w / 2 : 0, // Asegurar que la imagen sea circular
+              borderRadius: circle ? w / 2 : 0, // Asegurar que la imagen sea circular
             }}
             resizeMode="cover"
             onError={e => {
@@ -111,28 +108,7 @@ const Avatar = ({
           />
         )}
       </TouchableOpacity>
-      {level && (
-        <ImageBackground
-          source={require('../../../../src/images/ImageLevel.png')}
-          style={{
-            height: sizeIconDiamond,
-            width: sizeIconDiamond,
-            position: 'absolute',
-            bottom: bottomDiamond,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          resizeMode="cover">
-          <Text
-            style={{
-              fontFamily: FONTS.bold,
-              color: cssVar.cWhite,
-              fontSize: sizeIconDiamond / 2,
-            }}>
-            {level}
-          </Text>
-        </ImageBackground>
-      )}
+
       {/* {verify && (
         <Icon
           name={IconVerify}

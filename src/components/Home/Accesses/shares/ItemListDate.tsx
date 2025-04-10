@@ -16,13 +16,13 @@ const ItemListDate = ({inDate = null, outDate = null}: PropsType) => {
         {inDate && (
           <View style={styles.center}>
             <Icon size={20} name={IconArrowRight} color={cssVar.cSuccess} />
-            <Text style={styles.fecha}>{getDateTimeStrMes(inDate)}</Text>
+            <Text style={styles.fecha}>{getDateTimeStrMes(inDate, true)}</Text>
           </View>
         )}
         {outDate && (
           <View style={styles.center}>
             <Icon size={20} name={IconArrowLeft} color={cssVar.cError} />
-            <Text style={styles.fecha}>{getDateTimeStrMes(outDate)}</Text>
+            <Text style={styles.fecha}>{getDateTimeStrMes(outDate, true)}</Text>
           </View>
         )}
       </View>

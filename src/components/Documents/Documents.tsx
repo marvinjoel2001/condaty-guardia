@@ -1,27 +1,20 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import List from '../../../mk/components/ui/List/List';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import useApi from '../../../mk/hooks/useApi';
-import {Linking, TouchableOpacity, View} from 'react-native';
+import {Linking, View} from 'react-native';
 import {getUrlImages} from '../../../mk/utils/strings';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-
-import {
-  IconDOC,
-  IconEXE,
-  IconJPG,
-  IconPDF,
-  IconPNG,
-  IconZIP,
-} from '../../icons/IconLibrary';
-import { cssVar } from '../../../mk/styles/themes';
+import {IconDOC, IconEXE, IconJPG, IconPDF} from '../../icons/IconLibrary';
+import {cssVar} from '../../../mk/styles/themes';
 
 const Documents = () => {
   const [tab, setTab] = useState('TO');
   const [search, setSearch] = useState('');
+  const [dataFilter, setDataFilter] = useState([]);
   const {
     data: documents,
     loaded,
@@ -54,7 +47,13 @@ const Documents = () => {
     if (ext.includes('pdf')) return 'pdf';
     if (ext.includes('doc')) return 'doc';
     if (ext.includes('xls')) return 'xls';
-    if (ext.includes('jpg') || ext.includes('jpeg') || ext.includes('webp') || ext.includes('png')) return 'jpg';
+    if (
+      ext.includes('jpg') ||
+      ext.includes('jpeg') ||
+      ext.includes('webp') ||
+      ext.includes('png')
+    )
+      return 'jpg';
     if (ext.includes('exe')) return 'exe';
     return ext;
   };
@@ -69,18 +68,17 @@ const Documents = () => {
 
     // Obtener el tipo de archivo normalizado
     const fileType = getFileType(document.ext.toLowerCase());
-    
-    // Filtrar por tab seleccionado
-    if (
-      !(
-        tab === 'TO' || // Todo
-        (tab === 'PD' && fileType === 'pdf') ||
-        (tab === 'EX' && fileType === 'xls') ||
-        (tab === 'DO' && fileType === 'doc') ||
-        (tab === 'JP' && fileType === 'jpg')
-      )
-    )
-      return null;
+
+    // if (
+    //   !(
+    //     tab === 'TO' || // Todo
+    //     (tab === 'PD' && fileType === 'pdf') ||
+    //     (tab === 'EX' && fileType === 'xls') ||
+    //     (tab === 'DO' && fileType === 'doc') ||
+    //     (tab === 'JP' && fileType === 'jpg')
+    //   )
+    // )
+    //   return null;
 
     return (
       <ItemList
@@ -107,7 +105,6 @@ const Documents = () => {
                   ? IconDOC
                   : fileType === 'exe'
                   ? IconEXE
-
                   : fileType === 'jpg'
                   ? IconJPG
                   : IconPDF
@@ -119,6 +116,32 @@ const Documents = () => {
       />
     );
   };
+
+  useEffect(() => {
+    if (tab === 'TO') {
+      setDataFilter(documents?.data);
+    }
+    if (tab === 'PD') {
+      setDataFilter(
+        documents?.data.filter((document: any) => document.ext === 'pdf'),
+      );
+    }
+    if (tab === 'DO') {
+      setDataFilter(
+        documents?.data.filter((document: any) => document.ext === 'doc'),
+      );
+    }
+    if (tab === 'EX') {
+      setDataFilter(
+        documents?.data.filter((document: any) => document.ext === 'xls'),
+      );
+    }
+    if (tab === 'JP') {
+      setDataFilter(
+        documents?.data.filter((document: any) => document.ext === 'jpg'),
+      );
+    }
+  }, [tab, documents?.data]);
 
   return (
     <Layout title="Documentos" refresh={() => reload()}>
@@ -141,7 +164,7 @@ const Documents = () => {
           value={search}
         />
         <List
-          data={documents?.data}
+          data={dataFilter}
           renderItem={DocumentList}
           refreshing={!loaded}
         />

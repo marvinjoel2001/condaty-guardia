@@ -12,7 +12,7 @@ import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {buttonPrimary, buttonSecondary} from '../Accesses/shares/styles';
 
-const Orders = ({data, reload, setDataID}: any) => {
+const Orders = ({data, reload, setDataID, loaded}: any) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
 
@@ -116,13 +116,7 @@ const Orders = ({data, reload, setDataID}: any) => {
 
   return (
     <>
-      {data?.length === 0 ? (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text>Aquí se verá tu lista</Text>
-        </View>
-      ) : (
-        <List data={data} renderItem={renderItemOrder} />
-      )}
+      <List data={data} renderItem={renderItemOrder} refreshing={loaded} />
 
       {openDetail && (
         <DetOrders

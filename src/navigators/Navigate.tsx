@@ -7,6 +7,7 @@ import Alerts from '../components/Alerts/Alerts';
 import Binnacle from '../components/Binnacle/Binnacle';
 import Notifications from '../components/Notifications/Notifications';
 import Documents from '../components/Documents/Documents';
+import History from '../components/History/History';
 
 const Stack = createNativeStackNavigator();
 
@@ -61,6 +62,13 @@ const Navigate = () => {
       <Stack.Screen
         name="Documents"
         component={Documents}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="History"
+        component={History}
         options={{
           headerShown: false,
         }}

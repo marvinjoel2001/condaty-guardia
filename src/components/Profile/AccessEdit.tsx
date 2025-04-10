@@ -71,6 +71,12 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
         key: 'newPassword',
         errors,
       });
+      errors = checkRules({
+        value: formState.repPassword,
+        rules: ['required', 'same:newPassword'],
+        key: 'repPassword',
+        errors,
+      });
     }
 
     setErrors(errors);

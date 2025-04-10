@@ -1,11 +1,11 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View, RefreshControl, Text} from 'react-native';
+import {View, RefreshControl, Text, Keyboard} from 'react-native';
 import Animated from 'react-native-reanimated';
 import HeadTitle from './HeadTitle';
 import {cssVar, ThemeType, TypeStyles} from '../../styles/themes';
 import {useRoute} from '@react-navigation/native';
 import useAuth from '../../hooks/useAuth';
-import {logPerformance} from '../../utils/utils';
+import {isAndroid, logPerformance} from '../../utils/utils';
 import Footer from '../../../src/navigators/Footer/Footer';
 import {useEvent} from '../../hooks/useEvent';
 
@@ -77,12 +77,37 @@ const Layout = (props: PropsType) => {
   }, [store?.scrollTop]);
 
   const isRoute = () => {
-    if (route.name === 'Home' || route.name === 'Alerts') {
+    if (
+      route.name === 'Home' ||
+      route.name === 'Alerts' ||
+      route.name === 'History' ||
+      route.name === 'Binnacle'
+    ) {
       return true;
     }
     return false;
   };
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(isAndroid());
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
   return (
     <View style={[theme.layout]} onTouchEnd={onPress}>
       {/* <Animated.View style={isRoute() ? {...animatedHeaderStyle} : {}}> */}
@@ -118,7 +143,7 @@ const Layout = (props: PropsType) => {
               ...style,
               // paddingTop: isRoute() ? 50 : 0,
             }}
-            contentContainerStyle={{paddingBottom: isRoute() ? 70 : 0}}
+            contentContainerStyle={{paddingBottom: isRoute() ? 60 : 0}}
             // onScroll={scrollHandler}
             // scrollEventThrottle={16}
             refreshControl={
@@ -143,7 +168,7 @@ const Layout = (props: PropsType) => {
         )}
       </View>
 
-      {isRoute() && <Footer />}
+      {isRoute() && !isKeyboardVisible && <Footer />}
       {/* <Footer /> */}
 
       {/* {configApp.API_URL != configApp.API_URL_PROD && <PerformanceMonitor />} */}
