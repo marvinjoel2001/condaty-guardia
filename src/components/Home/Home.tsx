@@ -211,7 +211,7 @@ const Home = () => {
       </Layout>
       {!isKeyboardVisible && (
         <DropdawnAccess
-          onPressQr={() => setOpenQr(true)}
+          onPressQr={() => {setOpenQr(true);setTypeSearch("I")}}
           onPressCiNom={() => setOpenCiNom(true)}
         />
       )}
