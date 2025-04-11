@@ -157,6 +157,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     setDetails({data: data});
   };
 
+  const user = data?.visit ? data?.visit : data?.owner;
   return (
     <ModalFull title={'Detalle de acceso'} open={open} onClose={onClose}>
       {!data ? (
@@ -171,12 +172,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               marginVertical: 10,
               color: cssVar.cWhite,
             }}>
-            Visitante
+            {data?.visit ? 'Visita' : 'Residente'}
           </Text>
           <ItemList
-            title={getFullName(data?.visit)}
-            subtitle={'C.I. ' + data?.visit?.ci}
-            left={<Avatar name={getFullName(data?.visit)} />}
+            title={getFullName(user)}
+            subtitle={'C.I. ' + user?.ci}
+            left={<Avatar name={getFullName(user)} />}
             children={<DateAccess access={data} />}
           />
           {data?.accesses?.length > 0 && (
