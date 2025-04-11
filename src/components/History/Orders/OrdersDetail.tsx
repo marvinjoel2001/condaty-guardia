@@ -34,31 +34,31 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
   const _onDetail = (item: any) => {
     const data: ItemInfoType[] = [];
     data.push({
-      l: 'Tipo de acceso',
+      l: 'Tipo de acceso:',
       v: 'Pedido-' + item?.other_type.name,
     });
 
     data.push({
-      l: 'Descripción',
+      l: 'Descripción:',
       v: item?.descrip,
     });
     data.push({
-      l: 'Entregó a',
+      l: 'Entregó a:',
       v: getFullName(item?.owner),
     });
     data.push({
-      l: 'Guardia de entrada',
+      l: 'Guardia de entrada:',
       v: getFullName(item?.access?.guardia),
     });
     if (item?.access.out_guard) {
       data.push({
-        l: 'Guardia de salida',
+        l: 'Guardia de salida:',
         v: getFullName(item?.access?.out_guard),
       });
     }
     if (item?.access?.plate) {
       data.push({
-        l: 'Placa',
+        l: 'Placa:',
         v: item?.access?.plate,
       });
     }

@@ -75,7 +75,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         ? 'Por Entrar'
         : 'Denegado';
       data.push({
-        l: 'Estado',
+        l: 'Estado:',
         v: v,
         sv: {
           color: v == 'Denegado' ? cssVar.cError : cssVar.cWhite,
@@ -83,7 +83,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       });
 
       data.push({
-        l: 'Tipo de acceso',
+        l: 'Tipo de acceso:',
         v:
           item?.type == 'P'
             ? 'Pedido-' + item?.other?.other_type.name
@@ -97,18 +97,18 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       });
       if (item?.type === 'I' || item?.type === 'G') {
         if (item.type === 'G') {
-          data.push({l: 'Evento', v: item.invitation?.title});
+          data.push({l: 'Evento:', v: item.invitation?.title});
         }
         data.push({
-          l: 'Fecha de invitación',
+          l: 'Fecha de invitación:',
           v: getDateStrMes(item.invitation?.date_event),
         });
 
         item.invitation?.obs &&
-          data.push({l: 'Descripción', v: item.invitation?.obs});
+          data.push({l: 'Descripción:', v: item.invitation?.obs});
       }
       if (item?.type == 'P') {
-        data.push({l: 'Conductor', v: getFullName(item.visit)});
+        data.push({l: 'Conductor:', v: getFullName(item.visit)});
       } else {
         // data.push({l: "Visitante", v: item?.visit?.name});
       }
@@ -116,25 +116,25 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       if (item?.plate && !item.taxi) data.push({l: 'Placa', v: item.plate});
 
       if (item?.in_at && item.out_at) {
-        data.push({l: 'Visitó a', v: getFullName(item?.owner)});
+        data.push({l: 'Visitó a:', v: getFullName(item?.owner)});
       } else {
-        data.push({l: 'Visita a', v: getFullName(item?.owner)});
+        data.push({l: 'Visita a:', v: getFullName(item?.owner)});
       }
 
       if (v == 'Denegado') {
         data.push({
-          l: 'Fecha de denegación',
+          l: 'Fecha de denegación:',
           v: getDateStrMes(item?.confirm_at),
         });
-        data.push({l: 'Motivo', v: item?.obs_confirm});
+        data.push({l: 'Motivo:', v: item?.obs_confirm});
       }
 
       if (item?.out_at) {
-        data.push({l: 'Guardia de entrada', v: getFullName(item?.guardia)});
+        data.push({l: 'Guardia de entrada:', v: getFullName(item?.guardia)});
         item?.out_guard &&
           item?.guardia?.id != item?.out_guard?.id &&
           data.push({
-            l: 'Guardia de salida',
+            l: 'Guardia de salida:',
             v: getFullName(item?.out_guard),
           });
         (item?.obs_in ||
@@ -143,14 +143,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           item?.obs_guard) &&
           item?.obs_guard;
         item?.obs_guard &&
-          data.push({l: 'Obs. de solicitud', v: item?.obs_guard});
-        item?.obs_in && data.push({l: 'Obs. de entrada', v: item?.obs_in});
-        item?.obs_out && data.push({l: 'Obs. de salida', v: item?.obs_out});
+          data.push({l: 'Obs. de solicitud:', v: item?.obs_guard});
+        item?.obs_in && data.push({l: 'Obs. de entrada:', v: item?.obs_in});
+        item?.obs_out && data.push({l: 'Obs. de salida:', v: item?.obs_out});
       } else {
         (item?.obs_in || item?.obs_out || item?.obs_confirm) && item?.obs_in
-          ? data.push({l: 'Obs. de entrada', v: item?.obs_in})
+          ? data.push({l: 'Obs. de entrada:', v: item?.obs_in})
           : item?.obs_out
-          ? data.push({l: 'Obs. de salida', v: item?.obs_out})
+          ? data.push({l: 'Obs. de salida:', v: item?.obs_out})
           : '';
       }
     }

@@ -4,6 +4,7 @@ import Select from '../../../mk/components/forms/Select/Select';
 import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
 import useApi from '../../../mk/hooks/useApi';
 import useAuth from '../../../mk/hooks/useAuth';
+import { cssVar } from '../../../mk/styles/themes';
 
 type PropsType = {
   open: boolean;
@@ -65,6 +66,9 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
         error={errors}
         required
         name="level"
+        style={{
+          paddingTop: cssVar.spM,
+        }}
         options={[
           {id: 1, name: 'Bajo - Solo guardias'},
           {id: 2, name: 'Medio - Solo administradores y guardias'},
