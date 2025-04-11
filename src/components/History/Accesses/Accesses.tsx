@@ -22,11 +22,14 @@ const Accesses = ({data, loaded}: Props) => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const renderItem = (item: any) => {
+    console.log("mi item",item)
+    let user = item?.visit ? item?.visit : item?.owner;
+    const subTitle = item.type == "O" ? "Llave QR" : 'Visitó a ' + getFullName(item?.owner);
     if (search && search !== '') {
       if (
-        item?.visit?.name?.toLowerCase()?.includes(search?.toLowerCase()) ===
+        item.name?.toLowerCase()?.includes(search?.toLowerCase()) ===
           false &&
-        item?.visit?.last_name
+        item?.last_name
           ?.toLowerCase()
           ?.includes(search?.toLowerCase()) === false
       ) {
@@ -41,10 +44,10 @@ const Accesses = ({data, loaded}: Props) => {
             id: item?.access_id ? item?.access_id : item.id,
           });
         }}
-        key={item.id}
-        title={getFullName(item?.visit)}
-        subtitle={'Visitó a ' + getFullName(item?.owner)}
-        left={<Avatar name={getFullName(item?.visit)} />}
+        key={item?.id}
+        title={getFullName(user)}
+        subtitle={subTitle}
+        left={<Avatar name={getFullName(user)} />}
         children={<DateAccess access={item} />}
       />
     );
