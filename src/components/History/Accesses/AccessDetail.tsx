@@ -158,6 +158,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
   };
 
   const user = data?.visit ? data?.visit : data?.owner;
+  const typeLabels: Record<'O' | 'P' | 'I' | 'G', string> = {
+    O: 'Residente',
+    P: 'Repartidor',
+    I: 'Visitante individual',
+    G: 'Visitante grupal',
+  };
+  
+  const type = typeLabels[data?.type as 'O' | 'P' | 'I' | 'G'] || '';
   return (
     <ModalFull title={'Detalle de acceso'} open={open} onClose={onClose}>
       {!data ? (
@@ -172,7 +180,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               marginVertical: 10,
               color: cssVar.cWhite,
             }}>
-            {data?.visit ? 'Visita' : 'Residente'}
+            {type}
           </Text>
           <ItemList
             title={getFullName(user)}

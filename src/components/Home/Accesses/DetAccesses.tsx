@@ -188,7 +188,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           <LineDetail label="Placa:" value={data?.plate} />
         )}
         <LineDetail
-          label={data?.in_at && data?.out_at ? 'Visitó a' : 'Visita a'}
+          label={data?.in_at && data?.out_at ? 'Visitó a:' : 'Visita a:'}
           value={getFullName(data?.owner)}
         />
         {status === 'Denegado' && (
@@ -314,7 +314,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     return null;
   };
 
-  console.log(data)
+  const typeLabels: Record<'O' | 'P' | 'I' | 'G', string> = {
+    O: 'Residente',
+    P: 'Repartidor',
+    I: 'Visitante individual',
+    G: 'Visitante grupal',
+  };
+  
+  const type = typeLabels[data?.type as 'O' | 'P' | 'I' | 'G'] || '';
+
+  // let type = 
   return (
     <ModalFull
       onClose={close}
@@ -329,7 +338,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         <Card>
           {cardDetail()}
           {/* visita */}
-          <Text style={styles.labelAccess}>{data.type == "O" ? "Residente" : "Visita"}</Text>
+          <Text style={styles.labelAccess}>{type}</Text>
           {detailVisit(data)}
           {/* Lista de acompañantes */}
           {detailCompanions()}

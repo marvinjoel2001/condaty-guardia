@@ -173,9 +173,9 @@ const DetOrders = ({id, open, close, reload}: any) => {
     const status = getStatus();
     return (
       <>
-        <LineDetail label="Estado" value={getAccessStatus(data)} />
+        <LineDetail label="Estado:" value={getAccessStatus(data)} />
         <LineDetail
-          label="Tipo de pedido"
+          label="Tipo de pedido:"
           value={
             data?.type === 'P'
               ? 'Pedido-' + (data?.other?.otherType?.name || '')
@@ -184,13 +184,13 @@ const DetOrders = ({id, open, close, reload}: any) => {
         />
         {/* Si es un pedido de Taxi, por ejemplo, podrías mostrar el nombre del conductor */}
         {data?.other?.otherType?.name === 'Taxi' && (
-          <LineDetail label="Conductor" value={getFullName(data?.visit)} />
+          <LineDetail label="Conductor:" value={getFullName(data?.visit)} />
         )}
-        {data?.plate && <LineDetail label="Placa" value={data?.plate} />}
-        <LineDetail label="Entregó a" value={getFullName(data?.owner)} />
+        {data?.plate && <LineDetail label="Placa:" value={data?.plate} />}
+        <LineDetail label="Entregó a:" value={getFullName(data?.owner)} />
         {status === 'C' && data?.obs_confirm && (
           <>
-            <LineDetail label="Observación" value={data?.obs_confirm} />
+            <LineDetail label="Observación:" value={data?.obs_confirm} />
           </>
         )}
       </>
