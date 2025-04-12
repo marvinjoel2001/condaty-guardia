@@ -9,6 +9,7 @@ import {useFocusEffect} from '@react-navigation/native';
 
 const History = () => {
   const [tab, setTab] = useState('A');
+  const [_tab, set_tab] = useState('A');
   const [data, setData]: any = useState([]);
   const {execute} = useApi();
   const [loaded, setLoaded] = useState(false);
@@ -51,6 +52,7 @@ const History = () => {
         console.log('Tipo de búsqueda no válido:', tab);
         break;
     }
+    set_tab(tab);
   }, [tab]);
   return (
     <Layout
@@ -74,9 +76,9 @@ const History = () => {
         setSel={setTab}
       />
 
-      {tab === 'A' && <Accesses data={data} loaded={loaded} />}
-      {tab === 'I' && <Invitations data={data} loaded={loaded} />}
-      {tab === 'P' && <Orders data={data} loaded={loaded} />}
+      {_tab === 'A' && <Accesses data={data} loaded={loaded} />}
+      {_tab === 'I' && <Invitations data={data} loaded={loaded} />}
+      {_tab === 'P' && <Orders data={data} loaded={loaded} />}
     </Layout>
   );
 };

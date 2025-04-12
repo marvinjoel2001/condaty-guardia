@@ -40,22 +40,18 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     let id = codeId.replace(ltime, '');
     id = id.replace(ltime - 4, '');
 
-    const {data: QR} = await execute(
-      '/owners',
-      'GET',
-      {
-        searchBy: id,
-        fullType: 'KEY',
-      },
-      false,
-      3,
-    );
+    const {data: QR} = await execute('/owners', 'GET', {
+      searchBy: id,
+      fullType: 'KEY',
+    });
     if (QR?.success == true) {
       setData({
         invitation: QR?.data[0],
         type: 'O',
         status,
       });
+    } else {
+      onClose();
     }
   };
   const getInvitation = async () => {
@@ -110,20 +106,33 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     if (type == 'I' || type == 'G') {
       errors = checkRules({
         value: formState.ci,
-        rules: ['required'],
+        rules: ['required', 'ci'],
         key: 'ci',
         errors,
       });
       errors = checkRules({
         value: formState.name,
-        rules: ['required'],
+        rules: ['required', 'alpha'],
         key: 'name',
         errors,
       });
       errors = checkRules({
+        value: formState.middle_name,
+        rules: ['alpha'],
+        key: 'middle_name',
+        errors,
+      });
+
+      errors = checkRules({
         value: formState.last_name,
-        rules: ['required'],
+        rules: ['required', 'alpha'],
         key: 'last_name',
+        errors,
+      });
+      errors = checkRules({
+        value: formState.mother_last_name,
+        rules: ['alpha'],
+        key: 'mother_last_name',
         errors,
       });
       if (formState?.tab == 'V' || formState?.tab == 'T') {
@@ -142,14 +151,27 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           });
           errors = checkRules({
             value: formState.name_taxi,
-            rules: ['required'],
+            rules: ['required', 'alpha'],
             key: 'name_taxi',
+            errors,
+          });
+
+          errors = checkRules({
+            value: formState.middle_name_taxi,
+            rules: ['alpha'],
+            key: 'middle_name_taxi',
             errors,
           });
           errors = checkRules({
             value: formState.last_name_taxi,
-            rules: ['required'],
+            rules: ['required', 'alpha'],
             key: 'last_name_taxi',
+            errors,
+          });
+          errors = checkRules({
+            value: formState.mother_last_name_taxi,
+            rules: ['alpha'],
+            key: 'mother_last_name_taxi',
             errors,
           });
         }

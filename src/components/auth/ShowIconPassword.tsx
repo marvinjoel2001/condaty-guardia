@@ -22,12 +22,10 @@ export const InputPassworAndRepeat = ({
   return (
     <View>
       <Input
-        label="Nuevo PIN"
+        label="Nueva contraseña"
         name="newPassword"
         required
         password={showPassword}
-        maxLength={15}
-        keyboardType="numeric"
         error={errors}
         value={formState?.newPassword}
         onChange={(value: any) => handleInputChange('newPassword', value)}
@@ -36,27 +34,25 @@ export const InputPassworAndRepeat = ({
             <Icon
               onPress={() => togglePasswordVisibility()}
               name={IconEyeOff}
-              fillStroke={cssVar.cBlackV2}
+              fillStroke={cssVar.cWhiteV2}
               color={'transparent'}
             />
           ) : (
             <Icon
               onPress={() => togglePasswordVisibility()}
               name={IconEye}
-              color={cssVar.cBlackV2}
+              color={cssVar.cWhiteV2}
             />
           )
         }
       />
       <Input
-        label="Repetir nuevo PIN"
+        label="Repetir nuevo contraseña"
         name="repPassword"
         required
         password={showPassword}
         error={errors}
-        maxLength={15}
         value={formState?.repPassword}
-        keyboardType="numeric"
         onChange={(value: any) => handleInputChange('repPassword', value)}
         iconRight={
           showPassword ? (

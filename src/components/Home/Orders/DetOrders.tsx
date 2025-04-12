@@ -80,14 +80,28 @@ const DetOrders = ({id, open, close, reload}: any) => {
     });
     errors = checkRules({
       value: formState.name,
-      rules: ['required'],
+      rules: ['required', 'alpha'],
       key: 'name',
       errors,
     });
+
+    errors = checkRules({
+      value: formState.middle_name,
+      rules: ['alpha'],
+      key: 'middle_name',
+      errors,
+    });
+
     errors = checkRules({
       value: formState.last_name,
-      rules: ['required'],
+      rules: ['required', 'alpha'],
       key: 'last_name',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.mother_last_name,
+      rules: ['alpha'],
+      key: 'mother_last_name',
       errors,
     });
     if (formState?.tab == 'V') {
@@ -159,9 +173,9 @@ const DetOrders = ({id, open, close, reload}: any) => {
     const status = getStatus();
     return (
       <>
-        <LineDetail label="Estado" value={getAccessStatus(data)} />
+        <LineDetail label="Estado:" value={getAccessStatus(data)} />
         <LineDetail
-          label="Tipo de pedido"
+          label="Tipo de pedido:"
           value={
             data?.type === 'P'
               ? 'Pedido-' + (data?.other?.otherType?.name || '')
@@ -170,16 +184,15 @@ const DetOrders = ({id, open, close, reload}: any) => {
         />
         {/* Si es un pedido de Taxi, por ejemplo, podrías mostrar el nombre del conductor */}
         {data?.other?.otherType?.name === 'Taxi' && (
-          <LineDetail label="Conductor" value={getFullName(data?.visit)} />
+          <LineDetail label="Conductor:" value={getFullName(data?.visit)} />
         )}
-        {data?.plate && <LineDetail label="Placa" value={data?.plate} />}
-        <LineDetail label="Entregó a" value={getFullName(data?.owner)} />
+        {data?.plate && <LineDetail label="Placa:" value={data?.plate} />}
+        <LineDetail label="Entregó a:" value={getFullName(data?.owner)} />
         {status === 'C' && data?.obs_confirm && (
           <>
-            <LineDetail label="Observación" value={data?.obs_confirm} />
+            <LineDetail label="Observación:" value={data?.obs_confirm} />
           </>
         )}
-      
       </>
     );
   };
