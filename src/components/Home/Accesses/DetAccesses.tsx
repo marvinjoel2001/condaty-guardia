@@ -153,7 +153,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     const buttonTexts: Record<string, string> = {
       I: 'Dejar salir',
       Y: 'Dejar entrar',
-      S: 'Esperando Confirmacion',
+      S: '',
       C: '',
     };
     return buttonTexts[status] || '';
