@@ -10,6 +10,8 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DateAccess from '../DateAccess/DateAccess';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+import {Text} from 'react-native';
+import { cssVar } from '../../../../mk/styles/themes';
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -77,6 +79,16 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
     }
   }, [data]);
 
+  // const typeLabels: Record<'O' | 'P' | 'I' | 'G', string> = {
+  //   O: 'Residente',
+  //   P: 'Repartidor',
+  //   I: 'Visitante individual',
+  //   G: 'Visitante grupal',
+  // };
+
+  // const type = typeLabels[data?.type as 'O' | 'P' | 'I' | 'G'] || '';
+
+  // console.log("mi data un OrderDetails", data)
   return (
     <ModalFull title={'Detalle de pedido'} open={open} onClose={onClose}>
       {!data ? (
@@ -84,6 +96,15 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
       ) : (
         <>
           <ItemInfo type="C" details={details} />
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: 'bold',
+                marginVertical: 10,
+                color: cssVar.cWhite,
+              }}>
+                Repartidor
+            </Text>
           <ItemList
             title={getFullName(data?.access?.visit)}
             subtitle={'C.I. ' + data?.access?.visit?.ci}
