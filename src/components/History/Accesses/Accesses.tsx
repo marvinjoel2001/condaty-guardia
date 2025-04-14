@@ -27,9 +27,9 @@ const Accesses = ({data, loaded}: Props) => {
     const subTitle = item.type == "O" ? "Llave QR" : 'Visitó a ' + getFullName(item?.owner);
     if (search && search !== '') {
       if (
-        item.name?.toLowerCase()?.includes(search?.toLowerCase()) ===
+        user.name?.toLowerCase()?.includes(search?.toLowerCase()) ===
           false &&
-        item?.last_name
+        user?.last_name
           ?.toLowerCase()
           ?.includes(search?.toLowerCase()) === false
       ) {
