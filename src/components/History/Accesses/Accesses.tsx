@@ -10,7 +10,7 @@ import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 import {openLink} from '../../../../mk/utils/utils';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDownload, IconExport} from '../../../icons/IconLibrary';
+import {IconDownload} from '../../../icons/IconLibrary';
 import {cssVar} from '../../../../mk/styles/themes';
 
 type Props = {
@@ -22,16 +22,15 @@ const Accesses = ({data, loaded}: Props) => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const renderItem = (item: any) => {
-    console.log("mi item",item)
     let user = item?.visit ? item?.visit : item?.owner;
-    const subTitle = item.type == "O" ? "Llave QR" : 'Visitó a ' + getFullName(item?.owner);
+    const subTitle =
+      item.type == 'O' ? 'Llave QR' : 'Visitó a ' + getFullName(item?.owner);
+
     if (search && search !== '') {
       if (
-        user.name?.toLowerCase()?.includes(search?.toLowerCase()) ===
-          false &&
-        user?.last_name
-          ?.toLowerCase()
-          ?.includes(search?.toLowerCase()) === false
+        user.name?.toLowerCase()?.includes(search?.toLowerCase()) === false &&
+        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) ===
+          false
       ) {
         return null;
       }
@@ -47,7 +46,18 @@ const Accesses = ({data, loaded}: Props) => {
         key={item?.id}
         title={getFullName(user)}
         subtitle={subTitle}
-        left={<Avatar name={getFullName(user)} />}
+        left={
+          <Avatar
+            name={getFullName(user)}
+            src={
+              !item?.visit
+                ? getUrlImages(
+                    '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
+                  )
+                : ''
+            }
+          />
+        }
         children={<DateAccess access={item} />}
       />
     );
