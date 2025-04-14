@@ -103,7 +103,7 @@ const Accesses = ({data, reload, setDataID, loaded}: any) => {
 
   const subtitle = (item: any) => {
     if (item.type === 'O') {
-      return 'uso LLAVE VIRTUAL QR';
+      return 'USO LLAVE VIRTUAL QR';
     }
     let prefix = 'Visitó a: ';
     if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {

@@ -55,51 +55,51 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
   const _onDetail = (item: any) => {
     const data: ItemInfoType[] = [];
     data.push({
-      l: 'Tipo de acceso',
+      l: 'Tipo de acceso:',
       v: item?.type === 'G' ? 'QR Grupal' : 'QR Individual',
     });
     if (item?.type === 'G') {
       data.push({
-        l: 'Evento',
+        l: 'Evento:',
         v: item?.title,
       });
     }
     data.push({
-      l: 'Fecha de invitación',
+      l: 'Fecha de invitación:',
       v: getDateStrMes(item?.date_event),
     });
     data.push({
-      l: item?.type === 'G' ? 'Visitaron a' : 'Visitó a',
+      l: item?.type === 'G' ? 'Visitaron a:' : 'Visitó a:',
       v: getFullName(item?.owner),
     });
     if (item?.type === 'I') {
       if (item?.access[0]?.plate) {
         data.push({
-          l: 'Placa',
+          l: 'Placa:',
           v: item?.access[0]?.plate,
         });
       }
       data.push({
         l: item?.access[0]?.out_guard
-          ? 'Guardia de entrada'
-          : 'Guardia de entrada y salida',
+          ? 'Guardia de entrada:'
+          : 'Guardia de entrada y salida:',
         v: getFullName(item?.access[0]?.guardia),
       });
       if (item?.access[0]?.out_guard) {
         data.push({
-          l: 'Guardia de salida',
+          l: 'Guardia de salida:',
           v: getFullName(item?.access[0]?.out_guard),
         });
       }
       if (item?.access[0]?.obs_in) {
         data.push({
-          l: 'Observación de entrada',
+          l: 'Observación de entrada:',
           v: item?.access[0]?.obs_in,
         });
       }
       if (item?.access[0]?.obs_out) {
         data.push({
-          l: 'Observación de salida',
+          l: 'Observación de salida:',
           v: item?.access[0]?.obs_out,
         });
       }

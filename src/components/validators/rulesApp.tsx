@@ -15,11 +15,10 @@ export const validBetweenDate: ValidFunctionType = (value, param) => {
 };
 
 export const validPassword: ValidFunctionType = (value, param) => {
-  let [min, max]: any = param;
-  if (!min) min = 4;
-  if (!max) max = 10;
-  const error = 'El PIN debe tener entre ' + min + ' y ' + max + ' caracteres';
-  return value.length < min || value.length > max ? error : '';
+  if (!value || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value)) {
+    return 'Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número';
+  }
+  return '';
 };
 
 export const validCi: ValidFunctionType = (value, param) => {

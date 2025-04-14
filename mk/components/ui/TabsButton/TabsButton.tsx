@@ -32,8 +32,9 @@ const TabsButtons = ({
         ...style,
       }}>
       <ScrollView
-        horizontal
+        horizontal={true}
         showsHorizontalScrollIndicator={false}
+        bounces={false}
         contentContainerStyle={{
           alignItems: 'center',
           flexDirection: 'row',

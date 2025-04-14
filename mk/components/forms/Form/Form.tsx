@@ -18,7 +18,6 @@ interface PropsType {
   behaviorIos?: 'position' | 'padding';
   contentContainerStyle?: TypeStyles;
 }
-
 const Form = ({
   children,
   style = {},
@@ -28,26 +27,18 @@ const Form = ({
   keyboardVerticalOffset = 0,
   contentContainerStyle = {},
 }: PropsType) => {
+  const Wrapper: any = hideKeyboard ? TouchableWithoutFeedback : View;
+
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={keyboardVerticalOffset}
       behavior={Platform.OS === 'ios' ? behaviorIos : behaviorAndroid}
-      style={{flex: 1, ...style}}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          flexGrow: 1,
-          ...contentContainerStyle,
-        }}>
-        {hideKeyboard ? (
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={{flex: 1}}>{children}</View>
-          </TouchableWithoutFeedback>
-        ) : (
-          <View style={{flex: 1}}>{children}</View>
-        )}
-      </ScrollView>
+      style={[{flex: 1}, style]}>
+      <Wrapper
+        {...(hideKeyboard && {onPress: Keyboard.dismiss})}
+        style={{flex: 1}}>
+        <SafeAreaView style={{flex: 1}}>{children}</SafeAreaView>
+      </Wrapper>
     </KeyboardAvoidingView>
   );
 };

@@ -7,7 +7,6 @@ import Accesses from './Accesses/Accesses';
 import Orders from './Orders/Orders';
 import DropdawnAccess from './DropdawnAccess/DropdawnAccess';
 import CameraQr from './CameraQr/CameraQr';
-
 import {ThemeContext} from '../../../mk/contexts/ThemeContext';
 import useApi from '../../../mk/hooks/useApi';
 import {cssVar} from '../../../mk/styles/themes';
@@ -17,14 +16,13 @@ import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
 import {isAndroid} from '../../../mk/utils/utils';
-import {getUTCNow} from '../../../mk/utils/dates';
 
 const Home = () => {
   const {user} = useAuth();
   const [openQr, setOpenQr] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
   const [code, setCode]: any = useState(null);
-  const [showEntryQR, setShowEntryQR] = useState(false); // Add this state
+  const [showEntryQR, setShowEntryQR] = useState(false);
   const [data, setData]: any = useState([]);
   const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
@@ -213,7 +211,7 @@ const Home = () => {
       </Layout>
       {!isKeyboardVisible && (
         <DropdawnAccess
-          onPressQr={() => setOpenQr(true)}
+          onPressQr={() => {setOpenQr(true);setTypeSearch("I")}}
           onPressCiNom={() => setOpenCiNom(true)}
         />
       )}

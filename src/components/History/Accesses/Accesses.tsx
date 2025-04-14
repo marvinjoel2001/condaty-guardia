@@ -1,20 +1,41 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import {getFullName} from '../../../../mk/utils/strings';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import List from '../../../../mk/components/ui/List/List';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
 import useApi from '../../../../mk/hooks/useApi';
+import DataSearch from '../../../../mk/components/ui/DataSearch';
+import {openLink} from '../../../../mk/utils/utils';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
+import {IconDownload, IconExport} from '../../../icons/IconLibrary';
+import {cssVar} from '../../../../mk/styles/themes';
 
 type Props = {
   data: any;
   loaded: boolean;
 };
 const Accesses = ({data, loaded}: Props) => {
+  const {execute} = useApi();
+  const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const renderItem = (item: any) => {
+    console.log("mi item",item)
+    let user = item?.visit ? item?.visit : item?.owner;
+    const subTitle = item.type == "O" ? "Llave QR" : 'Visitó a ' + getFullName(item?.owner);
+    if (search && search !== '') {
+      if (
+        item.name?.toLowerCase()?.includes(search?.toLowerCase()) ===
+          false &&
+        item?.last_name
+          ?.toLowerCase()
+          ?.includes(search?.toLowerCase()) === false
+      ) {
+        return null;
+      }
+    }
     return (
       <ItemList
         onPress={() => {
@@ -23,17 +44,53 @@ const Accesses = ({data, loaded}: Props) => {
             id: item?.access_id ? item?.access_id : item.id,
           });
         }}
-        key={item.id}
-        title={getFullName(item?.visit)}
-        subtitle={'Visitó a ' + getFullName(item?.owner)}
-        left={<Avatar name={getFullName(item?.visit)} />}
+        key={item?.id}
+        title={getFullName(user)}
+        subtitle={subTitle}
+        left={<Avatar name={getFullName(user)} />}
         children={<DateAccess access={item} />}
       />
     );
   };
+  const onSearch = (value: string) => {
+    setSearch(value);
+  };
+
+  const onExport = async () => {
+    const {data: file} = await execute('/accesses', 'GET', {
+      perPage: -1,
+      page: 1,
+      fullType: 'L',
+      section: 'ACT',
+      _export: 'pdf',
+    });
+    if (file?.success == true) {
+      openLink(getUrlImages('/' + file?.data.path));
+    }
+  };
 
   return (
     <View style={{paddingHorizontal: 16}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 8,
+        }}>
+        <DataSearch
+          setSearch={(value: string) => onSearch(value)}
+          name="accesses"
+          value={search}
+          style={{flex: 1}}
+        />
+        <Icon
+          name={IconDownload}
+          onPress={onExport}
+          fillStroke={cssVar.cWhiteV2}
+          color={'transparent'}
+        />
+      </View>
       <List
         data={data}
         renderItem={renderItem}

@@ -471,7 +471,7 @@ const DetailAccess = ({
 
           {details.buttonText == 'Dejar entrar' && (
             <TextArea
-              label="Observaciones de Entrada"
+              label="Observaciones de Entrada:"
               name="obs_in"
               value={formState?.obs_in}
               onChange={value => handleInputChange('obs_in', value)}
@@ -480,7 +480,7 @@ const DetailAccess = ({
           )}
           {details.buttonText == 'Dejar salir' && (
             <TextArea
-              label="Observaciones de Salida"
+              label="Observaciones de Salida:"
               name="obs_out"
               value={formState?.obs_out}
               onChange={value => handleInputChange('obs_out', value)}

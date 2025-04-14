@@ -12,12 +12,10 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getFullName} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
-import SelectTransport from './shared/SelectTransport';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import {IconAlert, IconX} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {onExist} from '../../../../mk/utils/dbtools';
 import {TouchableOpacity} from 'react-native';
 import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
 import {getUTCNow} from '../../../../mk/utils/dates';
@@ -129,20 +127,32 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     let errors: any = {};
     errors = checkRules({
       value: formState.ci,
-      rules: ['required'],
+      rules: ['required', 'ci'],
       key: 'ci',
       errors,
     });
     if (steps > 0) {
       errors = checkRules({
-        value: formState.name,
+        value: formState.owner_id,
         rules: ['required'],
+        key: 'owner_id',
+        errors,
+      });
+      errors = checkRules({
+        value: formState.name,
+        rules: ['required', 'alpha'],
         key: 'name',
         errors,
       });
       errors = checkRules({
+        value: formState.middle_name,
+        rules: ['alpha'],
+        key: 'middle_name',
+        errors,
+      });
+      errors = checkRules({
         value: formState.last_name,
-        rules: ['required'],
+        rules: ['required', 'alpha'],
         key: 'last_name',
         errors,
       });
@@ -169,14 +179,28 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           });
           errors = checkRules({
             value: formState.name_taxi,
-            rules: ['required'],
+            rules: ['required', 'alpha'],
             key: 'name_taxi',
             errors,
           });
+
+          errors = checkRules({
+            value: formState.middle_name_taxi,
+            rules: ['alpha'],
+            key: 'middle_name_taxi',
+            errors,
+          });
+
           errors = checkRules({
             value: formState.last_name_taxi,
-            rules: ['required'],
+            rules: ['required', 'alpha'],
             key: 'last_name_taxi',
+            errors,
+          });
+          errors = checkRules({
+            value: formState.mother_last_name_taxi,
+            rules: ['alpha'],
+            key: 'mother_last_name_taxi',
             errors,
           });
         }
@@ -293,6 +317,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           />
         )}
         <Select
+          filter
           label="¿A quién visita?"
           placeholder="¿A quién visita?"
           name="owner_id"
@@ -305,6 +330,9 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
           optionLabel="name"
           height={300}
           search={true}
+          style={{
+            paddingTop: cssVar.spM,
+          }}
         />
         {visit.length === 0 && steps === 0 && (
           <Input

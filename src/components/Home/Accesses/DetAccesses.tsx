@@ -154,7 +154,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       I: 'Dejar salir',
       Y: 'Dejar entrar',
       S: 'Esperando Confirmacion',
-      C: 'Completado',
+      C: '',
     };
     return buttonTexts[status] || '';
   };
@@ -165,69 +165,69 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     const status = getStatus();
     return (
       <>
-        <LineDetail label="Estado" value={statusText} />
-        <LineDetail label="Tipo" value={accessType} />
+        <LineDetail label="Estado:" value={statusText || 'Completado'} />
+        <LineDetail label="Tipo:" value={accessType} />
         {(data?.type === 'I' || data?.type === 'G') && data?.invitation && (
           <>
             {data?.type === 'G' && data?.invitation?.title && (
-              <LineDetail label="Evento" value={data?.invitation?.title} />
+              <LineDetail label="Evento:" value={data?.invitation?.title} />
             )}
             <LineDetail
-              label="Fecha de invitación"
+              label="Fecha de invitación:"
               value={getDateStrMes(data?.invitation?.date_event)}
             />
             {data?.invitation?.obs && (
-              <LineDetail label="Descripción" value={data?.invitation?.obs} />
+              <LineDetail label="Descripción:" value={data?.invitation?.obs} />
             )}
           </>
         )}
         {data?.type === 'P' && (
-          <LineDetail label="Conductor" value={getFullName(data?.visit)} />
+          <LineDetail label="Conductor:" value={getFullName(data?.visit)} />
         )}
         {data?.plate && !data?.taxi && (
-          <LineDetail label="Placa" value={data?.plate} />
+          <LineDetail label="Placa:" value={data?.plate} />
         )}
         <LineDetail
-          label={data?.in_at && data?.out_at ? 'Visitó a' : 'Visita a'}
+          label={data?.in_at && data?.out_at ? 'Visitó a:' : 'Visita a:'}
           value={getFullName(data?.owner)}
         />
         {status === 'Denegado' && (
           <>
             <LineDetail
-              label="Fecha de denegación"
+              label="Fecha de denegación:"
               value={getDateStrMes(data?.confirm_at)}
             />
-            <LineDetail label="Motivo" value={data?.obs_confirm} />
+            <LineDetail label="Motivo:" value={data?.obs_confirm} />
           </>
         )}
         {data?.out_at ? (
           <>
             <LineDetail
-              label="Guardia de entrada"
+              label="Guardia de entrada:"
               value={getFullName(data?.guardia)}
             />
             {data?.out_guard && data?.guardia?.id !== data?.out_guard?.id && (
               <LineDetail
-                label="Guardia de salida"
+                label="Guardia de salida:"
                 value={getFullName(data?.out_guard)}
               />
             )}
             {data?.obs_guard && (
-              <LineDetail label="Obs. de solicitud" value={data?.obs_guard} />
+              <LineDetail label="Obs. de solicitud:" value={data?.obs_guard} />
             )}
             {data?.obs_in && (
-              <LineDetail label="Obs. de entrada" value={data?.obs_in} />
+              <LineDetail label="Obs. de entrada:" value={data?.obs_in} />
             )}
             {data?.obs_out && (
-              <LineDetail label="Obs. de salida" value={data?.obs_out} />
+              <LineDetail label="Obs. de salida:" value={data?.obs_out} />
             )}
           </>
         ) : (
           <>
             {data?.obs_in ? (
-              <LineDetail label="Obs. de entrada" value={data?.obs_in} />
+              <LineDetail label="Obs. de entrada:" value={data?.obs_in} />
             ) : data?.obs_out ? (
-              <LineDetail label="Obs. de salida" value={data?.obs_out} />
+              <LineDetail label="Obs. de salida:" value={data?.obs_out} />
             ) : null}
           </>
         )}
@@ -260,13 +260,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
 
   const detailVisit = (data: any) => {
+    let visit = data.visit ? data.visit : data.owner;
+  
+    console.log(data)
     const isSelected = acompanSelect[data?.id || '0'];
     return (
       <ItemList
         key={data?.visit?.id}
-        title={getFullName(data?.visit)}
-        subtitle={'C.I. ' + data?.visit?.ci}
-        left={<Avatar name={getFullName(data?.visit)} />}
+        title={getFullName(visit)}
+        subtitle={'C.I. ' + visit?.ci}
+        left={<Avatar name={getFullName(visit)} />}
         right={
           data?.out_at || status === 'Y'
             ? null
@@ -276,6 +279,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       />
     );
   };
+
 
   const detailCompanions = () => {
     if (data?.accesses?.length == 0) return null;
@@ -310,6 +314,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     return null;
   };
 
+  const typeLabels: Record<'O' | 'P' | 'I' | 'G', string> = {
+    O: 'Residente',
+    P: 'Repartidor',
+    I: 'Visitante individual',
+    G: 'Visitante grupal',
+  };
+  
+  const type = typeLabels[data?.type as 'O' | 'P' | 'I' | 'G'] || '';
+
+  // let type = 
   return (
     <ModalFull
       onClose={close}
@@ -324,7 +338,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         <Card>
           {cardDetail()}
           {/* visita */}
-          <Text style={styles.labelAccess}>Visita</Text>
+          <Text style={styles.labelAccess}>{type}</Text>
           {detailVisit(data)}
           {/* Lista de acompañantes */}
           {detailCompanions()}

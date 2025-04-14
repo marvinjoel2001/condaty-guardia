@@ -52,7 +52,9 @@ export const TextArea = (props: PropsType) => {
           testID={props.name}
           id={props.name}
           style={styleInput}
-          onFocus={() => setIsFocused(true)}
+          onFocus={e => {
+            setIsFocused(true), props.onFocus && props.onFocus(e);
+          }}
           onBlur={_onBlur}
           returnKeyType="none"
           onChangeText={handleTextChange}
