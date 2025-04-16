@@ -66,6 +66,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
       sortBy: 'name',
       orderBy: 'asc',
       searchBy: '',
+      fullType: 'L',
     },
     3,
     true,
