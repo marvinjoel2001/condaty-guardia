@@ -14,8 +14,10 @@ import {
   IconDelivery,
   IconOther,
   IconRejectVisit,
+  IconSend,
   IconSesionDel,
   IconTaxi,
+  IconVisit,
 } from '../../icons/IconLibrary';
 import {TouchableOpacity, View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
@@ -62,6 +64,7 @@ const Notifications = () => {
     const left = (data: any) => {
       let image = '';
       let name = '';
+      console.log("mis notificaciones para alert test",data)
       if (data.info?.act == 'alerts') {
         return (
           <Icon
@@ -135,6 +138,34 @@ const Notifications = () => {
           />
         );
       }
+      if (data.info?.act == 'in-visitQ') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+              transform: [{rotateY: '180deg'}]
+            }}
+            color={cssVar.cSuccess}
+            name={IconVisit}
+          />
+        );
+      }
+      if (data.info?.act == 'out-visit') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            color={cssVar.cError}
+            name={IconVisit}
+          />
+        );
+      }
+
       return <Avatar src={image} name={name} />;
     };
     return (
@@ -185,6 +216,7 @@ const Notifications = () => {
     );
   }, [tab, notifs?.data]);
 
+  console.log("mis datos filtrados",dataFilter)
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
       <TabsButtons
