@@ -27,7 +27,7 @@ const DateAccess = ({access}: Props) => {
             color: cssVar.cWhiteV2,
             fontSize: 12,
           }}>
-          {getDateTimeStrMes(access?.in_at, true)}
+          {getDateTimeStrMes(access?.in_at, true) || 'No ha ingresado'}
         </Text>
       </View>
       <View
