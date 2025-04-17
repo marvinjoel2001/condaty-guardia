@@ -14,13 +14,18 @@ import {
   IconDelivery,
   IconOther,
   IconRejectVisit,
+  IconSend,
   IconSesionDel,
   IconTaxi,
+  IconVehicle,
+  IconVisit,
 } from '../../icons/IconLibrary';
 import {TouchableOpacity, View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import {getDateTimeStrMes, getNow} from '../../../mk/utils/dates';
+import {useEvent} from '../../../mk/hooks/useEvent';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Notifications = () => {
   const [tab, setTab] = useState('T');
@@ -37,6 +42,14 @@ const Notifications = () => {
     loaded,
     reload,
   } = useApi('/notifications', 'GET', params);
+
+  const {dispatch}: any = useEvent('onResetNotif');
+  useFocusEffect(
+    React.useCallback(() => {
+      reload();
+      dispatch('hola');
+    }, []),
+  );
 
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
@@ -59,9 +72,13 @@ const Notifications = () => {
     // )
     //   return null;
 
+    /// ---------------------------------------------------------------------------------------
+    ///  REVISAR LOS ICONOS SE HIZO UN PARCHE PARA LOS SVG DE LOS ICONOS PONER LOS ADECUADOS
+    ///---------------------------------------------------------------------------------------
     const left = (data: any) => {
       let image = '';
       let name = '';
+      console.log('mis notificaciones para alert test', data);
       if (data.info?.act == 'alerts') {
         return (
           <Icon
@@ -135,8 +152,80 @@ const Notifications = () => {
           />
         );
       }
+      if (data.info?.act == 'in-visitQ') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+              transform: [{rotateY: '180deg'}],
+            }}
+            color={cssVar.cSuccess}
+            name={IconVisit}
+          />
+        );
+      }
+      if (data.info?.act == 'out-visit') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            color={cssVar.cError}
+            name={IconVisit}
+          />
+        );
+      }
+      if (data.info?.act == 'new-visit') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            color={cssVar.cSuccess}
+            name={IconVehicle}
+          />
+        );
+      }
+      if (data.info?.act == 'in-visitG') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            // fillStroke={cssVar.cError}
+            fillStroke={cssVar.cSuccess}
+            color={'transparent'}
+            name={IconConfirmVisit}
+          />
+        );
+      }
+      if (data.info?.act == 'in-visit') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            // fillStroke={cssVar.cError}
+            fillStroke={cssVar.cSuccess}
+            color={'transparent'}
+            name={IconConfirmVisit}
+          />
+        );
+      }
+
       return <Avatar src={image} name={name} />;
     };
+    const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
     return (
       <TouchableOpacity
       // onPress={() => {
@@ -145,8 +234,8 @@ const Notifications = () => {
       >
         <ItemList
           //   style={read ? {opacity: 0.5} : {}}
-          title={data.msg?.title}
-          subtitle={data.msg?.body}
+          title={msg?.title}
+          subtitle={msg?.body}
           date={getDateTimeStrMes(notifi.created_at)}
           widthMain="70%"
           left={left(data)}></ItemList>
@@ -185,6 +274,8 @@ const Notifications = () => {
     );
   }, [tab, notifs?.data]);
 
+console.log("mi loaded",loaded)
+console.log("mi notifi",notifs)
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
       <TabsButtons
@@ -202,7 +293,7 @@ const Notifications = () => {
       <View style={{padding: cssVar.spL, gap: cssVar.spL}}>
         <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
-        <List data={dataFilter} renderItem={NotifisList} refreshing={!loaded} />
+        <List data={dataFilter} renderItem={NotifisList} refreshing={!loaded} skeletonType='list'/>
       </View>
     </Layout>
   );

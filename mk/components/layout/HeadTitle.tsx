@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {TouchableOpacity, View, Text, Animated} from 'react-native';
 import Icon from '../ui/Icon/Icon';
@@ -13,6 +13,7 @@ import useAuth from '../../hooks/useAuth';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
 import {getPercentajeUser, navigate} from '../../utils/utils';
 import TextLog from '../ui/TextLog/TextLog';
+import {useEvent} from '../../hooks/useEvent';
 
 interface HeadTitleProps {
   title: string;
@@ -37,7 +38,19 @@ const HeadTitle = ({
 }: HeadTitleProps) => {
   const navigation: any = useNavigation();
   const route = useRoute();
-  const {user} = useAuth();
+
+  const [counter, setCounter] = useState(0);
+
+  const onNotif = useCallback((data: any) => {
+    console.log('nueva counter', data);
+    setCounter(old => old + 1);
+  }, []);
+  const onResetNotif = useCallback((data: any) => {
+    console.log('nueva counter', data);
+    setCounter(0);
+  }, []);
+  useEvent('onNotif', onNotif);
+  useEvent('onResetNotif', onResetNotif);
 
   const goBack = () => {
     if (onBack) {
@@ -102,6 +115,14 @@ const HeadTitle = ({
           }}
           onTouchEnd={() => navigation.navigate('Notifications')}>
           <Icon name={IconNotification} color={cssVar.cBlack} />
+          {counter > 0 && (
+            <View style={theme.notifPoint}>
+              <Text style={theme.notifPointNumber}>
+                {' '}
+                {counter > 99 ? '99+' : counter}
+              </Text>
+            </View>
+          )}
         </View>
       )}
     </Animated.View>
@@ -159,5 +180,22 @@ const theme: ThemeType = {
     fontSize: cssVar.sXs,
     fontFamily: FONTS.bold,
     color: cssVar.cWhite,
+  },
+  notifPoint: {
+    position: 'absolute',
+    top: -5,
+    right: -8,
+    borderRadius: 100,
+    backgroundColor: cssVar.cError,
+    width: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  notifPointNumber: {
+    fontSize: cssVar.sXs,
+    fontFamily: FONTS.bold,
+    color: cssVar.cWhite,
+    textAlign: 'center',
   },
 };

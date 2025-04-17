@@ -1,4 +1,10 @@
-import React, {useEffect, useState, useContext, useMemo} from 'react';
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useMemo,
+  useCallback,
+} from 'react';
 import {StyleSheet, View, Text, Keyboard} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
@@ -16,6 +22,7 @@ import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
 import {isAndroid} from '../../../mk/utils/utils';
+import {useEvent} from '../../../mk/hooks/useEvent';
 
 const Home = () => {
   const {user} = useAuth();
@@ -31,6 +38,37 @@ const Home = () => {
   const {theme} = useContext(ThemeContext);
   const {execute} = useApi();
   const [loaded, setLoaded] = useState(false);
+
+  const reloadNotif = (type: string) => {
+    if (type === 'I' && typeSearch === 'I') {
+      getAccesses('', '/accesses', 'P');
+    }
+    if (type === 'P' && typeSearch === 'P') {
+      getAccesses('', '/others', 'L');
+    }
+  };
+
+  const onNotif = useCallback((data: any) => {
+    if (
+      data?.event === 'out-visit' ||
+      data?.event === 'in-visitQ' ||
+      data?.event === 'in-visit' ||
+      data?.event === 'in-visitG' ||
+      data?.event === 'confirm' ||
+      data?.event === 'new-visit'
+    ) {
+      reloadNotif('I');
+    }
+
+    if (
+      data?.event === 'in-pedido' ||
+      data?.event === 'out-visit' ||
+      data?.event === '"new-visit"'
+    ) {
+      reloadNotif('P');
+    }
+  }, []);
+  useEvent('onNotif', onNotif);
 
   // Función que obtiene la data según el tipo de búsqueda
   const getAccesses = async (
@@ -128,6 +166,7 @@ const Home = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
   return (
     <>
       <Layout
@@ -206,12 +245,16 @@ const Home = () => {
             open={openCiNom}
             onClose={() => setOpenCiNom(false)}
             // setCode={setCode}
+            reload={() => getAccesses('', '/accesses', 'P')}
           />
         )}
       </Layout>
       {!isKeyboardVisible && (
         <DropdawnAccess
-          onPressQr={() => {setOpenQr(true);setTypeSearch("I")}}
+          onPressQr={() => {
+            setOpenQr(true);
+            setTypeSearch('I');
+          }}
           onPressCiNom={() => setOpenCiNom(true)}
         />
       )}

@@ -25,9 +25,10 @@ import InputFullName from '../../../../mk/components/forms/InputFullName/InputFu
 interface CiNomModalProps {
   open: boolean;
   onClose: () => void;
+  reload: any;
 }
 
-const CiNomModal = ({open, onClose}: CiNomModalProps) => {
+const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   const {user, showToast} = useAuth();
   const [visit, setVisit]: any = useState([]);
   const [formState, setFormState]: any = useState({});
@@ -66,6 +67,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
       sortBy: 'name',
       orderBy: 'asc',
       searchBy: '',
+      fullType: 'L',
     },
     3,
     true,
@@ -75,7 +77,12 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     if (owners?.data) {
       const newOwners = owners?.data.map((owner: any) => ({
         ...owner,
-        name: getFullName(owner),
+        name:
+          getFullName(owner) +
+          ' - ' +
+          owner?.dpto[0]?.nro +
+          ' - ' +
+          owner?.dpto[0]?.type?.name,
       }));
       setDataOwners(newOwners);
     }
@@ -230,6 +237,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     if (data?.success === true) {
       onClose();
       // Removed reload call since reload is not defined in the component scope
+      reload();
       showToast('Notificación enviada', 'success');
     } else {
       showToast(data?.message, 'error');
