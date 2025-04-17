@@ -77,7 +77,12 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     if (owners?.data) {
       const newOwners = owners?.data.map((owner: any) => ({
         ...owner,
-        name: getFullName(owner),
+        name:
+          getFullName(owner) +
+          ' - ' +
+          owner?.dpto[0]?.nro +
+          ' - ' +
+          owner?.dpto[0]?.type?.name,
       }));
       setDataOwners(newOwners);
     }
