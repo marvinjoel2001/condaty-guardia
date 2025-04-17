@@ -274,7 +274,8 @@ const Notifications = () => {
     );
   }, [tab, notifs?.data]);
 
-  console.log('mis datos filtrados', dataFilter);
+console.log("mi loaded",loaded)
+console.log("mi notifi",notifs)
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
       <TabsButtons
@@ -292,7 +293,7 @@ const Notifications = () => {
       <View style={{padding: cssVar.spL, gap: cssVar.spL}}>
         <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
-        <List data={dataFilter} renderItem={NotifisList} refreshing={!loaded} />
+        <List data={dataFilter} renderItem={NotifisList} refreshing={!loaded} skeletonType='list'/>
       </View>
     </Layout>
   );
