@@ -49,13 +49,13 @@ const Home = () => {
   };
 
   const onNotif = useCallback((data: any) => {
-    console.log(typeSearch);
     if (
       data?.event === 'out-visit' ||
       data?.event === 'in-visitQ' ||
       data?.event === 'in-visit' ||
       data?.event === 'in-visitG' ||
-      data?.event === 'confirm'
+      data?.event === 'confirm' ||
+      data?.event === 'new-visit'
     ) {
       reloadNotif('I');
     }

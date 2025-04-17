@@ -110,9 +110,12 @@ const InitProject = () => {
       showToast('¡Un pedido está en espera!', 'info');
     }
     if (data?.event === 'out-visit') {
-      // let accesType = info.type === 'P' ? 'pedido' : 'visitante';
-      // showToast(`Su ${accesType} ${info.name} ya salió del condominio`, 'info');
-      showToast('¡Un visitante salió del condominio!', 'info');
+      let text =
+        data.payload.type === 'P'
+          ? '¡Un pedido salió del condominio!'
+          : '¡Un visitante salió del condominio!';
+
+      showToast(text, 'info');
     }
     if (data?.event === 'confirm') {
       showToast('¡Una visita fue confirmada!', 'success');
