@@ -39,6 +39,37 @@ const Home = () => {
   const {execute} = useApi();
   const [loaded, setLoaded] = useState(false);
 
+  const reloadNotif = (type: string) => {
+    if (type === 'I' && typeSearch === 'I') {
+      getAccesses('', '/accesses', 'P');
+    }
+    if (type === 'P' && typeSearch === 'P') {
+      getAccesses('', '/others', 'L');
+    }
+  };
+
+  const onNotif = useCallback((data: any) => {
+    console.log(typeSearch);
+    if (
+      data?.event === 'out-visit' ||
+      data?.event === 'in-visitQ' ||
+      data?.event === 'in-visit' ||
+      data?.event === 'in-visitG' ||
+      data?.event === 'confirm'
+    ) {
+      reloadNotif('I');
+    }
+
+    if (
+      data?.event === 'in-pedido' ||
+      data?.event === 'out-visit' ||
+      data?.event === '"new-visit"'
+    ) {
+      reloadNotif('P');
+    }
+  }, []);
+  useEvent('onNotif', onNotif);
+
   // Función que obtiene la data según el tipo de búsqueda
   const getAccesses = async (
     searchParam: any = '',
@@ -136,31 +167,6 @@ const Home = () => {
     };
   }, []);
 
-  const onNotif = useCallback((data: any) => {
-    console.log(typeSearch);
-    if (
-      data?.event === 'out-visit' ||
-      data?.event === 'in-visitQ' ||
-      data?.event === 'in-visit' ||
-      data?.event === 'in-visitG' ||
-      data?.event === 'confirm'
-    ) {
-      if (typeSearch === 'I') {
-        getAccesses('', '/accesses', 'P');
-      }
-    }
-
-    if (
-      data?.event === 'in-pedido' ||
-      data?.event === 'out-visit' ||
-      data?.event === '"new-visit"'
-    ) {
-      if (typeSearch === 'P') {
-        getAccesses('', '/others', 'L');
-      }
-    }
-  }, []);
-  useEvent('onNotif', onNotif);
   return (
     <>
       <Layout
