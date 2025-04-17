@@ -1,4 +1,10 @@
-import React, {useEffect, useState, useContext, useMemo} from 'react';
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useMemo,
+  useCallback,
+} from 'react';
 import {StyleSheet, View, Text, Keyboard} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
@@ -16,6 +22,7 @@ import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
 import {isAndroid} from '../../../mk/utils/utils';
+import {useEvent} from '../../../mk/hooks/useEvent';
 
 const Home = () => {
   const {user} = useAuth();
@@ -128,6 +135,32 @@ const Home = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const onNotif = useCallback((data: any) => {
+    console.log(typeSearch);
+    if (
+      data?.event === 'out-visit' ||
+      data?.event === 'in-visitQ' ||
+      data?.event === 'in-visit' ||
+      data?.event === 'in-visitG' ||
+      data?.event === 'confirm'
+    ) {
+      if (typeSearch === 'I') {
+        getAccesses('', '/accesses', 'P');
+      }
+    }
+
+    if (
+      data?.event === 'in-pedido' ||
+      data?.event === 'out-visit' ||
+      data?.event === '"new-visit"'
+    ) {
+      if (typeSearch === 'P') {
+        getAccesses('', '/others', 'L');
+      }
+    }
+  }, []);
+  useEvent('onNotif', onNotif);
   return (
     <>
       <Layout
@@ -206,12 +239,16 @@ const Home = () => {
             open={openCiNom}
             onClose={() => setOpenCiNom(false)}
             // setCode={setCode}
+            reload={() => getAccesses('', '/accesses', 'P')}
           />
         )}
       </Layout>
       {!isKeyboardVisible && (
         <DropdawnAccess
-          onPressQr={() => {setOpenQr(true);setTypeSearch("I")}}
+          onPressQr={() => {
+            setOpenQr(true);
+            setTypeSearch('I');
+          }}
           onPressCiNom={() => setOpenCiNom(true)}
         />
       )}

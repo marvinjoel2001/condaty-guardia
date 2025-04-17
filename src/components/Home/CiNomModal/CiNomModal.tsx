@@ -25,9 +25,10 @@ import InputFullName from '../../../../mk/components/forms/InputFullName/InputFu
 interface CiNomModalProps {
   open: boolean;
   onClose: () => void;
+  reload: any;
 }
 
-const CiNomModal = ({open, onClose}: CiNomModalProps) => {
+const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   const {user, showToast} = useAuth();
   const [visit, setVisit]: any = useState([]);
   const [formState, setFormState]: any = useState({});
@@ -231,6 +232,7 @@ const CiNomModal = ({open, onClose}: CiNomModalProps) => {
     if (data?.success === true) {
       onClose();
       // Removed reload call since reload is not defined in the component scope
+      reload();
       showToast('Notificación enviada', 'success');
     } else {
       showToast(data?.message, 'error');
