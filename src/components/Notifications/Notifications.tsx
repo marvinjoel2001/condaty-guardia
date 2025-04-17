@@ -17,6 +17,7 @@ import {
   IconSend,
   IconSesionDel,
   IconTaxi,
+  IconVehicle,
   IconVisit,
 } from '../../icons/IconLibrary';
 import {TouchableOpacity, View} from 'react-native';
@@ -71,6 +72,9 @@ const Notifications = () => {
     // )
     //   return null;
 
+    /// ---------------------------------------------------------------------------------------
+    ///  REVISAR LOS ICONOS SE HIZO UN PARCHE PARA LOS SVG DE LOS ICONOS PONER LOS ADECUADOS
+    ///---------------------------------------------------------------------------------------
     const left = (data: any) => {
       let image = '';
       let name = '';
@@ -175,9 +179,53 @@ const Notifications = () => {
           />
         );
       }
+      if (data.info?.act == 'new-visit') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            color={cssVar.cSuccess}
+            name={IconVehicle}
+          />
+        );
+      }
+      if (data.info?.act == 'in-visitG') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            // fillStroke={cssVar.cError}
+            fillStroke={cssVar.cSuccess}
+            color={'transparent'}
+            name={IconConfirmVisit}
+          />
+        );
+      }
+      if (data.info?.act == 'in-visit') {
+        return (
+          <Icon
+            style={{
+              borderRadius: 50,
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+            }}
+            // fillStroke={cssVar.cError}
+            fillStroke={cssVar.cSuccess}
+            color={'transparent'}
+            name={IconConfirmVisit}
+          />
+        );
+      }
 
       return <Avatar src={image} name={name} />;
     };
+    const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
     return (
       <TouchableOpacity
       // onPress={() => {
@@ -186,8 +234,8 @@ const Notifications = () => {
       >
         <ItemList
           //   style={read ? {opacity: 0.5} : {}}
-          title={data.msg?.title}
-          subtitle={data.msg?.body}
+          title={msg?.title}
+          subtitle={msg?.body}
           date={getDateTimeStrMes(notifi.created_at)}
           widthMain="70%"
           left={left(data)}></ItemList>
