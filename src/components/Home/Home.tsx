@@ -41,33 +41,38 @@ const Home = () => {
 
   const reloadNotif = (type: string) => {
     if (type === 'I' && typeSearch === 'I') {
+      // if (typeSearch === 'I' && _typeSearch === 'I') {
       getAccesses('', '/accesses', 'P');
     }
     if (type === 'P' && typeSearch === 'P') {
+      // if (typeSearch === 'P' && _typeSearch === 'P') {
       getAccesses('', '/others', 'L');
     }
   };
 
-  const onNotif = useCallback((data: any) => {
-    if (
-      data?.event === 'out-visit' ||
-      data?.event === 'in-visitQ' ||
-      data?.event === 'in-visit' ||
-      data?.event === 'in-visitG' ||
-      data?.event === 'confirm' ||
-      data?.event === 'new-visit'
-    ) {
-      reloadNotif('I');
-    }
+  const onNotif = useCallback(
+    (data: any) => {
+      if (
+        data?.event === 'out-visit' ||
+        data?.event === 'in-visitQ' ||
+        data?.event === 'in-visit' ||
+        data?.event === 'in-visitG' ||
+        data?.event === 'confirm' ||
+        data?.event === 'new-visit'
+      ) {
+        reloadNotif('I');
+      }
 
-    if (
-      data?.event === 'in-pedido' ||
-      data?.event === 'out-visit' ||
-      data?.event === '"new-visit"'
-    ) {
-      reloadNotif('P');
-    }
-  }, []);
+      if (
+        data?.event === 'in-pedido' ||
+        data?.event === 'out-visit' ||
+        data?.event === '"new-visit"'
+      ) {
+        reloadNotif('P');
+      }
+    },
+    [reloadNotif],
+  );
   useEvent('onNotif', onNotif);
 
   // Función que obtiene la data según el tipo de búsqueda
