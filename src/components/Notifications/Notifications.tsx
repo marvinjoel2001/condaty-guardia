@@ -23,6 +23,8 @@ import {TouchableOpacity, View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import {getDateTimeStrMes, getNow} from '../../../mk/utils/dates';
+import {useEvent} from '../../../mk/hooks/useEvent';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Notifications = () => {
   const [tab, setTab] = useState('T');
@@ -39,6 +41,14 @@ const Notifications = () => {
     loaded,
     reload,
   } = useApi('/notifications', 'GET', params);
+
+  const {dispatch}: any = useEvent('onResetNotif');
+  useFocusEffect(
+    React.useCallback(() => {
+      reload();
+      dispatch('hola');
+    }, []),
+  );
 
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
@@ -64,7 +74,7 @@ const Notifications = () => {
     const left = (data: any) => {
       let image = '';
       let name = '';
-      console.log("mis notificaciones para alert test",data)
+      console.log('mis notificaciones para alert test', data);
       if (data.info?.act == 'alerts') {
         return (
           <Icon
@@ -145,7 +155,7 @@ const Notifications = () => {
               borderRadius: 50,
               padding: 8,
               backgroundColor: cssVar.cWhite,
-              transform: [{rotateY: '180deg'}]
+              transform: [{rotateY: '180deg'}],
             }}
             color={cssVar.cSuccess}
             name={IconVisit}
@@ -216,7 +226,7 @@ const Notifications = () => {
     );
   }, [tab, notifs?.data]);
 
-  console.log("mis datos filtrados",dataFilter)
+  console.log('mis datos filtrados', dataFilter);
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
       <TabsButtons
