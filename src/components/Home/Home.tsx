@@ -70,6 +70,14 @@ const Home = () => {
   }, []);
   useEvent('onNotif', onNotif);
 
+  const onNotifReload = useCallback((data: any) => {
+    console.log('data', data);
+    if (data?.modulo === 'access' || data?.modulo === 'others') {
+      reloadNotif(typeSearch);
+    }
+  }, []);
+  useEvent('onReload', onNotifReload);
+
   // Función que obtiene la data según el tipo de búsqueda
   const getAccesses = async (
     searchParam: any = '',

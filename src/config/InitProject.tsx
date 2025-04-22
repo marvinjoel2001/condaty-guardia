@@ -5,9 +5,11 @@ import {useEvent} from '../../mk/hooks/useEvent';
 
 const InitProject = () => {
   const {showToast, logout} = useAuth();
+  const {dispatch} = useEvent('onReload');
   // para rcibir notificaciones
   const onNotif = useCallback((data: any) => {
     console.log('onNotif**********', data);
+
     if (data?.event === 'ping') {
       showToast('se recibio Ping');
     }
@@ -19,9 +21,13 @@ const InitProject = () => {
       info = data?.payload;
     }
 
-    if (data?.event === 'new-visit' && info.type === 'P') {
-      showToast('¡Un pedido ingreso!', 'info');
+    if (data?.event === 'reload') {
+      dispatch(info);
     }
+
+    // if (data?.event === 'new-visit' && info.type === 'P') {
+    //   showToast('¡Un pedido ingreso!', 'info');
+    // }
     // if (data?.event === 'in-visit') {
     //   showToast('Visitante en el condominio', 'info');
     // }
@@ -31,25 +37,25 @@ const InitProject = () => {
     if (data?.event === 'alerts') {
       showToast(`¡Se creo una alerta nivel ${info.level}!`, 'warning');
     }
-    if (data?.event === 'in-visitG') {
-      // QR grupal
-      showToast('¡Un visitante Ingreso!', 'info');
-    }
-    if (data?.event === 'in-visitQ') {
-      // QR individual y sin Qr
-      showToast('¡Un visitante Ingreso!', 'warning');
-    }
+    // if (data?.event === 'in-visitG') {
+    //   // QR grupal
+    //   showToast('¡Un visitante Ingreso!', 'info');
+    // }
+    // if (data?.event === 'in-visitQ') {
+    //   // QR individual y sin Qr
+    //   showToast('¡Un visitante Ingreso!', 'warning');
+    // }
     if (data?.event === 'in-pedido') {
       showToast('¡Un pedido está en espera!', 'info');
     }
-    if (data?.event === 'out-visit') {
-      let text =
-        info.type === 'P'
-          ? '¡Un pedido salió del condominio!'
-          : '¡Un visitante salió del condominio!';
+    // if (data?.event === 'out-visit') {
+    //   let text =
+    //     info.type === 'P'
+    //       ? '¡Un pedido salió del condominio!'
+    //       : '¡Un visitante salió del condominio!';
 
-      showToast(text, 'info');
-    }
+    //   showToast(text, 'info');
+    // }
     if (data?.event === 'confirm') {
       showToast('¡Una visita fue confirmada!', 'success');
     }

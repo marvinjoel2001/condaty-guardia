@@ -19,17 +19,21 @@ import {
   IconVehicle,
   IconVisit,
 } from '../../icons/IconLibrary';
-import {TouchableOpacity, View} from 'react-native';
+import {View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import {getDateTimeStrMes} from '../../../mk/utils/dates';
 import {useEvent} from '../../../mk/hooks/useEvent';
 import {useFocusEffect} from '@react-navigation/native';
+import DetOrders from '../Home/Orders/DetOrders';
+import DetAccesses from '../Home/Accesses/DetAccesses';
 
 const Notifications = () => {
   const [tab, setTab] = useState('T');
   const [search, setSearch] = useState('');
   const [dataFilter, setDataFilter] = useState([]);
+  const [openDetail, setOpenDetail] = useState('');
+  const [formState, setFormState]: any = useState({});
   const {user} = useAuth();
   const [params, setParams]: any = useState({
     perPage: -1,
@@ -49,6 +53,27 @@ const Notifications = () => {
       dispatch('hola');
     }, []),
   );
+
+  const goNotif = (data: any) => {
+    console.log('data', data, data.info?.pedido_id);
+    if (data.info?.act == 'in-pedido') {
+      setFormState({id: data.info?.pedido_id});
+      setOpenDetail(data.info?.pedido_id ? 'Pedidos' : '');
+    }
+    if (
+      data.info?.act == 'out-visit' || // no deberia recibir
+      data.info?.act == 'confirm' ||
+      data.info?.act == 'new-visit' //no deberia recibir
+    ) {
+      setFormState({id: data.info?.id});
+      setOpenDetail(data.info?.id ? 'Access' : '');
+    }
+    if (data.info?.act == 'in-visit') {
+      //no deberia recibir
+      setFormState({id: data.info?.access_id});
+      setOpenDetail(data.info?.access_id ? 'Access' : '');
+    }
+  };
 
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
@@ -209,19 +234,16 @@ const Notifications = () => {
     };
     const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
     return (
-      <TouchableOpacity
-      // onPress={() => {
-      //   goNotif(data);
-      // }}
-      >
-        <ItemList
-          //   style={read ? {opacity: 0.5} : {}}
-          title={msg?.title}
-          subtitle={msg?.body}
-          date={getDateTimeStrMes(notifi.created_at)}
-          widthMain="70%"
-          left={left(data)}></ItemList>
-      </TouchableOpacity>
+      <ItemList
+        //   style={read ? {opacity: 0.5} : {}}
+        title={msg?.title + 'aa'}
+        subtitle={msg?.body}
+        date={getDateTimeStrMes(notifi.created_at)}
+        widthMain="70%"
+        onPress={() => {
+          goNotif(data);
+        }}
+        left={left(data)}></ItemList>
     );
   };
   const onSearch = (search: string) => {
@@ -280,6 +302,21 @@ const Notifications = () => {
           skeletonType="list"
         />
       </View>
+      {openDetail == 'Pedidos' && (
+        <DetOrders
+          id={formState?.id}
+          open={openDetail == 'Pedidos'}
+          close={() => setOpenDetail('')}
+        />
+      )}
+
+      {openDetail == 'Access' && (
+        <DetAccesses
+          id={formState?.id}
+          open={openDetail == 'Access'}
+          close={() => setOpenDetail('')}
+        />
+      )}
     </Layout>
   );
 };
