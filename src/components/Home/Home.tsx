@@ -25,7 +25,7 @@ import {isAndroid} from '../../../mk/utils/utils';
 import {useEvent} from '../../../mk/hooks/useEvent';
 
 const Home = () => {
-  const {user} = useAuth();
+  const {user, store, setStore} = useAuth();
   const [openQr, setOpenQr] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
   const [code, setCode]: any = useState(null);
@@ -41,46 +41,44 @@ const Home = () => {
 
   const reloadNotif = (type: string) => {
     if (type === 'I' && typeSearch === 'I') {
-      // if (typeSearch === 'I' && _typeSearch === 'I') {
       getAccesses('', '/accesses', 'P');
     }
     if (type === 'P' && typeSearch === 'P') {
-      // if (typeSearch === 'P' && _typeSearch === 'P') {
       getAccesses('', '/others', 'L');
     }
   };
 
   const onNotif = useCallback(
     (data: any) => {
-      if (
-        data?.event === 'out-visit' ||
-        data?.event === 'in-visitQ' ||
-        data?.event === 'in-visit' ||
-        data?.event === 'in-visitG' ||
-        data?.event === 'confirm' ||
-        data?.event === 'new-visit'
-      ) {
-        reloadNotif('I');
+      if (data?.event === 'confirm' || data?.event === 'in-pedido') {
+        reloadNotif(typeSearch);
       }
-
-      if (
-        data?.event === 'in-pedido' ||
-        data?.event === 'out-visit' ||
-        data?.event === '"new-visit"'
-      ) {
-        reloadNotif('P');
+      if (data?.event === 'confirm' && typeSearch !== 'I') {
+        setStore({...store, bagePending: true});
+      }
+      if (data?.event === 'in-pedido' && typeSearch !== 'P') {
+        setStore({...store, bageOthers: true});
       }
     },
-    [reloadNotif],
+    [typeSearch],
   );
   useEvent('onNotif', onNotif);
 
-  const onNotifReload = useCallback((data: any) => {
-    console.log('data', data);
-    if (data?.modulo === 'access' || data?.modulo === 'others') {
-      reloadNotif(typeSearch);
-    }
-  }, []);
+  const onNotifReload = useCallback(
+    (data: any) => {
+      console.log('data fnewoijn', data);
+      if (data?.modulo === 'access' || data?.modulo === 'others') {
+        reloadNotif(typeSearch);
+      }
+      if (data?.modulo === 'access' && typeSearch !== 'I') {
+        setStore({...store, bagePending: true});
+      }
+      if (data?.modulo === 'others' && typeSearch !== 'P') {
+        setStore({...store, bageOthers: true});
+      }
+    },
+    [typeSearch],
+  );
   useEvent('onReload', onNotifReload);
 
   // Función que obtiene la data según el tipo de búsqueda
@@ -108,12 +106,14 @@ const Home = () => {
     switch (typeSearch) {
       case 'I':
         getAccesses('', '/accesses', 'P');
+        setStore({...store, bagePending: false});
         break;
       case 'A':
         getAccesses('', '/accesses', 'AD');
         break;
       case 'P':
         getAccesses('', '/others', 'L');
+        setStore({...store, bageOthers: false});
         break;
       default:
         console.log('Tipo de búsqueda no válido:', typeSearch);
@@ -196,9 +196,9 @@ const Home = () => {
       >
         <TabsButtons
           tabs={[
-            {value: 'I', text: 'Pendientes'},
+            {value: 'I', text: 'Pendientes', isNew: store?.bagePending},
             {value: 'A', text: 'Accesos'},
-            {value: 'P', text: 'Pedidos'},
+            {value: 'P', text: 'Pedidos', isNew: store?.bageOthers},
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
