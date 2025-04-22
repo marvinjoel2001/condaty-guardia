@@ -1,6 +1,5 @@
 import {OneSignal} from 'react-native-onesignal';
 import {useCallback, useEffect} from 'react';
-import React from 'react';
 import useAuth from '../../mk/hooks/useAuth';
 import {useEvent} from '../../mk/hooks/useEvent';
 
@@ -16,7 +15,7 @@ const InitProject = () => {
     try {
       info = JSON.parse(data?.payload);
     } catch (error: unknown) {
-      console.error('Error parsing notification payload:', error);
+      // console.log('Error parsing notification payload:', error);
       info = data?.payload;
     }
 
