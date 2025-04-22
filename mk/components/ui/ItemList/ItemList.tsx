@@ -33,12 +33,13 @@ export const ItemList = (props: PropsType) => {
     date,
     style,
     onPressTitle,
+    onPress,
     widthMain,
     check = null,
   } = props;
 
   return (
-    <TouchableOpacity onPress={props.onPress ? props.onPress : onPressTitle}>
+    <TouchableOpacity onPress={onPress ?? onPressTitle}>
       <View
         style={{
           ...theme.itemList,

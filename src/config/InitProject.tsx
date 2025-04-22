@@ -1,94 +1,33 @@
 import {OneSignal} from 'react-native-onesignal';
 import {useCallback, useEffect} from 'react';
-import React from 'react';
 import useAuth from '../../mk/hooks/useAuth';
 import {useEvent} from '../../mk/hooks/useEvent';
 
-// export const processSocket = async (
-//   socketEvent: any,
-//   showToast: Function,
-//   setStore: Function,
-// ) => {
-//   // console.log('socket event init', JSON.stringify(socketEvent, null, 5));
-//   if (!socketEvent) return;
-//   if (socketEvent.data?.act == 'ping') {
-//     showToast(socketEvent.data?.msg, 'info');
-//   }
-//   if (socketEvent.data?.act == 'newEvent') {
-//     showToast(
-//       'Nuevo Evento ha llegado' + ':\n' + socketEvent.data?.titulo,
-//       'info',
-//     );
-//     setStore((old: any) => ({...old, nEvents: (old?.nEvents || 0) + 1}));
-//   }
-//   if (socketEvent.data?.act == 'newActivity') {
-//     showToast(
-//       'Nuevo Actividad ha llegado' + ':\n' + socketEvent.data?.titulo,
-//       'info',
-//     );
-//     setStore((old: any) => ({...old, nActivity: (old?.nActivity || 0) + 1}));
-//   }
-//   if (socketEvent.data?.act == 'newContent') {
-//     showToast('Nueva Noticia ha llegado', 'info');
-//     setStore((old: any) => ({
-//       ...old,
-//       nContents: (old?.nContents || 0) + 1,
-//       contentIds: [...(old?.contentIds || []), socketEvent.data?.candidate_id],
-//     }));
-//   }
-//   if (socketEvent.data?.act == 'newSurvey') {
-//     setStore((old: any) => ({...old, nSurveys: (old?.nSurveys || 0) + 1}));
-//   }
-//   if (socketEvent?.data?.act == 'newChatContact') {
-//     setStore({nChats: socketEvent.data?.cant || 0});
-//     showToast(
-//       'Solicitud de contacto de ' + ':\n' + socketEvent.data?.from,
-//       'info',
-//     );
-//   }
-//   if (socketEvent?.data?.act == 'newChatMsg') {
-//     setStore({nChats: socketEvent.data?.cant || 0});
-//     const msg = await decryptData(
-//       socketEvent.data?.msg,
-//       socketEvent.data?.from_id,
-//     );
-//     showToast('Mensaje de ' + socketEvent.data?.from + ':\n' + msg, 'info');
-//   }
-//   if (socketEvent.data?.act == 'newChatAccepted') {
-//     showToast(
-//       'Tu solicitud fue aceptada por' + ':\n' + socketEvent.data?.from,
-//       'info',
-//     );
-//   }
-//   if (socketEvent.data?.act == 'newLevel') {
-//     showToast('Subiste de NIVEL a ' + socketEvent.data?.name, 'success');
-//   }
-//   if (socketEvent.data?.act == 'newMedal') {
-//     setStore((old: any) => ({
-//       ...old,
-//       nMedals: socketEvent.data,
-//     }));
-//   }
-// };
-
 const InitProject = () => {
   const {showToast, logout} = useAuth();
+  const {dispatch} = useEvent('onReload');
   // para rcibir notificaciones
   const onNotif = useCallback((data: any) => {
     console.log('onNotif**********', data);
+
     if (data?.event === 'ping') {
       showToast('se recibio Ping');
     }
     let info;
     try {
       info = JSON.parse(data?.payload);
-    } catch (error) {
+    } catch (error: unknown) {
+      // console.log('Error parsing notification payload:', error);
       info = data?.payload;
     }
 
-    if (data?.event === 'new-visit' && data.payload.type === 'P') {
-      showToast('¡Un pedido ingreso!', 'info');
+    if (data?.event === 'reload') {
+      dispatch(info);
     }
+
+    // if (data?.event === 'new-visit' && info.type === 'P') {
+    //   showToast('¡Un pedido ingreso!', 'info');
+    // }
     // if (data?.event === 'in-visit') {
     //   showToast('Visitante en el condominio', 'info');
     // }
@@ -96,27 +35,27 @@ const InitProject = () => {
     //   showToast('¡Bienvenido a casa!', 'warning');
     // }
     if (data?.event === 'alerts') {
-      showToast(`¡Se creo una alerta nivel ${data.payload.level}!`, 'warning');
+      showToast(`¡Se creo una alerta nivel ${info.level}!`, 'warning');
     }
-    if (data?.event === 'in-visitG') {
-      // QR grupal
-      showToast('¡Un visitante Ingreso!', 'info');
-    }
-    if (data?.event === 'in-visitQ') {
-      // QR individual y sin Qr
-      showToast('¡Un visitante Ingreso!', 'warning');
-    }
+    // if (data?.event === 'in-visitG') {
+    //   // QR grupal
+    //   showToast('¡Un visitante Ingreso!', 'info');
+    // }
+    // if (data?.event === 'in-visitQ') {
+    //   // QR individual y sin Qr
+    //   showToast('¡Un visitante Ingreso!', 'warning');
+    // }
     if (data?.event === 'in-pedido') {
       showToast('¡Un pedido está en espera!', 'info');
     }
-    if (data?.event === 'out-visit') {
-      let text =
-        data.payload.type === 'P'
-          ? '¡Un pedido salió del condominio!'
-          : '¡Un visitante salió del condominio!';
+    // if (data?.event === 'out-visit') {
+    //   let text =
+    //     info.type === 'P'
+    //       ? '¡Un pedido salió del condominio!'
+    //       : '¡Un visitante salió del condominio!';
 
-      showToast(text, 'info');
-    }
+    //   showToast(text, 'info');
+    // }
     if (data?.event === 'confirm') {
       showToast('¡Una visita fue confirmada!', 'success');
     }

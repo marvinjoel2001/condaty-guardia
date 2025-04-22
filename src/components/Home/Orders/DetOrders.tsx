@@ -267,7 +267,7 @@ const DetOrders = ({id, open, close, reload}: any) => {
       disbledTaxi: false,
     });
   }, [tab]);
-  console.log(data);
+  // console.log(data);
   return (
     <ModalFull
       onClose={close}

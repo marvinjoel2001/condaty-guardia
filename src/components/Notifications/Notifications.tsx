@@ -14,23 +14,26 @@ import {
   IconDelivery,
   IconOther,
   IconRejectVisit,
-  IconSend,
   IconSesionDel,
   IconTaxi,
   IconVehicle,
   IconVisit,
 } from '../../icons/IconLibrary';
-import {TouchableOpacity, View} from 'react-native';
+import {View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
-import {getDateTimeStrMes, getNow} from '../../../mk/utils/dates';
+import {getDateTimeStrMes} from '../../../mk/utils/dates';
 import {useEvent} from '../../../mk/hooks/useEvent';
 import {useFocusEffect} from '@react-navigation/native';
+import DetOrders from '../Home/Orders/DetOrders';
+import DetAccesses from '../Home/Accesses/DetAccesses';
 
 const Notifications = () => {
   const [tab, setTab] = useState('T');
   const [search, setSearch] = useState('');
   const [dataFilter, setDataFilter] = useState([]);
+  const [openDetail, setOpenDetail] = useState('');
+  const [formState, setFormState]: any = useState({});
   const {user} = useAuth();
   const [params, setParams]: any = useState({
     perPage: -1,
@@ -51,6 +54,27 @@ const Notifications = () => {
     }, []),
   );
 
+  const goNotif = (data: any) => {
+    console.log('data', data, data.info?.pedido_id);
+    if (data.info?.act == 'in-pedido') {
+      setFormState({id: data.info?.pedido_id});
+      setOpenDetail(data.info?.pedido_id ? 'Pedidos' : '');
+    }
+    if (
+      data.info?.act == 'out-visit' || // no deberia recibir
+      data.info?.act == 'confirm' ||
+      data.info?.act == 'new-visit' //no deberia recibir
+    ) {
+      setFormState({id: data.info?.id});
+      setOpenDetail(data.info?.id ? 'Access' : '');
+    }
+    if (data.info?.act == 'in-visit') {
+      //no deberia recibir
+      setFormState({id: data.info?.access_id});
+      setOpenDetail(data.info?.access_id ? 'Access' : '');
+    }
+  };
+
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
     if (
@@ -58,27 +82,10 @@ const Notifications = () => {
       (data.msg?.body + '').toLowerCase().indexOf(search.toLowerCase()) == -1
     )
       return null;
-    // if (
-    //   !(
-    //     tab === 'T' ||
-    //     (tab === 'Y' &&
-    //       notifi.channel ===
-    //         (configApp.APP_AUTH_IAM as string).replace('/', '') + user?.id) ||
-    //     (tab === 'G' && notifi.channel === 'guards') ||
-    //     (tab === 'A1' && notifi.channel === 'alerts-1') ||
-    //     (tab === 'A2' && notifi.channel === 'alerts-2') ||
-    //     (tab === 'A3' && notifi.channel === 'alerts-3')
-    //   )
-    // )
-    //   return null;
 
-    /// ---------------------------------------------------------------------------------------
-    ///  REVISAR LOS ICONOS SE HIZO UN PARCHE PARA LOS SVG DE LOS ICONOS PONER LOS ADECUADOS
-    ///---------------------------------------------------------------------------------------
     const left = (data: any) => {
       let image = '';
       let name = '';
-      console.log('mis notificaciones para alert test', data);
       if (data.info?.act == 'alerts') {
         return (
           <Icon
@@ -227,19 +234,16 @@ const Notifications = () => {
     };
     const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
     return (
-      <TouchableOpacity
-      // onPress={() => {
-      //   goNotif(data);
-      // }}
-      >
-        <ItemList
-          //   style={read ? {opacity: 0.5} : {}}
-          title={msg?.title}
-          subtitle={msg?.body}
-          date={getDateTimeStrMes(notifi.created_at)}
-          widthMain="70%"
-          left={left(data)}></ItemList>
-      </TouchableOpacity>
+      <ItemList
+        //   style={read ? {opacity: 0.5} : {}}
+        title={msg?.title + 'aa'}
+        subtitle={msg?.body}
+        date={getDateTimeStrMes(notifi.created_at)}
+        widthMain="70%"
+        onPress={() => {
+          goNotif(data);
+        }}
+        left={left(data)}></ItemList>
     );
   };
   const onSearch = (search: string) => {
@@ -274,8 +278,6 @@ const Notifications = () => {
     );
   }, [tab, notifs?.data]);
 
-console.log("mi loaded",loaded)
-console.log("mi notifi",notifs)
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
       <TabsButtons
@@ -293,8 +295,28 @@ console.log("mi notifi",notifs)
       <View style={{padding: cssVar.spL, gap: cssVar.spL}}>
         <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
-        <List data={dataFilter} renderItem={NotifisList} refreshing={!loaded} skeletonType='list'/>
+        <List
+          data={dataFilter}
+          renderItem={NotifisList}
+          refreshing={!loaded}
+          skeletonType="list"
+        />
       </View>
+      {openDetail == 'Pedidos' && (
+        <DetOrders
+          id={formState?.id}
+          open={openDetail == 'Pedidos'}
+          close={() => setOpenDetail('')}
+        />
+      )}
+
+      {openDetail == 'Access' && (
+        <DetAccesses
+          id={formState?.id}
+          open={openDetail == 'Access'}
+          close={() => setOpenDetail('')}
+        />
+      )}
     </Layout>
   );
 };

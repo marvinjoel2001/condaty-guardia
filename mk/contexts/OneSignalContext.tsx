@@ -1,7 +1,6 @@
-import React, {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useState, createContext, useMemo} from 'react';
 import configApp from '../../src/config/config';
 import useAuth from '../hooks/useAuth';
-import {createContext} from 'react';
 import {Platform} from 'react-native';
 import {LogLevel, OneSignal} from 'react-native-onesignal';
 import {throttle} from '../utils/utils';
@@ -35,47 +34,32 @@ const OneSignalContextProvider = ({children}: any) => {
     } else {
       permission = await OneSignal.Notifications.getPermissionAsync();
     }
-    await setSignalPermission(permission);
+    setSignalPermission(permission);
 
     return permission;
   };
 
   const signalVerifyState = throttle(_verifyState, 1000);
   const signalInit = async () => {
-    await OneSignal.initialize(configApp.APP_SIGNAL_KEY);
-    const permission = await signalVerifyState();
+    OneSignal.initialize(configApp.APP_SIGNAL_KEY);
+    const permission = signalVerifyState();
     console.log('One signal initiate:', permission);
   };
 
   const throttleInit = throttle(signalInit, 5000);
 
   const signalGetInfoSignal = async (msg: string = '', extra: any = null) => {
-    const permission = await signalVerifyState();
+    const permission = signalVerifyState();
     let optedIn: any = await OneSignal.User.pushSubscription.getOptedInAsync();
     const id: any = await OneSignal.User.pushSubscription.getIdAsync();
     const token: any = await OneSignal.User.pushSubscription.getTokenAsync();
 
     if (!optedIn) {
-      await OneSignal.User.pushSubscription.optIn();
+      OneSignal.User.pushSubscription.optIn();
       optedIn = await OneSignal.User.pushSubscription.getOptedInAsync();
     }
     setSignalToken(token);
     setSignalId(id);
-    // console.log(
-    //   'getInfoSignal (' + msg + '):',
-    //   JSON.stringify(
-    //     {
-    //       token,
-    //       id,
-    //       optedIn,
-    //       permission,
-    //       signalPermission,
-    //       zextra: extra,
-    //     },
-    //     null,
-    //     5,
-    //   ),
-    // );
     return permission;
   };
 
@@ -151,18 +135,19 @@ const OneSignalContextProvider = ({children}: any) => {
   const signalGetTags = async () => {
     const tags = await OneSignal.User.getTags();
     // console.log('Tags:', tags);
+    return tags;
   };
 
   const signalSetTags = async (tags: any) => {
     console.log('onesignal tags', tags);
-    await OneSignal.User.addTags(tags);
+    OneSignal.User.addTags(tags);
   };
   const _signalGetUserPermissions = async () => {
     // await OneSignal.setConsentGiven(true);
     console.log('OneSignal: solicitando permisos');
-    await OneSignal.setConsentGiven(true);
-    await OneSignal.User.pushSubscription.optIn();
-    await OneSignal.InAppMessages.addTrigger('showPrompt', 'true');
+    OneSignal.setConsentGiven(true);
+    OneSignal.User.pushSubscription.optIn();
+    OneSignal.InAppMessages.addTrigger('showPrompt', 'true');
     //OneSignal.getInAppMessages().removeTrigger("showPrompt");
   };
 
@@ -173,51 +158,30 @@ const OneSignalContextProvider = ({children}: any) => {
       return;
     }
 
-    if (user && user.id) {
+    if (user?.id) {
       const userSignal =
         (
           configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX +
           '-' +
           configApp.APP_AUTH_IAM
         ).replace('/', '') + user.id;
-      await OneSignal.login(userSignal);
+      OneSignal.login(userSignal);
       let interests: any = {
         client_id:
           configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX + user?.client_id || '',
         user_id: userSignal,
-        lista_id:
-          configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX +
-            user?.datos?.lista_id +
-            '' || '',
-        dpto_id:
-          configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX +
-            user?.datos?.dpto_id +
-            '' || '',
-        mun_id:
-          configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX +
-            user?.datos?.mun_id +
-            '' || '',
-        barrio_id:
-          configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX +
-            user?.datos?.barrio_id +
-            '' || '',
-        client_type: 'aff',
+        client_type: 'GUA',
       };
       console.log('Interest ', interests);
-      await OneSignal.User.addTags(interests);
-      // // console.log("OneSignal: loged in", user.id, user.client_id);
+      OneSignal.User.addTags(interests);
       await signalGetInfoSignal('login', interests);
     } else {
       let interests: any = {
         client_id: '',
         user_id: '',
-        lista_id: '',
-        dpto_id: '',
-        mun_id: '',
-        barrio_id: '',
         client_type: '',
       };
-      await OneSignal.User.addTags(interests);
+      OneSignal.User.addTags(interests);
       console.log('onesignal logout tag', interests);
       await signalGetInfoSignal('logout', interests);
 
@@ -228,19 +192,22 @@ const OneSignalContextProvider = ({children}: any) => {
     logSignal(user);
   }, [user, signalPermission]);
 
+  const result = useMemo(() => {
+    return {
+      signalPermission,
+      signalGetUserPermissions,
+      signalGetTags,
+      signalSetTags,
+      signalVerifyState,
+      signalInit,
+      signalGetInfoSignal,
+      signalToken,
+      signalId,
+    };
+  }, [signalPermission, signalToken, signalId]);
+
   return (
-    <OneSignalContext.Provider
-      value={{
-        signalPermission,
-        signalGetUserPermissions,
-        signalGetTags,
-        signalSetTags,
-        signalVerifyState,
-        signalInit,
-        signalGetInfoSignal,
-        signalToken,
-        signalId,
-      }}>
+    <OneSignalContext.Provider value={result}>
       {children}
     </OneSignalContext.Provider>
   );
