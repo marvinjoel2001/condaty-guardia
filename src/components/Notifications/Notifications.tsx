@@ -239,10 +239,11 @@ const Notifications = () => {
       return <Avatar src={image} name={name} />;
     };
     const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
+    console.log("mi message",msg)
     return (
       <ItemList
         //   style={read ? {opacity: 0.5} : {}}
-        title={msg?.title + 'aa'}
+        title={msg?.title}
         subtitle={msg?.body}
         date={getDateTimeStrMes(notifi.created_at)}
         widthMain="70%"
