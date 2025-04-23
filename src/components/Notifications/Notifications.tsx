@@ -74,7 +74,7 @@ const Notifications = () => {
       setFormState({id: data.info?.access_id});
       setOpenDetail(data.info?.access_id ? 'Access' : '');
     }
-    if (data.info?.act == 'alert') {
+    if (data.info?.act == 'alerts') {
       //no deberia recibir
       setFormState({id: data.info?.id});
       setOpenDetail(data.info?.id ? 'Access' : '');
