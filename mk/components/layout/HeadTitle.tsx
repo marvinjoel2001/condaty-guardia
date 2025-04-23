@@ -37,6 +37,8 @@ const HeadTitle = ({
   const [counter, setCounter] = useState(0);
 
   const onNotif = useCallback((data: any) => {
+    console.log('onNotif', data);
+    if (data?.event == 'reload') return;
     setCounter(old => old + 1);
   }, []);
   const onResetNotif = useCallback((data: any) => {

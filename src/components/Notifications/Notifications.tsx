@@ -27,6 +27,7 @@ import {useEvent} from '../../../mk/hooks/useEvent';
 import {useFocusEffect} from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';
 import DetAccesses from '../Home/Accesses/DetAccesses';
+import AlertDetail from '../Alerts/AlertDetail';
 
 const Notifications = () => {
   const [tab, setTab] = useState('T');
@@ -72,6 +73,11 @@ const Notifications = () => {
       //no deberia recibir
       setFormState({id: data.info?.access_id});
       setOpenDetail(data.info?.access_id ? 'Access' : '');
+    }
+    if (data.info?.act == 'alert') {
+      //no deberia recibir
+      setFormState({id: data.info?.id});
+      setOpenDetail(data.info?.id ? 'Access' : '');
     }
   };
 
@@ -315,6 +321,13 @@ const Notifications = () => {
           id={formState?.id}
           open={openDetail == 'Access'}
           close={() => setOpenDetail('')}
+        />
+      )}
+      {openDetail == 'Alerts' && (
+        <AlertDetail
+          open={openDetail == 'Alerts'}
+          onClose={() => setOpenDetail('')}
+          id={formState.id}
         />
       )}
     </Layout>
