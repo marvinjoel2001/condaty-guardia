@@ -7,12 +7,7 @@ import {
   IconMenu,
   IconNotification,
 } from '../../../src/icons/IconLibrary';
-import Avatar from '../ui/Avatar/Avatar';
-import {getFullName, getUrlImages} from '../../utils/strings';
-import useAuth from '../../hooks/useAuth';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
-import {getPercentajeUser, navigate} from '../../utils/utils';
-import TextLog from '../ui/TextLog/TextLog';
 import {useEvent} from '../../hooks/useEvent';
 
 interface HeadTitleProps {
@@ -42,11 +37,11 @@ const HeadTitle = ({
   const [counter, setCounter] = useState(0);
 
   const onNotif = useCallback((data: any) => {
-    console.log('nueva counter', data);
+    console.log('onNotif', data);
+    if (data?.event == 'reload') return;
     setCounter(old => old + 1);
   }, []);
   const onResetNotif = useCallback((data: any) => {
-    console.log('nueva counter', data);
     setCounter(0);
   }, []);
   useEvent('onNotif', onNotif);
