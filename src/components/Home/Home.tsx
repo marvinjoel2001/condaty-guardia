@@ -66,14 +66,23 @@ const Home = () => {
 
   const onNotifReload = useCallback(
     (data: any) => {
-      console.log('data fnewoijn', data);
+      // console.log('data fnewoijn', data);
       if (data?.modulo === 'access' || data?.modulo === 'others') {
         reloadNotif(typeSearch);
       }
-      if (data?.modulo === 'access' && typeSearch !== 'I') {
+      if (
+        data?.modulo === 'access' &&
+        typeSearch !== 'I' &&
+        data?._act != 'new-visit' &&
+        data?._act != 'out-visit'
+      ) {
         setStore({...store, bagePending: true});
       }
-      if (data?.modulo === 'others' && typeSearch !== 'P') {
+      if (
+        data?.modulo === 'others' &&
+        typeSearch !== 'P' &&
+        data?._act != 'new-visit'
+      ) {
         setStore({...store, bageOthers: true});
       }
     },
@@ -81,7 +90,6 @@ const Home = () => {
   );
   useEvent('onReload', onNotifReload);
 
-  // Función que obtiene la data según el tipo de búsqueda
   const getAccesses = async (
     searchParam: any = '',
     endpoint: string,
