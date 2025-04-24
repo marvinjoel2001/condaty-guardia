@@ -19,6 +19,7 @@ import {IconX} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
 import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import ItemListDate from '../Accesses/shares/ItemListDate';
 
 const DetOrders = ({id, open, close, reload}: any) => {
   const {execute} = useApi();
@@ -60,7 +61,7 @@ const DetOrders = ({id, open, close, reload}: any) => {
       I: 'Dejar salir',
       Y: 'Dejar entrar',
       // S: 'Esperando confirmación',
-      C: 'Completado',
+      C: '',
     };
     return mapping[status] || '';
   };
@@ -130,7 +131,7 @@ const DetOrders = ({id, open, close, reload}: any) => {
         obs_out: formState?.obs_out || '',
       });
       if (result?.success) {
-        reload();
+        if (reload) reload();
         close();
       } else {
         console.log('Error al dejar salir:', error);
@@ -160,7 +161,7 @@ const DetOrders = ({id, open, close, reload}: any) => {
         3,
       );
       if (result?.success) {
-        reload();
+        if (reload) reload();
         close();
       } else {
         console.log('Error al dejar entrar:', error);
@@ -169,6 +170,7 @@ const DetOrders = ({id, open, close, reload}: any) => {
   };
 
   // Renderizamos el detalle del pedido
+  console.log(data);
   const renderDetails = () => {
     const status = getStatus();
     return (
@@ -176,11 +178,7 @@ const DetOrders = ({id, open, close, reload}: any) => {
         <LineDetail label="Estado:" value={getAccessStatus(data)} />
         <LineDetail
           label="Tipo de pedido:"
-          value={
-            data?.type === 'P'
-              ? 'Pedido-' + (data?.other?.otherType?.name || '')
-              : 'Pedido'
-          }
+          value={'Pedido-' + (data?.other_type?.name || '')}
         />
         {/* Si es un pedido de Taxi, por ejemplo, podrías mostrar el nombre del conductor */}
         {data?.other?.otherType?.name === 'Taxi' && (
@@ -192,6 +190,25 @@ const DetOrders = ({id, open, close, reload}: any) => {
           <>
             <LineDetail label="Observación:" value={data?.obs_confirm} />
           </>
+        )}
+        {data?.access?.plate && (
+          <LineDetail label="Placa:" value={data?.access?.plate} />
+        )}
+        {data?.descrip && (
+          <LineDetail label="Descripción:" value={data?.descrip} />
+        )}
+
+        {data?.access?.guardia && (
+          <LineDetail
+            label={data?.access?.out_guard ? 'Guardia de entrada:' : 'Guardia:'}
+            value={getFullName(data?.access?.guardia)}
+          />
+        )}
+        {data?.access?.out_guard && (
+          <LineDetail
+            label="Guardia de salida:"
+            value={getFullName(data?.access?.out_guard)}
+          />
         )}
       </>
     );
@@ -282,6 +299,24 @@ const DetOrders = ({id, open, close, reload}: any) => {
           <>
             {renderDetails()}
             <View style={{marginTop: 12}}>
+              {getStatus() === 'C' && (
+                <>
+                  <ItemList
+                    title={getFullName(data?.access?.visit)}
+                    subtitle={'C.I.' + data?.access?.visit?.ci}
+                    // subtitle2={
+                    //   data?.access?.plate
+                    //     ? 'Placa: ' + data?.access?.plate
+                    //     : 'Entrada a pie'
+                    // }
+                    left={<Avatar name={getFullName(data?.access?.visit)} />}>
+                    <ItemListDate
+                      inDate={data?.access?.in_at}
+                      outDate={data?.access?.out_at}
+                    />
+                  </ItemList>
+                </>
+              )}
               {getStatus() === 'Y' && (
                 <>
                   <Input
@@ -369,7 +404,11 @@ const DetOrders = ({id, open, close, reload}: any) => {
                   <ItemList
                     title={getFullName(data?.access?.visit)}
                     subtitle={'C.I.' + data?.access?.visit?.ci}
-                    subtitle2={'Placa: ' + data?.access?.plate || 'A pie'}
+                    // subtitle2={
+                    //   data?.access?.plate
+                    //     ? 'Placa: ' + data?.access?.plate
+                    //     : 'Entrada a pie'
+                    // }
                     left={<Avatar name={getFullName(data?.access?.visit)} />}
                   />
                   <TextArea
