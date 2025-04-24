@@ -30,12 +30,12 @@ import DetAccesses from '../Home/Accesses/DetAccesses';
 import AlertDetail from '../Alerts/AlertDetail';
 
 const Notifications = () => {
-  const [tab, setTab] = useState('T');
-  const [search, setSearch] = useState('');
+  // const [tab, setTab] = useState('T');
+  // const [search, setSearch] = useState('');
   // const [dataFilter, setDataFilter] = useState([]);
   const [openDetail, setOpenDetail] = useState('');
   const [formState, setFormState]: any = useState({});
-  const {user} = useAuth();
+  // const {user} = useAuth();
   // const [loaded, setLoaded] = useState(false);
   const [params, setParams]: any = useState({
     perPage: -1,
@@ -84,11 +84,11 @@ const Notifications = () => {
 
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
-    if (
-      search != '' &&
-      (data.msg?.body + '').toLowerCase().indexOf(search.toLowerCase()) == -1
-    )
-      return null;
+    // if (
+    //   search != '' &&
+    //   (data.msg?.body + '').toLowerCase().indexOf(search.toLowerCase()) == -1
+    // )
+    //   return null;
 
     const left = (data: any) => {
       let image = '';
@@ -254,9 +254,9 @@ const Notifications = () => {
         left={left(data)}></ItemList>
     );
   };
-  const onSearch = (search: string) => {
-    setSearch(search);
-  };
+  // const onSearch = (search: string) => {
+  //   setSearch(search);
+  // };
 
   // useEffect(() => {
   //   setDataFilter([]);
