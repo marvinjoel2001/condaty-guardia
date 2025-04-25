@@ -5,6 +5,7 @@ import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
 interface Tab {
   value: string;
   text: string;
+  isNew?: boolean;
 }
 
 interface TabsButtonsProps {
@@ -60,6 +61,7 @@ const TabsButtons = ({
               <Text
                 style={{
                   color: cssVar.cWhiteV2,
+
                   fontSize: 14,
                   fontFamily: FONTS.medium,
                   ...(sel === tab.value
@@ -71,6 +73,19 @@ const TabsButtons = ({
                 }}>
                 {tab.text}
               </Text>
+              {tab.isNew && (
+                <View
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 4,
+                    backgroundColor: cssVar.cError,
+                    right: 8,
+                    top: 4,
+                    position: 'absolute',
+                  }}
+                />
+              )}
             </View>
           </TouchableOpacity>
         ))}
