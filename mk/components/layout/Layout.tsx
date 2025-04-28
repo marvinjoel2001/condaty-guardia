@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View, RefreshControl, Keyboard} from 'react-native';
 import Animated from 'react-native-reanimated';
 import HeadTitle from './HeadTitle';
@@ -7,6 +7,13 @@ import {useRoute} from '@react-navigation/native';
 import useAuth from '../../hooks/useAuth';
 import {isAndroid} from '../../utils/utils';
 import Footer from '../../../src/navigators/Footer/Footer';
+import LockAlert from '../../../src/components/Alerts/LockAlert';
+import {
+  IconAmbulance,
+  IconFlame,
+  IconTheft,
+} from '../../../src/icons/IconLibrary';
+import {useEvent} from '../../hooks/useEvent';
 
 type PropsType = {
   title?: string;
@@ -43,10 +50,18 @@ const Layout = (props: PropsType) => {
     scroll = true,
   } = props;
 
-  const {setStore, store, user, showToast} = useAuth();
+  const {setStore, store} = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const route = useRoute();
   const scrollViewRef: any = useRef(null);
+  const [openAlert, setOpenAlert]: any = useState({open: false, data: null});
+
+  const onNotif = useCallback((data: any) => {
+    if (data?.event === 'alerts' && data?.payload?.level == 4) {
+      setOpenAlert({open: true, data: data?.payload});
+    }
+  }, []);
+  useEvent('onNotif', onNotif);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -99,6 +114,9 @@ const Layout = (props: PropsType) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+  const onCloseAlert = () => {
+    setOpenAlert({open: false, data: null});
+  };
   return (
     <View style={[theme.layout]} onTouchEnd={onPress}>
       {/* <Animated.View style={isRoute() ? {...animatedHeaderStyle} : {}}> */}
@@ -160,7 +178,13 @@ const Layout = (props: PropsType) => {
       </View>
 
       {isRoute() && !isKeyboardVisible && <Footer />}
-      {/* <Footer /> */}
+      {openAlert.open && (
+        <LockAlert
+          open={openAlert.open}
+          onClose={onCloseAlert}
+          data={openAlert.data}
+        />
+      )}
 
       {/* {configApp.API_URL != configApp.API_URL_PROD && <PerformanceMonitor />} */}
     </View>
