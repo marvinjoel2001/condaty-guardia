@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import {Text, View} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../mk/components/ui/Icon/Icon';
+import Sound from 'react-native-sound';
 import {
   IconAccess,
   IconAlert,
@@ -41,6 +42,31 @@ const LockAlert = ({open, onClose, data}: any) => {
   if (!data) {
     return null;
   }
+
+  useEffect(() => {
+    if (open) {
+      const alertSound = new Sound(
+        'sound_alert.mp3',
+        Sound.MAIN_BUNDLE,
+        error => {
+          if (error) {
+            console.log('Error al cargar el sonido:', error);
+            return;
+          }
+          alertSound.setVolume(0.5);
+          alertSound.play(success => {
+            if (!success) {
+              console.log('Error al reproducir el sonido');
+            }
+          });
+        },
+      );
+
+      return () => {
+        alertSound.release();
+      };
+    }
+  }, [open]);
   return (
     <Modal
       title="Alerta de emergencia"
