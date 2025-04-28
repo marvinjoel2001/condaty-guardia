@@ -7,6 +7,7 @@ import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {
   IconAccess,
+  IconAlert,
   IconAmbulance,
   IconFlame,
   IconTheft,
@@ -27,6 +28,11 @@ const typeAlerts: any = {
   T: {
     name: 'Robo',
     icon: IconTheft,
+    color: {background: cssVar.cHoverInfo, border: cssVar.cInfo},
+  },
+  O: {
+    name: 'Otro',
+    icon: IconAlert,
     color: {background: cssVar.cHoverInfo, border: cssVar.cInfo},
   },
 };
