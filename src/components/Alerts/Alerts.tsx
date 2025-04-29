@@ -14,6 +14,8 @@ import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
 import AlertDetail from './AlertDetail';
 
+export const levelAlerts = ['', 'bajo', 'medio', 'alto', 'panico'];
+
 const Alerts = () => {
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('T');
@@ -26,12 +28,7 @@ const Alerts = () => {
     fullType: 'L',
   });
 
-  const {
-    data: alertas,
-    reload,
-    execute,
-    loaded,
-  } = useApi('/alerts', 'GET', params, 2);
+  const {data: alertas, reload, loaded} = useApi('/alerts', 'GET', params);
 
   const onSearch = (search: string) => {
     setSearch(search);
@@ -50,7 +47,6 @@ const Alerts = () => {
           paddingHorizontal: 8,
           paddingVertical: 2,
           borderRadius: 12,
-          width: 85,
         }}>
         <Text
           style={{
@@ -58,11 +54,7 @@ const Alerts = () => {
             fontSize: 12,
             textAlign: 'center',
           }}>
-          {alerta.level == 1
-            ? 'Nivel bajo'
-            : alerta.level == 2
-            ? 'Nivel medio'
-            : 'Nivel alto'}
+          {'Nivel ' + levelAlerts[alerta.level]}
         </Text>
       </View>
     );
@@ -77,33 +69,24 @@ const Alerts = () => {
         .indexOf(search.toLowerCase()) == -1
     )
       return null;
-    // if (
-    //   !(
-    //     typeSearch === 'T' ||
-    //     (typeSearch === 'NA' && alerta.level === 3) ||
-    //     (typeSearch === 'NM' && alerta.level === 2) ||
-    //     (typeSearch === 'NB' && alerta.level === 1)
-    //   )
-    // )
-    //   return null;
+
+    const user = alerta.level === 4 ? alerta.owner : alerta.guardia;
+    const prefix = alerta.level === 4 ? '/OWNER-' : '/GUARD-';
 
     return (
       <ItemList
         onPress={() => {
           setOpenView({open: true, id: alerta.id});
         }}
-        title={getFullName(alerta.guardia)}
-        subtitle="Guardia"
+        title={getFullName(user)}
+        subtitle="Informador"
         date={getDateTimeStrMes(alerta.created_at)}
         left={
           <Avatar
             src={getUrlImages(
-              '/GUARD-' +
-                alerta?.guard_id +
-                '.webp?d=' +
-                alerta?.guardia?.updated_at,
+              prefix + user?.id + '.webp?d=' + user?.updated_at,
             )}
-            name={getFullName(alerta.guardia)}
+            name={getFullName(user)}
           />
         }
         right={renderRight(alerta)}>
