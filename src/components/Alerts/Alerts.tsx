@@ -39,7 +39,7 @@ const Alerts = () => {
       <View
         style={{
           backgroundColor:
-            alerta.level == 3
+            alerta.level == 3 || alerta.level == 4
               ? cssVar.cError
               : alerta.level == 2
               ? cssVar.cWarning

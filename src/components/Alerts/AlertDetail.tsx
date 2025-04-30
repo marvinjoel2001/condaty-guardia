@@ -38,7 +38,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     setDetails({});
   };
   const colorAlert =
-    details?.level === 3
+    details?.level === 3 || details?.level === 4
       ? cssVar.cError
       : details?.level === 2
       ? cssVar.cWarning
