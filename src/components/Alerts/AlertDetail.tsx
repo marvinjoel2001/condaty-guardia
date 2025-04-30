@@ -5,13 +5,16 @@ import {cssVar} from '../../../mk/styles/themes';
 import {ActivityIndicator, Text, View} from 'react-native';
 import {getFullName} from '../../../mk/utils/strings';
 import {getDateTimeStrMes} from '../../../mk/utils/dates';
+import Button from '../../../mk/components/forms/Button/Button';
+import {levelAlerts} from './Alerts';
+import KeyValue from '../../../mk/components/ui/KeyValue';
+import LineDetail from '../Home/Accesses/shares/LineDetail';
 
 type PropsType = {
   id: any;
   open: boolean;
   onClose: () => void;
 };
-const nivelAlerta = ['', 'Bajo', 'Medio', 'Alto'];
 
 const AlertDetail = ({id, open, onClose}: PropsType) => {
   const [details, setDetails]: any = useState({});
@@ -24,7 +27,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
       searchBy: id,
     });
     if (data?.success) {
-      setDetails(data?.data);
+      setDetails(data?.data?.data);
     }
   };
   useEffect(() => {
@@ -35,12 +38,22 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     setDetails({});
   };
   const colorAlert =
-    details?.data?.level === 3
+    details?.level === 3 || details?.level === 4
       ? cssVar.cError
-      : details?.data?.level === 2
+      : details?.level === 2
       ? cssVar.cWarning
       : cssVar.cSuccess;
 
+  const onSaveAttend = async () => {
+    const {data} = await execute('/attend', 'POST', {
+      id: details?.id,
+    });
+    console.log(data);
+    if (data?.success == true) {
+      _onClose();
+    }
+  };
+  console.log(details);
   return (
     <Modal
       open={open}
@@ -48,12 +61,9 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
         borderColor: colorAlert,
         borderWidth: 1,
       }}
-      headerStyles={
-        {color:colorAlert}}
+      headerStyles={{color: colorAlert}}
       title={
-        details?.data?.id
-          ? '¡Alerta nivel ' + nivelAlerta[details?.data?.level] + '!'
-          : ''
+        details?.id ? '¡Alerta nivel ' + levelAlerts[details?.level] + '!' : ''
       }
       overlayClose={true}
       // buttonCancel="Cerrar"
@@ -69,25 +79,55 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 fontSize: 14,
                 textAlign: 'center',
               }}>
-              {details?.data?.descrip}
+              {details?.descrip}
             </Text>
-            <Text
+            {/* <Text
               style={{
                 color: cssVar.cWhiteV2,
                 fontSize: 12,
                 textAlign: 'center',
                 marginTop: 10,
               }}>
-              Reportó: {getFullName(details?.data?.guardia)}
-            </Text>
-            <Text
+              Reportó:{' '}
+              {getFullName(
+                details.level == 4 ? details?.owner : details?.guardia,
+              )}
+            </Text> */}
+            <View style={{marginVertical: 10}}>
+              <LineDetail
+                label={'Reportó'}
+                value={getFullName(
+                  details.level == 4 ? details?.owner : details?.guardia,
+                )}
+              />
+              {details?.date_at && (
+                <>
+                  <LineDetail
+                    label={'Fue atendido por'}
+                    value={getFullName(
+                      details?.gua_attend
+                        ? details?.gua_attend
+                        : details?.adm_attend,
+                    )}
+                  />
+                  <LineDetail
+                    label={'Fecha de atención'}
+                    value={getDateTimeStrMes(details?.date_at, true)}
+                  />
+                </>
+              )}
+            </View>
+            {/* <Text
               style={{
                 color: cssVar.cWhiteV2,
                 fontSize: 10,
                 textAlign: 'center',
               }}>
-              {getDateTimeStrMes(details?.data?.created_at, true)}
-            </Text>
+              {getDateTimeStrMes(details?.created_at, true)}
+            </Text> */}
+            {!details?.date_at && details?.level == 4 && (
+              <Button onPress={onSaveAttend}>Marcar como atendido</Button>
+            )}
           </>
         )}
       </View>
