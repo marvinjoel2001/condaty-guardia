@@ -49,8 +49,8 @@ const Profile = () => {
   const dpto: any = user?.dpto?.find(
     (e: any) => e.client_id == user?.client_id,
   );
-  const currentClient: any = user.clients?.find(
-    (e: any) => e.pivot.client_id == user.client_id,
+  const currentClient: any = user?.clients?.find(
+    (e: any) => e?.pivot?.client_id == user.client_id,
   );
 
   useFocusEffect(
