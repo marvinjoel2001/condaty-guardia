@@ -14,6 +14,7 @@ import {
   IconTheft,
 } from '../../../src/icons/IconLibrary';
 import {useEvent} from '../../hooks/useEvent';
+import ChooseClient from '../../../src/components/ChooseClient/ChooseClient';
 
 type PropsType = {
   title?: string;
@@ -50,7 +51,7 @@ const Layout = (props: PropsType) => {
     scroll = true,
   } = props;
 
-  const {setStore, store} = useAuth();
+  const {setStore, store, user} = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const route = useRoute();
   const scrollViewRef: any = useRef(null);
@@ -117,6 +118,11 @@ const Layout = (props: PropsType) => {
   const onCloseAlert = () => {
     setOpenAlert({open: false, data: null});
   };
+  useEffect(() => {
+    if (!user?.client_id) {
+      setStore({...store, openClient: true});
+    }
+  }, []);
   return (
     <View style={[theme.layout]} onTouchEnd={onPress}>
       {/* <Animated.View style={isRoute() ? {...animatedHeaderStyle} : {}}> */}
@@ -183,6 +189,12 @@ const Layout = (props: PropsType) => {
           open={openAlert.open}
           onClose={onCloseAlert}
           data={openAlert.data}
+        />
+      )}
+      {store?.openClient && (
+        <ChooseClient
+          open={store?.openClient}
+          onClose={() => setStore({...store, openClient: false})}
         />
       )}
 

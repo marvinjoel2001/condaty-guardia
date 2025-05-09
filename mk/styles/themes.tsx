@@ -49,6 +49,7 @@ export const cssVar = {
 
   // Hovers
   cHover: '#FFFFFF0D',
+  cHoverSuccess: '#34A85333',
   cHoverError: '#DA5D5D33',
   cHoverWarning: '#E9B01E33',
   cHoverInfo: '#4285FA33',
