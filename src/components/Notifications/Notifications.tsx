@@ -30,12 +30,13 @@ import DetAccesses from '../Home/Accesses/DetAccesses';
 import AlertDetail from '../Alerts/AlertDetail';
 
 const Notifications = () => {
-  const [tab, setTab] = useState('T');
-  const [search, setSearch] = useState('');
-  const [dataFilter, setDataFilter] = useState([]);
+  // const [tab, setTab] = useState('T');
+  // const [search, setSearch] = useState('');
+  // const [dataFilter, setDataFilter] = useState([]);
   const [openDetail, setOpenDetail] = useState('');
   const [formState, setFormState]: any = useState({});
-  const {user} = useAuth();
+  // const {user} = useAuth();
+  // const [loaded, setLoaded] = useState(false);
   const [params, setParams]: any = useState({
     perPage: -1,
     page: 1,
@@ -83,11 +84,11 @@ const Notifications = () => {
 
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
-    if (
-      search != '' &&
-      (data.msg?.body + '').toLowerCase().indexOf(search.toLowerCase()) == -1
-    )
-      return null;
+    // if (
+    //   search != '' &&
+    //   (data.msg?.body + '').toLowerCase().indexOf(search.toLowerCase()) == -1
+    // )
+    //   return null;
 
     const left = (data: any) => {
       let image = '';
@@ -239,10 +240,11 @@ const Notifications = () => {
       return <Avatar src={image} name={name} />;
     };
     const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
+
     return (
       <ItemList
         //   style={read ? {opacity: 0.5} : {}}
-        title={msg?.title + 'aa'}
+        title={msg?.title}
         subtitle={msg?.body}
         date={getDateTimeStrMes(notifi.created_at)}
         widthMain="70%"
@@ -252,41 +254,48 @@ const Notifications = () => {
         left={left(data)}></ItemList>
     );
   };
-  const onSearch = (search: string) => {
-    setSearch(search);
-  };
+  // const onSearch = (search: string) => {
+  //   setSearch(search);
+  // };
 
-  useEffect(() => {
-    const channelMap: {[key: string]: string} = {
-      G: 'guards',
-      A1: 'alerts-1',
-      A2: 'alerts-2',
-      A3: 'alerts-3',
-    };
+  // useEffect(() => {
+  //   setDataFilter([]);
+  //   const channelMap: {[key: string]: string} = {
+  //     G: 'guards',
+  //     A1: 'alerts-1',
+  //     A2: 'alerts-2',
+  //     A3: 'alerts-3',
+  //   };
 
-    if (tab === 'T') {
-      setDataFilter(notifs?.data);
-      return;
-    }
+  //   if (tab === 'T') {
+  //     setDataFilter(notifs?.data);
+  //     return;
+  //   }
 
-    if (tab === 'Y') {
-      setDataFilter(
-        notifs?.data?.filter(
-          (notif: any) =>
-            notif.channel ===
-            `${(configApp.APP_AUTH_IAM as string).replace('/', '')}${user?.id}`,
-        ),
-      );
-      return;
-    }
-    setDataFilter(
-      notifs?.data?.filter((notif: any) => notif.channel === channelMap[tab]),
-    );
-  }, [tab, notifs?.data]);
+  //   if (tab === 'Y') {
+  //     setDataFilter(
+  //       notifs?.data?.filter(
+  //         (notif: any) =>
+  //           notif.channel ===
+  //           `${(configApp.APP_AUTH_IAM as string).replace('/', '')}${user?.id}`,
+  //       ),
+  //     );
+  //     return;
+  //   }
+  //   setDataFilter(
+  //     notifs?.data?.filter((notif: any) => notif.channel === channelMap[tab]),
+  //   );
+  // }, [tab, notifs?.data]);
+  // console.log(dataFilter);
+  // useEffect(() => {
+  //   if (dataFilter?.length > 0) {
+  //     setLoaded(true);
+  //   }
+  // }, [dataFilter]);
 
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
-      <TabsButtons
+      {/* <TabsButtons
         tabs={[
           {value: 'T', text: 'Todo'},
           {value: 'Y', text: 'Mis Notificaciones'},
@@ -297,12 +306,12 @@ const Notifications = () => {
         ]}
         sel={tab}
         setSel={setTab}
-      />
+      /> */}
       <View style={{padding: cssVar.spL, gap: cssVar.spL}}>
-        <DataSearch setSearch={onSearch} name="Novedades" value={search} />
+        {/* <DataSearch setSearch={onSearch} name="Novedades" value={search} /> */}
 
         <List
-          data={dataFilter}
+          data={notifs?.data}
           renderItem={NotifisList}
           refreshing={!loaded}
           skeletonType="list"

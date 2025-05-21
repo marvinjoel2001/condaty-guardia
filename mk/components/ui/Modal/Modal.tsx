@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState, useContext} from 'react';
+import {useEffect, useRef, useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,7 @@ import {
   TouchableOpacity,
   Modal as ModalRN,
   Animated,
-  BackHandler,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
 import Icon from '../Icon/Icon';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
 import {AuthContext} from '../../../contexts/AuthContext';
@@ -29,8 +27,6 @@ type PropsType = {
   buttonCancel?: string;
   buttonExtra?: any;
   id?: string;
-  duration?: number;
-  fullScreen?: boolean;
   iconClose?: boolean;
   disabled?: boolean;
   recursive?: boolean;
@@ -49,7 +45,6 @@ const Modal = ({
   buttonCancel = '',
   buttonExtra = null,
   id = '',
-  fullScreen = false,
   iconClose = true,
   overlayClose = false,
   disabled = false,
@@ -60,24 +55,6 @@ const Modal = ({
   const {toast, showToast}: any = useContext(AuthContext);
   const [_open, setOpen] = useState(false);
   const fadeAnim = useRef(new Animated.Value(200)).current;
-
-  // BackHandler logic
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const onBackPress = () => {
-  //       if (open && fullScreen) {
-  //         _onClose('back');
-  //         return true; // Prevent default back behavior
-  //       }
-  //       return false; // Allow default back behavior if modal isn't open or fullscreen
-  //     };
-
-  //     BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-  //     return () =>
-  //       BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  //   }, [open, fullScreen]), // Dependencies ensure the effect is applied when these change
-  // );
 
   useEffect(() => {
     if (open) {
@@ -124,7 +101,7 @@ const Modal = ({
             style={{
               ...theme.container,
               ...containerStyles,
-              width: screen.width - 80,
+              width: screen.width - 40,
               opacity: fadeAnim,
             }}>
             {(iconClose || title) && (

@@ -1,15 +1,17 @@
 import React from 'react';
 import {Text, View} from 'react-native';
-import {cssVar} from '../../../../../mk/styles/themes';
+import {cssVar, TypeStyles} from '../../../../../mk/styles/themes';
 
 type LineDetailProps = {
   label: any;
   value: any;
+  style?: TypeStyles;
 };
-const LineDetail = ({label, value}: LineDetailProps) => {
+const LineDetail = ({label, value, style}: LineDetailProps) => {
   return (
     <View
       style={{
+        ...style,
         display: 'flex',
         flexDirection: 'row',
         gap: cssVar.sS,

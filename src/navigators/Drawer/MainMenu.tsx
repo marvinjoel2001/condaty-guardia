@@ -2,6 +2,7 @@ import {Alert, ScrollView, Text, View} from 'react-native';
 import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
 import {
   IconAlert,
+  IconDepartments,
   IconDocs,
   IconFacebook,
   IconHistorial,
@@ -26,7 +27,7 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 
 const MainMenu = ({navigation}: DrawerContentComponentProps) => {
-  const {logout, user} = useAuth();
+  const {logout, user, setStore, store} = useAuth();
   const activeItem = getActivePage(navigation);
 
   // const navigateTo = (screen: string) => {
@@ -120,6 +121,16 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             reverse
             color={cssVar.cWhiteV2}
           />
+          {user?.clients && user.clients.length > 1 && (
+            <ItemMenu
+              // screen="CambiarCondo"
+              text="Cambiar Condominio"
+              icon={IconDepartments}
+              // activeItem={activeItem}
+              color={cssVar.cWhiteV2}
+              onPress={() => setStore({...store, openClient: true})}
+            />
+          )}
           <ItemMenu
             screen="Documents"
             text="Documentos"

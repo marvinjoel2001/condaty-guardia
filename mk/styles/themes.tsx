@@ -47,7 +47,12 @@ export const cssVar = {
   // cAlertMedio: '#f37f3d',
   // cAlertBajo: '#00e38c',
 
+  // Hovers
   cHover: '#FFFFFF0D',
+  cHoverSuccess: '#34A85333',
+  cHoverError: '#DA5D5D33',
+  cHoverWarning: '#E9B01E33',
+  cHoverInfo: '#4285FA33',
   /* Paleta de colores Random */
   cRandom1: '#a2d2bf',
   cRandom2: '#a9cce3',
