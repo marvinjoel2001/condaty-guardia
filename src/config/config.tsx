@@ -2,7 +2,8 @@ const configApp = {
   API_URL: 'https://api.condaty.com/api',
   API_URL_PROD: 'https://api.condaty.com/api',
   API_URL_DEV: 'https://phplaravel-1214481-5270819.cloudwaysapps.com/api',
-  // API_URL_TEST: 'https://apiuytest.elekta.app/api',
+  API_URL_TEST: 'https://phplaravel-1214481-5534746.cloudwaysapps.com/api',
+  API_URL_DEMO: 'http://localhost:8000/api',
   APP_NAME: 'Condaty Guards',
   APP_DESCRIPTION: 'Guardias Control de Accesos',
   APP_LOGO: '/assets/images/logo/logo.svg',
@@ -24,31 +25,34 @@ const configApp = {
   APP_PUSHER_BEAMS_INTEREST_PREFIX: 'condaty',
   APP_PUSHER_BEAMS_INTERESTS: 'guards,gral,alerts-1,alerts-3',
   APP_SIGNAL_KEY: '13cc913d-247b-4dc8-b5f1-54e64d173818',
-  APP_INSTANTDB_APP_ID: '8c5fd947-ecd0-4774-8d1a-1e503c1ec981',
+  APP_INSTANTDB_APP_ID: '324b0c54-bf82-437e-9a31-fbc637ab61d2',
   APP_INSTANTDB_APP_ID_DEV: '8c5fd947-ecd0-4774-8d1a-1e503c1ec981',
+  APP_INSTANTDB_APP_ID_TEST: 'd3a70e0a-21ae-449f-b153-37a05b6ec300',
+  APP_INSTANTDB_APP_ID_DEMO: 'd3a70e0a-21ae-449f-b153-37a05b6ec300',
   APP_DEBUG: 0,
 };
 
-configApp.API_URL = configApp.API_URL_DEV; // Cambiar a produccion
-if (process.env.NODE_ENV == 'development') {
-  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo
-  configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEV;
-  // configApp.API_URL = configApp.API_URL_PROD;
-  configApp.APP_DEBUG = 0;
-}
-// configApp.APP_XORKEY = configApp.API_URL;
-// if (configApp.API_URL == configApp.API_URL_PROD) {
-//   configApp.APP_PUSHER_KEY = configApp.APP_PUSHER_KEY_PROD;
-//   configApp.APP_PUSHER_APP_ID = configApp.APP_PUSHER_APP_ID_PROD;
-//   configApp.APP_PUSHER_SECRET = configApp.APP_PUSHER_SECRET_PROD;
-//   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX =
-//     configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX_PROD;
-// } else {
-//   configApp.APP_PUSHER_KEY = configApp.APP_PUSHER_KEY_DEV;
-//   configApp.APP_PUSHER_APP_ID = configApp.APP_PUSHER_APP_ID_DEV;
-//   configApp.APP_PUSHER_SECRET = configApp.APP_PUSHER_SECRET_DEV;
-//   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX =
-//     configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX_DEV;
-// }
+// configApp.API_URL = configApp.API_URL_PROD;
+configApp.API_URL = configApp.API_URL_DEV;
+// configApp.API_URL = configApp.API_URL_TEST;
+// configApp.API_URL = configApp.API_URL_DEMO;
 
+if (process.env.NODE_ENV == 'development') {
+  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
+}
+if (configApp.API_URL == configApp.API_URL_DEV) {
+  configApp.APP_DEBUG = 0;
+  configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydev';
+  configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEV;
+}
+if (configApp.API_URL == configApp.API_URL_TEST) {
+  configApp.APP_DEBUG = 0;
+  configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatytest';
+  configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_TEST;
+}
+if (configApp.API_URL == configApp.API_URL_DEMO) {
+  configApp.APP_DEBUG = 0;
+  configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydemo';
+  configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEMO;
+}
 export default configApp;
