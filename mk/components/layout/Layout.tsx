@@ -204,7 +204,7 @@ export default Layout;
 
 const theme: ThemeType = {
   layout: {
-    backgroundColor: cssVar.cBlackV1,
+    backgroundColor: cssVar.cBlack,
     flex: 1,
   },
   scrollView: {

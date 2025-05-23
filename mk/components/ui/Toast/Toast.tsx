@@ -22,11 +22,11 @@ interface ToastProps {
 }
 export const TIME_TOAST = 3000;
 const Toast = ({toast, showToast}: ToastProps) => {
-  const translateY = useRef(new Animated.Value(200)).current; // Inicia fuera de la pantalla
+  const translateY = useRef(new Animated.Value(-200)).current; // Inicia fuera de la pantalla
 
   const _close = () => {
     Animated.timing(translateY, {
-      toValue: 20, // Se mueve fuera de la pantalla hacia abajo
+      toValue: -200, // Se mueve fuera de la pantalla hacia abajo
       duration: 400,
       easing: Easing.ease,
       useNativeDriver: true,
@@ -98,7 +98,7 @@ const theme: ThemeType = {
   hidden: {display: 'none', pointerEvents: 'box-only'},
   container: {
     position: 'absolute',
-    bottom: 24,
+    top: 50,
     left: 0,
     right: 0,
     zIndex: 1000,

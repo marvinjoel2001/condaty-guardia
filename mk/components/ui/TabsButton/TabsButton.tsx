@@ -43,52 +43,45 @@ const TabsButtons = ({
           paddingHorizontal: 16,
           ...contentContainerStyles,
         }}>
-        {tabs.map(tab => (
-          <TouchableOpacity key={tab.value} onPress={() => setSel(tab?.value)}>
-            <View
-              style={{
-                borderRadius: 18,
-                paddingHorizontal: 18,
-                paddingVertical: 6,
-                backgroundColor: cssVar.cBlackV2,
-
-                ...(sel === tab.value
-                  ? {
-                      backgroundColor: cssVar.cAccent,
-                    }
-                  : {}),
-              }}>
-              <Text
+        {tabs.map(tab => {
+          const isActive = sel === tab.value;
+          return (
+            <TouchableOpacity key={tab.value} onPress={() => setSel(tab?.value)}>
+              <View
                 style={{
-                  color: cssVar.cWhiteV2,
-
-                  fontSize: 14,
-                  fontFamily: FONTS.medium,
-                  ...(sel === tab.value
-                    ? {
-                        color: cssVar.cBlack,
-                        fontFamily: FONTS.semiBold,
-                      }
-                    : {}),
+                  paddingHorizontal: 16,
+                  paddingVertical: 8,
+                  borderRadius: 8,
+                  borderWidth: isActive ? 0.5 : 0,
+                  borderColor: isActive ? cssVar.cSuccess : cssVar.cBlackV2,
+                  backgroundColor: isActive ? 'rgba(36, 105, 80, 0.84)' : cssVar.cHoverBlackV2,
                 }}>
-                {tab.text}
-              </Text>
-              {tab.isNew && (
-                <View
+                <Text
                   style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: cssVar.cError,
-                    right: 8,
-                    top: 4,
-                    position: 'absolute',
-                  }}
-                />
-              )}
-            </View>
-          </TouchableOpacity>
-        ))}
+                    fontSize: 14,
+                    fontFamily: isActive ? FONTS.bold : FONTS.regular,
+                    color: isActive ? cssVar.cWhite : cssVar.cWhiteV1,
+                    textAlign: 'center',
+                  }}>
+                  {tab.text}
+                </Text>
+                {tab.isNew && (
+                  <View
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: cssVar.cError,
+                      right: 8,
+                      top: 4,
+                      position: 'absolute',
+                    }}
+                  />
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
