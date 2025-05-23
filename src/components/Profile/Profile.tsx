@@ -325,10 +325,11 @@ const Profile = () => {
                 </View>
                 <View style={styles.inputContainerUnit}>
                   <Input
-                    label="Dirección"
+                    label="Unidad"
                     value={
                       user?.dpto && user.dpto.length > 0
-                        ? `${user.address || ''}`
+                        ? `${user.dpto[0]?.type?.name || ''} ${
+                            user.dpto[0]?.nro || ''}`
                         : 'No asignada'
                     }
                     disabled={true}
@@ -619,7 +620,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     marginHorizontal: -5,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   inputContainer: {
     flex: 1,
