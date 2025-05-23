@@ -325,12 +325,9 @@ const Profile = () => {
                 </View>
                 <View style={styles.inputContainerUnit}>
                   <Input
-                    label="Unidad"
+                    label="Domicilio"
                     value={
-                      user?.dpto && user.dpto.length > 0
-                        ? `${user.dpto[0]?.type?.name || ''} ${
-                            user.dpto[0]?.nro || ''}`
-                        : 'No asignada'
+                      user?.address || 'No asignado'
                     }
                     disabled={true}
                     name="unidad_display"
@@ -391,9 +388,9 @@ const Profile = () => {
             <Text style={styles.text}>{client?.name || 'No asignado'}</Text>
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
 
-            <Text style={styles.label}>Unidad</Text>
+            <Text style={styles.label}>Domicilio</Text>
             <Text style={styles.text}>
-              {user?.dpto?.[0]?.type?.name || 'No asignado'}
+              {user?.address || 'No asignado'}
             </Text>
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
             {user?.dpto && user?.dpto?.length > 0 && (
@@ -561,6 +558,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: cssVar.cBlackV2,
+    gap:16,
   },
   cardAccess: {
     borderRadius: 16,
