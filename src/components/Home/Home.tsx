@@ -132,8 +132,12 @@ const Home = () => {
 
   // Filtrar la data según el término de búsqueda
   const filteredData = useMemo(() => {
+    // Comprobación de seguridad
+    if (!Array.isArray(data)) {
+      console.warn('data is not an array in useMemo:', data);
+      return []; // Retorna un array vacío si data no es un array
+    }
     return data.filter((item: any) => {
-      // Consideramos que puede venir en item.owner o item.visit
       const ownerName = item?.owner
         ? getFullName(item.owner).toLowerCase()
         : '';

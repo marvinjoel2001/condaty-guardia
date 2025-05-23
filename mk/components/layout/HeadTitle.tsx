@@ -7,7 +7,12 @@ import {
   IconMenu,
   IconNotification,
 } from '../../../src/icons/IconLibrary';
+import Avatar from '../ui/Avatar/Avatar';
+import {getFullName, getUrlImages} from '../../utils/strings';
+import useAuth from '../../hooks/useAuth';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
+import {getPercentajeUser, navigate} from '../../utils/utils';
+import TextLog from '../ui/TextLog/TextLog';
 import {useEvent} from '../../hooks/useEvent';
 
 interface HeadTitleProps {
@@ -15,6 +20,7 @@ interface HeadTitleProps {
   backUrl?: string;
   style?: TypeStyles;
   onBack?: (() => void) | null;
+  onlyBack?: boolean;
   customTitle?: any;
   right?: any;
   back?: boolean;
@@ -30,18 +36,19 @@ const HeadTitle = ({
   right,
   back = false,
   avatar = false,
+  onlyBack = false,
 }: HeadTitleProps) => {
   const navigation: any = useNavigation();
   const route = useRoute();
-
+  const {user} = useAuth();
   const [counter, setCounter] = useState(0);
 
   const onNotif = useCallback((data: any) => {
-    console.log('onNotif', data);
-    if (data?.event == 'reload') return;
+    console.log('nueva counter', data);
     setCounter(old => old + 1);
   }, []);
   const onResetNotif = useCallback((data: any) => {
+    console.log('nueva counter', data);
     setCounter(0);
   }, []);
   useEvent('onNotif', onNotif);
@@ -68,7 +75,7 @@ const HeadTitle = ({
 
   return (
     <Animated.View style={{...theme.container, ...style}}>
-      {route.name == 'Home' ? (
+      {route.name == 'Home' && !onlyBack ? (
         <View
           style={{
             flexDirection: 'row',
@@ -99,7 +106,7 @@ const HeadTitle = ({
         </Text>
       )}
       {right && <View>{right}</View>}
-      {route.name == 'Home' && (
+      {route.name == 'Home' && !onlyBack && (
         <View
           style={{
             flexDirection: 'row',
@@ -108,7 +115,9 @@ const HeadTitle = ({
             backgroundColor: cssVar.cWhite,
             borderRadius: '100%',
           }}
-          onTouchEnd={() => navigation.navigate('Notifications')}>
+          onTouchEnd={() => {
+            navigation.navigate('Notificaciones');
+          }}>
           <Icon name={IconNotification} color={cssVar.cBlack} />
           {counter > 0 && (
             <View style={theme.notifPoint}>
@@ -130,12 +139,13 @@ const theme: ThemeType = {
   container: {
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    // borderBottomWidth: 1,
-    // borderBottomColor: cssVar.cWhiteV1,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+    borderWidth: 0.5,
+    borderTopWidth: 0,
+    borderBottomColor: cssVar.cWhiteV1,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
     padding: cssVar.spS,
-    shadowColor: 'black',
+
     alignItems: 'center',
     flexDirection: 'row',
   },
@@ -154,10 +164,10 @@ const theme: ThemeType = {
   },
   title: {
     flexGrow: 1,
-    paddingLeft: cssVar.spM,
+    paddingRight: cssVar.spM,
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
-    textAlign: 'left',
+    textAlign: 'center',
     fontSize: cssVar.sXl,
   },
   bage: {

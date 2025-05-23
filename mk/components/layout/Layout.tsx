@@ -174,10 +174,7 @@ const Layout = (props: PropsType) => {
           </Animated.ScrollView>
         ) : (
           // <Animated.View style={animatedViewStyle}>{children}</Animated.View>
-          <View
-            style={{
-              paddingBottom: isRoute() ? 60 : 0,
-            }}>
+          <View style={{ flex: 1, paddingBottom: isRoute() ? 60 : 0 }}>
             {children}
           </View>
         )}

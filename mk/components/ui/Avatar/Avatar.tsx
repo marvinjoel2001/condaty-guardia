@@ -1,9 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  ImageBackground,
   Image,
 } from 'react-native';
 import {initialsName} from '../../../utils/strings';
@@ -11,8 +10,6 @@ import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
 import {IconUser} from '../../../../src/icons/IconLibrary';
 import Icon from '../Icon/Icon';
 import {cRandomcolors} from '../../../utils/randomColors';
-// import FastImage from 'react-native-fast-image';
-// import {usePusher} from '../../../contexts/PusherContext';
 
 interface AvatarProps {
   src?: string | null;
@@ -30,8 +27,8 @@ interface AvatarProps {
   verify?: boolean;
   level?: any;
   circle?: boolean;
-  borderColor?: string; // Color del borde
-  borderWidth?: number; // Grosor del borde
+  borderColor?: string;
+  borderWidth?: number;
 }
 
 const Avatar = ({
@@ -47,14 +44,20 @@ const Avatar = ({
   sizeIconVerify = 16,
   verify = false,
   circle = true,
-  borderColor = 'transparent', // Valor por defecto para el borde
-  borderWidth = 0, // Valor por defecto para el grosor del borde
+  borderColor = 'transparent',
+  borderWidth = 0,
 }: AvatarProps) => {
   const [imageError, setImageError] = useState(false);
-  // const {connect} = usePusher();
 
-  const getBackgroundColor = (name: string) => {
-    const index = name.length % cRandomcolors.length;
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
+  const getBackgroundColor = (nameString: string) => {
+    if (!nameString || nameString.length === 0) {
+        return cRandomcolors[0];
+    }
+    const index = nameString.length % cRandomcolors.length;
     return cRandomcolors[index];
   };
 
@@ -68,10 +71,10 @@ const Avatar = ({
           ...theme.avatar,
           width: w,
           height: h,
-          backgroundColor: backgroundColor,
-          borderColor: borderColor, // Agregar color del borde
-          borderWidth: borderWidth, // Agregar grosor del borde
-          borderRadius: w / 2, // Asegurar que el borde sea circular
+          backgroundColor: (src && !imageError) ? 'transparent' : backgroundColor,
+          borderColor: borderColor,
+          borderWidth: borderWidth,
+          borderRadius: circle ? w / 2 : cssVar.bRadiusS,
           ...style,
         }}
         onPress={() => onClick && onClick()}>
@@ -81,18 +84,15 @@ const Avatar = ({
             style={{
               width: w,
               height: h,
-              borderRadius: circle ? w / 2 : 0, // Asegurar que la imagen sea circular
+              borderRadius: circle ? w / 2 : 0,
             }}
             resizeMode="cover"
             onError={e => {
-              // console.log('Error al cargar la imagen', e);
               error();
               setImageError(true);
             }}
-            onLoad={async () => {
+            onLoad={() => {
               setImageError(false);
-              // if (level && level != '') console.log('Imagen cargada');
-              // const a = await connect();
             }}
           />
         ) : !emptyIcon ? (
@@ -108,15 +108,6 @@ const Avatar = ({
           />
         )}
       </TouchableOpacity>
-
-      {/* {verify && (
-        <Icon
-          name={IconVerify}
-          color={cssVar.cSuccess}
-          size={sizeIconVerify}
-          style={{position: 'absolute', top: -4, right: 0}}
-        />
-      )} */}
     </View>
   );
 
@@ -134,8 +125,6 @@ const theme: ThemeType = {
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 40,
-    height: 40,
   },
   text: {
     color: cssVar.cBlackV1,
