@@ -117,9 +117,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input1: {
-    width: '50%',
+    width: '49%',
   },
   input2: {
-    width: '47%',
+    width: '48.5%',
   },
 });

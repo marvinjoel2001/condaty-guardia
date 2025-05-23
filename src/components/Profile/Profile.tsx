@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     marginHorizontal: -5,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   inputContainer: {
     flex: 1,

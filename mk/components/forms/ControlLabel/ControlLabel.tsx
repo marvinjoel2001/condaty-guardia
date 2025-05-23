@@ -101,7 +101,7 @@ export default ControlLabel;
 const theme: ThemeType = {
   container: {
     position: 'relative',
-    paddingTop: 2,
+
   },
   label: {
     color: cssVar.cWhiteV2,
@@ -126,7 +126,7 @@ const theme: ThemeType = {
   },
   error: {
     marginHorizontal: cssVar.spS,
-    marginBottom: cssVar.spS,
+
     fontSize: cssVar.sXs,
     color: cssVar.cError,
     fontFamily: FONTS.medium,
