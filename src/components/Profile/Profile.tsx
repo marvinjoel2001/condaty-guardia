@@ -325,11 +325,10 @@ const Profile = () => {
                 </View>
                 <View style={styles.inputContainerUnit}>
                   <Input
-                    label="Unidad"
+                    label="Dirección"
                     value={
                       user?.dpto && user.dpto.length > 0
-                        ? `${user.dpto[0]?.type?.name || ''} ${
-                            user.dpto[0]?.nro || ''}`
+                        ? `${user.address || ''}`
                         : 'No asignada'
                     }
                     disabled={true}
