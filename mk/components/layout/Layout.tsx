@@ -186,7 +186,13 @@ const Layout = (props: PropsType) => {
       </View>
 
       {isRoute() && <Footer />}
-
+      {openAlert.open && (
+        <LockAlert
+          open={openAlert.open}
+          onClose={onCloseAlert}
+          data={openAlert.data}
+        />
+      )}
       {store?.openClient && (
         <ChooseClient
           open={store?.openClient}
