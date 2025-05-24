@@ -10,7 +10,7 @@ const SubTitle = ({children, style}: PropsType) => {
 };
 const theme: ThemeType = {
   subTitle: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     fontSize: 12,
     paddingVertical: 8,
     fontFamily: FONTS.regular,

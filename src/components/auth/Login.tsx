@@ -196,14 +196,14 @@ const Login = () => {
                   <Icon
                     onPress={() => togglePasswordVisibility()}
                     name={IconEyeOff}
-                    fillStroke={cssVar.cWhiteV2}
+                    fillStroke={cssVar.cWhiteV1}
                     color={'transparent'}
                   />
                 ) : (
                   <Icon
                     onPress={() => togglePasswordVisibility()}
                     name={IconEye}
-                    color={cssVar.cWhiteV2}
+                    color={cssVar.cWhiteV1}
                   />
                 )
               }

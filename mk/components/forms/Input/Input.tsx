@@ -19,7 +19,7 @@ const Input = (props: PropsType) => {
   };
 
   const styleInput = {
-    ...{...theme.default, paddingLeft: props.iconLeft ? 30 : cssVar.spM},
+    ...{...theme.default, paddingLeft: props.iconLeft ? 30 : cssVar.spS},
     ...{paddingRight: props.iconRight ? 30 : cssVar.spM},
     ...(isFocused ? theme.focusInput : {}),
     ...(props.error && props.error[props.name] ? {...theme.errorInput} : {}),
@@ -64,7 +64,7 @@ const Input = (props: PropsType) => {
         value={props.value}
         returnKeyType={props.search}
         placeholder={isFocused ? '' : props.placeholder || ''}
-        placeholderTextColor={cssVar.cWhiteV2}
+        placeholderTextColor={cssVar.cWhiteV1}
         editable={!props.disabled && !props.readOnly}
         secureTextEntry={props.password || false}
         autoFocus={props.autoFocus || false}
@@ -85,15 +85,15 @@ const theme: ThemeType = {
   },
   default: {
     borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cBlackV2,
+    borderColor: cssVar.cWhiteV2,
     borderRadius: cssVar.bRadiusS,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
-    backgroundColor: cssVar.cBlackV2,
+    backgroundColor: cssVar.cWhiteV2,
     color: cssVar.cWhite,
-    paddingBottom: cssVar.spM,
-    paddingHorizontal: cssVar.spM,
-    paddingTop: 24,
+    paddingBottom: cssVar.spS,
+    paddingHorizontal: cssVar.spS,
+    paddingTop: 22,
     // paddingVertical: cssVar.spL,
   },
   errorInput: {borderColor: cssVar.cError},

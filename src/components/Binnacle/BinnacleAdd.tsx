@@ -8,6 +8,7 @@ import useAuth from '../../../mk/hooks/useAuth';
 import {IconScreenShot} from '../../icons/IconLibrary';
 import {cssVar} from '../../../mk/styles/themes';
 import useApi from '../../../mk/hooks/useApi';
+import UploadImage from '../../../mk/components/forms/UploadImage/UploadImage';
 type PropsType = {
   open: boolean;
   onClose: () => void;
@@ -67,44 +68,12 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}
         />
-        <TouchableOpacity
-          onPress={() => {
-            uploadImage({formState, setFormState, showToast});
-          }}
-          style={{
-            marginVertical: 12,
-            paddingVertical: 8,
-            borderRadius: 16,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            backgroundColor: cssVar.cBlackV2,
-          }}>
-          <Icon name={IconScreenShot} color={cssVar.cWhiteV2} />
-          <Text
-            style={{
-              color: cssVar.cWhiteV2,
-              fontFamily: 'Poppins Medium',
-            }}>
-            Subir Imagen
-          </Text>
-        </TouchableOpacity>
-        {formState?.avatar && (
-          <View
-            style={{
-              marginVertical: 16,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image
-              source={{uri: 'data:image/jpg;base64,' + formState.avatar}}
-              resizeMode="cover"
-              style={{width: 220, height: 290}}
-            />
-          </View>
-        )}
+        <UploadImage
+          setFormState={setFormState}
+          formState={formState}
+          label="Adjuntar imagen"
+          name="avatar"
+        />
       </View>
     </ModalFull>
   );

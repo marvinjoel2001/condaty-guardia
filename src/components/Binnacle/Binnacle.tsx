@@ -16,9 +16,14 @@ const Binnacle = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState({open: false, item: null});
   const [search, setSearch] = useState('');
-  const {data, reload, loaded} = useApi('/guardnews', 'GET', {
-    fullType: 'L',
-  });
+  const {data, reload, loaded} = useApi(
+    '/guardnews',
+    'GET',
+    {
+      fullType: 'L',
+    },
+    3,
+  );
 
   const novedadList = (novedad: any) => {
     if (

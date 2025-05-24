@@ -80,16 +80,16 @@ export const TextArea = (props: PropsType) => {
 
 const theme: ThemeType = {
   form: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
   },
   default: {
     borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cBlackV2,
+    borderColor: cssVar.cWhiteV2,
     borderRadius: cssVar.bRadiusS,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
     textAlignVertical: 'top',
-    backgroundColor: cssVar.cBlackV2,
+    backgroundColor: cssVar.cWhiteV2,
     color: cssVar.cWhite,
     // paddingVertical: cssVar.spL,
     paddingTop: cssVar.spXl,

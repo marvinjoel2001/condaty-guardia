@@ -214,7 +214,6 @@ const Home = () => {
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
-          contentContainerStyles={styles.contentContainerTab}
           style={{justifyContent: 'center', flex: 1, alignContent: 'center'}}
         />
 
@@ -290,11 +289,6 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-  contentContainerTab: {
-    width: '100%',
-    alignSelf: 'center',
-    justifyContent: 'center',
-  },
   listContainer: {
     width: '100%',
     paddingHorizontal: cssVar.spL,

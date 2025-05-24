@@ -3,6 +3,7 @@ import {Animated, ImageBackground, View} from 'react-native';
 import ItemFoot from './ItemFoot';
 import {
   IconAlert,
+  IconAlertNotification,
   IconContactos,
   IconFeedBack,
   IconHistorial,
@@ -55,7 +56,7 @@ const Footer = ({styles}: any) => {
       <ItemFoot
         path="Alerts"
         text="Alertas"
-        icon={IconAlert}
+        icon={IconAlertNotification}
         isActived={(store?.nEvents || 0) > 0}
       />
       <ItemFoot
@@ -81,10 +82,11 @@ const theme: ThemeType = {
     paddingVertical: cssVar.spM,
     backgroundColor: cssVar.cBlack,
     position: 'absolute',
-    // borderTopLeftRadius: 12,
-    // borderTopRightRadius: 12,
-    borderTopColor: cssVar.cBlackV2,
-    borderTopWidth: 2,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    borderWidth: 0.5,
+    borderBottomWidth: 0,
+    borderTopColor: cssVar.cWhiteV1,
     width: '100%',
     bottom: 0,
   },

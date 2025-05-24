@@ -221,7 +221,7 @@ const theme: ThemeType = {
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderBottomColor: cssVar.cWhiteV1,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
   },
   headerText: {
     color: cssVar.cWhite,
@@ -239,7 +239,7 @@ const theme: ThemeType = {
     padding: cssVar.spS,
     gap: cssVar.spS,
     borderTopColor: cssVar.cWhiteV1,
-    borderTopWidth: 1,
+    borderTopWidth: 0.5,
   },
   buttonExtra: {
     paddingHorizontal: 12,
