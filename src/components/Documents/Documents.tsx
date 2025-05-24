@@ -18,10 +18,12 @@ import {
   // IconZIP,
 } from '../../icons/IconLibrary';
 import {cssVar} from '../../../mk/styles/themes';
+import DocumentDetail from './DocumentDetail';
 
 const Documents = () => {
   // const [tab, setTab] = useState('TO');
   // const [search, setSearch] = useState('');
+  const [openDeatil, setOpenDetail] = useState({open: false, item: null});
   const {
     data: documents,
     loaded,
@@ -40,19 +42,19 @@ const Documents = () => {
   //   setSearch(search);
   // };
 
-  const openDocument = (document: any) => {
-    const documentUrl = getUrlImages(
-      '/DOC-' +
-        document?.id +
-        '.' +
-        document.ext +
-        '?d=' +
-        document?.updated_at,
-    );
-    Linking.openURL(documentUrl).catch(err => {
-      console.error('Error al abrir el enlace: ', err);
-    });
-  };
+  // const openDocument = (document: any) => {
+  //   const documentUrl = getUrlImages(
+  //     '/DOC-' +
+  //       document?.id +
+  //       '.' +
+  //       document.ext +
+  //       '?d=' +
+  //       document?.updated_at,
+  //   );
+  //   Linking.openURL(documentUrl).catch(err => {
+  //     console.error('Error al abrir el enlace: ', err);
+  //   });
+  // };
 
   const getFileType = (ext: string) => {
     // Normalizar las extensiones para manejar variaciones como 'docx', 'xlsx', etc.
@@ -92,7 +94,8 @@ const Documents = () => {
     return (
       <ItemList
         title={document?.name}
-        onPress={() => openDocument(document)}
+        // onPress={() => openDocument(document)}
+        onPress={() => setOpenDetail({open: true, item: document})}
         subtitle="Administración"
         //date={document.created_at}
         left={
@@ -147,6 +150,14 @@ const Documents = () => {
         renderItem={DocumentList}
         refreshing={!loaded}
       />
+
+      {openDeatil?.open && (
+        <DocumentDetail
+          open={openDeatil?.open}
+          onClose={() => setOpenDetail({open: false, item: null})}
+          item={openDeatil?.item}
+        />
+      )}
     </Layout>
   );
 };
