@@ -61,7 +61,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
         <TextArea
           label="Descripción"
           name="descrip"
-          placeholder="Describe alguna novedad o incidente ocurrido en tu jornada laboral."
+          placeholder="Escribir reporte..."
           error={errors}
           maxLength={250}
           required={true}

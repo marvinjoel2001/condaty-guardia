@@ -47,33 +47,31 @@ export const TextArea = (props: PropsType) => {
       type="textArea"
       isFocus={isFocused}
       maxLength={maxLength}>
-      <View>
-        <TextInput
-          testID={props.name}
-          id={props.name}
-          style={styleInput}
-          onFocus={e => {
-            setIsFocused(true), props.onFocus && props.onFocus(e);
-          }}
-          onBlur={_onBlur}
-          returnKeyType="none"
-          onChangeText={handleTextChange}
-          value={value}
-          placeholder={props.placeholder || ''}
-          placeholderTextColor={theme.form?.color}
-          editable={!props.disabled && !props.readOnly}
-          numberOfLines={props.lines || 8}
-          multiline={multiline}
-          autoFocus={props.autoFocus}
-          allowFontScaling={false}
-          maxLength={maxLength ?? undefined} // Permite texto ilimitado si no se define maxLength
-        />
-        {maxLength !== undefined && (
+      {/* <View> */}
+      <TextInput
+        testID={props.name}
+        id={props.name}
+        style={styleInput}
+        onFocus={() => setIsFocused(true)}
+        onBlur={_onBlur}
+        returnKeyType="none"
+        onChangeText={handleTextChange}
+        value={value}
+        placeholder={props.placeholder || ''}
+        placeholderTextColor={theme.form?.color}
+        editable={!props.disabled && !props.readOnly}
+        numberOfLines={props.lines || 8}
+        multiline={multiline}
+        autoFocus={props.autoFocus}
+        allowFontScaling={false}
+        maxLength={maxLength ?? undefined} // Permite texto ilimitado si no se define maxLength
+      />
+      {/* {maxLength !== undefined && (
           <Text style={theme.counter}>
             {textLength}/{maxLength}
           </Text>
         )}
-      </View>
+      </View> */}
     </ControlLabel>
   );
 };
@@ -84,7 +82,7 @@ const theme: ThemeType = {
   },
   default: {
     borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cWhiteV2,
+    borderColor: cssVar.cBlackV2,
     borderRadius: cssVar.bRadiusS,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
@@ -93,7 +91,7 @@ const theme: ThemeType = {
     color: cssVar.cWhite,
     // paddingVertical: cssVar.spL,
     paddingTop: cssVar.spXl,
-    paddingHorizontal: cssVar.spM,
+    paddingHorizontal: cssVar.spS,
     height: 120, // Limitar el tamaño del TextInput
   },
   errorInput: {borderColor: cssVar.cError},
