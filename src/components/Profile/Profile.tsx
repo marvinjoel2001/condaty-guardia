@@ -91,9 +91,13 @@ const Profile = () => {
           ...prevState,
           ...(userData || {}),
           avatar:
-            (prevState && prevState.avatar && prevState.avatar.startsWith('data:image'))
+            prevState &&
+            prevState.avatar &&
+            prevState.avatar.startsWith('data:image')
               ? prevState.avatar
-              : (userData && userData.avatar) || (prevState && prevState.avatar) || null,
+              : (userData && userData.avatar) ||
+                (prevState && prevState.avatar) ||
+                null,
         }));
       }
     } catch (error) {
@@ -107,17 +111,26 @@ const Profile = () => {
       setFormState((prevFormState: any) => ({
         ...prevFormState,
         ...user,
-        avatar: user?.avatar || (prevFormState.avatar && typeof prevFormState.avatar === 'string' && prevFormState.avatar.startsWith('data:image') ? prevFormState.avatar : user?.avatar || null),
+        avatar:
+          user?.avatar ||
+          (prevFormState.avatar &&
+          typeof prevFormState.avatar === 'string' &&
+          prevFormState.avatar.startsWith('data:image')
+            ? prevFormState.avatar
+            : user?.avatar || null),
       }));
     } else {
       setFormState((prevFormState: any) => {
-        const { avatar, ...restOfUser } = user;
+        const {avatar, ...restOfUser} = user;
         return {
           ...prevFormState,
           ...restOfUser,
-          avatar: (prevFormState.avatar && typeof prevFormState.avatar === 'string' && prevFormState.avatar.startsWith('data:image'))
-                    ? prevFormState.avatar
-                    : prevFormState.avatar || user?.avatar || null,
+          avatar:
+            prevFormState.avatar &&
+            typeof prevFormState.avatar === 'string' &&
+            prevFormState.avatar.startsWith('data:image')
+              ? prevFormState.avatar
+              : prevFormState.avatar || user?.avatar || null,
         };
       });
     }
@@ -138,11 +151,36 @@ const Profile = () => {
 
   const validate = (field = '') => {
     let errors: any = {};
-    errors = checkRules({ value: formState.name, rules: ['required', 'alpha'], key: 'name', errors });
-    errors = checkRules({ value: formState.middle_name, rules: ['alpha'], key: 'middle_name', errors });
-    errors = checkRules({ value: formState.last_name, rules: ['required', 'alpha'], key: 'last_name', errors });
-    errors = checkRules({ value: formState.mother_last_name, rules: ['alpha'], key: 'mother_last_name', errors });
-    errors = checkRules({ value: formState.phone, rules: ['required', 'phone'], key: 'phone', errors });
+    errors = checkRules({
+      value: formState.name,
+      rules: ['required', 'alpha'],
+      key: 'name',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.middle_name,
+      rules: ['alpha'],
+      key: 'middle_name',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.last_name,
+      rules: ['required', 'alpha'],
+      key: 'last_name',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.mother_last_name,
+      rules: ['alpha'],
+      key: 'mother_last_name',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.phone,
+      rules: ['required', 'phone'],
+      key: 'phone',
+      errors,
+    });
     setErrors(errors);
     return errors;
   };
@@ -152,8 +190,12 @@ const Profile = () => {
       return;
     }
     let avatarPayload;
-    if (formState.avatar && typeof formState.avatar === 'string' && formState.avatar.length > 1000) {
-        avatarPayload = {ext: 'webp', file: encodeURIComponent(formState.avatar)};
+    if (
+      formState.avatar &&
+      typeof formState.avatar === 'string' &&
+      formState.avatar.length > 1000
+    ) {
+      avatarPayload = {ext: 'webp', file: encodeURIComponent(formState.avatar)};
     }
 
     const newUser: any = {
@@ -222,16 +264,14 @@ const Profile = () => {
           />
         )
       }
-      style={{}}
-      scroll={false}
-    >
-      
-      
+      style={{}}>
       <View style={styles.avatarContainer}>
         <Avatar
           onClick={() => setImagePreview(true)}
           src={
-            formState.avatar && isEdit && formState.avatar.startsWith('data:image') // Asegura que sea un base64
+            formState.avatar &&
+            isEdit &&
+            formState.avatar.startsWith('data:image') // Asegura que sea un base64
               ? formState.avatar // Usa directamente si es base64 completo
               : formState.avatar && isEdit // Si es solo el string base64 sin el prefijo
               ? 'data:image/jpg;base64,' + formState.avatar
@@ -275,7 +315,6 @@ const Profile = () => {
       </Text>
 
       {isEdit ? (
-
         <View style={{flex: 1}}>
           <ScrollView
             style={{flex: 1}}
@@ -283,8 +322,7 @@ const Profile = () => {
               flexGrow: 1, // Para que el contenido pueda empujar el padding
               paddingBottom: 85, // Espacio para los botones. Ajusta si es necesario.
             }}
-            keyboardShouldPersistTaps="handled"
-          >
+            keyboardShouldPersistTaps="handled">
             <Form behaviorIos="position" keyboardVerticalOffset={100}>
               <InputFullName
                 formState={formState}
@@ -326,9 +364,7 @@ const Profile = () => {
                 <View style={styles.inputContainerUnit}>
                   <Input
                     label="Domicilio"
-                    value={
-                      user?.address || 'No asignado'
-                    }
+                    value={user?.address || 'No asignado'}
                     disabled={true}
                     name="unidad_display"
                     multiline={true}
@@ -348,7 +384,11 @@ const Profile = () => {
               onPress={() => {
                 setIsEdit(false);
                 setErrors({});
-                setFormState((prevState: any) => ({...prevState, ...user, avatar: user?.avatar || null}));
+                setFormState((prevState: any) => ({
+                  ...prevState,
+                  ...user,
+                  avatar: user?.avatar || null,
+                }));
               }}
               style={{...styles.buttonBase, ...styles.cancelButton}}
               variant="secondary">
@@ -389,9 +429,7 @@ const Profile = () => {
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
 
             <Text style={styles.label}>Domicilio</Text>
-            <Text style={styles.text}>
-              {user?.address || 'No asignado'}
-            </Text>
+            <Text style={styles.text}>{user?.address || 'No asignado'}</Text>
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
             {user?.dpto && user?.dpto?.length > 0 && (
               <>
@@ -418,12 +456,22 @@ const Profile = () => {
                   color={'transparent'}
                 />
                 <Text
-                  style={{...styles.textUnit, flexGrow: 1, color: cssVar.cWhiteV1}}>
+                  style={{
+                    ...styles.textUnit,
+                    flexGrow: 1,
+                    color: cssVar.cWhiteV1,
+                  }}>
                   Cambiar correo electrónico
                 </Text>
                 <Icon name={IconArrowRight} color={cssVar.cWhiteV1} />
               </View>
-              <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginHorizontal: 16}} />
+              <View
+                style={{
+                  height: 0.5,
+                  backgroundColor: cssVar.cWhiteV1,
+                  marginHorizontal: 16,
+                }}
+              />
               <View
                 style={{...styles.contentAccess, borderBottomWidth: 0}}
                 onTouchEnd={() => {
@@ -435,14 +483,17 @@ const Profile = () => {
                   color={'transparent'}
                 />
                 <Text
-                  style={{...styles.textUnit, flexGrow: 1, color: cssVar.cWhiteV1}}>
+                  style={{
+                    ...styles.textUnit,
+                    flexGrow: 1,
+                    color: cssVar.cWhiteV1,
+                  }}>
                   Cambiar contraseña
                 </Text>
                 <Icon name={IconArrowRight} color={cssVar.cWhiteV1} />
               </View>
             </View>
           </View>
-
 
           {!currentClient?.pivot?.titular_id && user?.dpto?.length > 0 && (
             <View style={styles.dependentSection}>
@@ -558,13 +609,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: cssVar.cBlackV2,
-    gap:16,
+    gap: 16,
   },
   cardAccess: {
     borderRadius: 16,
     marginVertical: 8,
     backgroundColor: cssVar.cBlackV2,
-
   },
   contentAccess: {
     paddingVertical: 12,
@@ -599,13 +649,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   logoutContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     alignItems: 'center',
     paddingVertical: 20,
-
 
     width: '100%',
   },
@@ -654,20 +699,22 @@ const styles = StyleSheet.create({
     backgroundColor: cssVar.cBlack,
     width: '100%',
   },
-  buttonBase: { // MODIFICACIÓN AQUÍ: Quitar flex: 1
+  buttonBase: {
+    // MODIFICACIÓN AQUÍ: Quitar flex: 1
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
- 
   },
-  cancelButton: { // MODIFICACIÓN AQUÍ: Añadir flex: 1
+  cancelButton: {
+    // MODIFICACIÓN AQUÍ: Añadir flex: 1
     borderColor: cssVar.cWhiteV1,
     marginRight: 8, // Mantenemos el margen para la separación
     flex: 1, // Este botón tomará 1 parte del espacio flexible
   },
-  saveButton: { // MODIFICACIÓN AQUÍ: Añadir flex: 2
+  saveButton: {
+    // MODIFICACIÓN AQUÍ: Añadir flex: 2
     backgroundColor: cssVar.cAccent,
     borderColor: cssVar.cAccent,
     flex: 2, // Este botón tomará 2 partes del espacio flexible (el doble que cancelar)
