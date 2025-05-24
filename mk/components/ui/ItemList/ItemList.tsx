@@ -126,13 +126,13 @@ const theme: ThemeType = {
     fontFamily: FONTS.semiBold,
   },
   subtitle: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     fontSize: cssVar.sS,
     fontFamily: FONTS.medium,
     textAlign: 'left',
   },
   subtitle2: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     fontSize: cssVar.sS,
     fontFamily: FONTS.regular,
     textAlign: 'left',
@@ -146,7 +146,7 @@ const theme: ThemeType = {
   date: {
     alignItems: 'flex-end',
     textAlign: 'right',
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     paddingTop: cssVar.spXs,
     fontFamily: FONTS.regular,
     fontSize: cssVar.sM,
