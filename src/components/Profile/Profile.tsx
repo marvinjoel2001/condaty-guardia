@@ -325,16 +325,14 @@ const Profile = () => {
                 </View>
                 <View style={styles.inputContainerUnit}>
                   <Input
-                    label="Unidad"
+                    label="Dirección"
                     value={
-                      user?.dpto && user.dpto.length > 0
-                        ? `${user.dpto[0]?.type?.name || ''} ${
-                            user.dpto[0]?.nro || ''}`
+                      user?.address
+                        ? `${user.address || ''}`
                         : 'No asignada'
                     }
-                    disabled={true}
                     name="unidad_display"
-                    multiline={true}
+                    multiline={false}
                   />
                 </View>
               </View>
@@ -391,9 +389,9 @@ const Profile = () => {
             <Text style={styles.text}>{client?.name || 'No asignado'}</Text>
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
 
-            <Text style={styles.label}>Unidad</Text>
+            <Text style={styles.label}>Dirección</Text>
             <Text style={styles.text}>
-              {user?.dpto?.[0]?.type?.name || 'No asignado'}
+              {user?.address || 'No asignado'}
             </Text>
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
             {user?.dpto && user?.dpto?.length > 0 && (
