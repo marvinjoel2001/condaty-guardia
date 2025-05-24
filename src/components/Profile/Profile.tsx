@@ -282,6 +282,7 @@ const Profile = () => {
             contentContainerStyle={{
               flexGrow: 1, // Para que el contenido pueda empujar el padding
               paddingBottom: 85, // Espacio para los botones. Ajusta si es necesario.
+              paddingHorizontal:12,
             }}
             keyboardShouldPersistTaps="handled"
           >
@@ -552,15 +553,18 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
     fontSize: 18,
     marginVertical: 16,
+    marginStart:12,
   },
   card: {
+    marginHorizontal:12,
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: cssVar.cBlackV2,
-    gap:16,
+
   },
   cardAccess: {
+    marginHorizontal:12,
     borderRadius: 16,
     marginVertical: 8,
     backgroundColor: cssVar.cBlackV2,
