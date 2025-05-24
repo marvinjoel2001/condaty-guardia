@@ -61,7 +61,7 @@ const Binnacle = () => {
           <Text style={{color: cssVar.cWhite}}>Descripción</Text>
           <Text
             style={{
-              color: cssVar.cWhiteV2,
+              color: cssVar.cWhiteV1,
               fontSize: 10,
               fontWeight: '400',
             }}>
@@ -78,19 +78,14 @@ const Binnacle = () => {
   return (
     <>
       <Layout title="Bitácora">
-        <View style={{paddingHorizontal: 16}}>
-          <DataSearch
-            setSearch={onSearch}
-            name="Bitácora"
-            style={{marginVertical: 8}}
-            value={search}
-          />
-          <List
-            data={data?.data}
-            renderItem={novedadList}
-            refreshing={!loaded}
-          />
-        </View>
+        <DataSearch
+          setSearch={onSearch}
+          name="Bitácora"
+          style={{marginVertical: 8}}
+          value={search}
+        />
+        <List data={data?.data} renderItem={novedadList} refreshing={!loaded} />
+
         {openAdd && (
           <BinnacleAdd
             open={openAdd}

@@ -214,7 +214,6 @@ const Home = () => {
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
-          style={{justifyContent: 'center', flex: 1, alignContent: 'center'}}
         />
 
         {/* Buscador */}
@@ -291,7 +290,7 @@ export default Home;
 const styles = StyleSheet.create({
   listContainer: {
     width: '100%',
-    paddingHorizontal: cssVar.spL,
+
     paddingBottom: 40,
   },
 });

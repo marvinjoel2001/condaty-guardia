@@ -55,7 +55,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       title="Nueva bitácora"
       onSave={onSaveNovedades}
       onClose={onClose}
-      buttonText="Guardar"
+      buttonText="Enviar reporte"
       buttonCancel="">
       <View style={{marginTop: 12}}>
         <TextArea

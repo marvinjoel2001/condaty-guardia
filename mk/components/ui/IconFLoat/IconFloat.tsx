@@ -60,7 +60,7 @@ const theme: ThemeType = {
   touchable: {
     position: 'absolute',
     bottom: 80,
-    right: 24,
+    right: 12,
     backgroundColor: cssVar.cAccent,
     padding: cssVar.spM,
     borderRadius: cssVar.bRadiusS,
