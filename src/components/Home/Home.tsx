@@ -40,12 +40,12 @@ const Home = () => {
   const [loaded, setLoaded] = useState(false);
 
   const reloadNotif = (type: string) => {
-    if (type === 'I' && typeSearch === 'I') {
-      getAccesses('', '/accesses', 'P');
-    }
-    if (type === 'P' && typeSearch === 'P') {
-      getAccesses('', '/others', 'L');
-    }
+    // if (type === 'I' && typeSearch === 'I') {
+    getAccesses('', '/accesses', 'P');
+    // }
+    // if (type === 'P' && typeSearch === 'P') {
+    //   getAccesses('', '/others', 'L');
+    // }
   };
 
   const onNotif = useCallback(
@@ -193,7 +193,6 @@ const Home = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
-  console.log(data);
 
   return (
     <>

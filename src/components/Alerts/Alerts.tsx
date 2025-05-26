@@ -122,7 +122,11 @@ const Alerts = () => {
         }}
         // title={getFullName(alerta.guardia)}
         title={alerta.descrip}
-        subtitle={'Residente: ' + getFullName(user)}
+        subtitle={
+          alerta.level === 4
+            ? 'Residente: ' + getFullName(user)
+            : 'Guardia - ' + getDateTimeAgo(alerta.created_at)
+        }
         // subtitle2={}
         left={
           alerta?.level === 4 ? (

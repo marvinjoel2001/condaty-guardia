@@ -72,7 +72,7 @@ const LockAlert = ({open, onClose, data}: any) => {
       title="Alerta de emergencia"
       open={open}
       onClose={onClose}
-      buttonText="Atender"
+      buttonText="Cerrar"
       onSave={onClose}
       containerStyles={{
         borderWidth: 1,

@@ -135,7 +135,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                   left={
                     <Avatar
                       src={
-                        details?.data?.gua_attend
+                        details?.gua_attend
                           ? getUrlImages(
                               '/GUARD-' +
                                 details?.gua_attend?.id +
