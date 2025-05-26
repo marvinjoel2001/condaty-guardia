@@ -21,7 +21,7 @@ import {
 } from '../../icons/IconLibrary';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 
-export const levelAlerts = ['', 'bajo', 'medio', 'alto', 'panico'];
+export const levelAlerts = ['', 'bajo', 'medio', 'alto', 'pánico'];
 export const statusColor: any = {
   1: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
   2: {color: cssVar.cWarning, background: cssVar.cHoverWarning},
