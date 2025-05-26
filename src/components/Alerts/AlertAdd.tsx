@@ -4,7 +4,8 @@ import Select from '../../../mk/components/forms/Select/Select';
 import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
 import useApi from '../../../mk/hooks/useApi';
 import useAuth from '../../../mk/hooks/useAuth';
-import { cssVar } from '../../../mk/styles/themes';
+import {cssVar} from '../../../mk/styles/themes';
+import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 
 type PropsType = {
   open: boolean;
@@ -24,20 +25,28 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       [name]: v,
     });
   };
-  const onSaveAlerts = async () => {
-    let error: any = {};
-    if (!formState['level']) {
-      error = {...error, level: 'Seleccione un nivel'};
-    }
-    if (!formState['descrip']) {
-      error = {...error, descrip: 'Ingrese una descripcion'};
-    }
+  const validate = () => {
+    let errors: any = {};
+    errors = checkRules({
+      value: formState.level,
+      rules: ['required'],
+      key: 'level',
+      errors,
+    });
+    errors = checkRules({
+      value: formState.descrip,
+      rules: ['required'],
+      key: 'descrip',
+      errors,
+    });
+    setErrors(errors);
+    return errors;
+  };
 
-    if (Object.keys(error).length > 0) {
-      setErrors(error);
+  const onSaveAlerts = async () => {
+    if (hasErrors(validate())) {
       return;
     }
-    console.log(error,formState,'errfst')
     const {data: alerts, error: err} = await execute('/alerts', 'POST', {
       level: formState.level,
       descrip: formState.descrip,
@@ -45,11 +54,10 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
     if (alerts?.success == true) {
       onClose();
       reload();
-      formState.descrip = '';
-      formState.level = '';
       showToast('Alerta Enviada', 'success');
     } else {
-      const errorMessage = typeof err === 'string' ? err : 'Error al enviar la alerta';
+      const errorMessage =
+        typeof err === 'string' ? err : 'Error al enviar la alerta';
       showToast(errorMessage, 'error');
     }
   };
@@ -62,7 +70,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       buttonText="Crear alerta">
       <Select
         label="Nivel de alerta"
-        placeholder="Nivel de alerta"
+        // placeholder="Nivel de alerta"
         error={errors}
         required
         name="level"
@@ -78,8 +86,8 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
         onChange={value => handleInputChange('level', value)}
       />
       <TextArea
-        label="Descripción de la alerta"
-        placeholder="Ej. Se ha detectado un incendio en el edificio 1 piso 2."
+        label="Descripción"
+        // placeholder="Ej. Se ha detectado un incendio en el edificio 1 piso 2."
         name="descrip"
         required
         error={errors}
