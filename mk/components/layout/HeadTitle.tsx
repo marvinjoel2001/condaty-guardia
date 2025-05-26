@@ -167,7 +167,7 @@ const theme: ThemeType = {
   },
   title: {
     flexGrow: 1,
-    paddingRight: cssVar.spM,
+    // paddingRight: cssVar.spM,
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
     textAlign: 'center',
