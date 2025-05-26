@@ -189,14 +189,14 @@ const Select = ({
                 height: 58,
                 width: 40,
                 position: 'absolute',
-                top: -12,
+                top: -16,
                 right: 0,
                 alignItems: 'flex-end',
                 paddingTop: 15,
               }}>
               <Icon
                 name={openOptions ? IconArrowUp : IconArrowDown}
-                color={cssVar.cWhite}
+                color={cssVar.cWhiteV1}
               />
             </TouchableOpacity>
           }
