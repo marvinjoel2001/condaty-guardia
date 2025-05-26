@@ -147,7 +147,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const handleInputChange = (name: string, value: string) => {
     setFormState({...formState, [name]: value});
   };
-
+  console.log(getStatus(), 'status');
   const getButtonText = () => {
     const status = getStatus();
     const buttonTexts: Record<string, string> = {
@@ -158,8 +158,18 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     };
     return buttonTexts[status] || '';
   };
+  const getStatusText = () => {
+    const status = getStatus();
+    const statusTexts: Record<string, string> = {
+      I: 'Por salir',
+      Y: 'Por ingresar',
+      S: 'Esperando confirmación',
+      C: 'Completado',
+    };
+    return statusTexts[status] || '';
+  };
 
-  const statusText = getButtonText();
+  const statusText = getStatusText();
 
   const cardDetail = () => {
     const status = getStatus();
@@ -261,8 +271,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
   const detailVisit = (data: any) => {
     let visit = data.visit ? data.visit : data.owner;
-  
-    console.log(data)
+
+    console.log(data);
     const isSelected = acompanSelect[data?.id || '0'];
     return (
       <ItemList
@@ -279,7 +289,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       />
     );
   };
-
 
   const detailCompanions = () => {
     if (data?.accesses?.length == 0) return null;
@@ -320,13 +329,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     I: 'Visitante individual',
     G: 'Visitante grupal',
   };
-  
+
   const type = typeLabels[data?.type as 'O' | 'P' | 'I' | 'G'] || '';
 
-  // let type = 
+  // let type =
   return (
     <ModalFull
-      onClose={close}
+      onClose={() => close()}
       open={open}
       title={'Detalle'}
       onSave={handleSave}
