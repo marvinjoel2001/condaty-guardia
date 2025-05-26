@@ -44,9 +44,7 @@ export const cssVar = {
   cWarning: '#E9B01E',
   cGrayLight: '#A7A7A7',
   cGrayLightV3: '#393C3F',
-  // cAlertAlto: '#e46055',
-  // cAlertMedio: '#f37f3d',
-  // cAlertBajo: '#00e38c',
+  cAlertMedio: '#F37F3D',
   cOrange: '#F58220',
 
   cSidebar: '#246950',
@@ -58,6 +56,17 @@ export const cssVar = {
   cHoverError: '#E4605533',
   cHoverInfo: '#4285FA33',
   cHoverWarning: '#E9B01E33',
+  cHoverOrange: '#F5822033',
+  cHoverCompl1: '#FAFF7F33',
+  cHoverCompl2: '#A2FAA333',
+  cHoverCompl3: '#B382D933',
+  cHoverCompl4: '#A9CCE333',
+  cHoverCompl5: '#F7B26733',
+  cHoverCompl6: '#FF7F5133',
+  cHoverCompl7: '#6CD16D33',
+  cHoverCompl8: '#DE6A6033',
+  cHoverCompl9: '#5AB0E933',
+
   /* Paleta de colores Random */
   cRandom1: '#a2d2bf',
   cRandom2: '#a9cce3',
@@ -78,6 +87,16 @@ export const cssVar = {
   cRandom17: '#fdf0d5',
   cRandom18: '#f7b267',
   cRandom19: '#b8c0ff',
+  /* Paleta de complementos */
+  cCompl1: '#FAFF7F',
+  cCompl2: '#A2FAA3',
+  cCompl3: '#B382D9',
+  cCompl4: '#A9CCE3',
+  cCompl5: '#F7B267',
+  cCompl6: '#FF7F51',
+  cCompl7: '#6CD16D',
+  cCompl8: '#DE6A60',
+  cCompl9: '#5AB0E9',
 
   //sizes
   sXxl: 24,

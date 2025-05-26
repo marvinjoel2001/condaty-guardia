@@ -106,6 +106,9 @@ const HeadTitle = ({
         </Text>
       )}
       {right && <View>{right}</View>}
+      {!right && route.name !== 'Home' && (
+        <View style={{width: 34, height: 34}}></View>
+      )}
       {route.name == 'Home' && !onlyBack && (
         <View
           style={{
