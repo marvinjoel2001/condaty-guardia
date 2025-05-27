@@ -99,6 +99,6 @@ const theme: ThemeType = {
     // paddingVertical: cssVar.spL,
   },
   errorInput: {borderColor: cssVar.cError},
-  disabled: {opacity: 0.3, backgroundColor: cssVar.cWhiteV2},
+  disabled: {opacity: 0.6, backgroundColor: cssVar.cWhiteV2,color: cssVar.cWhite},
   focusInput: {borderColor: cssVar.cAccent},
 };
