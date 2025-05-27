@@ -125,13 +125,13 @@ const theme: ThemeType = {
   },
   title: {
     color: cssVar.cWhite,
-    fontSize: cssVar.sL,
-    fontFamily: FONTS.semiBold,
+    fontSize: cssVar.sM,
+    fontFamily: FONTS.medium,
   },
   subtitle: {
     color: cssVar.cWhiteV1,
-    fontSize: cssVar.sS,
-    fontFamily: FONTS.medium,
+    fontSize: cssVar.sM,
+    fontFamily: FONTS.regular,
     textAlign: 'left',
   },
   subtitle2: {

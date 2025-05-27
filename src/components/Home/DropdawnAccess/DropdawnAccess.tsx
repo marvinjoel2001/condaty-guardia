@@ -91,13 +91,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    bottom: isIos() ? 70 : 74,
+    bottom: isIos() ? 68.5 : 74,
     borderTopRightRadius: cssVar.bRadius,
     borderTopLeftRadius: cssVar.bRadius,
     overflow: 'hidden',
     borderWidth: 0.5,
     borderBottomWidth: 0,
-
     borderTopColor: cssVar.cWhiteV1,
   },
   containerLine: {
