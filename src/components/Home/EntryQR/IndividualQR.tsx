@@ -1,11 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import ItemInfo, {
-  ItemInfoType,
-  TypeDetails,
-} from '../../../../mk/components/ui/ItemInfo/ItemInfo';
-import {getFullName} from '../../../../mk/utils/strings';
-import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -16,9 +11,8 @@ import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import {AccompaniedAdd} from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconX} from '../../../icons/IconLibrary';
+import {IconAdd, IconX} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
-import {onExist} from '../../../../mk/utils/dbtools';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 
 type PropsType = {
@@ -29,6 +23,7 @@ type PropsType = {
   errors: any;
   setErrors: any;
 };
+
 const IndividualQR = ({
   setFormState,
   formState,
@@ -40,89 +35,31 @@ const IndividualQR = ({
   const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
-  const [details, setDetails] = useState<TypeDetails>({
-    data: [],
-  });
-  const visit = data?.visit;
-  const access = data?.access;
-  const _onDetail = (item: any) => {
-    const data: ItemInfoType[] = [];
-    const labelEstado =
-      item?.status == 'A'
-        ? 'Activo'
-        : item?.status == 'X'
-        ? 'Anulado'
-        : item?.status == 'I'
-        ? item?.access?.length > 0
-          ? item?.access?.[0]?.out_at
-            ? 'Usada ya no Valida'
-            : 'Por salir'
-          : ''
-        : item?.access?.[0]?.out_at
-        ? 'Completado'
-        : '';
-    // if (labelEstado == "") {
-    //   showToast("Qr ya usado", "warning");
-    //   if (onClose) onClose();
-    //   return;
-    // }
-    data.push({
-      l: 'Estado:',
-      v: labelEstado,
-      sv:
-        item?.status == 'A'
-          ? {color: cssVar.cSuccess}
-          : item?.status == 'X'
-          ? {color: cssVar.cError}
-          : {color: cssVar.cWhiteV2},
-    });
-    data.push({
-      v: getFullName(item?.owner),
-      l: 'Residente:',
-    });
-    data.push({
-      v: getDateStrMes(item?.date_event),
-      l: 'Válido hasta:',
-    });
-    {
-      item?.access?.[0]?.plate &&
-        data.push({
-          l: 'Placa:',
-          v: item.access?.[0].plate,
-        });
-    }
-    {
-      item?.access?.length > 0 &&
-        data.push({
-          l: 'Entrada:',
-          v: getDateTimeStrMes(item?.access?.[0].in_at),
-        });
-    }
-    {
-      item?.access?.[0]?.out_at &&
-        data.push({
-          l: ' Salida:',
-          v: getDateTimeStrMes(item?.access?.[0]?.out_at),
-        });
-    }
 
-    setDetails({data: data});
-  };
-  // console.log(data);
+  const visit = data?.visit;
+  const owner = data?.owner;
+  const access = data?.access;
+
   useEffect(() => {
-    _onDetail(data);
-    setFormState({
-      ...formState,
-      ci: visit?.ci,
-      name: visit?.name,
-      middle_name: visit?.middle_name,
-      last_name: visit?.last_name,
-      mother_last_name: visit?.mother_last_name,
-      access_id: access?.[0]?.id,
-    });
-  }, [data]);
+    if (data) {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        ci: visit?.ci || prevState?.ci || '',
+        name: visit?.name || prevState?.name || '',
+        middle_name: visit?.middle_name || prevState?.middle_name || '',
+        last_name: visit?.last_name || prevState?.last_name || '',
+        mother_last_name:
+          visit?.mother_last_name || prevState?.mother_last_name || '',
+        access_id: access?.[0]?.id || prevState?.access_id || null,
+      }));
+    }
+  }, [data, visit, access, setFormState]);
 
   const onExistVisits = async () => {
+    if (!formState?.ci || formState.ci.length < 5) {
+      setErrors({...errors, ci: ''});
+      return;
+    }
     const {data: exist} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -139,46 +76,38 @@ const IndividualQR = ({
       setErrors({...errors, ci: ''});
     }
   };
+
   useEffect(() => {
-    setFormState({
-      ...formState,
+    setFormState((prevState: any) => ({
+      ...prevState,
       tab: tab,
       ci_taxi: '',
       name_taxi: '',
       middle_name_taxi: '',
       last_name_taxi: '',
       mother_last_name_taxi: '',
-      plate: '',
+      plate: tab === 'V' ? prevState?.plate || '' : '',
+      plate_taxi: tab === 'T' ? prevState?.plate_taxi || '' : '',
       disbledTaxi: false,
-    });
-  }, [tab]);
+    }));
+  }, [tab, setFormState]);
 
-  const onDelAcom = (acom: any) => {
-    const acomps = formState?.acompanantes;
-    const newAcomps = acomps.filter((item: any) => item.ci !== acom.ci);
+  const onDelAcom = (acom: {ci: string}) => {
+    const acomps = formState?.acompanantes || [];
+    const newAcomps = acomps.filter((item: {ci: string}) => item.ci !== acom.ci);
     setFormState({...formState, acompanantes: newAcomps});
   };
 
-  const acompanantesList = (acompanante: any) => {
+  const acompanantesList = ({item}: {item: any}) => {
     return (
-      <TouchableOpacity
-      // onPress={() => handleEditAcompanante(acompanante.ci)}
-      >
+      <TouchableOpacity>
         <ItemList
-          title={getFullName(acompanante)}
-          subtitle={'C.I. ' + acompanante.ci}
-          subtitle2={
-            acompanante.obs_in
-              ? 'Observaciones de entrada: ' + acompanante.obs_in
-              : ''
-          }
-          left={<Avatar name={getFullName(acompanante)} />}
+          title={getFullName(item)}
+          subtitle={'C.I. ' + item.ci}
+          subtitle2={item.obs_in ? 'Observaciones: ' + item.obs_in : ''}
+          left={<Avatar name={getFullName(item)} />}
           right={
-            <Icon
-              name={IconX}
-              color={cssVar.cWhiteV2}
-              onPress={() => onDelAcom(acompanante)}
-            />
+            <Icon name={IconX} color={cssVar.cWhiteV2} onPress={() => onDelAcom(item)} />
           }
         />
       </TouchableOpacity>
@@ -186,6 +115,17 @@ const IndividualQR = ({
   };
 
   const onExistTaxi = async () => {
+    if (!formState?.ci_taxi || formState.ci_taxi.length < 5) {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        disbledTaxi: false,
+      }));
+      return;
+    }
     const {data: exist} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -194,90 +134,125 @@ const IndividualQR = ({
       ci_visit: formState?.ci_taxi,
     });
     if (exist?.data) {
-      setFormState({
-        ...formState,
-        ci_taxi: exist?.data.ci,
-        name_taxi: exist?.data.name,
-        middle_name_taxi: exist?.data.middle_name,
-        last_name_taxi: exist?.data.last_name,
-        mother_last_name_taxi: exist?.data.mother_last_name,
-        plate: exist?.data.plate,
+      setFormState((prevState: any) =>({
+        ...prevState,
+        ci_taxi: exist.data.ci,
+        name_taxi: exist.data.name,
+        middle_name_taxi: exist.data.middle_name,
+        last_name_taxi: exist.data.last_name,
+        mother_last_name_taxi: exist.data.mother_last_name,
+        plate_taxi: prevState.plate_taxi || exist.data.plate || '',
         disbledTaxi: true,
-      });
+      }));
     } else {
-      setFormState({
-        ...formState,
+      setFormState((prevState: any) => ({
+        ...prevState,
         name_taxi: '',
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate: '',
         disbledTaxi: false,
-      });
+      }));
     }
   };
-  console.log(data);
+
+  const getUnitInfo = (ownerData: any) => {
+    if (ownerData?.dpto && ownerData.dpto.length > 0) {
+      const dpto = ownerData.dpto[0];
+      return dpto.nro || 'No especificada';
+    }
+    return 'No especificada';
+  };
+
+  if (!data) {
+    return <Loading />;
+  }
+
   return (
     <>
-      {!data ? (
-        <Loading />
-      ) : (
-        <View>
-          <ItemInfo type="C" details={details} />
-          <Text
-            style={{
-              fontSize: 16,
-              fontFamily: FONTS.semiBold,
-              marginBottom: 4,
-              color: cssVar.cWhiteV2,
-            }}>
-            Invitado:
-          </Text>
-          <ItemList
-            title={getFullName(visit)}
-            left={<Avatar name={getFullName(visit)} />}
-            subtitle={'CI:' + (visit?.ci || 'Sin registro')}
+      <View style={styles.mainContainer}>
+        <View style={styles.residentCard}>
+          <Text style={styles.residentTitle}>Visita a:</Text>
+          <View style={styles.residentInfoRow}>
+            <Avatar
+              src={owner?.url_avatar ? getUrlImages(owner.url_avatar) : undefined}
+              name={getFullName(owner)}
+              w={40}
+              h={40}
+            />
+            <View style={styles.residentTextContainer}>
+              <Text style={styles.residentName}>{getFullName(owner)}</Text>
+              <Text style={styles.residentUnit}>
+                Unidad: {getUnitInfo(owner)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <Text style={styles.sectionTitle}>Invitado:</Text>
+        <View style={styles.visitorCard}>
+          <Avatar
+            src={visit?.url_avatar ? getUrlImages(visit.url_avatar) : undefined}
+            name={getFullName(visit)}
+            w={40}
+            h={40}
           />
-          {!visit?.ci && data?.status !== 'X' && (
-            <>
+          <View style={styles.visitorTextContainer}>
+            <Text style={styles.visitorName}>{getFullName(visit)}</Text>
+            <Text style={styles.visitorDetail}>
+              C.I. {visit?.ci || 'Sin registrar'}
+            </Text>
+          </View>
+        </View>
+
+        {!visit?.ci && data?.status !== 'X' && (
+          <View style={styles.formSection}>
+            <InputFullName
+              formState={formState}
+              errors={errors}
+              handleChangeInput={handleChange}
+              inputGrid={true}
+            />
+        
               <Input
-                label="Carnet de identidad"
-                type="date"
+                label="Carnet del visitante*"
                 name="ci"
-                required={true}
                 maxLength={10}
-                value={formState?.ci}
+                value={formState?.ci || ''}
                 error={errors}
-                onChange={(value: any) => handleChange('ci', value)}
-                onBlur={() => onExistVisits()}
+                required
+                onChange={(value: string) => handleChange('ci', value)}
+                onBlur={onExistVisits}
+            
               />
-              <InputFullName
-                formState={formState}
-                errors={errors}
-                handleChangeInput={handleChange}
-                inputGrid={false}
-              />
-            </>
-          )}
-          {data?.status != 'X' &&
-            (!access?.[0]?.in_at ? (
+         
+          </View>
+        )}
+
+        {data?.status !== 'X' && (
+          <View style={styles.formSection}>
+            {!access?.[0]?.in_at ? (
               <TextArea
                 label="Observaciones de entrada"
                 placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
                 name="obs_in"
-                value={formState?.obs_in}
-                onChange={value => handleChange('obs_in', value)}
+                value={formState?.obs_in || ''}
+                onChange={(value: string) => handleChange('obs_in', value)}
               />
             ) : (
               <TextArea
                 label="Observaciones de salida"
                 placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
                 name="obs_out"
-                value={formState?.obs_out}
-                onChange={value => handleChange('obs_out', value)}
+                value={formState?.obs_out || ''}
+                onChange={(value: string) => handleChange('obs_out', value)}
               />
-            ))}
-          {!access?.[0]?.in_at && data?.status !== 'X' && (
+            )}
+          </View>
+        )}
+
+        {!access?.[0]?.in_at && data?.status !== 'X' && (
+          <View style={styles.tabsContainer}>
             <TabsButtons
               tabs={[
                 {value: 'P', text: 'A pie'},
@@ -287,99 +262,87 @@ const IndividualQR = ({
               sel={tab}
               setSel={setTab}
             />
-          )}
-          {access?.length == 0 && (
-            <>
-              {tab == 'V' && (
+          </View>
+        )}
+
+        {access?.length === 0 && data?.status !== 'X' && (
+          <View style={styles.formSection}>
+            {tab === 'V' && (
+              <Input
+                label="Placa del vehículo"
+                type="text"
+                name="plate"
+                error={errors?.plate}
+                required={tab === 'V'}
+                value={formState?.plate || ''}
+                onChange={(value: string) => handleChange('plate', value.toUpperCase())}
+                autoCapitalize="characters"
+              />
+            )}
+            {tab === 'T' && (
+              <>
+                <Text style={styles.subSectionTitle}>
+                  Datos del conductor del taxi:
+                </Text>
                 <Input
-                  label="Placa"
-                  type="text"
-                  name="plate"
-                  error={errors}
-                  required={tab == 'V'}
-                  value={formState['plate']}
-                  onChange={(value: any) => handleChange('plate', value)}
+                  label="Carnet de identidad (Taxista)"
+                  name="ci_taxi"
+                  maxLength={10}
+                  error={errors?.ci_taxi}
+                  required
+                  value={formState?.ci_taxi || ''}
+                  onBlur={onExistTaxi}
+                  onChange={(value: string) => handleChange('ci_taxi', value)}
+                  style={{marginBottom: 16}}
                 />
-              )}
-              {tab == 'T' && (
-                <>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                      marginBottom: 4,
-                      color: cssVar.cWhiteV2,
-                    }}>
-                    Datos del conductor:
-                  </Text>
-                  <Input
-                    label="Carnet de identidad"
-                    type="date"
-                    name="ci_taxi"
-                    maxLength={10}
-                    error={errors}
-                    required
-                    value={formState?.ci_taxi}
-                    onBlur={() => onExistTaxi()}
-                    // onBlur={() => onCheckCI(true)}
-                    onChange={(value: any) => handleChange('ci_taxi', value)}
-                  />
-                  <InputFullName
-                    formState={formState}
-                    errors={errors}
-                    disabled={formState?.disbledTaxi}
-                    prefijo="_taxi"
-                    handleChangeInput={handleChange}
-                  />
-                  <Input
-                    label="Placa"
-                    type="text"
-                    name="plate"
-                    error={errors}
-                    // disabled={formState?.disbledTaxi}
-                    required={tab == 'T'}
-                    value={formState['plate']}
-                    onChange={(value: any) => handleChange('plate', value)}
-                  />
-                </>
-              )}
-              {access?.length == 0 && data?.status != 'X' && (
-                <TouchableOpacity
-                  style={{
-                    alignSelf: 'flex-start',
-                    marginVertical: 4,
-                  }}
-                  onPress={() => setOpenAcom(true)}>
-                  <Text
-                    style={{
-                      color: cssVar.cWhite,
-                      textDecorationLine: 'underline',
-                    }}>
-                    Agregar acompañante
-                  </Text>
-                </TouchableOpacity>
-              )}
-              {formState?.acompanantes?.length > 0 && (
-                <>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontFamily: FONTS.semiBold,
-                      marginVertical: 4,
-                      color: cssVar.cWhiteV2,
-                    }}>
-                    Acompañantes:
-                  </Text>
-                  <List
-                    data={formState?.acompanantes}
-                    renderItem={acompanantesList}
-                  />
-                </>
-              )}
-            </>
-          )}
-        </View>
-      )}
+                <InputFullName
+                  formState={formState}
+                  errors={errors}
+                  disabled={formState?.disbledTaxi}
+                  prefijo="_taxi"
+                  handleChangeInput={handleChange}
+                  inputGrid={true}
+                />
+                <Input
+                  label="Placa del taxi"
+                  type="text"
+                  name="plate_taxi"
+                  error={errors?.plate_taxi}
+                  required={tab === 'T'}
+                  value={formState?.plate_taxi || ''}
+                  onChange={(value: string) => handleChange('plate_taxi', value.toUpperCase())}
+                  autoCapitalize="characters"
+                />
+              </>
+            )}
+          </View>
+        )}
+
+        {!access?.[0]?.in_at && data?.status !== 'X' && (
+          <View style={styles.acompanantesSection}>
+            <TouchableOpacity
+              style={styles.addAcompananteButton}
+              onPress={() => setOpenAcom(true)}>
+              <Icon name={IconAdd} size={16} color={cssVar.cSuccess} />
+              <Text style={styles.addAcompananteText}>
+                Agregar acompañante
+              </Text>
+            </TouchableOpacity>
+
+            {(formState?.acompanantes?.length || 0) > 0 && (
+              <>
+                <Text style={styles.subSectionTitle}>Acompañantes:</Text>
+                <List
+                  data={formState.acompanantes}
+                  renderItem={acompanantesList}
+                  keyExtractor={(item: any) => item.ci || `acom-${item.id}`}
+                />
+              </>
+            )}
+          </View>
+        )}
+      </View>
+
       <AccompaniedAdd
         open={openAcom}
         onClose={() => setOpenAcom(false)}
@@ -391,3 +354,123 @@ const IndividualQR = ({
 };
 
 export default IndividualQR;
+
+const styles = StyleSheet.create({
+  mainContainer: {
+    paddingTop: 16,
+    flexDirection: 'column',
+    gap: 16,
+  },
+  residentCard: {
+    backgroundColor: '#333536',
+    padding: 12,
+    borderRadius: 12,
+    flexDirection: 'column',
+    gap: 8,
+  },
+  residentTitle: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
+    color: '#FAFAFA',
+  },
+  residentInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 40,
+  },
+  residentTextContainer: {
+    flexDirection: 'column',
+    gap: 2,
+    flex: 1,
+  },
+  residentName: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: cssVar.cWhiteV1,
+  },
+  residentUnit: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: cssVar.cWhiteV1,
+  },
+  sectionTitle: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
+    color: cssVar.cWhite,
+  },
+  visitorCard: {
+    backgroundColor: '#414141',
+    padding: 8,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  visitorTextContainer: {
+    flexDirection: 'column',
+    gap: 2,
+    flex: 1,
+  },
+  visitorName: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: cssVar.cWhiteV1,
+  },
+  visitorDetail: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: cssVar.cWhiteV1,
+  },
+  tabsContainer: {},
+  formSection: {
+    flexDirection: 'column',
+  },
+  ciInputWrapper: {
+    height: 48,
+    backgroundColor: '#414141',
+    borderRadius: 8,
+    justifyContent: 'center',
+    paddingHorizontal: 12, 
+  },
+  inputFieldStyle: { 
+    backgroundColor: 'transparent',
+    borderBottomWidth: 0,
+    paddingHorizontal: 0, 
+    paddingVertical: 0,
+    height: '100%',
+    justifyContent: 'center',
+  },
+  textInFieldStyle: {
+    fontSize: 14,
+    color: cssVar.cWhite,
+    fontFamily: FONTS.regular,
+  },
+  labelInFieldStyle: {
+    fontSize: 12,
+    color: cssVar.cWhiteV2,
+    fontFamily: FONTS.regular,
+    marginBottom: 2,
+  },
+  subSectionTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+    color: cssVar.cWhiteV1,
+  },
+  acompanantesSection: {
+    flexDirection: 'column',
+    gap: 8,
+  },
+  addAcompananteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+  },
+  addAcompananteText: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    textDecorationLine: 'underline',
+    color: cssVar.cSuccess || '#00E38C',
+  },
+});

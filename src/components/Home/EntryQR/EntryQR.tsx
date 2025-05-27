@@ -244,7 +244,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       }}
       buttonCancel=""
       buttonText={
-        (!openSelected && type == 'G') || data?.status == 'X' ? '' : 'Continuar'
+        (!openSelected && type == 'G') || data?.status == 'X' ? '' : 'Dejar entrar'
       }>
       {type === 'I' && (
         <IndividualQR
