@@ -118,7 +118,7 @@ const theme: ThemeType = {
     fontSize: cssVar.sXs,
     fontFamily: FONTS.regular,
     position: 'absolute',
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     zIndex: 1,
     // transform: [{translateY: 10}],
     top: 10,
