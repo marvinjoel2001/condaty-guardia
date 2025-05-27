@@ -58,7 +58,7 @@ const InputFullName = ({
         </View>
         <View style={input2}>
           <Input
-            label="Segundo nombre (opcional)"
+            label="Segundo nombre"
             type="text"
             style={styleInputs}
             error={errors}
@@ -90,7 +90,7 @@ const InputFullName = ({
               </View>
    <View style={input2}>
       <Input
-        label="Apellido materno (opcional)"
+        label="Apellido materno"
         type="text"
         style={styleInputs}
         name={'mother_last_name' + (name_prefijo || prefijo)}
