@@ -123,7 +123,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
             </Text>
             {details?.level == 4 && renderAlertPanic()}
             <Text style={{...styles.text, marginTop: 16}}>
-              {details?.level == 4 ? 'Atendido por:' : 'Informante:'}
+              {details?.level == 4 ? 'Atendida por:' : 'Informante:'}
             </Text>
             {details?.level == 4 ? (
               details?.gua_attend || details?.adm_attend ? (
