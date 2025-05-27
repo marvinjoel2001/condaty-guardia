@@ -3,8 +3,9 @@ import {Text, View, Animated, Easing, TouchableOpacity, StyleSheet} from 'react-
 import Icon from '../Icon/Icon';
 import {
   IconX,
-  IconSuccessToast,
+  IconSuccessToastNotCircle,
   IconInfoToast,
+  IconSuccessToast,
 
 } from '../../../../src/icons/IconLibrary';
 import {cssVar, FONTS} from '../../../styles/themes';
@@ -64,7 +65,7 @@ const Toast = ({toast, showToast}: ToastProps) => {
     switch (toast?.type) {
       case 'success':
         return {
-          iconName: IconSuccessToast,
+          iconName: IconSuccessToastNotCircle,
           iconColor: cssVar.cWhite,
           iconBackgroundColor: '#2A8A46', 
           toastBackgroundColor: '#34A853', 
