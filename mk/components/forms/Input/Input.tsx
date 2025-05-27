@@ -71,7 +71,9 @@ const Input = (props: PropsType) => {
         autoComplete={props.autoComplete || 'off'}
         autoCapitalize={props.autoCapitalize || 'none'}
         allowFontScaling={false}
-        multiline={props.multiline || false}
+        numberOfLines={props.multiline ? undefined : 1} // AÑADIDO: Si no es multilínea, forza 1 línea
+                                                        // Esto puede ayudar a prevenir el crecimiento vertical
+                                                        // y puede truncar el texto con "..." si es muy largo (depende de la plataforma y estilos)
       />
     </ControlLabel>
   );

@@ -64,7 +64,7 @@ const ControlLabel = ({
   const _label =
     label +
     ' ' +
-    (required ? '*' : required === false || disabled ? '' : '(opcional)');
+    (required ? '' : required === false || disabled ? '' : '(opcional)');
   return (
     <View style={theme.container}>
       {iconLeft && <View style={theme.iconLeft}>{iconLeft}</View>}
@@ -104,7 +104,7 @@ const theme: ThemeType = {
 
   },
   label: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     left: 16,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
@@ -118,7 +118,7 @@ const theme: ThemeType = {
     fontSize: cssVar.sXs,
     fontFamily: FONTS.regular,
     position: 'absolute',
-    color: cssVar.cWhiteV2,
+    color: cssVar.cAccent,
     zIndex: 1,
     // transform: [{translateY: 10}],
     top: 10,

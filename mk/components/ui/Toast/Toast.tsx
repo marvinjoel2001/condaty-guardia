@@ -1,25 +1,25 @@
 import React, {useEffect, useRef} from 'react';
-import {Text, View, Animated, Easing, TouchableOpacity, StyleSheet} from 'react-native'; // Added TouchableOpacity, StyleSheet
+import {Text, View, Animated, Easing, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from '../Icon/Icon';
 import {
   IconX,
   IconSuccessToast,
   IconInfoToast,
-  // Assuming you might have specific icons for error/warning or will reuse IconInfoToast/IconX
-} from '../../../../src/icons/IconLibrary'; // Adjust path as needed
-import {cssVar, FONTS, ThemeType} from '../../../styles/themes'; // Adjust path as needed
+
+} from '../../../../src/icons/IconLibrary';
+import {cssVar, FONTS} from '../../../styles/themes';
 
 type toastProps = {
   msg: string | null;
   type: 'success' | 'error' | 'warning' | 'info';
   time?: number;
   important?: boolean;
-  title?: string; // Added optional title prop
+  title?: string;
 };
 
 interface ToastProps {
   toast: toastProps;
-  showToast: (param: string) => void; // Assuming this clears the toast by setting msg to '' or null
+  showToast: (param: string | null) => void;
 }
 
 export const TIME_TOAST = 3000;
@@ -30,81 +30,113 @@ const Toast = ({toast, showToast}: ToastProps) => {
   const _close = () => {
     Animated.timing(translateY, {
       toValue: -200,
-      duration: 400,
-      easing: Easing.ease,
-      useNativeDriver: true, // Native driver is good for transform animations
+      duration: 300,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
     }).start(() => {
-      if (toast?.msg) { // Ensure showToast is called only if there was a message
-        showToast(''); // Clear the toast message
+      if (toast?.msg) {
+        showToast(null);
       }
     });
   };
 
   useEffect(() => {
     if (toast?.msg) {
-      Animated.timing(translateY, {
-        toValue: 0, // Target position (depends on how theme.container positions it)
-        duration: 800, // Slower animation as per original
-        easing: Easing.ease,
+      translateY.setValue(-200); 
+      Animated.spring(translateY, { 
+        toValue: 0, 
         useNativeDriver: true,
+        friction: 7,
+        tension: 60,
       }).start();
 
       const timer = setTimeout(() => {
         _close();
       }, toast?.time || TIME_TOAST);
-      return () => clearTimeout(timer); // Cleanup timer
+      return () => clearTimeout(timer);
     } else {
-      // If toast.msg becomes null/empty (e.g. from parent), ensure it's hidden
-      // This might be redundant if _close() is always called, but good for safety
       translateY.setValue(-200);
     }
-  }, [toast?.msg, toast?.time]); // Added toast.time to dependencies
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast?.msg, toast?.time]);
 
-  const getIconAndColor = () => {
+  const getThemeStyles = () => {
     switch (toast?.type) {
       case 'success':
-        return {icon: IconSuccessToast, color: '#34a853', defaultTitle: '¡Excelente!'};
+        return {
+          iconName: IconSuccessToast,
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: '#2A8A46', 
+          toastBackgroundColor: '#34A853', 
+          textColor: cssVar.cWhite,
+          defaultTitle: '¡Excelente!',
+        };
       case 'error':
-        return {icon: IconX, color: cssVar.cError, defaultTitle: 'Error'}; // Keep your error color
+        return {
+          iconName:  IconX, 
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: '#C12A2A', 
+          toastBackgroundColor: cssVar.cError || '#E53935',
+          textColor: cssVar.cWhite,
+          defaultTitle: 'Error',
+        };
       case 'warning':
-        return {icon: IconInfoToast, color: cssVar.cWarning, style: {transform: [{scaleY: -1}]}, defaultTitle: 'Advertencia'}; // Keep your warning color
+        return {
+          iconName:IconInfoToast, 
+          iconColor: cssVar.cBlack, 
+          iconBackgroundColor: '#D4A017', 
+          toastBackgroundColor: cssVar.cWarning || '#FFB300',
+          textColor: cssVar.cBlack, 
+          defaultTitle: 'Advertencia',
+        };
       case 'info':
-        return {icon: IconInfoToast, color: cssVar.cInfo, defaultTitle: 'Información'}; // Keep your info color
+        return {
+          iconName: IconInfoToast,
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: '#1A73E8', 
+          toastBackgroundColor: cssVar.cInfo || '#2196F3',
+          textColor: cssVar.cWhite,
+          defaultTitle: 'Información',
+        };
       default:
-        return {icon: IconInfoToast, color: cssVar.cBlack, defaultTitle: 'Mensaje'};
+        return {
+          iconName: IconInfoToast,
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: cssVar.cWhiteV1 || '#5F6368', 
+          toastBackgroundColor: cssVar.cWhiteV1 || '#9E9E9E', 
+          textColor: cssVar.cWhite,
+          defaultTitle: 'Mensaje',
+        };
     }
   };
 
-  const {icon, color, style: iconStyle, defaultTitle} = getIconAndColor();
-  const currentTitle = toast?.title || defaultTitle;
+  const theme = getThemeStyles();
+  const currentTitle = toast?.title || theme.defaultTitle;
 
   if (!toast?.msg) {
-    return null; // Don't render anything if there's no message
+    return null;
   }
 
   return (
-    // This View handles the absolute positioning and centering of the toast
     <View style={styles.outerContainer}>
-      <Animated.View
-        style={[
-          styles.toastAnimatedContainer,
-          {transform: [{translateY}]}, // Apply animation here
-        ]}>
-        {/* Status Icon */}
-        <View style={styles.statusIconWrapper}>
-          <Icon name={icon} color={color} style={iconStyle} size={28} />
+      <Animated.View style={{transform: [{translateY}]}}>
+        
+        {/* ÍCONO FLOTANTE SEPARADO - FUERA DEL TOAST */}
+        <View style={[styles.iconOuterCircle, {backgroundColor: theme.iconBackgroundColor}]}>
+          <Icon name={theme.iconName} color={theme.iconColor} size={22} />
         </View>
 
-        {/* Text Content (Title and Message) */}
-        <View style={styles.textContentWrapper}>
-          <Text style={styles.titleText}>{currentTitle}</Text>
-          <Text style={styles.messageText}>{toast.msg}</Text>
-        </View>
+        {/* CONTENEDOR DEL TOAST */}
+        <View style={[styles.toastBaseContainer, {backgroundColor: theme.toastBackgroundColor}]}>
+          <View style={styles.textContentWrapper}>
+            <Text style={[styles.titleText, {color: theme.textColor}]}>{currentTitle}</Text>
+            <Text style={[styles.messageText, {color: theme.textColor}]}>{toast.msg}</Text>
+          </View>
 
-        {/* Close Button */}
-        <TouchableOpacity onPress={_close} style={styles.closeButtonWrapper}>
-          <Icon name={IconX} size={12} color={cssVar.cBlackV2 || cssVar.cBlack} />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={_close} style={styles.closeButtonWrapper}>
+            <Icon name={IconX} size={14} color={theme.textColor} />
+          </TouchableOpacity>
+        </View>
       </Animated.View>
     </View>
   );
@@ -112,60 +144,76 @@ const Toast = ({toast, showToast}: ToastProps) => {
 
 export default Toast;
 
-// Styles
 const styles = StyleSheet.create({
-  outerContainer: { // Corresponds to old theme.container
+  outerContainer: {
     position: 'absolute',
-    top: 50, // Or your desired vertical position
+    top: 55, 
     left: 0,
     right: 0,
-    alignItems: 'center', // Centers the toast horizontally
+    alignItems: 'center',
     zIndex: 1000,
+    paddingHorizontal: 20, 
   },
-  toastAnimatedContainer: { // Corresponds to old theme.visible and new HTML structure
-    width: 320, // w-80
-    height: 72, // h-[72px]
-    flexDirection: 'row',
-    alignItems: 'center', // Vertically align items within the toast
-    backgroundColor: cssVar.cWhite,
-    borderRadius: 10,
-    paddingHorizontal: 16, // Provides space at the sides
-    paddingVertical: 10, // Adjust to vertically center content within 72px height
-    elevation: 5, // Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    pointerEvents: 'box-only', // From original
-  },
-  statusIconWrapper: {
-    marginRight: 12, // Space between status icon and text content
-    // Icon size is set directly on <Icon />
-  },
-  textContentWrapper: {
-    flex: 1, // Allows text content to take available space
-    flexDirection: 'column',
-    justifyContent: 'center', // To help center title+message block vertically if it's shorter than icon
-    // gap: 4, // For spacing between title and message, use margin instead for wider compatibility
-  },
-  titleText: {
-    fontFamily: FONTS.semiBold, // font-semibold
-    fontSize: 14, // text-[14px]
-    color: cssVar.cBlack, // Assuming light background
-    marginBottom: 4, // Simulates gap-1 from HTML structure (space between title and message)
-  },
-  messageText: {
-    fontFamily: FONTS.regular, // font-normal
-    fontSize: 12, // text-[12px]
-    color: cssVar.cBlack, // Assuming light background
-    flexShrink: 1, // Allow message to shrink and wrap if needed
-  },
-  closeButtonWrapper: {
-    width: 24, // w-5 (20px) from HTML, increased touch area
-    height: 24, // h-5 (20px) from HTML, increased touch area
+  // ÍCONO SEPARADO - POSICIÓN ABSOLUTA DESDE EL CONTENEDOR PADRE
+  iconOuterCircle: {
+    width: 48, 
+    height: 48,
+    borderRadius: 24, 
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 12, // Space between text content and close button
-    padding: 4, // Make touch area slightly bigger than icon
+    position: 'absolute',
+    left: 20,     // Posición desde el borde izquierdo del contenedor
+    top: -10,     // Posición hacia arriba
+    zIndex: 10,   // Asegurar que esté por encima del toast
+    // Sombra pronunciada para efecto flotante
+    elevation: 15,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    // Borde blanco grueso para separación visual
+    borderWidth: 8,
+    borderColor: cssVar.cBlack, 
+  },
+  toastBaseContainer: {
+    width: '100%', 
+    maxWidth: 340, 
+    minHeight: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12, 
+    paddingLeft: 90,   // Espacio grande para que no se superponga con el ícono
+    paddingRight: 16,
+    paddingVertical: 12,
+    marginTop: 20,     // CLAVE: Margen superior para separar del ícono
+    // Sombra sutil para el toast
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  textContentWrapper: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  titleText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  messageText: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    flexShrink: 1,
+  },
+  closeButtonWrapper: {
+    width: 30, 
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
+    padding: 4, 
   },
 });
