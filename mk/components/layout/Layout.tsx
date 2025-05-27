@@ -50,7 +50,7 @@ const Layout = (props: PropsType) => {
     back = false,
     avatar = false,
     scroll = true,
-    bounces = false,
+    bounces = true,
   } = props;
 
   const {setStore, store, user} = useAuth();

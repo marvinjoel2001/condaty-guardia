@@ -97,8 +97,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 0.5,
     borderBottomWidth: 0,
+
     borderTopColor: cssVar.cWhiteV1,
-    borderColor: 'transparent',
   },
   containerLine: {
     alignItems: 'center',

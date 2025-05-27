@@ -272,7 +272,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const detailVisit = (data: any) => {
     let visit = data.visit ? data.visit : data.owner;
 
-    console.log(data);
     const isSelected = acompanSelect[data?.id || '0'];
     return (
       <ItemList
@@ -362,7 +361,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 const styles = StyleSheet.create({
   // Definiciones básicas
   label: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     fontSize: 12,
     fontFamily: FONTS.light,
   },

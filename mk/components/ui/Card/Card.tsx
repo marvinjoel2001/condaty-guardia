@@ -34,7 +34,7 @@ export default Card;
 
 const theme: ThemeType = {
   container: {
-    backgroundColor: cssVar.cBlack,
+    backgroundColor: cssVar.cBlackV2,
     borderRadius: cssVar.bRadiusS,
     padding: cssVar.spM,
     marginVertical: cssVar.spS,
