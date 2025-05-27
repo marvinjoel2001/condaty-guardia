@@ -20,7 +20,7 @@ const LineDetail = ({label, value, style}: LineDetailProps) => {
       <Text
         style={{
           width: '50%',
-          color: cssVar.cWhiteV2,
+          color: cssVar.cWhiteV1,
           textAlign: 'right',
         }}>
         {label}
