@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   fecha: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
   },
 });
 export default ItemListDate;

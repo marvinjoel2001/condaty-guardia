@@ -1,5 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
+
+import {useContext} from 'react';
 import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
 
 interface Tab {
@@ -13,77 +15,79 @@ interface TabsButtonsProps {
   tabs: Tab[];
   setSel: (value: string) => void;
   style?: TypeStyles;
-  contentContainerStyles?: TypeStyles;
 }
 
-const TabsButtons = ({
-  sel,
-  tabs,
-  setSel,
-  style = {},
-  contentContainerStyles = {},
-}: TabsButtonsProps) => {
+const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
   return (
     <View
       style={{
-        alignItems: 'center',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginVertical: 8,
+        width: '100%',
         ...style,
+        marginVertical: 12,
       }}>
       <ScrollView
-        horizontal={true}
+        horizontal
         showsHorizontalScrollIndicator={false}
-        bounces={false}
         contentContainerStyle={{
-          alignItems: 'center',
           flexDirection: 'row',
           gap: 8,
-          paddingHorizontal: 16,
-          ...contentContainerStyles,
+          flexGrow: tabs.length <= 4 ? 1 : 0,
         }}>
-        {tabs.map(tab => {
-          const isActive = sel === tab.value;
-          return (
-            <TouchableOpacity key={tab.value} onPress={() => setSel(tab?.value)}>
-              <View
+        {tabs.map(tab => (
+          <TouchableOpacity
+            key={tab.value}
+            onPress={() => setSel(tab.value)}
+            style={{
+              flex: tabs.length <= 4 ? 1 : 0,
+            }}>
+            <View
+              style={{
+                borderRadius: 8,
+                paddingHorizontal: 18,
+                paddingVertical: 8,
+                backgroundColor: cssVar.cHoverBlackV2,
+                ...(sel === tab.value
+                  ? {
+                      backgroundColor: cssVar.cHoverSuccess,
+                      borderWidth: 1,
+                      borderColor: cssVar.cSidebar,
+                    }
+                  : {}),
+              }}>
+              <Text
                 style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                  borderRadius: 8,
-                  borderWidth: isActive ? 0.5 : 0,
-                  borderColor: isActive ? cssVar.cSuccess : cssVar.cBlackV2,
-                  backgroundColor: isActive ? 'rgba(36, 105, 80, 0.84)' : cssVar.cHoverBlackV2,
+                  color: cssVar.cWhiteV1,
+                  fontSize: 14,
+                  fontFamily: FONTS.regular,
+                  textAlign: 'center',
+                  ...(sel === tab.value
+                    ? {
+                        color: cssVar.cWhite,
+                        fontFamily: FONTS.semiBold,
+                      }
+                    : {}),
                 }}>
-                <Text
+                {tab.text}
+              </Text>
+              {tab.isNew && (
+                <View
                   style={{
-                    fontSize: 14,
-                    fontFamily: isActive ? FONTS.bold : FONTS.regular,
-                    color: isActive ? cssVar.cWhite : cssVar.cWhiteV1,
-                    textAlign: 'center',
-                  }}>
-                  {tab.text}
-                </Text>
-                {tab.isNew && (
-                  <View
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 4,
-                      backgroundColor: cssVar.cError,
-                      right: 8,
-                      top: 4,
-                      position: 'absolute',
-                    }}
-                  />
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        })}
+                    width: 8,
+                    height: 8,
+                    borderRadius: 4,
+                    backgroundColor: cssVar.cError,
+                    right: 8,
+                    top: 4,
+                    position: 'absolute',
+                  }}
+                />
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </View>
   );
 };
+
 export default TabsButtons;

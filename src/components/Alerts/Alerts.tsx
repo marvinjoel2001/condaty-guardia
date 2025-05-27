@@ -3,18 +3,37 @@ import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import {Text, TouchableOpacity, View} from 'react-native';
-import {cssVar} from '../../../mk/styles/themes';
+import {cssVar, FONTS} from '../../../mk/styles/themes';
 import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {getDateTimeStrMes} from '../../../mk/utils/dates';
+import {getDateTimeAgo, getDateTimeStrMes} from '../../../mk/utils/dates';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
 import AlertDetail from './AlertDetail';
+import {
+  IconAlert,
+  IconAmbulance,
+  IconFlame,
+  IconTheft,
+} from '../../icons/IconLibrary';
+import Icon from '../../../mk/components/ui/Icon/Icon';
 
-export const levelAlerts = ['', 'bajo', 'medio', 'alto', 'panico'];
+export const levelAlerts = ['', 'bajo', 'medio', 'alto', 'pánico'];
+export const statusColor: any = {
+  1: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
+  2: {color: cssVar.cWarning, background: cssVar.cHoverWarning},
+  3: {color: cssVar.cError, background: cssVar.cHoverError},
+  4: {color: cssVar.cError, background: cssVar.cHoverError},
+};
+export const statusColorPanic: any = {
+  E: {border: cssVar.cError, background: cssVar.cHoverError},
+  F: {border: cssVar.cWarning, background: cssVar.cHoverWarning},
+  T: {border: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
+  O: {border: cssVar.cCompl4, background: cssVar.cHoverCompl4},
+};
 
 const Alerts = () => {
   const [search, setSearch] = useState('');
@@ -33,24 +52,18 @@ const Alerts = () => {
   const onSearch = (search: string) => {
     setSearch(search);
   };
-
   const renderRight = (alerta: any) => {
     return (
       <View
         style={{
-          backgroundColor:
-            alerta.level == 3 || alerta.level == 4
-              ? cssVar.cError
-              : alerta.level == 2
-              ? cssVar.cWarning
-              : cssVar.cSuccess,
+          backgroundColor: statusColor[alerta?.level]?.background,
           paddingHorizontal: 8,
           paddingVertical: 2,
-          borderRadius: 12,
+          borderRadius: 4,
         }}>
         <Text
           style={{
-            color: cssVar.cWhite,
+            color: statusColor[alerta?.level]?.color,
             fontSize: 12,
             textAlign: 'center',
           }}>
@@ -59,7 +72,37 @@ const Alerts = () => {
       </View>
     );
   };
+  const renderLeft = (alerta: any) => {
+    let icon: any;
 
+    switch (alerta.type) {
+      case 'F':
+        icon = IconFlame;
+        break;
+      case 'E':
+        icon = IconAmbulance;
+        break;
+      case 'T':
+        icon = IconTheft;
+        break;
+      case 'O':
+        icon = IconAlert;
+        break;
+      default:
+    }
+    return (
+      <View
+        style={{
+          backgroundColor: statusColorPanic[alerta?.type]?.background,
+          borderColor: statusColorPanic[alerta?.type]?.border,
+          borderWidth: 1,
+          padding: 8,
+          borderRadius: '100%',
+        }}>
+        <Icon name={icon} color={cssVar.cWhite} />
+      </View>
+    );
+  };
   const alertList = (alerta: any) => {
     if (
       search != '' &&
@@ -71,36 +114,47 @@ const Alerts = () => {
       return null;
 
     const user = alerta.level === 4 ? alerta.owner : alerta.guardia;
-    const prefix = alerta.level === 4 ? '/OWNER-' : '/GUARD-';
 
     return (
       <ItemList
         onPress={() => {
           setOpenView({open: true, id: alerta.id});
         }}
-        title={getFullName(user)}
-        subtitle="Informador"
-        date={getDateTimeStrMes(alerta.created_at)}
+        // title={getFullName(alerta.guardia)}
+        title={alerta.descrip}
+        subtitle={
+          alerta.level === 4
+            ? 'Residente: ' + getFullName(user)
+            : 'Guardia - ' + getDateTimeAgo(alerta.created_at)
+        }
+        // subtitle2={}
         left={
-          <Avatar
-            src={getUrlImages(
-              prefix + user?.id + '.webp?d=' + user?.updated_at,
-            )}
-            name={getFullName(user)}
-          />
+          alerta?.level === 4 ? (
+            renderLeft(alerta)
+          ) : (
+            <Avatar
+              src={getUrlImages(
+                '/GUARD-' +
+                  alerta?.guard_id +
+                  '.webp?d=' +
+                  alerta?.guardia?.updated_at,
+              )}
+              name={getFullName(alerta.guardia)}
+            />
+          )
         }
         right={renderRight(alerta)}>
-        <View style={{paddingTop: 8}}>
-          <Text style={{color: cssVar.cWhite}}>Asunto</Text>
+        {alerta?.level !== 4 && (
           <Text
             style={{
-              color: cssVar.cWhiteV2,
-              fontSize: 10,
-              fontWeight: '400',
+              marginTop: 4,
+              color: cssVar.cWhiteV1,
+              fontSize: 14,
+              fontFamily: FONTS.regular,
             }}>
             {alerta.descrip}
           </Text>
-        </View>
+        )}
       </ItemList>
     );
   };
@@ -132,16 +186,16 @@ const Alerts = () => {
           sel={typeSearch}
           setSel={setTypeSearch}
         />
-        <View style={{paddingHorizontal: 16}}>
-          <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
-          <List
-            style={{marginTop: 8}}
-            data={dataFilter}
-            renderItem={alertList}
-            refreshing={!loaded}
-          />
-        </View>
+        <DataSearch setSearch={onSearch} name="Novedades" value={search} />
+
+        <List
+          style={{marginTop: 8}}
+          data={dataFilter}
+          renderItem={alertList}
+          refreshing={!loaded}
+        />
+
         {openAdd && (
           <AlertAdd
             open={openAdd}

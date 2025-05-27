@@ -54,13 +54,13 @@ const DataSearch = ({
           marginTop: 1,
         }}>
         {!searchBy && !value && (
-          <Icon name={IconSearch} size={20} color={cssVar.cWhiteV2} />
+          <Icon name={IconSearch} size={20} color={cssVar.cWhiteV1} />
         )}
         {((searchBy && searchBy) || value !== '') && (
           <Icon
             name={IconX}
             size={20}
-            color={cssVar.cWhiteV2}
+            color={cssVar.cWhiteV1}
             onPress={() => onSearch('')}
           />
         )}
@@ -88,7 +88,7 @@ const DataSearch = ({
         onChangeText={(e: string) => setSearchBy(e)}
         value={searchBy}
         placeholder="Buscar..."
-        placeholderTextColor={cssVar.cWhiteV2}
+        placeholderTextColor={cssVar.cWhiteV1}
         onSubmitEditing={() => onSearch()}
       />
       <View style={theme.iconRight}>{iconRight()}</View>
@@ -106,11 +106,11 @@ const theme: ThemeType = {
   },
   dataSearch: {
     borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cBlackV2,
+    borderColor: cssVar.cWhiteV2,
     borderRadius: cssVar.bRadiusS,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
-    backgroundColor: cssVar.cBlackV2,
+    backgroundColor: cssVar.cWhiteV2,
     color: cssVar.cWhite,
     paddingVertical: 16,
     paddingHorizontal: cssVar.spM,

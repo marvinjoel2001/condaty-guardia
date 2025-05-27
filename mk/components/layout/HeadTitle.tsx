@@ -106,6 +106,9 @@ const HeadTitle = ({
         </Text>
       )}
       {right && <View>{right}</View>}
+      {!right && route.name !== 'Home' && (
+        <View style={{width: 34, height: 34}}></View>
+      )}
       {route.name == 'Home' && !onlyBack && (
         <View
           style={{
@@ -164,7 +167,7 @@ const theme: ThemeType = {
   },
   title: {
     flexGrow: 1,
-    paddingRight: cssVar.spM,
+    // paddingRight: cssVar.spM,
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
     textAlign: 'center',

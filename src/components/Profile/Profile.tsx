@@ -582,7 +582,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
- 
   },
   // Estilo específico para el botón "Guardar"
   saveButton: {

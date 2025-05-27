@@ -10,29 +10,51 @@ import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
 import {buttonPrimary, buttonSecondary} from './shares/styles';
-
-const Accesses = ({data, reload, setDataID, loaded}: any) => {
+import DetOrders from '../Orders/DetOrders';
+interface PropsType {
+  data: any;
+  reload: any;
+  typeSearch: string;
+  loaded: boolean;
+}
+const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
-  const [edit, setEdit] = useState(false);
   const [formState, setFormState]: any = useState({});
-  const screenParams: any = useState(null);
+  const [dataAcesses, setDataAccesses] = useState([]);
+  const [dataOrders, setDataOrders] = useState([]);
+  const [openDetailOrders, setOpenDetailOrders] = useState(false);
 
   useEffect(() => {
-    setDataID(62);
-  }, [openDetail]);
+    let _dataAccesses = [];
+    let _dataOrders = [];
+    if (typeSearch === 'I') {
+      _dataAccesses = data?.accesses?.filter(
+        (item: any) => !item?.in_at && !item?.out_at,
+      );
+      _dataOrders = data?.others?.filter(
+        (item: any) => !item?.access?.in_at && !item?.access?.out_at,
+      );
+    } else if (typeSearch === 'S') {
+      _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
+      _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
+    }
+    setDataAccesses(_dataAccesses);
+    setDataOrders(_dataOrders);
+  }, [typeSearch, data]);
 
-  const onPressDetail = (item: any) => {
-    setOpenDetail(true);
+  const onPressDetail = (item: any, type: string) => {
+    if (type == 'A') setOpenDetail(true);
+    if (type == 'O') setOpenDetailOrders(true);
     setFormState({id: item.id});
   };
 
   const handleAction = (item: any) => {
     if (!item?.in_at && item?.confirm_at && item?.confirm === 'Y') {
-      onPressDetail(item);
+      onPressDetail(item, 'A');
     } else if (item.in_at && !item.out_at) {
-      onPressDetail(item);
+      onPressDetail(item, 'A');
     } else {
-      onPressDetail(item);
+      onPressDetail(item, 'A');
     }
   };
 
@@ -76,7 +98,7 @@ const Accesses = ({data, reload, setDataID, loaded}: any) => {
     );
   };
 
-  const right = (item: any) => {
+  const rightAccess = (item: any) => {
     if (!item?.in_at && !item?.confirm_at) {
       return waitingConfirmation(item);
     }
@@ -92,8 +114,43 @@ const Accesses = ({data, reload, setDataID, loaded}: any) => {
     }
     return null;
   };
+  const right = (item: any) => {
+    // Si el pedido está cancelado, mostramos un texto de "Cancelado"
+    if (item.status === 'X') {
+      return (
+        <Text
+          style={{
+            color: cssVar.cError,
+            fontSize: 12,
+            fontFamily: FONTS.regular,
+          }}>
+          Cancelado
+        </Text>
+      );
+    }
+    if (item.access && !item.access.out_at) {
+      return (
+        <TouchableOpacity
+          style={{borderRadius: 10}}
+          onPress={() => onPressDetail(item, 'O')}>
+          <Text style={buttonSecondary}>Dejar salir</Text>
+        </TouchableOpacity>
+      );
+    }
 
-  const title = (item: any) => {
+    if (!item.access) {
+      return (
+        <TouchableOpacity
+          style={{borderRadius: 10}}
+          onPress={() => onPressDetail(item, 'O')}>
+          <Text style={buttonPrimary}>Dejar Entrar</Text>
+        </TouchableOpacity>
+      );
+    }
+    return null;
+  };
+
+  const titleAccess = (item: any) => {
     return item.type === 'O' ? (
       <Text>{getFullName(item.owner)}</Text>
     ) : (
@@ -101,7 +158,7 @@ const Accesses = ({data, reload, setDataID, loaded}: any) => {
     );
   };
 
-  const subtitle = (item: any) => {
+  const subtitleAccess = (item: any) => {
     if (item.type === 'O') {
       return 'USO LLAVE VIRTUAL QR';
     }
@@ -127,16 +184,26 @@ const Accesses = ({data, reload, setDataID, loaded}: any) => {
     return <Text>{prefix + getFullName(item.owner)}</Text>;
   };
 
-  const hours = (item: any) => {
-    return (
-      <ItemListDate
-        inDate={item.in_at}
-        outDate={item.type !== 'O' ? item.out_at : null}
-      />
-    );
-  };
+  // const hoursAccess = (item: any) => {
+  //   return (
+  //     <ItemListDate
+  //       inDate={item.in_at}
+  //       outDate={item.type !== 'O' ? item.out_at : null}
+  //     />
+  //   );
+  // };
 
-  const icon = (item: any) => {
+  // const hours = (item: any) => {
+  //   console.log(item, 'item pedidos pipipi');
+  //   return (
+  //     <ItemListDate
+  //       inDate={item?.access?.in_at}
+  //       outDate={item?.access?.out_at}
+  //     />
+  //   );
+  // };
+
+  const iconAccess = (item: any) => {
     const isOrder = item.type === 'P';
     const orderIcons: Record<string, any> = {
       Taxi: IconTaxi,
@@ -175,27 +242,72 @@ const Accesses = ({data, reload, setDataID, loaded}: any) => {
       />
     );
   };
+  const iconOrder = (item: any) => {
+    const orderIcons: Record<string, any> = {
+      Taxi: IconTaxi,
+      Mensajeria: IconOther,
+      Delivery: IconDelivery,
+      Otro: IconOther,
+    };
+    // console.log(item?.other_type?.name,'icono')
 
-  const renderItemAccess = (item: any, onPressDetail: (item: any) => void) => {
+    const iconName = orderIcons[item?.other_type?.name] || IconOther;
+    return (
+      <Icon
+        style={{
+          backgroundColor: cssVar.cWhite,
+          padding: 8,
+          borderRadius: 50,
+        }}
+        name={iconName}
+        size={24}
+      />
+    );
+  };
+
+  const renderItemAccess = (item: any) => {
     return (
       <ItemList
-        title={title(item)}
-        subtitle={subtitle(item)}
-        left={icon(item)}
-        right={right(item)}
-        date={hours(item)}
+        key={item.id}
+        title={titleAccess(item)}
+        subtitle={subtitleAccess(item)}
+        left={iconAccess(item)}
+        right={rightAccess(item)}
+        // date={hoursAccess(item)}
         widthMain={150}
-        onPress={() => onPressDetail(item)}
+        onPress={() => onPressDetail(item, 'A')}
+      />
+    );
+  };
+  const renderItemOrder = (item: any) => {
+    // console.log(item , 'item pedidos pipipi')
+    return (
+      <ItemList
+        key={item?.id}
+        onPress={() => onPressDetail(item, 'O')}
+        title={getFullName(
+          item?.access?.in_at ? item?.access?.visit : item?.owner,
+        )}
+        subtitle={
+          !item?.access?.in_at
+            ? 'Detalle: ' + item?.descrip
+            : 'Entregó a: ' + getFullName(item?.owner)
+        }
+        left={iconOrder(item)}
+        right={right(item)}
+        // date={hours(item)}
       />
     );
   };
   return (
     <>
-      <List
-        data={data}
-        renderItem={item => renderItemAccess(item, onPressDetail)}
+      {/* <List
+        data={data?.accesses}
+        renderItem={item => renderItemAccess(item)}
         refreshing={loaded}
-      />
+      /> */}
+      {dataAcesses?.map((item: any) => renderItemAccess(item))}
+      {dataOrders?.map((item: any) => renderItemOrder(item))}
       {openDetail && (
         <DetAccesses
           id={formState?.id}
@@ -204,16 +316,14 @@ const Accesses = ({data, reload, setDataID, loaded}: any) => {
           reload={reload}
           // execute={execute}
         />
-        // <DetailContainer
-        //   id={formState?.id}
-        //   open={openDetail}
-        //   close={() => setOpenDetail(false)}
-        //   reload={reload}
-        //   edit={edit}
-        //   type="accesos"
-        //   detailComponent={AccessDetail}
-        //   screenParams={screenParams}
-        // />
+      )}
+      {openDetailOrders && (
+        <DetOrders
+          id={formState?.id}
+          open={openDetailOrders}
+          close={() => setOpenDetailOrders(false)}
+          reload={reload}
+        />
       )}
     </>
   );
