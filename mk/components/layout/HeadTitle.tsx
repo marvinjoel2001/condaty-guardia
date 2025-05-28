@@ -7,12 +7,14 @@ import {
   IconMenu,
   IconNotification,
 } from '../../../src/icons/IconLibrary';
-import Avatar from '../ui/Avatar/Avatar';
-import {getFullName, getUrlImages} from '../../utils/strings';
-import useAuth from '../../hooks/useAuth';
+// Avatar, getFullName, getUrlImages, useAuth, navigate, TextLog, getPercentajeUser no se usan directamente en este snippet
+// pero se mantienen por si son usados por 'right' o 'customTitle' props.
+// import Avatar from '../ui/Avatar/Avatar';
+// import {getFullName, getUrlImages} from '../../utils/strings';
+// import useAuth from '../../hooks/useAuth';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
-import {getPercentajeUser, navigate} from '../../utils/utils';
-import TextLog from '../ui/TextLog/TextLog';
+// import {getPercentajeUser, navigate} from '../../utils/utils';
+// import TextLog from '../ui/TextLog/TextLog';
 import {useEvent} from '../../hooks/useEvent';
 
 interface HeadTitleProps {
@@ -24,7 +26,7 @@ interface HeadTitleProps {
   customTitle?: any;
   right?: any;
   back?: boolean;
-  avatar?: boolean;
+  // avatar?: boolean; // avatar prop no parece usarse
 }
 
 const HeadTitle = ({
@@ -34,13 +36,13 @@ const HeadTitle = ({
   customTitle = null,
   onBack = null,
   right,
-  back = false,
-  avatar = false,
+  back = false, // 'back' prop se usa para determinar si mostrar la flecha de atrás
+  // avatar = false,
   onlyBack = false,
 }: HeadTitleProps) => {
   const navigation: any = useNavigation();
   const route = useRoute();
-  const {user} = useAuth();
+  // const {user} = useAuth(); // user no se usa directamente aquí
   const [counter, setCounter] = useState(0);
 
   const onNotif = useCallback((data: any) => {
@@ -66,72 +68,108 @@ const HeadTitle = ({
     navigation.goBack();
   };
 
-  const goProfile = () => {
-    navigation.navigate('profile');
-  };
+  // const goProfile = () => { // No se usa
+  //   navigation.navigate('profile');
+  // };
   const togleDrawer = () => {
     navigation.toggleDrawer();
   };
 
-  return (
-    <Animated.View style={{...theme.container, ...style}}>
-      {route.name == 'Home' && !onlyBack ? (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 8,
-            backgroundColor: cssVar.cWhite,
-            borderRadius: '100%',
-          }}
-          onTouchEnd={() => togleDrawer()}>
-          <Icon name={IconMenu} color={cssVar.cBlack} />
-        </View>
-      ) : (
+  // Asumimos que el tamaño del icono es ~20px y el padding es 8px (theme.back)
+  // Ancho efectivo del contenedor del icono = 20 + 2*8 = 36px.
+  // Ajusta este valor si tus iconos o padding son diferentes.
+  const effectiveIconContainerWidth = 36;
+  const iconContainerBorderRadius = effectiveIconContainerWidth / 2;
+
+
+  const renderLeftElement = () => {
+    if (route.name === 'Home' && !onlyBack) {
+      return (
+        <TouchableOpacity onPress={togleDrawer} accessibilityLabel={'Abrir menú'}>
+          <View
+            style={{
+              width: effectiveIconContainerWidth,
+              height: effectiveIconContainerWidth,
+              justifyContent: 'center',
+              alignItems: 'center',
+              // flexDirection: 'row', // No necesario para un solo icono centrado
+              // alignItems: 'center', // Cubierto por alignItems en View
+              padding: 8, // Mantenemos padding si el icono se ajusta dentro
+              backgroundColor: cssVar.cWhite,
+              borderRadius: iconContainerBorderRadius, 
+            }}>
+            <Icon name={IconMenu} color={cssVar.cBlack} />
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    // Mostrar flecha atrás si 'back' es true, o si no es Home, o si es Home con onlyBack
+    if (back || route.name !== 'Home' || onlyBack) {
+      return (
         <TouchableOpacity onPress={goBack} accessibilityLabel={'Volver atrás'}>
-          <View style={theme.back}>
+          <View style={theme.back}> 
+            {/* theme.back ya tiene padding: 8. Asumimos que esto + icono = effectiveIconContainerWidth */}
             <Icon name={IconArrowLeft} color={cssVar.cWhite} />
           </View>
         </TouchableOpacity>
-      )}
+      );
+    }
+    // Si no hay nada a la izquierda por lógica, renderizar un espaciador para mantener equilibrio
+    return <View style={{width: effectiveIconContainerWidth, height: effectiveIconContainerWidth}} />;
+  };
+
+  const renderRightElement = () => {
+    if (right) {
+      return <View>{right}</View>; // El usuario provee 'right', puede tener cualquier ancho
+    }
+    if (route.name === 'Home' && !onlyBack) {
+      return (
+        <TouchableOpacity onPress={() => navigation.navigate('Notificaciones')} accessibilityLabel={'Notificaciones'}>
+          <View
+            style={{
+              width: effectiveIconContainerWidth,
+              height: effectiveIconContainerWidth,
+              justifyContent: 'center',
+              alignItems: 'center',
+              // flexDirection: 'row', // No necesario
+              // alignItems: 'center', // Cubierto
+              padding: 8,
+              backgroundColor: cssVar.cWhite,
+              borderRadius: iconContainerBorderRadius,
+            }}>
+            <Icon name={IconNotification} color={cssVar.cBlack} />
+            {counter > 0 && (
+              <View style={theme.notifPoint}>
+                <Text style={theme.notifPointNumber}>
+                  {counter > 99 ? '99+' : counter}
+                </Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    // Espaciador si 'right' no fue provisto Y no es el icono de notificación de Home.
+    // Esto cubre pantallas no-Home, y Home con 'onlyBack = true'.
+    return <View style={{width: effectiveIconContainerWidth, height: effectiveIconContainerWidth}} />;
+  };
+
+  return (
+    <Animated.View style={{...theme.container, ...style}}>
+      {renderLeftElement()}
 
       {customTitle ? (
         <View style={theme.customTitle}>{customTitle}</View>
       ) : (
         <Text
-          style={{
-            ...theme.title,
-          }}>
+          style={theme.title}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {title}
         </Text>
       )}
-      {right && <View>{right}</View>}
-      {!right && route.name !== 'Home' && (
-        <View style={{width: 34, height: 34}}></View>
-      )}
-      {route.name == 'Home' && !onlyBack && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 8,
-            backgroundColor: cssVar.cWhite,
-            borderRadius: '100%',
-          }}
-          onTouchEnd={() => {
-            navigation.navigate('Notifications');
-          }}>
-          <Icon name={IconNotification} color={cssVar.cBlack} />
-          {counter > 0 && (
-            <View style={theme.notifPoint}>
-              <Text style={theme.notifPointNumber}>
-                {' '}
-                {counter > 99 ? '99+' : counter}
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
+      {renderRightElement()}
     </Animated.View>
   );
 };
@@ -147,32 +185,35 @@ const theme: ThemeType = {
     borderBottomColor: cssVar.cWhiteV1,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
-    padding: cssVar.spS,
-
+    paddingHorizontal: cssVar.spS, // Aplicar padding horizontal aquí
+    paddingVertical: cssVar.spS, // O un padding vertical si es necesario
+    minHeight: 56, // Altura mínima para consistencia
     alignItems: 'center',
     flexDirection: 'row',
+    justifyContent: 'space-between', // Esto puede ayudar si los elementos laterales son fijos
   },
-  back: {
+  back: { // Este estilo se usa para el contenedor del icono de flecha atrás
+    padding: 8, // Si el icono es 20x20, esto hace el touch target 36x36
+    // El ancho/alto implícito será el tamaño del icono + padding
+    // No es necesario width/height explícito si el icono + padding dan el tamaño deseado
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: cssVar.cWhite,
-    // borderRadius: '100%',
-    padding: 8,
   },
-  customTitle: {
-    flexGrow: 1,
-    fontFamily: FONTS.bold,
-    fontSize: cssVar.sXl,
-    // paddingTop: cssVar.spL,
+  customTitle: { // El contenedor del título personalizado
+    flex: 1, // Que tome el espacio restante
+    // Si customTitle es un Text, necesitaría textAlign: 'center'
+    // Si es un View complejo, ese View debe manejar su propio centrado de texto
+    marginHorizontal: cssVar.spXs, // Pequeño margen para que no toque los iconos
   },
-  title: {
-    flexGrow: 1,
-    // paddingRight: cssVar.spM,
+  title: { // El componente Text del título
+    flex: 1, // Que tome el espacio restante
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
     textAlign: 'center',
     fontSize: cssVar.sXl,
+    marginHorizontal: cssVar.spXs, // Pequeño margen para que no toque los iconos
   },
+  // bage y textBage no se usan en el snippet, se dejan por si acaso.
   bage: {
     position: 'absolute',
     top: -5,
@@ -191,14 +232,15 @@ const theme: ThemeType = {
   },
   notifPoint: {
     position: 'absolute',
-    top: -5,
-    right: -8,
-    borderRadius: 100,
-    backgroundColor: cssVar.cError,
-    width: 18,
+    top: -2, // Ajustado para mejor visualización
+    right: -2, // Ajustado
+    minWidth: 18, // Para que números pequeños se vean bien
     height: 18,
+    borderRadius: 9, // Mitad de la altura/ancho
+    backgroundColor: cssVar.cError,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 4, // Padding para números más grandes
   },
   notifPointNumber: {
     fontSize: cssVar.sXs,

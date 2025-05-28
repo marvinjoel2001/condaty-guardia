@@ -131,7 +131,7 @@ const Layout = (props: PropsType) => {
         title={title}
         customTitle={customTitle}
         back={back}
-        avatar={avatar}
+        
         style={styleHead}
         right={rigth}
         onBack={onBack}
