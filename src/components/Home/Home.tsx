@@ -228,12 +228,12 @@ const Home = () => {
         {/* Buscador */}
 
         <View style={styles.listContainer}>
-          <DataSearch
+          {/* <DataSearch
             setSearch={setSearch}
             name="home"
             value={search}
             style={{marginBottom: 8}}
-          />
+          /> */}
           {(_typeSearch === 'S' || typeSearch == 'I') && (
             <Accesses
               data={data}

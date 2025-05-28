@@ -119,7 +119,7 @@ const HeadTitle = ({
             borderRadius: '100%',
           }}
           onTouchEnd={() => {
-            navigation.navigate('Notificaciones');
+            navigation.navigate('Notifications');
           }}>
           <Icon name={IconNotification} color={cssVar.cBlack} />
           {counter > 0 && (

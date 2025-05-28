@@ -307,16 +307,16 @@ const Notifications = () => {
         sel={tab}
         setSel={setTab}
       /> */}
-      <View style={{padding: cssVar.spL, gap: cssVar.spL}}>
-        {/* <DataSearch setSearch={onSearch} name="Novedades" value={search} /> */}
 
-        <List
-          data={notifs?.data}
-          renderItem={NotifisList}
-          refreshing={!loaded}
-          skeletonType="list"
-        />
-      </View>
+      {/* <DataSearch setSearch={onSearch} name="Novedades" value={search} /> */}
+
+      <List
+        data={notifs?.data}
+        renderItem={NotifisList}
+        refreshing={!loaded}
+        skeletonType="list"
+      />
+
       {openDetail == 'Pedidos' && (
         <DetOrders
           id={formState?.id}
