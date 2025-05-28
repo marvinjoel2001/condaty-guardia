@@ -1,17 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View, StyleSheet, Image} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import List from '../../../../mk/components/ui/List/List';
-import ItemInfo, {
-  ItemInfoType,
-  TypeDetails,
-} from '../../../../mk/components/ui/ItemInfo/ItemInfo';
-import {getDateStrMes} from '../../../../mk/utils/dates';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconArrowLeft, IconX} from '../../../icons/IconLibrary';
+import {IconArrowLeft, IconX, IconAdd} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
@@ -19,6 +14,7 @@ import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import {AccompaniedAdd} from './AccompaniedAdd';
 import useApi from '../../../../mk/hooks/useApi';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+
 type PropsType = {
   setFormState: any;
   formState: any;
@@ -29,6 +25,82 @@ type PropsType = {
   errors: any;
   setErrors: any;
 };
+const Br = () => (
+  <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 8}} />
+);
+
+const formatDateForInvitation = (dateString: string | undefined) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Fecha inválida';
+
+    const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const dayOfWeek = days[date.getUTCDay()];
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    return `${dayOfWeek}, ${day}/${month}/${year} - ${hours}:${minutes}`;
+  } catch (e) {
+    return 'Fecha inválida';
+  }
+};
+
+const OwnerInvitationInfoDisplay = ({ invitationData }: { invitationData: any }) => {
+  if (!invitationData || !invitationData.owner) return null;
+
+  return (
+    <View style={styles.ownerInfoMainContainer}>
+      <View style={styles.invitationDetailsSection}>
+        <View style={styles.invitationDetailsInnerWrapper}>
+          <View style={styles.invitationDetailsContent}>
+            <Text style={styles.sectionTitle}>Detalles de la invitación</Text>
+            <View style={styles.detailsGroup}>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Nombre del evento</Text>
+                <Text style={styles.detailValueRight}>{invitationData.title}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Cantidad de invitados</Text>
+                <Text style={styles.detailValueRightNormal}>{invitationData.guests?.length || 0}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Fecha de invitación</Text>
+                <Text style={styles.detailValueRightNormal}>{formatDateForInvitation(invitationData.created_at)}</Text>
+              </View>
+              <Br />
+            </View>
+          </View>
+
+          <View style={styles.visitToSection}>
+            <Text style={styles.sectionTitle}>Visita a:</Text>
+            <View style={styles.visitToContent}>
+              <Avatar name={getFullName(invitationData.owner)} w={40} h={40} style={styles.avatarImage} />
+              <View style={styles.visitToTextContainer}>
+                <Text style={styles.ownerNameValue}>{getFullName(invitationData.owner)}</Text>
+                <Text style={styles.ownerUnitValue}>
+                  Unidad: {invitationData.owner.dpto && invitationData.owner.dpto.length > 0 ? invitationData.owner.dpto[0].nro : 'N/A'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* <View style={styles.ownerCiSection}>
+        <Avatar name={getFullName(invitationData.owner)} w={40} h={40} style={styles.avatarImage} />
+        <View style={styles.ownerCiTextContainer}>
+          <Text style={styles.ownerNameValue}>{getFullName(invitationData.owner)}</Text>
+          <Text style={styles.ownerUnitValue}>C.I. {invitationData.owner.ci || 'N/A'}</Text>
+        </View>
+      </View> */}
+    </View>
+  );
+};
+
+
 const GroupQR = ({
   setFormState,
   formState,
@@ -43,9 +115,7 @@ const GroupQR = ({
   const [tab, setTab] = useState('P');
   const [selectedVisit, setSelectedVisit]: any = useState(null);
   const [openAcom, setOpenAcom] = useState(false);
-  const [details, setDetails] = useState<TypeDetails>({
-    data: [],
-  });
+
   const visitList = (item: any) => {
     return (
       <ItemList
@@ -62,9 +132,17 @@ const GroupQR = ({
             ci: item.visit.ci,
             visit_id: item.visit_id,
             access_id: item.access_id,
+            obs_in: item.access?.obs_in || '',
+            obs_out: item.access?.obs_out || '',
+            plate: item.access?.plate || '',
           }));
           if (data?.status !== 'X' && !item.access?.out_at) {
             setOpenSelected(true);
+            if (item.access?.type) {
+                setTab(item.access.type);
+            } else {
+                setTab('P');
+            }
           }
         }}
         title={getFullName(item.visit) || getFullName(item)}
@@ -83,7 +161,6 @@ const GroupQR = ({
                 style={{
                   backgroundColor: cssVar.cWhiteV2,
                   borderRadius: 100,
-
                   paddingHorizontal: 8,
                   paddingVertical: 4,
                 }}>
@@ -103,7 +180,6 @@ const GroupQR = ({
                 backgroundColor: cssVar.cAccent,
                 borderRadius: 100,
                 alignItems: 'center',
-
                 paddingHorizontal: 8,
                 paddingVertical: 4,
               }}>
@@ -128,65 +204,19 @@ const GroupQR = ({
     data?.guests?.map((invitado: any) => invitado?.access && ingreados++);
     return ingreados;
   };
-  const _onDetail = (item: any) => {
-    const data: ItemInfoType[] = [];
-    const day = new Date().toISOString().split('T')[0];
-    const fechaInvitacion = item?.date_event?.slice(0, -9);
-
-    data.push({
-      l: 'Evento:',
-      v: item?.title,
-    });
-    data.push({
-      l: 'Estado:',
-      v:
-        fechaInvitacion < day
-          ? 'Vencido'
-          : item?.status == 'A'
-          ? 'Activa'
-          : item?.status == 'X'
-          ? 'Anulado'
-          : item?.status == 'O' || formState.allout
-          ? 'Evento Termino'
-          : item?.status == 'I' && !formState.allout && 'Todos Ingresaron',
-      sv: {
-        color:
-          fechaInvitacion < day
-            ? cssVar.cWhiteV2
-            : item?.status == 'A'
-            ? cssVar.cAccent
-            : item?.status == 'X'
-            ? cssVar.cError
-            : cssVar.cWhiteV2,
-      },
-    });
-    data.push({
-      l: 'Residente:',
-      v: getFullName(item?.owner),
-    });
-    data.push({
-      l: 'Válido hasta:',
-      v: getDateStrMes(item?.date_event),
-    });
-
-    setDetails({data: data});
-  };
-
+  
   useEffect(() => {
-    _onDetail(data);
-  }, [data]);
-  useEffect(() => {
-    setFormState({
-      ...formState,
+    setFormState((prevState: any) => ({
+      ...prevState,
       tab: tab,
       ci_taxi: '',
       name_taxi: '',
       middle_name_taxi: '',
       last_name_taxi: '',
       mother_last_name_taxi: '',
-      plate: '',
+      plate: tab === 'P' ? '' : prevState.plate,
       disbledTaxi: false,
-    });
+    }));
   }, [tab]);
 
   const onDelAcom = (acom: any) => {
@@ -194,11 +224,10 @@ const GroupQR = ({
     const newAcomps = acomps.filter((item: any) => item.ci !== acom.ci);
     setFormState({...formState, acompanantes: newAcomps});
   };
+
   const acompanantesList = (acompanante: any) => {
     return (
-      <TouchableOpacity
-      // onPress={() => handleEditAcompanante(acompanante.ci)}
-      >
+      <TouchableOpacity>
         <ItemList
           title={getFullName(acompanante)}
           subtitle={'C.I. ' + acompanante.ci}
@@ -219,7 +248,9 @@ const GroupQR = ({
       </TouchableOpacity>
     );
   };
+
   const onExistTaxi = async () => {
+    if (!formState?.ci_taxi) return;
     const {data: exist} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -235,7 +266,7 @@ const GroupQR = ({
         middle_name_taxi: exist?.data.middle_name,
         last_name_taxi: exist?.data.last_name,
         mother_last_name_taxi: exist?.data.mother_last_name,
-        plate: exist?.data.plate,
+        plate: exist?.data.plate || formState.plate,
         disbledTaxi: true,
       });
     } else {
@@ -250,19 +281,22 @@ const GroupQR = ({
       });
     }
   };
+
   return (
     <>
       {!data ? (
         <Loading />
       ) : (
-        <View>
-          <ItemInfo type="C" details={details} />
+        <View style={{width: 388, alignSelf: 'center'}}>
+          <OwnerInvitationInfoDisplay invitationData={data} />
           {!openSelected ? (
             <>
               <Text
                 style={{
                   fontFamily: FONTS.medium,
                   color: cssVar.cWhite,
+                  marginTop: 10,
+                  marginBottom: 5,
                 }}>
                 Cantidad de invitados ingresados: {ingresados()} /
                 {data?.guests?.length}
@@ -271,29 +305,28 @@ const GroupQR = ({
                 <List
                   data={data?.guests}
                   renderItem={visitList}
-                  // refreshing={!loaded}
                 />
               </ScrollView>
             </>
           ) : (
-            <>
+            <ScrollView style={styles.selectedGuestScrollView}>
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
                   gap: 5,
                   alignItems: 'center',
-                  marginBottom: 5,
+                  marginBottom: 15, marginTop:10,
                 }}
                 onPress={() => {
                   setOpenSelected(false);
-                  // setTab('E');
                 }}>
-                <Icon name={IconArrowLeft} color={cssVar.cWhite} />
+                <Icon name={IconArrowLeft} color={cssVar.cWhite} size={20}/>
                 <Text
                   style={{
                     color: cssVar.cWhite,
                     fontWeight: '600',
                     fontFamily: FONTS.medium,
+                    fontSize: 16,
                   }}>
                   Volver a los invitados
                 </Text>
@@ -302,10 +335,11 @@ const GroupQR = ({
                 title={getFullName(selectedVisit?.visit)}
                 subtitle={
                   selectedVisit?.visit.ci
-                    ? 'C.I.' + selectedVisit?.visit.ci
+                    ? 'C.I. ' + selectedVisit?.visit.ci
                     : 'C.I. (Sin registrar)'
                 }
                 left={<Avatar name={getFullName(selectedVisit?.visit)} />}
+                style={{marginBottom: 16}}
               />
               {!selectedVisit?.visit?.ci && (
                 <>
@@ -318,45 +352,30 @@ const GroupQR = ({
                     required
                     error={errors}
                     onChange={(value: any) => handleChange('ci', value)}
-                    // onBlur={() => onCheckC(true)}
                   />
                   <InputFullName
                     formState={formState}
                     errors={errors}
                     handleChangeInput={handleChange}
+                    inputGrid={true}
                   />
                 </>
               )}
-              {data?.status != 'X' &&
-                (!selectedVisit?.access?.in_at ? (
-                  <TextArea
-                    label="Observaciones de entrada"
-                    placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
-                    name={'obs_in'}
-                    value={formState['obs_in']}
-                    onChange={value => handleChange('obs_in', value)}
-                  />
-                ) : (
-                  <TextArea
-                    label="Observaciones de Salida"
-                    placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
-                    name="obs_out"
-                    value={formState?.obs_out}
-                    onChange={value => handleChange('obs_out', value)}
-                  />
-                ))}
-              {!selectedVisit?.access?.in_at && data?.status !== 'X' && (
-                <>
-                  <TabsButtons
-                    tabs={[
-                      {value: 'P', text: 'A pie'},
-                      {value: 'V', text: 'En vehículo'},
-                      {value: 'T', text: 'En taxi'},
-                    ]}
-                    sel={tab}
-                    setSel={setTab}
-                  />
-                  {tab == 'V' && (
+
+                <View style={styles.transportButtonsContainer}>
+                    <TabsButtons
+                        tabs={[
+                            {value: 'P', text: 'A pie'},
+                            {value: 'V', text: 'En vehículo'},
+                            {value: 'T', text: 'En taxi'},
+                        ]}
+                        sel={tab}
+                        setSel={setTab}
+                    />
+                </View>
+
+
+                {tab == 'V' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
                     <Input
                       label="Placa"
                       type="text"
@@ -369,27 +388,27 @@ const GroupQR = ({
                       }}
                     />
                   )}
-                  {tab == 'T' && (
+                  {tab == 'T' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
                     <>
                       <Text
                         style={{
                           fontSize: 16,
                           fontWeight: 'bold',
-                          marginBottom: 4,
-                          color: cssVar.cWhiteV2,
+                          marginVertical: 8,
+                          color: cssVar.cWhite,
                           fontFamily: FONTS.medium,
                         }}>
                         Datos del conductor:
                       </Text>
                       <Input
                         label="Carnet de identidad"
-                        type="date"
+                        type="text"
                         name="ci_taxi"
                         required
                         maxLength={10}
+                        keyboardType="number-pad"
                         error={errors}
                         value={formState['ci_taxi']}
-                        // onBlur={() => onCheckCI(true)}
                         onBlur={() => onExistTaxi()}
                         onChange={(value: any) =>
                           handleChange('ci_taxi', value)
@@ -401,6 +420,7 @@ const GroupQR = ({
                         handleChangeInput={handleChange}
                         disabled={formState?.disbledTaxi}
                         prefijo={'_taxi'}
+                        inputGrid={true}
                       />
                       <Input
                         label="Placa"
@@ -413,40 +433,64 @@ const GroupQR = ({
                       />
                     </>
                   )}
-                  <TouchableOpacity
-                    style={{
-                      alignSelf: 'flex-start',
-                      marginVertical: 4,
-                    }}
+              
+              {!selectedVisit?.access?.in_at && data?.status !== 'X' && (
+                <TouchableOpacity
+                    style={styles.addCompanionLinkContainer}
                     onPress={() => setOpenAcom(true)}>
-                    <Text
-                      style={{
-                        color: cssVar.cWhite,
-                        textDecorationLine: 'underline',
-                      }}>
-                      Agregar acompañante
-                    </Text>
-                  </TouchableOpacity>
-                  {formState?.acompanantes?.length > 0 && (
-                    <>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontFamily: FONTS.semiBold,
-                          marginVertical: 4,
-                          color: cssVar.cWhiteV2,
-                        }}>
-                        Acompañantes:
-                      </Text>
-                      <List
-                        data={formState?.acompanantes}
-                        renderItem={acompanantesList}
-                      />
-                    </>
-                  )}
+                    <Icon name={IconAdd} size={13} color={cssVar.cSuccess} />
+                    <Text style={styles.addCompanionLinkText}>Agregar acompañante</Text>
+                </TouchableOpacity>
+              )}
+
+              {formState?.acompanantes?.length > 0 && (
+                <>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: FONTS.semiBold,
+                      marginVertical: 10,
+                      color: cssVar.cWhite,
+                    }}>
+                    Acompañantes:
+                  </Text>
+                  <List
+                    data={formState?.acompanantes}
+                    renderItem={acompanantesList}
+                  />
                 </>
               )}
-            </>
+              <View style={styles.observationsOuterContainer}>
+                  {data?.status != 'X' &&
+                    (!selectedVisit?.access?.in_at ? (
+                      <View style={styles.observationsInnerContainer}>
+                       
+                        <TextArea
+                            label='Observaciones de entrada'
+                            placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
+                            name={'obs_in'}
+                            value={formState['obs_in']}
+                            onChange={value => handleChange('obs_in', value)}
+                            style={styles.textAreaStyle}
+                            
+                        />
+                      </View>
+                    ) : (
+                      <View style={styles.observationsInnerContainer}>
+                        <Text style={styles.observationsLabel}>Observaciones de Salida</Text>
+                        <TextArea
+                            placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
+                            name="obs_out"
+                            value={formState?.obs_out}
+                            onChange={value => handleChange('obs_out', value)}
+                            style={styles.textAreaStyle}
+                            
+                        />
+                      </View>
+                    ))}
+              </View>
+
+            </ScrollView>
           )}
         </View>
       )}
@@ -459,5 +503,200 @@ const GroupQR = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  ownerInfoMainContainer: {
+    width: '100%', // Changed from 388px to be responsive within its parent
+    flexDirection: 'column',
+    gap: 12, // Corresponds to gap-3
+  },
+  invitationDetailsSection: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 12, // gap-4
+    alignSelf: 'stretch',
+    backgroundColor: '#333536',
+    padding: 12, // p-3
+    borderRadius: 12, // rounded-xl
+    marginTop: 16,
+  },
+  invitationDetailsInnerWrapper: {
+    flexDirection: 'column',
+    // alignItems: 'flex-end', // Original HTML had this, but content seems left-aligned
+    gap: 16, // gap-4
+    alignSelf: 'stretch',
+  },
+  invitationDetailsContent: {
+    flexDirection: 'column',
+    gap: 12, // gap-3
+    alignSelf: 'stretch',
+  },
+  sectionTitle: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
+    color: cssVar.cWhite, // neutral-50
+  },
+  detailsGroup: {
+    flexDirection: 'column',
+    gap: 12, // gap-3
+    alignSelf: 'stretch',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+  },
+  detailLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: '#a7a7a7',
+  },
+  detailValueRight: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: cssVar.cWhite, // neutral-50
+    textAlign: 'right',
+  },
+  detailValueRightNormal: {
+    fontFamily: FONTS.regular, // HTML shows font-normal for these values
+    fontSize: 14,
+    color: cssVar.cWhite, // neutral-50
+    textAlign: 'right',
+  },
+  visitToSection: {
+    flexDirection: 'column',
+    gap: 12, // gap-3
+    alignSelf: 'stretch',
+  },
+  visitToContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8, // gap-2
+    alignSelf: 'stretch',
+    height: 40, // h-10
+  },
+  avatarImage: {
+    width: 40, // w-10
+    height: 40, // h-10
+    // resizeMode: 'cover', // Avatar component handles this
+  },
+  visitToTextContainer: {
+    // width: 202, // w-[202px] - flexGrow is better for responsiveness
+    flex: 1,
+    flexDirection: 'column',
+    gap: 2, // gap-0.5
+  },
+  ownerNameValue: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: cssVar.cWhite, // neutral-50
+  },
+  ownerUnitValue: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: '#a7a7a7',
+  },
+  ownerCiSection: {
+    width: '100%', // w-[388px] - use 100% of parent
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8, // gap-2
+    backgroundColor: '#414141',
+    padding: 8, // p-2
+    borderRadius: 8, // rounded-lg
+  },
+  ownerCiTextContainer: {
+    flexDirection: 'column',
+    gap: 2, // gap-0.5
+    flexGrow: 1,
+  },
+  selectedGuestScrollView: {
+    marginTop: 10,
+  },
+  transportButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8, // gap-2 from HTML example
+    alignSelf: 'stretch',
+    marginVertical: 12,
+  },
+  transportButtonBase: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 8, // p-2
+    paddingHorizontal: 8,
+    borderRadius: 8, // rounded-lg
+  },
+  transportButtonActivePie: {
+    backgroundColor: '#00af90',
+    borderWidth: 0.5,
+    borderColor: '#246950',
+  },
+  transportButtonActiveGeneral: { // For Vehiculo and Taxi when active (using accent color)
+    backgroundColor: cssVar.cAccent, // Or #00af90 if strictly following 'A pie' active style
+    borderWidth: 0.5,
+    borderColor: cssVar.cAccent, // Or #246950
+  },
+  transportButtonInactive: {
+    backgroundColor: '#333536',
+  },
+  transportButtonTextActive: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    textAlign: 'center',
+    color: cssVar.cWhite, // neutral-50
+  },
+  transportButtonTextInactive: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#a7a7a7',
+  },
+  addCompanionLinkContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4, // gap in HTML is 2 for overall, 2.5 for inner. Average to 4 here.
+    marginVertical: 12,
+  },
+  addCompanionLinkText: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+    color: '#00e38c',
+  },
+  observationsOuterContainer: {
+    alignSelf: 'stretch',
+
+  
+  
+    borderRadius: 8, // rounded-lg
+    marginTop: 12,
+    marginBottom: 12,
+    minHeight: 105, // h-[105px]
+  },
+  observationsInnerContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignSelf: 'stretch',
+    flex: 1,
+  },
+  observationsLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 10,
+    color: '#a7a7a7',
+    marginBottom: 4,
+  },
+  textAreaStyle: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: cssVar.cWhite, // Input text color should be light
+    textAlignVertical: 'top', // For Android
+    minHeight: 60, // Ensure text area has some height
+  
+  },
+});
 
 export default GroupQR;
