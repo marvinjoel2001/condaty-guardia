@@ -4,7 +4,7 @@ import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import List from '../../../../mk/components/ui/List/List';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import AccessDetail from './AccessDetail';
+import AccessDetail from '../Accesses/AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
 import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
@@ -17,10 +17,12 @@ type Props = {
   data: any;
   loaded: boolean;
 };
-const Accesses = ({data, loaded}: Props) => {
+
+const WithoutQR = ({data, loaded}: Props) => {
   const {execute} = useApi();
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
+
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
     const subTitle =
@@ -29,13 +31,12 @@ const Accesses = ({data, loaded}: Props) => {
       item.type == 'I' ? 'QR Individual' : 
       item.type == 'G' ? 'QR Grupal' : 
       item.type == 'F' ? 'QR Frecuente' : 
-      item.type == 'P' ? 'Pedido'  : '';
+      item.type == 'P' ? 'Pedido'  : '';     
 
     if (search && search !== '') {
       if (
         user.name?.toLowerCase()?.includes(search?.toLowerCase()) === false &&
-        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) ===
-          false
+        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) === false
       ) {
         return null;
       }
@@ -67,6 +68,7 @@ const Accesses = ({data, loaded}: Props) => {
       />
     );
   };
+
   const onSearch = (value: string) => {
     setSearch(value);
   };
@@ -75,7 +77,7 @@ const Accesses = ({data, loaded}: Props) => {
     const {data: file} = await execute('/accesses', 'GET', {
       perPage: -1,
       page: 1,
-      fullType: 'L',
+      fullType: 'WQ',
       section: 'ACT',
       _export: 'pdf',
     });
@@ -85,7 +87,7 @@ const Accesses = ({data, loaded}: Props) => {
   };
 
   return (
-    <View >
+    <View>
       <View
         style={{
           flexDirection: 'row',
@@ -95,7 +97,7 @@ const Accesses = ({data, loaded}: Props) => {
         }}>
         <DataSearch
           setSearch={(value: string) => onSearch(value)}
-          name="accesses"
+          name="without-qr"
           value={search}
           style={{flex: 1}}
         />
@@ -123,4 +125,4 @@ const Accesses = ({data, loaded}: Props) => {
   );
 };
 
-export default Accesses;
+export default WithoutQR; 

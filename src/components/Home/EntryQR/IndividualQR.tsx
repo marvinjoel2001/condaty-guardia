@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity, View, StyleSheet, ScrollView} from 'react-native'; // Agregado ScrollView
+import {Text, TouchableOpacity, View, StyleSheet, ScrollView} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
@@ -11,7 +11,7 @@ import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import {AccompaniedAdd} from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconAdd, IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
+import {IconAdd, IconX} from '../../../icons/IconLibrary'; // IconAdd es usado en la nueva version del boton
 import List from '../../../../mk/components/ui/List/List';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 
@@ -41,7 +41,7 @@ const IndividualQR = ({
   const access = data?.access;
 
   useEffect(() => {
-    const currentVisit = data?.visit; // Usar variables locales para claridad
+    const currentVisit = data?.visit;
     const currentAccess = data?.access;
     if (data) {
       setFormState((prevState: any) => ({
@@ -55,19 +55,17 @@ const IndividualQR = ({
         access_id: currentAccess?.[0]?.id || prevState?.access_id || null,
         obs_in: currentAccess?.[0]?.obs_in || prevState?.obs_in || '',
         obs_out: currentAccess?.[0]?.obs_out || prevState?.obs_out || '',
-        plate: currentAccess?.[0]?.plate || prevState?.plate || '',
-        // No reinicializar acompanantes aquí para que se mantengan los agregados
-        // acompanantes: prevState?.acompanantes || [], // Esto se maneja al inicializar formState
+        // plate es manejado por el efecto de 'tab' y onExistTaxi
       }));
     }
-  }, [data, setFormState]); // Dependencias simplificadas
+  }, [data, setFormState]);
 
   const onExistVisits = async () => {
     if (!formState?.ci || formState.ci.length < 5) {
       setErrors({...errors, ci: ''});
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', { // Renombrada la variable de respuesta
+    const {data: existData} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -93,8 +91,8 @@ const IndividualQR = ({
       middle_name_taxi: '',
       last_name_taxi: '',
       mother_last_name_taxi: '',
-      plate: tab === 'V' ? prevState?.plate || '' : (tab === 'P' ? '' : prevState?.plate),
-      plate_taxi: tab === 'T' ? prevState?.plate_taxi || '' : '',
+      plate: tab === 'V' ? prevState?.plate || '' : '', // Limpiar 'plate' si no es Vehículo (Taxi lo llenará con onExistTaxi)
+      // plate_taxi: '', // No necesitamos plate_taxi si usamos 'plate' para el taxi
       disbledTaxi: false,
     }));
   }, [tab, setFormState]);
@@ -105,7 +103,6 @@ const IndividualQR = ({
     setFormState({...formState, acompanantes: newAcomps});
   };
 
-  // ESTA ES LA FUNCIÓN acompanantesList DE LA "VERSIÓN ANTIGUA QUE SÍ FUNCIONABA"
   const acompanantesList = (acompanante: any) => {
     if (!acompanante) return null;
     return (
@@ -139,12 +136,12 @@ const IndividualQR = ({
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate_taxi: '',
+        plate: prevState.tab === 'T' ? '' : prevState.plate, // Limpiar plate si es taxi y CI corto
         disbledTaxi: false,
       }));
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', { // Renombrada la variable de respuesta
+    const {data: existData} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -159,7 +156,7 @@ const IndividualQR = ({
         middle_name_taxi: existData.data.middle_name,
         last_name_taxi: existData.data.last_name,
         mother_last_name_taxi: existData.data.mother_last_name,
-        plate_taxi: existData.data.plate || '',
+        plate: existData.data.plate || '', // Usar 'plate' para el taxi
         disbledTaxi: true,
       }));
     } else {
@@ -169,7 +166,7 @@ const IndividualQR = ({
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate_taxi: '',
+        plate: prevState.tab === 'T' ? '' : prevState.plate, // Limpiar plate si es taxi y no existe
         disbledTaxi: false,
       }));
     }
@@ -191,7 +188,6 @@ const IndividualQR = ({
     <>
       <ScrollView style={styles.scrollViewContainer}>
         <View style={styles.mainContainer}>
-          {/* ESTA ES LA PARTE DE VISUALIZACIÓN DE PROPIETARIO/INVITADO DEL CÓDIGO MÁS RECIENTE (SIN ItemInfo) */}
           <View style={styles.residentCard}>
             <Text style={styles.residentTitle}>Visita a:</Text>
             <View style={styles.residentInfoRow}>
@@ -225,7 +221,6 @@ const IndividualQR = ({
               </Text>
             </View>
           </View>
-          {/* FIN DE LA PARTE DE VISUALIZACIÓN DE PROPIETARIO/INVITADO */}
 
           {!visit?.ci && data?.status !== 'X' && (
             <View style={styles.formSection}>
@@ -285,15 +280,14 @@ const IndividualQR = ({
             </View>
           )}
           
-          {/* SECCIÓN DE VEHÍCULO/TAXI Y ACOMPAÑANTES */}
-          {/* La condición original era access?.length === 0, aquí se usa la misma que para tabs y observaciones */}
-          {!access?.[0]?.in_at && data?.status !== 'X' && (
+          {/* CONDICIÓN RESTAURADA A LA DE LA "VERSIÓN ANTIGUA QUE SÍ FUNCIONABA" */}
+          {access?.length === 0 && data?.status !== 'X' && (
             <View style={styles.formSection}>
               {tab === 'V' && (
                 <Input
                   label="Placa del vehículo"
                   type="text"
-                  name="plate"
+                  name="plate" // Vehículo usa 'plate'
                   error={errors?.plate}
                   required={tab === 'V'}
                   value={formState?.plate || ''}
@@ -303,7 +297,6 @@ const IndividualQR = ({
               )}
               {tab === 'T' && (
                 <>
-                  {/* El styles.subSectionTitle es del código más reciente, si prefieres el estilo antiguo para "Datos del conductor" debes indicarlo */}
                   <Text style={styles.subSectionTitle}> 
                     Datos del conductor del taxi:
                   </Text>
@@ -330,31 +323,27 @@ const IndividualQR = ({
                   <Input
                     label="Placa del taxi"
                     type="text"
-                    name="plate_taxi"
-                    error={errors?.plate_taxi}
+                    name="plate" // Taxi usa 'plate' como en la versión antigua
+                    error={errors?.plate} // Error para 'plate'
                     required={tab === 'T'}
-                    value={formState?.plate_taxi || ''}
-                    onChange={(value: string) => handleChange('plate_taxi', value.toUpperCase())}
+                    value={formState?.plate || ''} // Valor de 'plate'
+                    onChange={(value: string) => handleChange('plate', value.toUpperCase())}
                     autoCapitalize="characters"
                   />
                 </>
               )}
               
-              {/* ESTA ES LA SECCIÓN DE ACOMPAÑANTES COMO EN LA "VERSIÓN ANTIGUA QUE SÍ FUNCIONABA" */}
               <TouchableOpacity
                 style={{
                   alignSelf: 'flex-start',
-                  marginVertical: 4,
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  marginVertical: 4, // Estilo de la versión antigua
+                  // Si se desea el ícono como en la versión más reciente, se debe agregar aquí Icon y ajustar estilos
                 }}
                 onPress={() => setOpenAcom(true)}>
-                <Icon name={IconSimpleAdd} color="#4CAF50" size={13} />
                 <Text
                   style={{
-                    color: '#4CAF50',
+                    color: cssVar.cWhite, // Estilo de la versión antigua
                     textDecorationLine: 'underline',
-                    marginLeft: 4,
                   }}>
                   Agregar acompañante
                 </Text>
@@ -363,22 +352,20 @@ const IndividualQR = ({
               {(formState?.acompanantes?.length || 0) > 0 && (
                 <>
                   <Text
-                    style={{ // Estilo de la versión antigua para el título "Acompañantes:"
+                    style={{ 
                       fontSize: 16,
                       fontFamily: FONTS.semiBold,
                       marginVertical: 4,
-                      color: cssVar.cWhiteV1,
+                      color: cssVar.cWhiteV1, // Coincidir con subSectionTitle o definir un color específico
                     }}>
                     Acompañantes:
                   </Text>
                   <List
-                    data={formState?.acompanantes} // Usar optional chaining como en la versión antigua
+                    data={formState?.acompanantes} 
                     renderItem={acompanantesList}
-                    // Sin keyExtractor explícito, como en la versión antigua
                   />
                 </>
               )}
-              {/* FIN DE LA SECCIÓN DE ACOMPAÑANTES */}
             </View>
           )}
         </View>
@@ -397,15 +384,15 @@ const IndividualQR = ({
 export default IndividualQR;
 
 const styles = StyleSheet.create({
-  scrollViewContainer: { // Añadido para el ScrollView
+  scrollViewContainer: { 
     flex: 1,
   },
   mainContainer: {
-    
+    paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 32, // Añadido padding inferior
+    paddingBottom: 32, 
     flexDirection: 'column',
-    gap: 20, // Gap general entre secciones principales
+    gap: 20, 
   },
   residentCard: {
     backgroundColor: '#333536',
@@ -469,18 +456,14 @@ const styles = StyleSheet.create({
     color: cssVar.cWhiteV1 || '#D0D0D0',
   },
   tabsContainer: {
-    // Puedes agregar estilos si es necesario, o quitar el View si no aporta
   },
-  formSection: { // Estilo para agrupar formularios y el área de acompañantes
+  formSection: { 
     flexDirection: 'column',
-    
+    gap: 16, 
   },
-  subSectionTitle: { // Estilo usado en la "nueva" versión para "Datos del conductor" y "Acompañantes"
+  subSectionTitle: { 
     fontSize: 16,
     fontFamily: FONTS.semiBold,
     color: cssVar.cWhiteV1 || '#D0D0D0',
-    // marginBottom: 8, // Eliminado para usar el gap del formSection
   },
-  // Los estilos para el botón de agregar acompañante no son necesarios si usamos los inline de la versión antigua
-  // acompanantesSection, addAcompananteButton, addAcompananteText pueden eliminarse si no se usan.
 });

@@ -75,7 +75,7 @@ export const Orders = ({data, loaded}: Props) => {
   };
 
   return (
-    <View style={{paddingHorizontal: 16}}>
+    <View>
       <View
         style={{
           flexDirection: 'row',
@@ -89,12 +89,12 @@ export const Orders = ({data, loaded}: Props) => {
           value={search}
           style={{flex: 1}}
         />
-        <Icon
+        {/* <Icon
           name={IconDownload}
           onPress={onExport}
           fillStroke={cssVar.cWhiteV2}
           color={'transparent'}
-        />
+        /> */}
       </View>
       <List data={data} renderItem={renderItem} refreshing={loaded} />
       {openDetail.open && (
