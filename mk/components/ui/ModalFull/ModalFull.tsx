@@ -151,7 +151,7 @@ const ModalFull = ({
               <View
                 style={{
                   ...theme.footer,
-                  borderTopWidth: buttonText ? cssVar.bWidth : 0,
+                  borderTopWidth: cssVar.bWidth,
                 }}>
                 {buttonText && (
                   // <View style={{paddingHorizontal: cssVar.spM}}>
@@ -183,7 +183,7 @@ const ModalFull = ({
                 )}
                 {buttonExtra && (
                   // <View style={{paddingHorizontal: cssVar.spM}}>
-                  <View>{buttonExtra}</View>
+                  <View style={{flexGrow: 1, flexBasis: 0}}>{buttonExtra}</View>
                 )}
               </View>
             )}
