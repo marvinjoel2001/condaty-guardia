@@ -6,7 +6,7 @@ import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import List from '../../../../mk/components/ui/List/List';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconArrowLeft, IconX, IconAdd} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
+import {IconArrowLeft, IconX, IconAdd, IconSimpleAdd} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
@@ -438,7 +438,7 @@ const GroupQR = ({
                 <TouchableOpacity
                     style={styles.addCompanionLinkContainer}
                     onPress={() => setOpenAcom(true)}>
-                    <Icon name={IconAdd} size={13} color={cssVar.cSuccess} />
+                    <Icon name={IconSimpleAdd} size={13} color={cssVar.cSuccess} />
                     <Text style={styles.addCompanionLinkText}>Agregar acompañante</Text>
                 </TouchableOpacity>
               )}

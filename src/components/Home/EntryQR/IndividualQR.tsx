@@ -11,7 +11,7 @@ import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import {AccompaniedAdd} from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconAdd, IconX} from '../../../icons/IconLibrary'; // IconAdd es usado en la nueva version del boton
+import {IconAdd, IconSimpleAdd, IconX} from '../../../icons/IconLibrary'; // IconAdd es usado en la nueva version del boton
 import List from '../../../../mk/components/ui/List/List';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 
@@ -336,14 +336,17 @@ const IndividualQR = ({
               <TouchableOpacity
                 style={{
                   alignSelf: 'flex-start',
-                  marginVertical: 4, // Estilo de la versión antigua
-                  // Si se desea el ícono como en la versión más reciente, se debe agregar aquí Icon y ajustar estilos
+                  marginVertical: 4,
+                  flexDirection: 'row',
+                  alignItems: 'center',
                 }}
                 onPress={() => setOpenAcom(true)}>
+                <Icon name={IconSimpleAdd} color={cssVar.cSuccess} size={13} />
                 <Text
                   style={{
-                    color: cssVar.cWhite, // Estilo de la versión antigua
+                    color: cssVar.cSuccess,
                     textDecorationLine: 'underline',
+                    marginLeft: 4,
                   }}>
                   Agregar acompañante
                 </Text>
