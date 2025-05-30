@@ -93,6 +93,18 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     }
   };
 
+  const Br = () => {
+    return (
+      <View
+        style={{
+          height: 0.5,
+          backgroundColor: cssVar.cWhiteV1,
+          marginVertical: 12,
+          width: '100%',
+        }}
+      />
+    );
+  };
   return (
     <Modal
       open={open}
@@ -115,6 +127,23 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
           <Text style={{color: cssVar.cWhite}}>Cargando...</Text>
         ) : (
           <>
+            {details?.level == 4 && (
+              <>
+                <KeyValue
+                  keys="Unidad:"
+                  value={
+                    details?.owner?.dpto?.[0]?.nro +
+                    ', ' +
+                    details?.owner?.dpto?.[0]?.description
+                  }
+                />
+                <KeyValue
+                  keys="Residente:"
+                  value={getFullName(details?.owner)}
+                />
+                <Br />
+              </>
+            )}
             <Text
               style={{
                 ...styles.text,
@@ -122,7 +151,8 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
               {details?.level == 4 ? 'Tipo de emergencia' : details?.descrip}
             </Text>
             {details?.level == 4 && renderAlertPanic()}
-            <Text style={{...styles.text, marginTop: 16}}>
+            <Br />
+            <Text style={{...styles.text}}>
               {details?.level == 4 ? 'Atendida por:' : 'Informante:'}
             </Text>
             {details?.level == 4 ? (
@@ -131,7 +161,12 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                   title={getFullName(
                     details?.gua_attend || details?.adm_attend,
                   )}
-                  subtitle={details?.gua_attend ? 'Guardia' : 'Administrador'}
+                  subtitle={
+                    details?.gua_attend
+                      ? 'Guardia -' + getDateTimeStrMes(details?.date_at, true)
+                      : 'Administrador -' +
+                        getDateTimeStrMes(details?.date_at, true)
+                  }
                   left={
                     <Avatar
                       src={
@@ -164,7 +199,9 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
               <ItemList
                 title={getFullName(details?.guardia)}
                 subtitle={
-                  'Guardia' + ' - ' + getDateTimeAgo(details?.created_at)
+                  'Guardia' +
+                  ' - ' +
+                  getDateTimeStrMes(details?.created_at, true)
                 }
                 left={
                   <Avatar
