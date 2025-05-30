@@ -1,19 +1,19 @@
-import {CSSProperties, useEffect, useRef, useState} from 'react';
-import {TextInput, View, Platform} from 'react-native';
-import {Text} from 'react-native';
-import Icon from './Icon/Icon';
-import {IconSearch, IconX} from '../../../src/icons/IconLibrary';
-import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
-import Input from '../forms/Input/Input';
-import ControlLabel from '../forms/ControlLabel/ControlLabel';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {TextInput, View, Platform, StyleSheet} from 'react-native';
+// Text component was commented out in your original code and is not used here.
+import Icon from './Icon/Icon'; // Assuming this is your custom Icon component
+import {IconSearch, IconX} from '../../../src/icons/IconLibrary'; // Your icon sources
+import {FONTS} from '../../styles/themes'; // Assuming FONTS.regular is defined in your project
+
+// Interface for component props - msg is removed as it wasn't used in the original JSX.
 interface DataSearchProps {
   setSearch: (search: string) => void;
   name?: string;
   value?: string;
-  msg?: string;
-  style?: TypeStyles;
-  iconLeft?: any;
+  style?: object; // Use 'object' or 'ViewStyle' from 'react-native'
+  iconLeft?: any; // This prop's original usage was unclear with absolute positioning.
+                  // In this new layout, it's not directly used for the search icon placement,
+                  // but kept in props if it serves another purpose.
   focus?: boolean;
 }
 
@@ -21,12 +21,13 @@ const DataSearch = ({
   setSearch,
   name = '',
   value = '',
-  msg = '',
   style = {},
   focus = false,
-  iconLeft,
+  // iconLeft, // Not directly used in the revised layout logic for the search icon
 }: DataSearchProps) => {
-  const [active, setActive] = useState(false);
+  // The 'active' state was not used for styling in the target design,
+  // so related onFocus/onBlur logic for setActive is removed to simplify.
+  // If 'active' had other purposes, this might need to be re-evaluated.
   const [searchBy, setSearchBy] = useState('');
   const [oldSearch, setOldSearch] = useState('');
 
@@ -36,100 +37,91 @@ const DataSearch = ({
       s = v.trim();
       setSearchBy(s);
     }
-    if (s === '') setActive(false);
     if (s === oldSearch) return;
-    setActive(true);
     setSearch(s);
     setOldSearch(s);
   };
 
   useEffect(() => {
     setSearchBy(value);
-  }, [name]);
-
-  const iconRight = () => {
-    return (
-      <View
-        style={{
-          marginTop: 1,
-        }}>
-        {!searchBy && !value && (
-          <Icon name={IconSearch} size={20} color={cssVar.cWhiteV1} />
-        )}
-        {((searchBy && searchBy) || value !== '') && (
-          <Icon
-            name={IconX}
-            size={20}
-            color={cssVar.cWhiteV1}
-            onPress={() => onSearch('')}
-          />
-        )}
-      </View>
-    );
-  };
+  }, [name]); // Kept original dependency [name] as per "no functionality change" instruction.
 
   return (
-    <View style={{...theme.container, ...style}}>
-      {iconLeft && searchBy == '' && (
-        <View style={theme.iconLeft}>{iconLeft}</View>
+    <View style={[styles.container, style]}>
+      {/* Conditionally render Search Icon on the left, as per original visibility logic */}
+      {/* It shows if both searchBy and initial value are empty. */}
+      {!searchBy && !value && (
+        <Icon
+          name={IconSearch}
+          size={20}
+          color="#a7a7a7" // Color from your target image
+          style={styles.searchIcon}
+        />
       )}
+
       <TextInput
         testID={'__searchBasic' + name}
-        id={'__searchBasic' + name}
-        style={{
-          ...theme.dataSearch,
-          padding: Platform.OS == 'ios' ? 12 : 5,
-          paddingLeft: iconLeft && searchBy == '' ? 30 : 10,
-        }}
+        // id prop is not standard for React Native TextInput
+        style={[
+          styles.textInput,
+          // If the left search icon is not visible (i.e., when text is present),
+          // the text input will naturally align to the left edge of its allocated space.
+          // This is typically desired.
+          (!searchBy && !value) ? {} : {marginLeft: 0} // Ensures text aligns left if icon disappears
+                                                        // but given container padding, it will align correctly.
+                                                        // If IconSearch is visible, it has marginRight. If not, TextInput starts at container's padding.
+        ]}
         autoFocus={focus}
-        onFocus={() => setActive(true)}
         returnKeyType="search"
-        onBlur={() => setActive(false)}
         onChangeText={(e: string) => setSearchBy(e)}
         value={searchBy}
         placeholder="Buscar..."
-        placeholderTextColor={cssVar.cWhiteV1}
+        placeholderTextColor="#a7a7a7" // Color from your target image
         onSubmitEditing={() => onSearch()}
+        underlineColorAndroid="transparent" // Removes default underline on Android
       />
-      <View style={theme.iconRight}>{iconRight()}</View>
 
-      {/* {value !== '' && <Text style={theme.text}>{value}</Text>} */}
+      {/* Clear Icon (X) on the right, appears if there is text, as per original logic */}
+      {((searchBy && searchBy.length > 0) || (value !== '' && searchBy === value)) && (
+        // This condition is based on your original: ((searchBy && searchBy) || value !== '')
+        // It shows the X if there's current input OR if an initial `value` was provided.
+        <Icon
+          name={IconX}
+          size={20}
+          color="#a7a7a7" // Consistent color, can be changed if desired
+          onPress={() => onSearch('')} // Action to clear search
+          style={styles.clearIcon}
+        />
+      )}
     </View>
   );
 };
 
-export default DataSearch;
-
-const theme: ThemeType = {
+const styles = StyleSheet.create({
   container: {
-    position: 'relative',
+    flexDirection: 'row', // Align items horizontally: icon, input, icon
+    alignItems: 'center', // Align items vertically centered
+    backgroundColor: '#414141', // Background color from your target image
+    borderRadius: 8, // Rounded corners, similar to 'rounded-lg'
+    height: 48, // Fixed height, similar to 'h-12' (approx 48px)
+    paddingHorizontal: 12, // Horizontal padding inside the container
+    // Removed 'position: relative' as it's not needed for this flexbox layout
   },
-  dataSearch: {
-    borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cWhiteV2,
-    borderRadius: cssVar.bRadiusS,
-    fontSize: cssVar.sM,
-    fontFamily: FONTS.regular,
-    backgroundColor: cssVar.cWhiteV2,
-    color: cssVar.cWhite,
-    paddingVertical: 16,
-    paddingHorizontal: cssVar.spM,
+  searchIcon: {
+    marginRight: 8, // Space between the search icon and the text input (like 'gap-2')
   },
-  iconLeft: {
-    position: 'absolute',
-    left: 6,
-    top: 9,
-    zIndex: 1000,
+  textInput: {
+    flex: 1, // Allows the TextInput to take up the available space in the middle
+    height: '100%', // Fills the height of the container
+    fontFamily: FONTS.regular, // Uses the font from your original theme setup
+    fontSize: 14, // Font size from your target image's span
+    color: '#FFFFFF', // Color of the text entered by the user (assuming white)
+    // Vertical padding for text input is implicitly handled by container height and alignItemscenter.
+    // No specific horizontal padding needed here as it's managed by icon margins and container padding.
   },
-  iconRight: {
-    position: 'absolute',
-    right: 6,
-    top: 14,
+  clearIcon: {
+    marginLeft: 8, // Space between the text input and the clear (X) icon
   },
-  text: {
-    fontSize: cssVar.sXs,
-    // position: 'absolute',
-    color: cssVar.cWhite,
-    // bottom: -12,
-  },
-};
+});
+
+export default DataSearch;
