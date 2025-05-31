@@ -343,11 +343,14 @@ const Profile = () => {
               <View style={styles.row}>
                 <View style={styles.inputContainerFullWidth}>
                   <Input
-                    label="Domicilio"
-                    value={user?.address || 'No asignado'} // 'address' parece ser el campo para Guardias
-                    disabled={true}
+                    label="Dirección"
+                    value={
+                      user?.address
+                        ? `${user.address || ''}`
+                        : 'No asignada'
+                    }
                     name="unidad_display"
-                    multiline={true} // Por si la dirección es larga
+                    multiline={false}
                   />
                 </View>
               </View>
@@ -390,13 +393,25 @@ const Profile = () => {
             <Text style={styles.textValue}>{user?.ci || 'Sin registrar'}</Text>
             <Br />
             <Text style={styles.label}>Teléfono</Text>
-            <Text style={styles.textValue}>{user?.phone || 'Sin registrar'}</Text>
-            <Br />
-            <Text style={styles.label}>{lCondo[client?.type] || 'Entidad'}</Text>
-            <Text style={styles.textValue}>{client?.name || 'No asignado'}</Text>
-            <Br />
-            <Text style={styles.label}>Domicilio</Text>
-            <Text style={styles.textValue}>{user?.address || 'No asignado'}</Text>
+            <Text style={styles.text}>{user?.phone || 'Sin teléfono'}</Text>
+            <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
+            <Text style={styles.label}>{lCondo[client?.type]}</Text>
+            <Text style={styles.text}>{client?.name || 'No asignado'}</Text>
+            <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
+
+            <Text style={styles.label}>Dirección</Text>
+            <Text style={styles.text}>
+              {user?.address || 'No asignado'}
+            </Text>
+            <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
+            {user?.dpto && user?.dpto?.length > 0 && (
+              <>
+                <Text style={styles.label}>{lDpto[client?.type_dpto]}</Text>
+                <Text style={styles.text}>
+                  {user?.dpto?.[0]?.nro} - {user?.dpto?.[0]?.description}
+                </Text>
+              </>
+            )}
           </View>
 
           <Text style={styles.sectionTitle}>Datos de acceso</Text>
