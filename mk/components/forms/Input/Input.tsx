@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Platform, StyleSheetProperties, TextInput} from 'react-native';
+import {TextInput} from 'react-native';
 import ControlLabel, {PropsTypeInputBase} from '../ControlLabel/ControlLabel';
 import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
 import React from 'react';
@@ -71,9 +71,6 @@ const Input = (props: PropsType) => {
         autoComplete={props.autoComplete || 'off'}
         autoCapitalize={props.autoCapitalize || 'none'}
         allowFontScaling={false}
-        numberOfLines={props.multiline ? undefined : 1} // AÑADIDO: Si no es multilínea, forza 1 línea
-                                                        // Esto puede ayudar a prevenir el crecimiento vertical
-                                                        // y puede truncar el texto con "..." si es muy largo (depende de la plataforma y estilos)
       />
     </ControlLabel>
   );
@@ -95,10 +92,10 @@ const theme: ThemeType = {
     color: cssVar.cWhite,
     paddingBottom: cssVar.spS,
     paddingHorizontal: cssVar.spS,
-    paddingTop: 22,
+    paddingTop: 24,
     // paddingVertical: cssVar.spL,
   },
   errorInput: {borderColor: cssVar.cError},
-  disabled: {opacity: 0.6, backgroundColor: cssVar.cWhiteV2,color: cssVar.cWhite},
+  disabledInput: {opacity: 0.6, color: cssVar.cWhiteV3},
   focusInput: {borderColor: cssVar.cAccent},
 };

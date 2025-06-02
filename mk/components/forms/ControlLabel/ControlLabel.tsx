@@ -64,7 +64,7 @@ const ControlLabel = ({
   const _label =
     label +
     ' ' +
-    (required ? '' : required === false || disabled ? '' : '(opcional)');
+    (required ? '*' : required === false || disabled ? '' : '(opcional)');
   return (
     <View style={theme.container}>
       {iconLeft && <View style={theme.iconLeft}>{iconLeft}</View>}
@@ -101,17 +101,16 @@ export default ControlLabel;
 const theme: ThemeType = {
   container: {
     position: 'relative',
-    paddingTop: 2,
   },
   label: {
     color: cssVar.cWhiteV1,
-    left: 8,
+    left: 12,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
     position: 'absolute',
     zIndex: 1,
     // transform: [{translateY: 18}],
-    top: 16,
+    top: 18,
     pointerEvents: 'none',
   },
   focus: {
@@ -120,13 +119,14 @@ const theme: ThemeType = {
     position: 'absolute',
     color: cssVar.cWhiteV1,
     zIndex: 1,
+    left: 12,
     // transform: [{translateY: 10}],
     top: 10,
     // paddingHorizontal: cssVar.spXs,
   },
   error: {
     marginHorizontal: cssVar.spS,
-    marginBottom: cssVar.spXs,
+
     fontSize: cssVar.sXs,
     color: cssVar.cError,
     fontFamily: FONTS.medium,
@@ -144,13 +144,13 @@ const theme: ThemeType = {
   iconLeft: {
     position: 'absolute',
     left: 0,
-    top: 16,
+    top: 14,
     marginLeft: 4,
   },
   iconRight: {
     position: 'absolute',
     right: 4,
-    top: 16,
+    top: 14,
     marginRight: 4,
   },
 };
