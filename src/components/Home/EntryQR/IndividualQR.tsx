@@ -305,12 +305,12 @@ const IndividualQR = ({
                     name="ci_taxi"
                     keyboardType="numeric"
                     maxLength={10}
-                    error={errors?.ci_taxi}
+                    error={errors}
                     required
                     value={formState?.ci_taxi || ''}
                     onBlur={onExistTaxi}
                     onChange={(value: string) => handleChange('ci_taxi', value)}
-                    style={{marginBottom: 16}}
+                    
                   />
                   <InputFullName
                     formState={formState}
@@ -324,7 +324,7 @@ const IndividualQR = ({
                     label="Placa del taxi"
                     type="text"
                     name="plate" // Taxi usa 'plate' como en la versión antigua
-                    error={errors?.plate} // Error para 'plate'
+                    error={errors} // Error para 'plate'
                     required={tab === 'T'}
                     value={formState?.plate || ''} // Valor de 'plate'
                     onChange={(value: string) => handleChange('plate', value.toUpperCase())}
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
   },
   formSection: { 
     flexDirection: 'column',
-    gap: 16, 
+    
   },
   subSectionTitle: { 
     fontSize: 16,

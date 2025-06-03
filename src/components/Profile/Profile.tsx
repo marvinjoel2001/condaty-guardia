@@ -239,7 +239,7 @@ const Profile = () => {
         isEdit ? setIsEdit(false) : navigation.goBack(); 
       }}
       title={'Mi perfil'}
-      rigth={ // Icono de editar en la cabecera, solo visible si no está en modo edición
+      /* rigth={ // Icono de editar en la cabecera, solo visible si no está en modo edición
         isEdit ? null : (
           <Icon
             name={IconEdit}
@@ -248,7 +248,7 @@ const Profile = () => {
             onPress={handleEdit}
           />
         )
-      }
+      } */
       // El scroll se maneja internamente dependiendo de si está en modo edición o no
       scroll={!isEdit} // Layout se encarga del scroll solo si NO estamos editando
       >
@@ -393,21 +393,21 @@ const Profile = () => {
             <Text style={styles.textValue}>{user?.ci || 'Sin registrar'}</Text>
             <Br />
             <Text style={styles.label}>Teléfono</Text>
-            <Text style={styles.text}>{user?.phone || 'Sin teléfono'}</Text>
+            <Text style={styles.textValue}>{user?.phone || 'Sin teléfono'}</Text>
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
             <Text style={styles.label}>{lCondo[client?.type]}</Text>
-            <Text style={styles.text}>{client?.name || 'No asignado'}</Text>
+            <Text style={styles.textValue}>{client?.name || 'No asignado'}</Text>
             <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
 
             <Text style={styles.label}>Dirección</Text>
-            <Text style={styles.text}>
+            <Text style={styles.textValue}>
               {user?.address || 'No asignado'}
             </Text>
-            <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
+            
             {user?.dpto && user?.dpto?.length > 0 && (
               <>
-                <Text style={styles.label}>{lDpto[client?.type_dpto]}</Text>
-                <Text style={styles.text}>
+                {/* <Text style={styles.label}>{lDpto[client?.type_dpto]}</Text> */}
+                <Text style={styles.textValue}>
                   {user?.dpto?.[0]?.nro} - {user?.dpto?.[0]?.description}
                 </Text>
               </>
