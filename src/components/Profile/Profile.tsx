@@ -35,7 +35,7 @@ import configApp from '../../config/config';
 
 // Componente separador simple, si no tienes Br definido globalmente
 const Br = () => (
-  <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 8}} />
+  <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 4}} />
 );
 
 const Profile = () => {
@@ -394,10 +394,10 @@ const Profile = () => {
             <Br />
             <Text style={styles.label}>Teléfono</Text>
             <Text style={styles.textValue}>{user?.phone || 'Sin teléfono'}</Text>
-            <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
+            <Br />
             <Text style={styles.label}>{lCondo[client?.type]}</Text>
             <Text style={styles.textValue}>{client?.name || 'No asignado'}</Text>
-            <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1}} />
+            <Br />
 
             <Text style={styles.label}>Dirección</Text>
             <Text style={styles.textValue}>
@@ -503,6 +503,7 @@ const styles = StyleSheet.create({
    
     paddingHorizontal: 12,
     backgroundColor: cssVar.cBlackV2, // Color de fondo de la tarjeta
+    paddingVertical: 12,
     
   },
   // Etiqueta de un campo de información (ej. "Nombre completo")
@@ -517,7 +518,7 @@ const styles = StyleSheet.create({
     color: cssVar.cWhite,
     fontFamily: FONTS.regular, // O FONTS.semiBold si se quiere más énfasis
     fontSize: 15,
-    marginBottom: 10, // Espacio antes del siguiente separador o etiqueta
+    marginBottom: 2, // Espacio antes del siguiente separador o etiqueta
   },
   // Fila para opciones de acceso (email, contraseña)
   accessRow: {
