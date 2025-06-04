@@ -16,19 +16,20 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
   const [imageError, setImageError] = useState(false);
   const RowData = ({title, value}: any) => {
     return (
-      <View style={{flexDirection: 'row', gap: 5}}>
+      <View style={{alignItems: 'flex-start', gap: 5, width: '100%'}}>
         <Text
           style={{
             color: cssVar.cWhite,
-            textAlign: 'right',
-            width: '50%',
+            textAlign: 'left',
+            fontWeight: '500',
           }}>
           {title}
         </Text>
         <Text
           style={{
             color: cssVar.cWhiteV1,
-            width: '50%',
+            flexWrap: 'wrap',
+            flexShrink: 1,
           }}>
           {value}
         </Text>
@@ -43,17 +44,18 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
       onClose={onClose}
       buttonCancel=""
       buttonText="">
-      <View style={{padding: 16}}>
+      <View style={{padding: 2, gap: 10}}>
         {/* <Card> */}
         <View
           style={{
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
           }}>
           <RowData
-            title="Fecha"
+            title="Fecha:"
             value={getDateTimeStrMes(item.created_at, true)}
           />
-          <RowData title="Descripción" value={item.descrip} />
+          <RowData title="Descripción:" value={item.descrip} />
         </View>
 
         <>

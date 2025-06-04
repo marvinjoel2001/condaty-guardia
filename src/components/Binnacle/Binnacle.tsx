@@ -60,6 +60,8 @@ const Binnacle = () => {
         <View style={{paddingTop: 8}}>
           <Text style={{color: cssVar.cWhite}}>Descripción</Text>
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               color: cssVar.cWhiteV1,
               fontSize: 10,
