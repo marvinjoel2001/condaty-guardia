@@ -27,7 +27,7 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
         </Text>
         <Text
           style={{
-            color: cssVar.cWhiteV2,
+            color: cssVar.cWhiteV1,
             width: '50%',
           }}>
           {value}
@@ -60,7 +60,7 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
           {imageError ? (
             <Text
               style={{
-                color: cssVar.cWhiteV2,
+                color: cssVar.cWhiteV1,
                 textAlign: 'center',
                 marginVertical: 16,
                 fontSize: 14,

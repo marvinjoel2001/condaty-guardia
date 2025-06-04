@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState, useContext} from 'react';
+import {useCallback, useEffect, useRef, useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   Modal as ModalRN,
   Animated,
+  BackHandler,
 } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import Icon from '../Icon/Icon';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
 import {AuthContext} from '../../../contexts/AuthContext';
@@ -27,6 +29,8 @@ type PropsType = {
   buttonCancel?: string;
   buttonExtra?: any;
   id?: string;
+  duration?: number;
+  fullScreen?: boolean;
   iconClose?: boolean;
   disabled?: boolean;
   recursive?: boolean;
@@ -45,6 +49,7 @@ const Modal = ({
   buttonCancel = '',
   buttonExtra = null,
   id = '',
+  fullScreen = false,
   iconClose = true,
   overlayClose = false,
   disabled = false,
@@ -55,6 +60,24 @@ const Modal = ({
   const {toast, showToast}: any = useContext(AuthContext);
   const [_open, setOpen] = useState(false);
   const fadeAnim = useRef(new Animated.Value(200)).current;
+
+  // BackHandler logic
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const onBackPress = () => {
+  //       if (open && fullScreen) {
+  //         _onClose('back');
+  //         return true; // Prevent default back behavior
+  //       }
+  //       return false; // Allow default back behavior if modal isn't open or fullscreen
+  //     };
+
+  //     BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+  //     return () =>
+  //       BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+  //   }, [open, fullScreen]), // Dependencies ensure the effect is applied when these change
+  // );
 
   useEffect(() => {
     if (open) {
@@ -101,22 +124,22 @@ const Modal = ({
             style={{
               ...theme.container,
               ...containerStyles,
-              width: screen.width - 40,
+              width: screen.width - 12,
               opacity: fadeAnim,
             }}>
             {(iconClose || title) && (
               <View style={{...theme.header, ...headerStyles}}>
-                {iconClose && (
-                  <View style={{width: '100%', alignItems: 'flex-end'}}>
-                    <TouchableOpacity onPress={() => _onClose('x')}>
-                      <Icon name={IconX} color={cssVar.cWhite} />
-                    </TouchableOpacity>
-                  </View>
-                )}
                 {title && (
                   <Text style={{...theme.headerText, ...headerStyles}}>
                     {title}
                   </Text>
+                )}
+                {iconClose && (
+                  <View style={{alignItems: 'flex-end'}}>
+                    <TouchableOpacity onPress={() => _onClose('x')}>
+                      <Icon name={IconX} color={cssVar.cWhite} />
+                    </TouchableOpacity>
+                  </View>
                 )}
               </View>
             )}
@@ -132,28 +155,32 @@ const Modal = ({
               style={theme.body}>
               {children}
             </ScrollView>
-            <View style={theme.footer}>
-              {buttonText && (
-                <View style={{flexGrow: 1}}>
+            {(buttonText || buttonCancel || buttonExtra) && (
+              <View style={theme.footer}>
+                {buttonText && (
+                  // <View style={{flexGrow: 1}}>
                   <Button
                     variant="primary"
                     disabled={disabled}
                     onPress={() => onSave(id)}>
                     {buttonText}
                   </Button>
-                </View>
-              )}
-              {buttonCancel && (
-                <View style={{flexGrow: 1}}>
+                  // </View>
+                )}
+                {buttonCancel && (
+                  // <View style={{flexGrow: 1, flexBasis: 0}}>
                   <Button
                     variant="secondary"
                     onPress={() => _onClose('cancel')}>
                     {buttonCancel}
                   </Button>
-                </View>
-              )}
-            </View>
-            {buttonExtra && <View style={{flexGrow: 1}}>{buttonExtra}</View>}
+                  // </View>
+                )}
+                {buttonExtra && (
+                  <View style={{flexGrow: 1}}>{buttonExtra}</View>
+                )}
+              </View>
+            )}
           </Animated.View>
         </TouchableOpacity>
         <Toast toast={toast} showToast={showToast} />
@@ -167,7 +194,7 @@ export default Modal;
 const theme: ThemeType = {
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: '#2E2E2ECC',
     position: 'absolute',
     top: 0,
     left: 0,
@@ -187,9 +214,14 @@ const theme: ThemeType = {
     overflow: 'hidden',
   },
   header: {
-    flexShrink: 1,
-    paddingHorizontal: cssVar.spL,
-    paddingVertical: cssVar.spM,
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderBottomColor: cssVar.cWhiteV1,
+    borderBottomWidth: 0.5,
   },
   headerText: {
     color: cssVar.cWhite,
@@ -198,18 +230,19 @@ const theme: ThemeType = {
   },
   body: {
     flexGrow: 1,
-    marginBottom: cssVar.spM,
+    // marginBottom: cssVar.spM,
     paddingHorizontal: cssVar.spM,
+    paddingVertical: cssVar.spM,
     width: '100%',
   },
   footer: {
-    paddingTop: cssVar.spS,
-    paddingHorizontal: cssVar.spM,
+    padding: cssVar.spS,
     gap: cssVar.spS,
-    marginBottom: cssVar.spM,
+    borderTopColor: cssVar.cWhiteV1,
+    borderTopWidth: 0.5,
   },
   buttonExtra: {
-    paddingHorizontal: cssVar.spM,
+    paddingHorizontal: 12,
     paddingBottom: cssVar.spS,
   },
 };

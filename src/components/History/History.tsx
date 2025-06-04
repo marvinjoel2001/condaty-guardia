@@ -5,6 +5,8 @@ import useApi from '../../../mk/hooks/useApi';
 import Accesses from './Accesses/Accesses';
 import Invitations from './Invitations/Invitations';
 import {Orders} from './Orders/Orders';
+import QR from './QR/QR';
+import WithoutQR from './WithoutQR/WithoutQR';
 import {useFocusEffect} from '@react-navigation/native';
 
 const History = () => {
@@ -42,6 +44,12 @@ const History = () => {
       case 'A':
         getHistory('', '/accesses', 'L');
         break;
+      case 'Q':
+        getHistory('', '/accesses', 'Q');
+        break;
+      case 'WQ':
+        getHistory('', '/accesses', 'WQ');
+        break;
       case 'I':
         getHistory('', '/invitations', 'L');
         break;
@@ -54,14 +62,17 @@ const History = () => {
     }
     set_tab(tab);
   }, [tab]);
+
   return (
     <Layout
       title="Historial"
       refresh={() =>
         tab == 'A'
           ? getHistory('', '/accesses', 'L')
-          : tab == 'I'
-          ? getHistory('', '/invitations', 'L')
+          : tab == 'Q'
+          ? getHistory('', '/accesses', 'Q')
+          : tab == 'WQ'
+          ? getHistory('', '/accesses', 'WQ')
           : tab == 'P'
           ? getHistory('', '/others', 'L')
           : console.log('Tipo de búsqueda no válido:', tab)
@@ -69,7 +80,8 @@ const History = () => {
       <TabsButtons
         tabs={[
           {value: 'A', text: 'Accesos'},
-          {value: 'I', text: 'Invitaciones'},
+          {value: 'Q', text: 'QR'},
+          {value: 'WQ', text: 'Sin QR'},
           {value: 'P', text: 'Pedidos'},
         ]}
         sel={tab}
@@ -77,6 +89,8 @@ const History = () => {
       />
 
       {_tab === 'A' && <Accesses data={data} loaded={loaded} />}
+      {_tab === 'Q' && <QR data={data} loaded={loaded} />}
+      {_tab === 'WQ' && <WithoutQR data={data} loaded={loaded} />}
       {_tab === 'I' && <Invitations data={data} loaded={loaded} />}
       {_tab === 'P' && <Orders data={data} loaded={loaded} />}
     </Layout>

@@ -161,8 +161,8 @@ const Login = () => {
             resizeMode="cover"
           />
           <View style={theme.container}>
-            <Text style={theme.titleLogin}>Guardia</Text>
-            <Text style={theme.subtitleLogin}>Bienvenido</Text>
+            <Text style={theme.titleLogin}>¡Te damos la bienvenida!</Text>
+            <Text style={theme.subtitleLogin}>Guardia</Text>
             <Input
               label="Cédula de identidad"
               name="email"
@@ -196,14 +196,14 @@ const Login = () => {
                   <Icon
                     onPress={() => togglePasswordVisibility()}
                     name={IconEyeOff}
-                    fillStroke={cssVar.cWhiteV2}
+                    fillStroke={cssVar.cWhiteV1}
                     color={'transparent'}
                   />
                 ) : (
                   <Icon
                     onPress={() => togglePasswordVisibility()}
                     name={IconEye}
-                    color={cssVar.cWhiteV2}
+                    color={cssVar.cWhiteV1}
                   />
                 )
               }
@@ -309,15 +309,15 @@ const theme: ThemeType = {
   titleLogin: {
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
-    fontSize: 32,
-    paddingBottom: 8,
+    fontSize: 24,
     textAlign: 'center',
   },
   subtitleLogin: {
-    color: cssVar.cWhite,
+    color: cssVar.cWhiteV1,
     textAlign: 'center',
+    fontFamily: FONTS.regular,
     fontSize: 14,
-    paddingBottom: 8,
+    marginBottom: 24,
   },
 
   container: {

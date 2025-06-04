@@ -1,5 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
+
+import {useContext} from 'react';
 import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
 
 interface Tab {
@@ -13,60 +15,54 @@ interface TabsButtonsProps {
   tabs: Tab[];
   setSel: (value: string) => void;
   style?: TypeStyles;
-  contentContainerStyles?: TypeStyles;
 }
 
-const TabsButtons = ({
-  sel,
-  tabs,
-  setSel,
-  style = {},
-  contentContainerStyles = {},
-}: TabsButtonsProps) => {
+const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
   return (
     <View
       style={{
-        alignItems: 'center',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginVertical: 8,
+        width: '100%',
         ...style,
+        marginVertical: 12,
       }}>
       <ScrollView
-        horizontal={true}
+        horizontal
         showsHorizontalScrollIndicator={false}
-        bounces={false}
         contentContainerStyle={{
-          alignItems: 'center',
           flexDirection: 'row',
           gap: 8,
-          paddingHorizontal: 16,
-          ...contentContainerStyles,
+          flexGrow: tabs.length <= 4 ? 1 : 0,
         }}>
         {tabs.map(tab => (
-          <TouchableOpacity key={tab.value} onPress={() => setSel(tab?.value)}>
+          <TouchableOpacity
+            key={tab.value}
+            onPress={() => setSel(tab.value)}
+            style={{
+              flex: tabs.length <= 4 ? 1 : 0,
+            }}>
             <View
               style={{
-                borderRadius: 18,
+                borderRadius: 8,
                 paddingHorizontal: 18,
-                paddingVertical: 6,
-                backgroundColor: cssVar.cBlackV2,
-
+                paddingVertical: 8,
+                backgroundColor: cssVar.cHoverBlackV2,
                 ...(sel === tab.value
                   ? {
-                      backgroundColor: cssVar.cAccent,
+                      backgroundColor: cssVar.cHoverSuccess,
+                      borderWidth: 1,
+                      borderColor: cssVar.cSidebar,
                     }
                   : {}),
               }}>
               <Text
                 style={{
-                  color: cssVar.cWhiteV2,
-
+                  color: cssVar.cWhiteV1,
                   fontSize: 14,
-                  fontFamily: FONTS.medium,
+                  fontFamily: FONTS.regular,
+                  textAlign: 'center',
                   ...(sel === tab.value
                     ? {
-                        color: cssVar.cBlack,
+                        color: cssVar.cWhite,
                         fontFamily: FONTS.semiBold,
                       }
                     : {}),
@@ -93,4 +89,5 @@ const TabsButtons = ({
     </View>
   );
 };
+
 export default TabsButtons;

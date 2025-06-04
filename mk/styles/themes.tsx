@@ -1,4 +1,4 @@
-import {Platform, TextStyle, ViewStyle} from 'react-native';
+import {Dimensions, Platform, TextStyle, ViewStyle} from 'react-native';
 
 export interface TypeStyles extends ViewStyle, TextStyle {}
 export interface ThemeType {
@@ -31,10 +31,9 @@ export const cssVar = {
   cTerciary: '#212121 ',
   cAccent: '#00E38C',
   cWhite: '#FAFAFA',
-  cWhiteV1: '#EEEEEE',
-  cWhiteV2: '#A7A7A7',
+  cWhiteV1: '#A7A7A7',
+  cWhiteV2: '#414141',
   cWhiteV3: '#FFFFFF0D',
-  cWhiteV4: '#D8D8D8',
   cBlack: '#212121',
   cBlackV1: '#292929',
   cBlackV2: '#333536',
@@ -43,16 +42,31 @@ export const cssVar = {
   cSuccess: '#34A853',
   cInfo: '#4285FA',
   cWarning: '#E9B01E',
-  // cAlertAlto: '#e46055',
-  // cAlertMedio: '#f37f3d',
-  // cAlertBajo: '#00e38c',
+  cGrayLight: '#A7A7A7',
+  cGrayLightV3: '#393C3F',
+  cAlertMedio: '#F37F3D',
+  cOrange: '#F58220',
 
-  // Hovers
+  cSidebar: '#246950',
+
   cHover: '#FFFFFF0D',
-  cHoverSuccess: '#34A85333',
-  cHoverError: '#DA5D5D33',
-  cHoverWarning: '#E9B01E33',
+  cHoverBlack: '#212121CC',
+  cHoverBlackV2: '#33353633',
+  cHoverSuccess: '#00AF9033',
+  cHoverError: '#E4605533',
   cHoverInfo: '#4285FA33',
+  cHoverWarning: '#E9B01E33',
+  cHoverOrange: '#F5822033',
+  cHoverCompl1: '#FAFF7F33',
+  cHoverCompl2: '#A2FAA333',
+  cHoverCompl3: '#B382D933',
+  cHoverCompl4: '#A9CCE333',
+  cHoverCompl5: '#F7B26733',
+  cHoverCompl6: '#FF7F5133',
+  cHoverCompl7: '#6CD16D33',
+  cHoverCompl8: '#DE6A6033',
+  cHoverCompl9: '#5AB0E933',
+
   /* Paleta de colores Random */
   cRandom1: '#a2d2bf',
   cRandom2: '#a9cce3',
@@ -73,6 +87,16 @@ export const cssVar = {
   cRandom17: '#fdf0d5',
   cRandom18: '#f7b267',
   cRandom19: '#b8c0ff',
+  /* Paleta de complementos */
+  cCompl1: '#FAFF7F',
+  cCompl2: '#A2FAA3',
+  cCompl3: '#B382D9',
+  cCompl4: '#A9CCE3',
+  cCompl5: '#F7B267',
+  cCompl6: '#FF7F51',
+  cCompl7: '#6CD16D',
+  cCompl8: '#DE6A60',
+  cCompl9: '#5AB0E9',
 
   //sizes
   sXxl: 24,
@@ -104,3 +128,5 @@ export const cssVar = {
   responsiveTablet: 768,
   responsiveMobile: 480,
 };
+
+export const screenHeight = Dimensions.get('window').height;

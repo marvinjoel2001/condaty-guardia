@@ -31,7 +31,7 @@ const Home = () => {
   const [code, setCode]: any = useState(null);
   const [showEntryQR, setShowEntryQR] = useState(false);
   const [data, setData]: any = useState([]);
-  const [dataID, setDataID] = useState(0);
+  // const [dataID, setDataID] = useState(0);
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('I');
   const [_typeSearch, set_TypeSearch] = useState('I');
@@ -40,12 +40,12 @@ const Home = () => {
   const [loaded, setLoaded] = useState(false);
 
   const reloadNotif = (type: string) => {
-    if (type === 'I' && typeSearch === 'I') {
-      getAccesses('', '/accesses', 'P');
-    }
-    if (type === 'P' && typeSearch === 'P') {
-      getAccesses('', '/others', 'L');
-    }
+    // if (type === 'I' && typeSearch === 'I') {
+    getAccesses('', '/accesses', 'P');
+    // }
+    // if (type === 'P' && typeSearch === 'P') {
+    //   getAccesses('', '/others', 'L');
+    // }
   };
 
   const onNotif = useCallback(
@@ -102,7 +102,7 @@ const Home = () => {
       page: 1,
       fullType,
       searchBy: searchParam || '',
-      section: endpoint === '/others' ? 'HOME' : '',
+      // section: endpoint === '/others' ? 'HOME' : '',
     });
     setLoaded(false);
     setData(data?.data || []);
@@ -111,41 +111,47 @@ const Home = () => {
   // Actualizar data cuando cambia el tipo de búsqueda
   useEffect(() => {
     setData([]);
-    switch (typeSearch) {
-      case 'I':
-        getAccesses('', '/accesses', 'P');
-        setStore({...store, bagePending: false});
-        break;
-      case 'A':
-        getAccesses('', '/accesses', 'AD');
-        break;
-      case 'P':
-        getAccesses('', '/others', 'L');
-        setStore({...store, bageOthers: false});
-        break;
-      default:
-        console.log('Tipo de búsqueda no válido:', typeSearch);
-        break;
-    }
+    // switch (typeSearch) {
+    //   case 'I':
+    //     getAccesses('', '/accesses', 'P');
+    //     setStore({...store, bagePending: false});
+    //     break;
+    //   case 'S':
+    //     getAccesses('', '/accesses', 'P');
+    //     break;
+    //   case 'P':
+    //     getAccesses('', '/others', 'L');
+    //     setStore({...store, bageOthers: false});
+    //     break;
+    //   default:
+    //     console.log('Tipo de búsqueda no válido:', typeSearch);
+    //     break;
+    // }
+    getAccesses('', '/accesses', 'P');
+    setStore({...store, bagePending: false});
+
     set_TypeSearch(typeSearch);
   }, [typeSearch]);
 
   // Filtrar la data según el término de búsqueda
-  const filteredData = useMemo(() => {
-    return data.filter((item: any) => {
-      // Consideramos que puede venir en item.owner o item.visit
-      const ownerName = item?.owner
-        ? getFullName(item.owner).toLowerCase()
-        : '';
-      const visitName = item?.visit
-        ? getFullName(item.visit).toLowerCase()
-        : '';
-      return (
-        ownerName.includes(search.toLowerCase()) ||
-        visitName.includes(search.toLowerCase())
-      );
-    });
-  }, [data, search]);
+  // const filteredData = useMemo(() => {
+  //   // Comprobación de seguridad
+  //   if (!Array.isArray(data)) {
+  //     return [];
+  //   }
+  //   return data.filter((item: any) => {
+  //     const ownerName = item?.owner
+  //       ? getFullName(item.owner).toLowerCase()
+  //       : '';
+  //     const visitName = item?.visit
+  //       ? getFullName(item.visit).toLowerCase()
+  //       : '';
+  //     return (
+  //       ownerName.includes(search.toLowerCase()) ||
+  //       visitName.includes(search.toLowerCase())
+  //     );
+  //   });
+  // }, [data, search]);
 
   const customTitle = () => (
     <View>
@@ -188,63 +194,64 @@ const Home = () => {
     };
   }, []);
 
+  // console.log(data);
+
   return (
     <>
       <Layout
         title="Home"
         customTitle={customTitle()}
-        refresh={() =>
-          typeSearch == 'I'
-            ? getAccesses('', '/accesses', 'P')
-            : typeSearch == 'A'
-            ? getAccesses('', '/accesses', 'AD')
-            : getAccesses('', '/others', 'L')
-        }
+        // refresh={() =>
+        //   typeSearch == 'I'
+        //     ? getAccesses('', '/accesses', 'P')
+        //     : typeSearch == 'A'
+        //     ? getAccesses('', '/accesses', 'AD')
+        //     : getAccesses('', '/others', 'L')
+        // }
+        refresh={() => getAccesses('', '/accesses', 'P')}
         // style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}
       >
         <TabsButtons
           tabs={[
-            {value: 'I', text: 'Pendientes', isNew: store?.bagePending},
-            {value: 'A', text: 'Accesos'},
-            {value: 'P', text: 'Pedidos', isNew: store?.bageOthers},
+            {
+              value: 'I',
+              text: 'Pendiente de ingreso',
+              isNew: store?.bagePending,
+            },
+            {value: 'S', text: 'Pendiente de salida'},
+            // {value: 'P', text: 'Pedidos', isNew: store?.bageOthers},
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
-          contentContainerStyles={styles.contentContainerTab}
-          style={{justifyContent: 'center', flex: 1, alignContent: 'center'}}
         />
 
         {/* Buscador */}
 
         <View style={styles.listContainer}>
-          <DataSearch
+          {/* <DataSearch
             setSearch={setSearch}
             name="home"
             value={search}
             style={{marginBottom: 8}}
-          />
-          {(_typeSearch === 'A' || _typeSearch === 'I') && (
+          /> */}
+          {(_typeSearch === 'S' || typeSearch == 'I') && (
             <Accesses
-              data={filteredData}
-              reload={() =>
-                getAccesses(
-                  search,
-                  '/accesses',
-                  typeSearch === 'A' ? 'AD' : 'P',
-                )
-              }
-              setDataID={setDataID}
+              data={data}
+              reload={() => getAccesses(search, '/accesses', 'P')}
+              // setDataID={setDataID}
+              typeSearch={typeSearch}
               loaded={loaded}
             />
           )}
-          {_typeSearch === 'P' && (
+
+          {/* {_typeSearch === 'P' && (
             <Orders
-              data={filteredData}
+              data={data}
               reload={() => getAccesses(search, '/others', 'L')}
               setDataID={setDataID}
               loaded={loaded}
             />
-          )}
+          )} */}
         </View>
         {openQr && (
           <CameraQr
@@ -286,14 +293,9 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-  contentContainerTab: {
-    width: '100%',
-    alignSelf: 'center',
-    justifyContent: 'center',
-  },
   listContainer: {
     width: '100%',
-    paddingHorizontal: cssVar.spL,
+
     paddingBottom: 40,
   },
 });

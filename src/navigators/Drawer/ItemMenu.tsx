@@ -2,6 +2,7 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import {cssVar} from '../../../mk/styles/themes';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {useNavigation} from '@react-navigation/native';
+import React from 'react';
 
 interface PropsType {
   screen?: string | null;
@@ -57,9 +58,23 @@ const ItemMenu = ({
         {icon != '' && (
           <Icon
             name={icon}
-            color={!reverse ? 'transparent' : isActive ? cssVar.cWhite : color}
+            color={
+              !reverse
+                ? 'transparent'
+                : isActive
+                ? cssVar.cWhite
+                : color
+                ? color
+                : cssVar.cWhiteV1
+            }
             fillStroke={
-              reverse ? 'transparent' : isActive ? cssVar.cWhite : color
+              reverse
+                ? 'transparent'
+                : isActive
+                ? cssVar.cWhite
+                : color
+                ? color
+                : cssVar.cWhiteV1
             }
           />
         )}
@@ -69,7 +84,7 @@ const ItemMenu = ({
               ? colorText
               : isActive
               ? cssVar.cWhite
-              : cssVar.cWhiteV2,
+              : cssVar.cWhiteV1,
           }}>
           {text}
         </Text>

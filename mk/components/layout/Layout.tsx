@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View, RefreshControl, Keyboard} from 'react-native';
+import {View, RefreshControl, Keyboard, ScrollView} from 'react-native';
 import Animated from 'react-native-reanimated';
 import HeadTitle from './HeadTitle';
 import {cssVar, ThemeType, TypeStyles} from '../../styles/themes';
@@ -31,6 +31,7 @@ type PropsType = {
   backUrl?: string;
   avatar?: boolean;
   back?: boolean;
+  bounces?: boolean;
   scroll?: boolean;
 };
 
@@ -49,6 +50,7 @@ const Layout = (props: PropsType) => {
     back = false,
     avatar = false,
     scroll = true,
+    bounces = true,
   } = props;
 
   const {setStore, store, user} = useAuth();
@@ -56,7 +58,7 @@ const Layout = (props: PropsType) => {
   const route = useRoute();
   const scrollViewRef: any = useRef(null);
   const [openAlert, setOpenAlert]: any = useState({open: false, data: null});
-
+  const shouldDisableScroll = route.name === 'QrIndividual';
   const onNotif = useCallback((data: any) => {
     if (data?.event === 'alerts' && data?.payload?.level == 4) {
       setOpenAlert({open: true, data: data?.payload});
@@ -125,29 +127,24 @@ const Layout = (props: PropsType) => {
   }, []);
   return (
     <View style={[theme.layout]} onTouchEnd={onPress}>
-      {/* <Animated.View style={isRoute() ? {...animatedHeaderStyle} : {}}> */}
       <HeadTitle
         title={title}
         customTitle={customTitle}
         back={back}
-        avatar={avatar}
+        
         style={styleHead}
         right={rigth}
         onBack={onBack}
         backUrl={backUrl}
       />
-      {/* </Animated.View> */}
-
       <View style={{flex: 1}}>
-        {scroll ? (
-          <Animated.ScrollView
+        {scroll && !shouldDisableScroll ? (
+          <ScrollView
             id="LayoutScrollview"
             testID="LayoutScrollview"
             nativeID="LayoutScrollview"
-            // onScroll={({nativeEvent}: any) => {
-            //   headerHide(nativeEvent);
-            // }}
             scrollEventThrottle={16}
+            bounces={bounces}
             showsVerticalScrollIndicator={false}
             ref={scrollViewRef}
             keyboardDismissMode="interactive"
@@ -158,7 +155,10 @@ const Layout = (props: PropsType) => {
               ...style,
               // paddingTop: isRoute() ? 50 : 0,
             }}
-            contentContainerStyle={{paddingBottom: isRoute() ? 60 : 0}}
+            contentContainerStyle={{
+              paddingBottom: isRoute() ? 70 : 0,
+              flexGrow: 1,
+            }}
             // onScroll={scrollHandler}
             // scrollEventThrottle={16}
             refreshControl={
@@ -171,11 +171,13 @@ const Layout = (props: PropsType) => {
               />
             }>
             {children}
-          </Animated.ScrollView>
+          </ScrollView>
         ) : (
           // <Animated.View style={animatedViewStyle}>{children}</Animated.View>
           <View
             style={{
+              ...theme.scrollView,
+              ...style,
               paddingBottom: isRoute() ? 60 : 0,
             }}>
             {children}
@@ -183,7 +185,7 @@ const Layout = (props: PropsType) => {
         )}
       </View>
 
-      {isRoute() && !isKeyboardVisible && <Footer />}
+      {isRoute() && <Footer />}
       {openAlert.open && (
         <LockAlert
           open={openAlert.open}
@@ -197,8 +199,6 @@ const Layout = (props: PropsType) => {
           onClose={() => setStore({...store, openClient: false})}
         />
       )}
-
-      {/* {configApp.API_URL != configApp.API_URL_PROD && <PerformanceMonitor />} */}
     </View>
   );
 };
@@ -207,10 +207,11 @@ export default Layout;
 
 const theme: ThemeType = {
   layout: {
-    backgroundColor: cssVar.cBlackV1,
+    backgroundColor: cssVar.cBlack,
     flex: 1,
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 12,
   },
 };

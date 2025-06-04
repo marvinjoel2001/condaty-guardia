@@ -135,8 +135,9 @@ const theme: ThemeType = {
     color: cssVar.cWhite,
   },
   default: {
-    borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cBlackV3,
+    // borderWidth: cssVar.bWidth,
+    // borderColor: cssVar.cBlackV3,
+    backgroundColor: cssVar.cWhiteV2,
     borderRadius: cssVar.spXs,
     paddingTop: cssVar.spS,
     paddingHorizontal: cssVar.spM,

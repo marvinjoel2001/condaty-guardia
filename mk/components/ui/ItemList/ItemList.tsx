@@ -20,6 +20,7 @@ interface PropsType {
   widthMain?: any;
   check?: boolean | null;
   onPressTitle?: () => void;
+  onLongPress?: () => void;
 }
 
 export const ItemList = (props: PropsType) => {
@@ -33,13 +34,15 @@ export const ItemList = (props: PropsType) => {
     date,
     style,
     onPressTitle,
-    onPress,
+    onLongPress,
     widthMain,
     check = null,
   } = props;
 
   return (
-    <TouchableOpacity onPress={onPress ?? onPressTitle}>
+    <TouchableOpacity
+      onPress={props.onPress ? props.onPress : onPressTitle}
+      onLongPress={onLongPress ? () => onLongPress() : undefined}>
       <View
         style={{
           ...theme.itemList,
@@ -78,7 +81,7 @@ export const ItemList = (props: PropsType) => {
               <Icon
                 name={check ? IconCheckSquare : IconCheckOff}
                 color={check ? cssVar.cAccent : 'transparent'}
-                fillStroke={check ? undefined : cssVar.cWhiteV2}
+                fillStroke={check ? undefined : cssVar.cWhiteV1}
                 style={{alignItems: 'center', justifyContent: 'flex-end'}}
               />
             ) : null}
@@ -101,7 +104,7 @@ export const ItemList = (props: PropsType) => {
 
 const theme: ThemeType = {
   itemList: {
-    backgroundColor: cssVar.cBlackV2,
+    backgroundColor: cssVar.cWhiteV2,
     padding: 12,
     borderRadius: 12,
     marginVertical: 4,
@@ -122,17 +125,17 @@ const theme: ThemeType = {
   },
   title: {
     color: cssVar.cWhite,
-    fontSize: cssVar.sL,
-    fontFamily: FONTS.semiBold,
+    fontSize: cssVar.sM,
+    fontFamily: FONTS.medium,
   },
   subtitle: {
-    color: cssVar.cWhiteV2,
-    fontSize: cssVar.sS,
-    fontFamily: FONTS.medium,
+    color: cssVar.cWhiteV1,
+    fontSize: cssVar.sM,
+    fontFamily: FONTS.regular,
     textAlign: 'left',
   },
   subtitle2: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     fontSize: cssVar.sS,
     fontFamily: FONTS.regular,
     textAlign: 'left',
@@ -146,7 +149,7 @@ const theme: ThemeType = {
   date: {
     alignItems: 'flex-end',
     textAlign: 'right',
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     paddingTop: cssVar.spXs,
     fontFamily: FONTS.regular,
     fontSize: cssVar.sM,

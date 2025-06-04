@@ -2,6 +2,7 @@ import {Alert, ScrollView, Text, View} from 'react-native';
 import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
 import {
   IconAlert,
+  IconAlertNotification,
   IconDepartments,
   IconDocs,
   IconFacebook,
@@ -77,7 +78,6 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             text="Inicio"
             icon={IconHome}
             activeItem={activeItem}
-            color={cssVar.cWhiteV2}
             reverse
           />
 
@@ -86,14 +86,12 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             text="Mi perfil"
             icon={IconUser}
             activeItem={activeItem}
-            color={cssVar.cWhiteV2}
           />
           <ItemMenu
             screen="Alerts"
             text="Alertas"
-            icon={IconAlert}
+            icon={IconAlertNotification}
             activeItem={activeItem}
-            color={cssVar.cWhiteV2}
             reverse
           />
 
@@ -103,7 +101,6 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             icon={IconNovedades}
             reverse
             activeItem={activeItem}
-            color={cssVar.cWhiteV2}
           />
           <ItemMenu
             screen="Notifications"
@@ -111,7 +108,6 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             icon={IconNotification}
             activeItem={activeItem}
             reverse
-            color={cssVar.cWhiteV2}
           />
           <ItemMenu
             screen="History"
@@ -119,7 +115,6 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             icon={IconHistorial}
             activeItem={activeItem}
             reverse
-            color={cssVar.cWhiteV2}
           />
           {user?.clients && user.clients.length > 1 && (
             <ItemMenu
@@ -127,7 +122,7 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
               text="Cambiar Condominio"
               icon={IconDepartments}
               // activeItem={activeItem}
-              color={cssVar.cWhiteV2}
+
               onPress={() => setStore({...store, openClient: true})}
             />
           )}
@@ -136,7 +131,6 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             text="Documentos"
             icon={IconDocs}
             activeItem={activeItem}
-            color={cssVar.cWhiteV2}
           />
           <ItemMenu
             text="Cerrar sesión"
@@ -157,29 +151,29 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
         }}>
         <Icon
           name={IconFacebook}
-          color={cssVar.cWhiteV2}
+          color={cssVar.cWhiteV1}
           onPress={() => openLink('https://www.facebook.com/condaty.bo')}
         />
         <Icon
           name={IconInstagram}
-          color={cssVar.cWhiteV2}
+          color={cssVar.cWhiteV1}
           onPress={() => openLink('https://www.instagram.com/condaty.bo')}
         />
         <Icon
           name={IconTikTok}
-          color={cssVar.cWhiteV2}
+          color={cssVar.cWhiteV1}
           onPress={() => openLink('https://www.tiktok.com/@condaty.bo')}
         />
         <Icon
           name={IconYoutube}
-          color={cssVar.cWhiteV2}
+          color={cssVar.cWhiteV1}
           onPress={() =>
             openLink('https://www.youtube.com/channel/UCoMKYylu7j4gg9hoyHexV-A')
           }
         />
         <Icon
           name={IconLinkedin}
-          color={cssVar.cWhiteV2}
+          color={cssVar.cWhiteV1}
           onPress={() =>
             openLink('https://www.linkedin.com/in/condaty-by-fos-54a58627a/')
           }

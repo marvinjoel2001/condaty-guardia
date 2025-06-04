@@ -47,14 +47,14 @@ const ItemFoot = ({path, text, icon, reverse, isActived}: PropsType) => {
               ? 'transparent'
               : activeItem == path
               ? cssVar.cAccent
-              : cssVar.cWhiteV2
+              : cssVar.cWhiteV1
           }
           fillStroke={
             !reverse
               ? 'transparent'
               : activeItem == path
               ? cssVar.cAccent
-              : cssVar.cWhiteV2
+              : cssVar.cWhiteV1
           }
         />
         {isActived && <View style={theme.redDot} />}
@@ -62,7 +62,7 @@ const ItemFoot = ({path, text, icon, reverse, isActived}: PropsType) => {
       <Text
         style={{
           ...theme.text,
-          color: activeItem == path ? cssVar.cAccent : cssVar.cWhiteV2,
+          color: activeItem == path ? cssVar.cAccent : cssVar.cWhiteV1,
         }}>
         {text}
       </Text>

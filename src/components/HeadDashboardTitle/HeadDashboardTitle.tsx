@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   label: {
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     fontSize: 12,
-    fontFamily: FONTS.light,
+    fontFamily: FONTS.regular,
   },
   text: {
     color: cssVar.cWhite,

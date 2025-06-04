@@ -101,11 +101,10 @@ export default ControlLabel;
 const theme: ThemeType = {
   container: {
     position: 'relative',
-    paddingTop: 2,
   },
   label: {
-    color: cssVar.cWhiteV2,
-    left: 16,
+    color: cssVar.cWhiteV1,
+    left: 12,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
     position: 'absolute',
@@ -118,15 +117,16 @@ const theme: ThemeType = {
     fontSize: cssVar.sXs,
     fontFamily: FONTS.regular,
     position: 'absolute',
-    color: cssVar.cAccent,
+    color: cssVar.cWhiteV1,
     zIndex: 1,
+    left: 12,
     // transform: [{translateY: 10}],
     top: 10,
-    paddingHorizontal: cssVar.spXs,
+    // paddingHorizontal: cssVar.spXs,
   },
   error: {
     marginHorizontal: cssVar.spS,
-    marginBottom: cssVar.spS,
+
     fontSize: cssVar.sXs,
     color: cssVar.cError,
     fontFamily: FONTS.medium,
@@ -144,13 +144,13 @@ const theme: ThemeType = {
   iconLeft: {
     position: 'absolute',
     left: 0,
-    top: 18,
+    top: 14,
     marginLeft: 4,
   },
   iconRight: {
     position: 'absolute',
     right: 4,
-    top: 18,
+    top: 14,
     marginRight: 4,
   },
 };

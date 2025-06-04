@@ -72,7 +72,7 @@ const LockAlert = ({open, onClose, data}: any) => {
       title="Alerta de emergencia"
       open={open}
       onClose={onClose}
-      buttonText="Atender"
+      buttonText="Cerrar"
       onSave={onClose}
       containerStyles={{
         borderWidth: 1,
@@ -92,7 +92,9 @@ const LockAlert = ({open, onClose, data}: any) => {
         subtitle={'Unidad: ' + data?.unit}
         left={
           <Avatar
-            src={getUrlImages('/OWNER-' + data?.owner_id + '.webp?d=')}
+            src={getUrlImages(
+              '/OWNER-' + data?.owner_id + '.webp?d=' + data?.owner_updated_at,
+            )}
             name={data?.owner_name}
           />
         }

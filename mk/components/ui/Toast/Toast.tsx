@@ -1,141 +1,220 @@
-import {useEffect, useRef} from 'react';
-import {Text, View, Animated, Easing} from 'react-native';
+import React, {useEffect, useRef} from 'react';
+import {Text, View, Animated, Easing, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from '../Icon/Icon';
 import {
   IconX,
-  IconSuccessToast,
+  IconSuccessToastNotCircle,
   IconInfoToast,
+  IconSuccessToast,
+
 } from '../../../../src/icons/IconLibrary';
-import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
-import React from 'react';
+import {cssVar, FONTS} from '../../../styles/themes';
 
 type toastProps = {
   msg: string | null;
   type: 'success' | 'error' | 'warning' | 'info';
   time?: number;
   important?: boolean;
+  title?: string;
 };
 
 interface ToastProps {
   toast: toastProps;
-  showToast: (param: string) => void;
+  showToast: (param: string | null) => void;
 }
+
 export const TIME_TOAST = 3000;
+
 const Toast = ({toast, showToast}: ToastProps) => {
-  const translateY = useRef(new Animated.Value(200)).current; // Inicia fuera de la pantalla
+  const translateY = useRef(new Animated.Value(-200)).current;
 
   const _close = () => {
     Animated.timing(translateY, {
-      toValue: 20, // Se mueve fuera de la pantalla hacia abajo
-      duration: 400,
-      easing: Easing.ease,
+      toValue: -200,
+      duration: 300,
+      easing: Easing.inOut(Easing.ease),
       useNativeDriver: true,
     }).start(() => {
-      showToast('');
+      if (toast?.msg) {
+        showToast(null);
+      }
     });
   };
 
   useEffect(() => {
-    if (toast?.msg && toast?.msg !== '') {
-      Animated.timing(translateY, {
-        toValue: 0, // Se mueve a la posición visible
-        duration: 800,
-        easing: Easing.ease,
+    if (toast?.msg) {
+      translateY.setValue(-200); 
+      Animated.spring(translateY, { 
+        toValue: 0, 
         useNativeDriver: true,
+        friction: 7,
+        tension: 60,
       }).start();
-      setTimeout(() => {
+
+      const timer = setTimeout(() => {
         _close();
       }, toast?.time || TIME_TOAST);
+      return () => clearTimeout(timer);
+    } else {
+      translateY.setValue(-200);
     }
-  }, [toast?.msg]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast?.msg, toast?.time]);
+
+  const getThemeStyles = () => {
+    switch (toast?.type) {
+      case 'success':
+        return {
+          iconName: IconSuccessToastNotCircle,
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: '#2A8A46', 
+          toastBackgroundColor: '#34A853', 
+          textColor: cssVar.cWhite,
+          defaultTitle: '¡Excelente!',
+        };
+      case 'error':
+        return {
+          iconName:  IconX, 
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: '#C12A2A', 
+          toastBackgroundColor: cssVar.cError || '#E53935',
+          textColor: cssVar.cWhite,
+          defaultTitle: 'Error',
+        };
+      case 'warning':
+        return {
+          iconName:IconInfoToast, 
+          iconColor: cssVar.cBlack, 
+          iconBackgroundColor: '#D4A017', 
+          toastBackgroundColor: cssVar.cWarning || '#FFB300',
+          textColor: cssVar.cBlack, 
+          defaultTitle: 'Advertencia',
+        };
+      case 'info':
+        return {
+          iconName: IconInfoToast,
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: '#1A73E8', 
+          toastBackgroundColor: cssVar.cInfo || '#2196F3',
+          textColor: cssVar.cWhite,
+          defaultTitle: 'Información',
+        };
+      default:
+        return {
+          iconName: IconInfoToast,
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: cssVar.cWhiteV1 || '#5F6368', 
+          toastBackgroundColor: cssVar.cWhiteV1 || '#9E9E9E', 
+          textColor: cssVar.cWhite,
+          defaultTitle: 'Mensaje',
+        };
+    }
+  };
+
+  const theme = getThemeStyles();
+  const currentTitle = toast?.title || theme.defaultTitle;
+
+  if (!toast?.msg) {
+    return null;
+  }
 
   return (
-    <View style={theme.container}>
-      <Animated.View
-        accessibilityLabel="Cerrar"
-        onTouchStart={() => _close()}
-        style={
-          !toast?.msg || toast?.msg == ''
-            ? theme.hidden
-            : {
-                ...theme.visible,
-                // transform: [{translateY}],
-                backgroundColor: cssVar.cWhite,
-                pointerEvents: 'box-only',
-              }
-        }>
-        <View style={theme.icon}>
-          {toast?.type == 'success' && (
-            <Icon name={IconSuccessToast} color={cssVar.cSuccess} />
-          )}
-          {toast?.type == 'error' && (
-            <Icon name={IconX} color={cssVar.cError} />
-          )}
-          {toast?.type == 'warning' && (
-            <Icon
-              name={IconInfoToast}
-              style={{transform: [{scaleY: -1}]}}
-              color={cssVar.cWarning}
-            />
-          )}
-          {toast?.type == 'info' && (
-            <Icon name={IconInfoToast} color={cssVar.cInfo} />
-          )}
+    <View style={styles.outerContainer}>
+      <Animated.View style={{transform: [{translateY}]}}>
+        
+        {/* ÍCONO FLOTANTE SEPARADO - FUERA DEL TOAST */}
+        <View style={[styles.iconOuterCircle, {backgroundColor: theme.iconBackgroundColor}]}>
+          <Icon name={theme.iconName} color={theme.iconColor} size={22} />
         </View>
-        <View style={theme.conntainerMessage}>
-          <Text style={theme.message}>{toast?.msg}</Text>
+
+        {/* CONTENEDOR DEL TOAST */}
+        <View style={[styles.toastBaseContainer, {backgroundColor: theme.toastBackgroundColor}]}>
+          <View style={styles.textContentWrapper}>
+            <Text style={[styles.titleText, {color: theme.textColor}]}>{currentTitle}</Text>
+            <Text style={[styles.messageText, {color: theme.textColor}]}>{toast.msg}</Text>
+          </View>
+
+          <TouchableOpacity onPress={_close} style={styles.closeButtonWrapper}>
+            <Icon name={IconX} size={14} color={theme.textColor} />
+          </TouchableOpacity>
         </View>
-        {/* <View style={{position: 'absolute', right: 6, top: 2}}>
-        <Icon name={IconX} color={cssVar.cWhite} />
-      </View> */}
       </Animated.View>
     </View>
   );
 };
 
 export default Toast;
-const theme: ThemeType = {
-  hidden: {display: 'none', pointerEvents: 'box-only'},
-  container: {
+
+const styles = StyleSheet.create({
+  outerContainer: {
     position: 'absolute',
-    bottom: 24,
+    top: 55, 
     left: 0,
     right: 0,
-    zIndex: 1000,
     alignItems: 'center',
-  },
-  visible: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    // position: 'absolute',
-    // bottom: 30,
-    // left: '50%',
-    // transform: [{translateX: -155}],
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    // shadowOffset: {width: 0, height: 20},
-    // shadowOpacity: 0.25,
-    // elevation: 5,
     zIndex: 1000,
-    maxWidth: 320,
-    // width: 'auto',
-
-    // height: 50,
+    paddingHorizontal: 20, 
   },
-  icon: {
-    // flexShrink: 1,
-    width: 30,
+  // ÍCONO SEPARADO - POSICIÓN ABSOLUTA DESDE EL CONTENEDOR PADRE
+  iconOuterCircle: {
+    width: 48, 
+    height: 48,
+    borderRadius: 24, 
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    left: 20,     // Posición desde el borde izquierdo del contenedor
+    top: -10,     // Posición hacia arriba
+    zIndex: 10,   // Asegurar que esté por encima del toast
+    // Sombra pronunciada para efecto flotante
+    elevation: 15,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    // Borde blanco grueso para separación visual
+    borderWidth: 8,
+    borderColor: cssVar.cBlack, 
   },
-  conntainerMessage: {
-    paddingHorizontal: 8,
+  toastBaseContainer: {
+    width: '100%', 
+    maxWidth: 340, 
+    minHeight: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12, 
+    paddingLeft: 90,   // Espacio grande para que no se superponga con el ícono
+    paddingRight: 16,
+    paddingVertical: 12,
+    marginTop: 20,     // CLAVE: Margen superior para separar del ícono
+    // Sombra sutil para el toast
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
-  message: {
-    fontSize: cssVar.sS,
-    color: cssVar.cBlack,
-    fontFamily: FONTS.medium,
+  textContentWrapper: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
-};
+  titleText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  messageText: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    flexShrink: 1,
+  },
+  closeButtonWrapper: {
+    width: 30, 
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
+    padding: 4, 
+  },
+});

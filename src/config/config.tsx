@@ -8,7 +8,7 @@ const configApp = {
   APP_DESCRIPTION: 'Guardias Control de Accesos',
   APP_LOGO: '/assets/images/logo/logo.svg',
   APP_LOGIN_USER: 'CI',
-  APP_USER: '/guards',
+  APP_USER: '/guards/',
   APP_LOGIN_PASS: 'Password',
   APP_AUTH_LOGIN: '/guard-login',
   APP_AUTH_REGISTER: '/guard-register',
