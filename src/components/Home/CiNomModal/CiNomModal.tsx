@@ -327,7 +327,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         <Select
           filter
           label="¿A quién visita?"
-          placeholder="¿A quién visita?"
           name="owner_id"
           required={true}
           options={dataOwners || []}
