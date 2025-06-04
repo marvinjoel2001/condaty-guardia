@@ -121,7 +121,11 @@ const Alerts = () => {
           setOpenView({open: true, id: alerta.id});
         }}
         // title={getFullName(alerta.guardia)}
-        title={alerta.descrip}
+        title={
+          alerta.level === 4
+            ? alerta.descrip
+            : getFullName(alerta.guardia)
+        }
         subtitle={
           alerta.level === 4
             ? 'Residente: ' + getFullName(user)
@@ -146,11 +150,14 @@ const Alerts = () => {
         right={renderRight(alerta)}>
         {alerta?.level !== 4 && (
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               marginTop: 4,
               color: cssVar.cWhiteV1,
               fontSize: 14,
               fontFamily: FONTS.regular,
+             
             }}>
             {alerta.descrip}
           </Text>
