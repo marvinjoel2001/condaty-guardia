@@ -391,7 +391,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mainContainer: {
-    paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 32, 
     flexDirection: 'column',

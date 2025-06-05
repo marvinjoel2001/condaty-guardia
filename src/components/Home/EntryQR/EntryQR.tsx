@@ -102,7 +102,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   };
 
   const validate = () => {
-    let errors: any = {};
+    let errors: any = {...formState.errors};
     if (type == 'I' || type == 'G') {
       errors = checkRules({
         value: formState.ci,
