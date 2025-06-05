@@ -240,7 +240,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.mainCard}>
           <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Resumen</Text>
+            <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>Resumen</Text>
             <View style={styles.personBlock}>
               <Avatar
                 name={mainUserFullName}
@@ -249,7 +249,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 h={40}
 
                 fontSize={cssVar.sL}
-                circle={false}
+               
               />
               <View style={styles.personInfoContainer}>
                 <Text style={styles.personName}>{mainUserFullName}</Text>
@@ -316,14 +316,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       w={40}
                       h={40}
                       fontSize={cssVar.sL}
-                      circle={false}
+              
                     />
                     <View style={styles.personInfoContainer}>
                       <Text style={styles.personName}>{getFullName(taxiUser)}</Text>
                       <Text style={styles.personSubDetail}>
                           {(taxiUser.ci ? `C.I. ${taxiUser.ci}` : '') +
                            (taxiUser.ci && item.plate ? ' • ' : '') +
-                           (item.plate ? `Placa: ${item.plate}` : '')}
+                           (item.plate ? `Placa: ${item.plate}` : '') || 'Datos no disponibles'}
                       </Text>
                     </View>
                     <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
@@ -373,7 +373,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   w={40}
                   h={40}
                   fontSize={cssVar.sL}
-                  circle={false}
+                 
                 />
                 <View style={styles.personInfoContainer}>
                   <Text style={styles.personName}>{getFullName(modalPersonData.person)}</Text>
@@ -412,15 +412,25 @@ const styles = StyleSheet.create({
     backgroundColor: cssVar.cBlackV2,
     padding: cssVar.spM,
     borderRadius: cssVar.bRadiusL,
+    marginTop: cssVar.spM,
   },
   sectionContainer: {
     marginBottom: cssVar.spL,
-    gap: cssVar.spM,
+  
   },
   sectionTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: cssVar.sL,
     color: cssVar.cWhite,
+    borderTopWidth: 0.5,
+    borderTopColor: cssVar.cWhiteV1,
+    paddingTop: cssVar.spS,
+    marginTop: cssVar.spS,
+  },
+  sectionTitleNoBorder: {
+    borderTopWidth: 0,
+    paddingTop: 0,
+    marginTop: 0,
   },
   personBlock: {
     flexDirection: 'row',
@@ -455,15 +465,14 @@ const styles = StyleSheet.create({
   },
   detailsGroup: {
     flexDirection: 'column',
-    gap: cssVar.spS,
+    gap: cssVar.spM,
+    
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingVertical: cssVar.spS,
-    borderBottomWidth: 1,
-    borderBottomColor: cssVar.cBlackV3,
+
   },
   detailLabel: {
     fontFamily: FONTS.regular,
