@@ -131,7 +131,12 @@ const Alerts = () => {
             ? 'Residente: ' + getFullName(user)
             : 'Guardia - ' + getDateTimeAgo(alerta.created_at)
         }
-        // subtitle2={}
+
+        subtitle2={
+          alerta.level === 4 && alerta.owner?.dpto?.length > 0
+            ? `Unidad: ${alerta.owner.dpto[0].nro}`
+            : ''
+        }
         left={
           alerta?.level === 4 ? (
             renderLeft(alerta)
@@ -178,6 +183,9 @@ const Alerts = () => {
     if (typeSearch === 'NB') {
       setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 1));
     }
+    if (typeSearch === 'P') {
+      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 4));
+    }
   }, [typeSearch, alertas?.data]);
 
   return (
@@ -189,6 +197,7 @@ const Alerts = () => {
             {value: 'NA', text: 'Nivel alto'},
             {value: 'NM', text: 'Nivel medio'},
             {value: 'NB', text: 'Nivel bajo'},
+            {value: 'P', text: 'Nivel Pánico'},
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
