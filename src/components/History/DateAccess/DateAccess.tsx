@@ -43,7 +43,7 @@ const DateAccess = ({access}: Props) => {
   if (!access?.in_at && !access?.out_at) {
     return (
       <View style={styles.statusContainer}>
-        <Text style={styles.deniedText}>Denegado</Text>
+        <Text style={styles.deniedText}>Rechazado</Text>
       </View>
     );
   }
