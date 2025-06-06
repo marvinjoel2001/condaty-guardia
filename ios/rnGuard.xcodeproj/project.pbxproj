@@ -10,19 +10,19 @@
 		133BD208C1564540B8030E60 /* Roboto-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB75407F13A340209259B49F /* Roboto-SemiBold.ttf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		1C7ED83BCBC943399623CCFF /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6B876381E6664502AC611E7F /* Roboto-Regular.ttf */; };
-		2696FB1DA140529E45357389 /* libPods-OneSignalNotificationServiceExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 132838693B6035861DAFA17F /* libPods-OneSignalNotificationServiceExtension.a */; };
 		48E49E648D114280B79B1DF1 /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5FCF784BE98A4F378CBEF4E8 /* Roboto-Thin.ttf */; };
+		605ECAEFDFFBC713A8FBD810 /* libPods-OneSignalNotificationServiceExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C80228C8CAFB9B9768F825F /* libPods-OneSignalNotificationServiceExtension.a */; };
 		700284E00292461EA9079DB2 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DAA14D5080549C299BD25DC /* Roboto-Bold.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		7FDCEADC81C0407AB9FF1662 /* Roboto-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4AACCA119C3D47BE84A8795B /* Roboto-ExtraBold.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		988110850769825041935DF8 /* libPods-rnGuard.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B408F3ACBF6D9B6D856762 /* libPods-rnGuard.a */; };
 		B01934A12DBFFF5A007B38E4 /* sound_alert.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B01934A02DBFFF59007B38E4 /* sound_alert.mp3 */; };
 		B05E8FB12D67799B00215348 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05E8FB02D67799B00215348 /* NotificationService.swift */; };
 		B05E8FB52D67799B00215348 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B05E8FAE2D67799B00215348 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B05E8FB92D677AED00215348 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B06239742D676C96008F5F20 /* UserNotifications.framework */; };
 		B05E8FBA2D677AED00215348 /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B06239752D676C96008F5F20 /* UserNotificationsUI.framework */; };
 		B37D531E113D4FED959CD622 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2F19E2345B994F49BFD7EDA3 /* Roboto-Medium.ttf */; };
-		BDD20175973A132AD1D322C6 /* libPods-rnGuard.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9397C63A1A2BAF830F5414A7 /* libPods-rnGuard.a */; };
 		CF8974FEEE4B4F22A9AA2870 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 735B341EB9FC47BEB099098F /* Roboto-Light.ttf */; };
 		D353C85625B44FCAB1C22AAB /* Roboto-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18F2EEEBB8384D68BE37B4D4 /* Roboto-Italic.ttf */; };
 		D52B5320AEB048AA1AC0F39C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
@@ -56,25 +56,25 @@
 
 /* Begin PBXFileReference section */
 		0B4E804F0D6242438CA8F791 /* Roboto-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Black.ttf"; path = "../assets/fonts/Roboto-Black.ttf"; sourceTree = "<group>"; };
-		132838693B6035861DAFA17F /* libPods-OneSignalNotificationServiceExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-OneSignalNotificationServiceExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* rnGuard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rnGuard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = rnGuard/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = rnGuard/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = rnGuard/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		14138FC136D22F385290717D /* Pods-rnGuard.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rnGuard.release.xcconfig"; path = "Target Support Files/Pods-rnGuard/Pods-rnGuard.release.xcconfig"; sourceTree = "<group>"; };
 		18F2EEEBB8384D68BE37B4D4 /* Roboto-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Italic.ttf"; path = "../assets/fonts/Roboto-Italic.ttf"; sourceTree = "<group>"; };
 		2F19E2345B994F49BFD7EDA3 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Medium.ttf"; path = "../assets/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; };
 		3DAA14D5080549C299BD25DC /* Roboto-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Bold.ttf"; path = "../assets/fonts/Roboto-Bold.ttf"; sourceTree = "<group>"; };
 		4AACCA119C3D47BE84A8795B /* Roboto-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ExtraBold.ttf"; path = "../assets/fonts/Roboto-ExtraBold.ttf"; sourceTree = "<group>"; };
+		5C80228C8CAFB9B9768F825F /* libPods-OneSignalNotificationServiceExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-OneSignalNotificationServiceExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F2F26F40244236818BDA1EC /* Pods-rnGuard.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rnGuard.debug.xcconfig"; path = "Target Support Files/Pods-rnGuard/Pods-rnGuard.debug.xcconfig"; sourceTree = "<group>"; };
 		5FCF784BE98A4F378CBEF4E8 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Thin.ttf"; path = "../assets/fonts/Roboto-Thin.ttf"; sourceTree = "<group>"; };
-		6342389D2A9E7AD25FE74C85 /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		6B876381E6664502AC611E7F /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../assets/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
 		735B341EB9FC47BEB099098F /* Roboto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Light.ttf"; path = "../assets/fonts/Roboto-Light.ttf"; sourceTree = "<group>"; };
-		749F84F025D339579D1E0343 /* Pods-rnGuard.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rnGuard.debug.xcconfig"; path = "Target Support Files/Pods-rnGuard/Pods-rnGuard.debug.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = rnGuard/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = rnGuard/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9397C63A1A2BAF830F5414A7 /* libPods-rnGuard.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-rnGuard.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9F76F537FDF72893035FD269 /* Pods-rnGuard.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rnGuard.release.xcconfig"; path = "Target Support Files/Pods-rnGuard/Pods-rnGuard.release.xcconfig"; sourceTree = "<group>"; };
 		9F781D8E10A348EAB34D039E /* Roboto-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ExtraLight.ttf"; path = "../assets/fonts/Roboto-ExtraLight.ttf"; sourceTree = "<group>"; };
+		A6B408F3ACBF6D9B6D856762 /* libPods-rnGuard.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-rnGuard.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A763513A30E2FF82A4D5AA7F /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
 		B01934A02DBFFF59007B38E4 /* sound_alert.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound_alert.mp3; path = ../../sound_alert.mp3; sourceTree = "<group>"; };
 		B05E8FAE2D67799B00215348 /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B05E8FB02D67799B00215348 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -86,8 +86,8 @@
 		B06239742D676C96008F5F20 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		B06239752D676C96008F5F20 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
 		B06239792D676E84008F5F20 /* OneSignalInAppMessages.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:J3J28YJX9L:OneSignal, Inc."; lastKnownFileType = wrapper.xcframework; name = OneSignalInAppMessages.xcframework; path = Pods/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_InAppMessages/OneSignalInAppMessages.xcframework; sourceTree = "<group>"; };
+		C75044A6995F248BFAED9D69 /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		CB75407F13A340209259B49F /* Roboto-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-SemiBold.ttf"; path = "../assets/fonts/Roboto-SemiBold.ttf"; sourceTree = "<group>"; };
-		E0D78776F1B2849DE7C58F70 /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -96,7 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BDD20175973A132AD1D322C6 /* libPods-rnGuard.a in Frameworks */,
+				988110850769825041935DF8 /* libPods-rnGuard.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,7 +106,7 @@
 			files = (
 				B05E8FBA2D677AED00215348 /* UserNotificationsUI.framework in Frameworks */,
 				B05E8FB92D677AED00215348 /* UserNotifications.framework in Frameworks */,
-				2696FB1DA140529E45357389 /* libPods-OneSignalNotificationServiceExtension.a in Frameworks */,
+				605ECAEFDFFBC713A8FBD810 /* libPods-OneSignalNotificationServiceExtension.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,8 +150,8 @@
 				B06239742D676C96008F5F20 /* UserNotifications.framework */,
 				B06239752D676C96008F5F20 /* UserNotificationsUI.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				132838693B6035861DAFA17F /* libPods-OneSignalNotificationServiceExtension.a */,
-				9397C63A1A2BAF830F5414A7 /* libPods-rnGuard.a */,
+				5C80228C8CAFB9B9768F825F /* libPods-OneSignalNotificationServiceExtension.a */,
+				A6B408F3ACBF6D9B6D856762 /* libPods-rnGuard.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -212,10 +212,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				6342389D2A9E7AD25FE74C85 /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */,
-				E0D78776F1B2849DE7C58F70 /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */,
-				749F84F025D339579D1E0343 /* Pods-rnGuard.debug.xcconfig */,
-				9F76F537FDF72893035FD269 /* Pods-rnGuard.release.xcconfig */,
+				C75044A6995F248BFAED9D69 /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */,
+				A763513A30E2FF82A4D5AA7F /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */,
+				5F2F26F40244236818BDA1EC /* Pods-rnGuard.debug.xcconfig */,
+				14138FC136D22F385290717D /* Pods-rnGuard.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -227,14 +227,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "rnGuard" */;
 			buildPhases = (
-				692463BCDA0A2F0E0F4F04E7 /* [CP] Check Pods Manifest.lock */,
+				6CF55E0F7433952E06DA95A6 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				B06239722D676776008F5F20 /* Embed Foundation Extensions */,
-				488B69C2CD978F4A4B3877C3 /* [CP] Embed Pods Frameworks */,
-				7DFFFAE7811DC05111B43382 /* [CP] Copy Pods Resources */,
+				F2B611EDC0E1E26540DBA25E /* [CP] Embed Pods Frameworks */,
+				06DCF01739B65C990D3F9549 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -250,7 +250,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B05E8FB82D67799B00215348 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */;
 			buildPhases = (
-				5F39C5F0F51D7563AF7B3618 /* [CP] Check Pods Manifest.lock */,
+				F00CA74A66E0F6809522019D /* [CP] Check Pods Manifest.lock */,
 				B05E8FAA2D67799B00215348 /* Sources */,
 				B05E8FAB2D67799B00215348 /* Frameworks */,
 				B05E8FAC2D67799B00215348 /* Resources */,
@@ -349,46 +349,28 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		488B69C2CD978F4A4B3877C3 /* [CP] Embed Pods Frameworks */ = {
+		06DCF01739B65C990D3F9549 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5F39C5F0F51D7563AF7B3618 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-OneSignalNotificationServiceExtension-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		692463BCDA0A2F0E0F4F04E7 /* [CP] Check Pods Manifest.lock */ = {
+		6CF55E0F7433952E06DA95A6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -410,21 +392,47 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7DFFFAE7811DC05111B43382 /* [CP] Copy Pods Resources */ = {
+		F00CA74A66E0F6809522019D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-OneSignalNotificationServiceExtension-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F2B611EDC0E1E26540DBA25E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-rnGuard/Pods-rnGuard-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -459,14 +467,14 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 749F84F025D339579D1E0343 /* Pods-rnGuard.debug.xcconfig */;
+			baseConfigurationReference = 5F2F26F40244236818BDA1EC /* Pods-rnGuard.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = rnGuard/rnGuard.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = rnGuard/Images.xcassets;
 				DEVELOPMENT_TEAM = VCLPZYHJ77;
 				ENABLE_BITCODE = NO;
@@ -499,14 +507,14 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9F76F537FDF72893035FD269 /* Pods-rnGuard.release.xcconfig */;
+			baseConfigurationReference = 14138FC136D22F385290717D /* Pods-rnGuard.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = rnGuard/rnGuard.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = rnGuard/Images.xcassets;
 				DEVELOPMENT_TEAM = VCLPZYHJ77;
 				INFOPLIST_FILE = rnGuard/Info.plist;
@@ -605,10 +613,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -678,10 +683,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -692,7 +694,7 @@
 		};
 		B05E8FB62D67799B00215348 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6342389D2A9E7AD25FE74C85 /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */;
+			baseConfigurationReference = C75044A6995F248BFAED9D69 /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -734,7 +736,7 @@
 		};
 		B05E8FB72D67799B00215348 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E0D78776F1B2849DE7C58F70 /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */;
+			baseConfigurationReference = A763513A30E2FF82A4D5AA7F /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
