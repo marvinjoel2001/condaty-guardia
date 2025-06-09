@@ -39,7 +39,7 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
   const onGetCode = async () => {
     const {data, error} = await execute('/guard-getpin', 'POST', {}, false, 3);
     if (data?.success == true) {
-      showToast(data.message + '(' + data.data + ')', 'success');
+      showToast(data.message , 'success');
       setFormState({...formState, pinned: 1, code: ''});
     } else {
       showToast(error?.message, 'error');
