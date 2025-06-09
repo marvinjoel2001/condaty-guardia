@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import {Text, View} from 'react-native';
 import InputCode from '../../../mk/components/forms/InputCode/InputCode';
@@ -130,25 +130,49 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
     }
   };
 
-  const onCheckEmail = async () => {
-    let email = formState.newEmail;
+  const onCheckEmail = useCallback(async () => {
     setErrors({});
-    const result = await onExist({
-      execute,
-      field: 'email',
-      value: email,
-      module: 'ownerexist',
-      cols: 'id,name,middle_name,last_name,mother_last_name,ci,email',
-    });
-    if (!result) {
-      setFormState({...formState, enableButton: true});
+    const {data} = await execute(
+      '/guards',
+      'GET',
+      {
+        fullType: 'EXIST',
+        type: 'email',
+        searchBy: formState.newEmail,
+      },
+      false,
+      true,
+    );
+
+    if (data?.success && data.data?.data?.id) {
+      showToast('El email ya esta en uso', 'warning');
+      setFormState({...formState, newEmail: ''});
+      setErrors({newEmail: 'El correo ya se encuentra registrado'});
+      // return;
     } else {
-      if (result.email == email) {
-        setErrors({newEmail: 'El correo ya se encuentra registrado'});
-        return;
-      }
+      setFormState({...formState, enableButton: true});
     }
-  };
+  }, []);
+
+  // const onCheckEmail = async () => {
+  //   let email = formState.newEmail;
+  //   setErrors({});
+  //   const {dataresult} = await execute({
+  //     execute,
+  //     field: 'email',
+  //     value: email,
+  //     module: 'ownerexist',
+  //     cols: 'id,name,middle_name,last_name,mother_last_name,ci,email',
+  //   });
+  //   if (!result) {
+  //     setFormState({...formState, enableButton: true});
+  //   } else {
+  //     if (result.email == email) {
+  //       setErrors({newEmail: 'El correo ya se encuentra registrado'});
+  //       return;
+  //     }
+  //   }
+  // };
 
   const _onClose = () => {
     onClose();
