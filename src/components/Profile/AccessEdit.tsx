@@ -10,7 +10,6 @@ import useApi from '../../../mk/hooks/useApi';
 import useAuth from '../../../mk/hooks/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import configApp from '../../config/config';
-import {onExist} from '../../../mk/utils/dbtools';
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 type PropsType = {
   open: boolean;
@@ -20,7 +19,7 @@ type PropsType = {
 
 const AccessEdit = ({open, onClose, type}: PropsType) => {
   const [formState, setFormState]: any = useState({
-    pinned: 0,
+    pinned: 1,
   });
   const [showPassword, setShowPassword] = useState(true);
   const {execute} = useApi();
@@ -37,9 +36,9 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
     setShowPassword(!showPassword);
   };
   const onGetCode = async () => {
-    const {data, error} = await execute('/guard-getpin', 'POST', {}, false, 3);
+    const {data, error} = await execute('/owner-getpin', 'POST', {}, false, 3);
     if (data?.success == true) {
-      showToast(data.message , 'success');
+      showToast(data.message, 'success');
       setFormState({...formState, pinned: 1, code: ''});
     } else {
       showToast(error?.message, 'error');
@@ -67,13 +66,7 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
     if (type == 'P') {
       errors = checkRules({
         value: formState.newPassword,
-        rules: ['required'],
-        key: 'newPassword',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.newPassword,
-        rules: ['password'],
+        rules: ['required', 'password'],
         key: 'newPassword',
         errors,
       });
@@ -89,6 +82,7 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
     setErrors(errors);
     return errors;
   };
+
   const onChangeData = async () => {
     if (hasErrors(validate())) {
       return;
@@ -102,10 +96,10 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
       param = {...param, password: formState.newPassword};
     }
     const {data, error} = await execute(url, 'POST', param, false, 3);
-
+    console.log(data);
     if (data?.success == true) {
       if (type == 'M') {
-        setUser({...user, email: formState.newEmail});
+        setUser({...user, email: formState?.newEmail});
         await AsyncStorage.setItem(
           configApp.APP_AUTH_IAM + 'token',
           JSON.stringify({
@@ -121,7 +115,6 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
       getUser();
     } else {
       // showToast(error?.data?.message || error?.message, 'error');
-      // setErrors(error?.data?.errors);
       if (data?.message) {
         setErrors({newPassword: data?.message});
       } else {
@@ -132,6 +125,18 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
 
   const onCheckEmail = useCallback(async () => {
     setErrors({});
+    let errors: any = [];
+    errors = checkRules({
+      value: formState.newEmail,
+      rules: ['required', 'email'],
+      key: 'newEmail',
+      errors,
+    });
+    if (hasErrors(errors)) {
+      setFormState({...formState, enableButton: false});
+      setErrors(errors);
+      return;
+    }
     const {data} = await execute(
       '/guards',
       'GET',
@@ -141,23 +146,22 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
         searchBy: formState.newEmail,
       },
       false,
-      true,
+      3,
     );
 
     if (data?.success && data.data?.data?.id) {
       showToast('El email ya esta en uso', 'warning');
-      setFormState({...formState, newEmail: ''});
+      setFormState({...formState, newEmail: '', enableButton: false});
       setErrors({newEmail: 'El correo ya se encuentra registrado'});
       // return;
     } else {
       setFormState({...formState, enableButton: true});
     }
-  }, []);
-
+  }, [formState]);
   // const onCheckEmail = async () => {
   //   let email = formState.newEmail;
   //   setErrors({});
-  //   const {dataresult} = await execute({
+  //   const result = await onExist({
   //     execute,
   //     field: 'email',
   //     value: email,
@@ -182,7 +186,10 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
   return (
     <Modal
       open={open}
-      title={type == 'M' ? 'Cambiar correo' : 'Cambiar contraseña'}
+      title={
+        (type == 'M' ? 'Cambiar correo' : 'Cambiar contraseña') +
+        formState.newEmail
+      }
       onClose={_onClose}
       onSave={formState.pinned != 1 ? onGetCode : onChangeData}
       buttonText={formState.pinned != 1 ? 'Enviar PIN' : 'Cambiar'}
@@ -202,6 +209,15 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
         </View>
       ) : (
         <>
+          {/* <Input
+            label="Código PIN"
+            name="code"
+            required
+            placeholder="Código PIN"
+            value={formState['code']}
+            error={errors}
+            onChange={(value: any) => handleInputChange('code', value)}
+          /> */}
           <InputCode
             value={formState.code}
             name="code"
@@ -230,7 +246,7 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
                 placeholder="Nueva contraseña"
                 password={showPassword}
                 error={errors}
-                value={formState?.newPassword}
+                value={formState['newPassword']}
                 onChange={(value: any) =>
                   handleInputChange('newPassword', value)
                 }
