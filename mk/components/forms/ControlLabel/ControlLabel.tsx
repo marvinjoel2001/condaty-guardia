@@ -1,4 +1,4 @@
-import {View, Text, KeyboardTypeOptions} from 'react-native';
+import {View, Text, KeyboardTypeOptions, SafeAreaView} from 'react-native';
 import {FONTS, ThemeType, TypeStyles, cssVar} from '../../../styles/themes';
 import React from 'react';
 
@@ -56,7 +56,14 @@ const ControlLabel = ({
     ...(!isFocus && iconLeft && !value ? {paddingLeft: cssVar.spM} : {}),
     ...(!isFocus && iconRight && !value ? {paddingRight: cssVar.spM} : {}),
     ...(isFocus || value || placeholder
-      ? {...theme.focus, left: iconLeft ? 24 : 8}
+      ? {
+          ...theme.focus,
+          left: iconLeft ? 24 : 8,
+          color:
+            !isFocus && (placeholder || value)
+              ? cssVar.cWhiteV1
+              : cssVar.cAccent,
+        }
       : {}),
     ...(error?.[name] ? {color: cssVar.cError} : {}),
     ...(disabled ? theme.disabled : {}),
@@ -117,7 +124,7 @@ const theme: ThemeType = {
     fontSize: cssVar.sXs,
     fontFamily: FONTS.regular,
     position: 'absolute',
-    color: cssVar.cWhiteV1,
+    color: cssVar.cAccent,
     zIndex: 1,
     left: 12,
     // transform: [{translateY: 10}],
