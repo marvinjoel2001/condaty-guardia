@@ -6,14 +6,14 @@ import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
 interface PropsType extends PropsTypeInputBase {
   lines?: number;
   maxLength?: number;
-  fixedHeight?: boolean;
-  multiline?: boolean;
 }
 
 export const TextArea = (props: PropsType) => {
-  const {value, maxLength, multiline = true} = props;
+  const {value, maxLength, multiline} = props;
   const [isFocused, setIsFocused] = useState(false);
   const [textLength, setTextLength] = useState(value?.length || 0);
+  const lineHeight = 20;
+  const lines = props?.lines || 4;
 
   const styleInput = {
     ...theme.default,
@@ -23,6 +23,7 @@ export const TextArea = (props: PropsType) => {
       : {}),
     ...props.style,
     ...(props.disabled ? theme.disabledInput : {}),
+    height: lineHeight * lines,
   };
 
   const _onBlur = (e: any) => {
@@ -58,12 +59,13 @@ export const TextArea = (props: PropsType) => {
         onChangeText={handleTextChange}
         value={value}
         placeholder={props.placeholder || ''}
-        placeholderTextColor={theme.form?.color}
-        editable={!props.disabled && !props.readOnly}
-        numberOfLines={props.lines || 8}
-        multiline={multiline}
+        placeholderTextColor={cssVar.cWhiteV3}
+        editable={!props?.disabled && !props.readOnly}
+        numberOfLines={lines}
+        multiline={true}
         autoFocus={props.autoFocus}
         allowFontScaling={false}
+        textAlignVertical="top"
         maxLength={maxLength ?? undefined} // Permite texto ilimitado si no se define maxLength
       />
       {/* {maxLength !== undefined && (
@@ -86,13 +88,12 @@ const theme: ThemeType = {
     borderRadius: cssVar.bRadiusS,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
-    textAlignVertical: 'top',
+
     backgroundColor: cssVar.cWhiteV2,
     color: cssVar.cWhite,
     // paddingVertical: cssVar.spL,
     paddingTop: cssVar.spXl,
     paddingHorizontal: cssVar.spS,
-    height: 120, // Limitar el tamaño del TextInput
   },
   errorInput: {borderColor: cssVar.cError},
   disabledInput: {opacity: 0.6, color: cssVar.cWhiteV3},

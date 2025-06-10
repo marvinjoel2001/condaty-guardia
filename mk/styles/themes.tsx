@@ -33,7 +33,7 @@ export const cssVar = {
   cWhite: '#FAFAFA',
   cWhiteV1: '#A7A7A7',
   cWhiteV2: '#414141',
-  cWhiteV3: '#FFFFFF0D',
+  cWhiteV3: '#818181',
   cBlack: '#212121',
   cBlackV1: '#292929',
   cBlackV2: '#333536',
@@ -48,10 +48,12 @@ export const cssVar = {
   cOrange: '#F58220',
 
   cSidebar: '#246950',
+  cFillSidebar: '#1F2D27',
 
   cHover: '#FFFFFF0D',
   cHoverBlack: '#212121CC',
   cHoverBlackV2: '#33353633',
+  cHovetablepdf: '#7979791A',
   cHoverSuccess: '#00AF9033',
   cHoverError: '#E4605533',
   cHoverInfo: '#4285FA33',
@@ -127,6 +129,9 @@ export const cssVar = {
   //responsives
   responsiveTablet: 768,
   responsiveMobile: 480,
+
+  cHoverSecondary: '#21212133',
+  cHoverAccent: '#00E38C33',
 };
 
 export const screenHeight = Dimensions.get('window').height;
