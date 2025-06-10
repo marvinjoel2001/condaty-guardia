@@ -36,7 +36,7 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
     setShowPassword(!showPassword);
   };
   const onGetCode = async () => {
-    const {data, error} = await execute('/owner-getpin', 'POST', {}, false, 3);
+    const {data, error} = await execute('/guard-getpin', 'POST', {}, false, 3);
     if (data?.success == true) {
       showToast(data.message, 'success');
       setFormState({...formState, pinned: 1, code: ''});
@@ -158,25 +158,6 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
       setFormState({...formState, enableButton: true});
     }
   }, [formState]);
-  // const onCheckEmail = async () => {
-  //   let email = formState.newEmail;
-  //   setErrors({});
-  //   const result = await onExist({
-  //     execute,
-  //     field: 'email',
-  //     value: email,
-  //     module: 'ownerexist',
-  //     cols: 'id,name,middle_name,last_name,mother_last_name,ci,email',
-  //   });
-  //   if (!result) {
-  //     setFormState({...formState, enableButton: true});
-  //   } else {
-  //     if (result.email == email) {
-  //       setErrors({newEmail: 'El correo ya se encuentra registrado'});
-  //       return;
-  //     }
-  //   }
-  // };
 
   const _onClose = () => {
     onClose();
@@ -186,10 +167,7 @@ const AccessEdit = ({open, onClose, type}: PropsType) => {
   return (
     <Modal
       open={open}
-      title={
-        (type == 'M' ? 'Cambiar correo' : 'Cambiar contraseña') +
-        formState.newEmail
-      }
+      title={type == 'M' ? 'Cambiar correo' : 'Cambiar contraseña'}
       onClose={_onClose}
       onSave={formState.pinned != 1 ? onGetCode : onChangeData}
       buttonText={formState.pinned != 1 ? 'Enviar PIN' : 'Cambiar'}
