@@ -136,7 +136,7 @@ const IndividualQR = ({
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate, // Limpiar plate si es taxi y CI corto
+        plate: prevState.tab === 'T' ? '' : prevState.plate, 
         disbledTaxi: false,
       }));
       return;
@@ -156,7 +156,7 @@ const IndividualQR = ({
         middle_name_taxi: existData.data.middle_name,
         last_name_taxi: existData.data.last_name,
         mother_last_name_taxi: existData.data.mother_last_name,
-        plate: existData.data.plate || '', // Usar 'plate' para el taxi
+        plate: existData.data.plate || '', 
         disbledTaxi: true,
       }));
     } else {
@@ -166,7 +166,7 @@ const IndividualQR = ({
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate, // Limpiar plate si es taxi y no existe
+        plate: prevState.tab === 'T' ? '' : prevState.plate, 
         disbledTaxi: false,
       }));
     }
@@ -236,7 +236,7 @@ const IndividualQR = ({
                   maxLength={10}
                   keyboardType="numeric"
                   value={formState?.ci || ''}
-                  error={errors?.ci}
+                  error={errors}
                   required
                   onChange={(value: string) => handleChange('ci', value)}
                   onBlur={onExistVisits}
@@ -288,7 +288,7 @@ const IndividualQR = ({
                   label="Placa del vehículo"
                   type="text"
                   name="plate" // Vehículo usa 'plate'
-                  error={errors?.plate}
+                  error={errors}
                   required={tab === 'V'}
                   value={formState?.plate || ''}
                   onChange={(value: string) => handleChange('plate', value.toUpperCase())}
@@ -391,7 +391,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mainContainer: {
-    paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 32, 
     flexDirection: 'column',

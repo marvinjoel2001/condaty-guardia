@@ -56,7 +56,7 @@ const OwnerInvitationInfoDisplay = ({ invitationData }: { invitationData: any })
       <View style={styles.invitationDetailsSection}>
         <View style={styles.invitationDetailsInnerWrapper}>
           <View style={styles.invitationDetailsContent}>
-            <Text style={styles.sectionTitle}>Detalles de la invitación</Text>
+            <Text style={styles.sectionTitle}>Detalles de la invitaciónES</Text>
             <View style={styles.detailsGroup}>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Nombre del evento</Text>
@@ -224,6 +224,27 @@ const GroupQR = ({
     const newAcomps = acomps.filter((item: any) => item.ci !== acom.ci);
     setFormState({...formState, acompanantes: newAcomps});
   };
+  const onExistVisits = async () => {
+    if (!formState?.ci || formState.ci.length < 5) {
+      setErrors({...errors, ci: ''});
+      return;
+    }
+    const {data: existData} = await execute('/visits', 'GET', {
+      perPage: 1,
+      page: 1,
+      exist: '1',
+      fullType: 'L',
+      ci_visit: formState?.ci,
+    });
+    if (existData?.data) {
+      setErrors({
+        ...errors,
+        ci: 'Ya existe un registro de entrada para este CI',
+      });
+    } else {
+      setErrors({...errors, ci: ''});
+    }
+  };
 
   const acompanantesList = (acompanante: any) => {
     return (
@@ -287,7 +308,7 @@ const GroupQR = ({
       {!data ? (
         <Loading />
       ) : (
-        <View style={{width: 388, alignSelf: 'center'}}>
+        <View >
           <OwnerInvitationInfoDisplay invitationData={data} />
           {!openSelected ? (
             <>
@@ -349,9 +370,10 @@ const GroupQR = ({
                     maxLength={10}
                     keyboardType="number-pad"
                     value={formState.ci}
-                    required
+                    required={true}
                     error={errors}
                     onChange={(value: any) => handleChange('ci', value)}
+                    onBlur={onExistVisits}
                   />
                   <InputFullName
                     formState={formState}

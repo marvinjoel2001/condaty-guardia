@@ -121,13 +121,22 @@ const Alerts = () => {
           setOpenView({open: true, id: alerta.id});
         }}
         // title={getFullName(alerta.guardia)}
-        title={alerta.descrip}
+        title={
+          alerta.level === 4
+            ? alerta.descrip
+            : getFullName(alerta.guardia)
+        }
         subtitle={
           alerta.level === 4
             ? 'Residente: ' + getFullName(user)
             : 'Guardia - ' + getDateTimeAgo(alerta.created_at)
         }
-        // subtitle2={}
+
+        subtitle2={
+          alerta.level === 4 && alerta.owner?.dpto?.length > 0
+            ? `Unidad: ${alerta.owner.dpto[0].nro}`
+            : ''
+        }
         left={
           alerta?.level === 4 ? (
             renderLeft(alerta)
@@ -146,11 +155,14 @@ const Alerts = () => {
         right={renderRight(alerta)}>
         {alerta?.level !== 4 && (
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               marginTop: 4,
               color: cssVar.cWhiteV1,
               fontSize: 14,
               fontFamily: FONTS.regular,
+             
             }}>
             {alerta.descrip}
           </Text>
@@ -171,6 +183,9 @@ const Alerts = () => {
     if (typeSearch === 'NB') {
       setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 1));
     }
+    if (typeSearch === 'P') {
+      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 4));
+    }
   }, [typeSearch, alertas?.data]);
 
   return (
@@ -182,6 +197,7 @@ const Alerts = () => {
             {value: 'NA', text: 'Nivel alto'},
             {value: 'NM', text: 'Nivel medio'},
             {value: 'NB', text: 'Nivel bajo'},
+            {value: 'P', text: 'Nivel Pánico'},
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
