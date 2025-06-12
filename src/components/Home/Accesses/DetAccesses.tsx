@@ -95,7 +95,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         3,
       );
       if (result?.success) {
-        reload();
+        if (reload) reload();
         close();
         showToast('El visitante salió', 'success');
       } else {
@@ -108,7 +108,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         obs_in: formState?.obs_in || '',
       });
       if (result?.success) {
-        reload();
+        if (reload) reload();
         close();
       } else {
         console.log('Error en dejar entrar:', error);
@@ -147,7 +147,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const handleInputChange = (name: string, value: string) => {
     setFormState({...formState, [name]: value});
   };
-  console.log(getStatus(), 'status');
+
   const getButtonText = () => {
     const status = getStatus();
     const buttonTexts: Record<string, string> = {
