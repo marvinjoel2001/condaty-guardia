@@ -1,10 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
-import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
-import DataSearch from '../../../mk/components/ui/DataSearch';
 import List from '../../../mk/components/ui/List/List';
-import configApp from '../../config/config';
-import useAuth from '../../../mk/hooks/useAuth';
 import useApi from '../../../mk/hooks/useApi';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {cssVar} from '../../../mk/styles/themes';
@@ -19,10 +15,10 @@ import {
   IconVehicle,
   IconVisit,
 } from '../../icons/IconLibrary';
-import {View} from 'react-native';
+import {Text} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
-import {getDateTimeStrMes} from '../../../mk/utils/dates';
+import {getTimeAgoSimple} from '../../../mk/utils/dates';
 import {useEvent} from '../../../mk/hooks/useEvent';
 import {useFocusEffect} from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';
@@ -30,13 +26,8 @@ import DetAccesses from '../Home/Accesses/DetAccesses';
 import AlertDetail from '../Alerts/AlertDetail';
 
 const Notifications = () => {
-  // const [tab, setTab] = useState('T');
-  // const [search, setSearch] = useState('');
-  // const [dataFilter, setDataFilter] = useState([]);
   const [openDetail, setOpenDetail] = useState('');
   const [formState, setFormState]: any = useState({});
-  // const {user} = useAuth();
-  // const [loaded, setLoaded] = useState(false);
   const [params, setParams]: any = useState({
     perPage: -1,
     page: 1,
@@ -57,7 +48,6 @@ const Notifications = () => {
   );
 
   const goNotif = (data: any) => {
-    console.log('data', data, data.info?.pedido_id);
     if (data.info?.act == 'in-pedido') {
       setFormState({id: data.info?.pedido_id});
       setOpenDetail(data.info?.pedido_id ? 'Pedidos' : '');
@@ -76,7 +66,6 @@ const Notifications = () => {
       setOpenDetail(data.info?.access_id ? 'Access' : '');
     }
     if (data.info?.act == 'alerts') {
-      //no deberia recibir
       setFormState({id: data.info?.id});
       setOpenDetail(data.info?.id ? 'Alerts' : '');
     }
@@ -84,12 +73,6 @@ const Notifications = () => {
 
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
-    // if (
-    //   search != '' &&
-    //   (data.msg?.body + '').toLowerCase().indexOf(search.toLowerCase()) == -1
-    // )
-    //   return null;
-
     const left = (data: any) => {
       let image = '';
       let name = '';
@@ -246,70 +229,28 @@ const Notifications = () => {
         //   style={read ? {opacity: 0.5} : {}}
         title={msg?.title}
         subtitle={msg?.body}
-        date={getDateTimeStrMes(notifi.created_at)}
-        widthMain="70%"
+        truncateSubtitle={true}
+        right={
+          <Text
+            style={{
+              color: cssVar.cWhiteV1,
+              fontSize: 10,
+              alignItems: 'flex-end',
+              flex: 1,
+            }}>
+            {getTimeAgoSimple(notifi.created_at)}
+          </Text>
+        }
+        // date={getDateTimeStrMes(notifi.created_at)}
         onPress={() => {
           goNotif(data);
         }}
         left={left(data)}></ItemList>
     );
   };
-  // const onSearch = (search: string) => {
-  //   setSearch(search);
-  // };
-
-  // useEffect(() => {
-  //   setDataFilter([]);
-  //   const channelMap: {[key: string]: string} = {
-  //     G: 'guards',
-  //     A1: 'alerts-1',
-  //     A2: 'alerts-2',
-  //     A3: 'alerts-3',
-  //   };
-
-  //   if (tab === 'T') {
-  //     setDataFilter(notifs?.data);
-  //     return;
-  //   }
-
-  //   if (tab === 'Y') {
-  //     setDataFilter(
-  //       notifs?.data?.filter(
-  //         (notif: any) =>
-  //           notif.channel ===
-  //           `${(configApp.APP_AUTH_IAM as string).replace('/', '')}${user?.id}`,
-  //       ),
-  //     );
-  //     return;
-  //   }
-  //   setDataFilter(
-  //     notifs?.data?.filter((notif: any) => notif.channel === channelMap[tab]),
-  //   );
-  // }, [tab, notifs?.data]);
-  // console.log(dataFilter);
-  // useEffect(() => {
-  //   if (dataFilter?.length > 0) {
-  //     setLoaded(true);
-  //   }
-  // }, [dataFilter]);
 
   return (
     <Layout title="Notificaciones" refresh={() => reload()}>
-      {/* <TabsButtons
-        tabs={[
-          {value: 'T', text: 'Todo'},
-          {value: 'Y', text: 'Mis Notificaciones'},
-          {value: 'G', text: 'Guardias'},
-          {value: 'A1', text: 'Alertas Nivel Bajo'},
-          {value: 'A2', text: 'Alertas Nivel Medio'},
-          {value: 'A3', text: 'Alertas Nivel Alto'},
-        ]}
-        sel={tab}
-        setSel={setTab}
-      /> */}
-
-      {/* <DataSearch setSearch={onSearch} name="Novedades" value={search} /> */}
-
       <List
         data={notifs?.data}
         renderItem={NotifisList}

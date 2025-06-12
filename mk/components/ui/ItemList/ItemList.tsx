@@ -19,6 +19,7 @@ interface PropsType {
   style?: TypeStyles;
   widthMain?: any;
   check?: boolean | null;
+  truncateSubtitle?: boolean;
   onPressTitle?: () => void;
   onLongPress?: () => void;
 }
@@ -28,6 +29,7 @@ export const ItemList = (props: PropsType) => {
     title,
     subtitle,
     subtitle2,
+    truncateSubtitle = false,
     right,
     left,
     children,
@@ -67,7 +69,14 @@ export const ItemList = (props: PropsType) => {
               style={theme.title}>
               {title}
             </Text>
-            {subtitle && <Text style={theme.subtitle}>{subtitle}</Text>}
+            {subtitle && (
+              <Text
+                ellipsizeMode={truncateSubtitle ? 'tail' : undefined}
+                numberOfLines={truncateSubtitle ? 1 : undefined}
+                style={theme.subtitle}>
+                {subtitle}
+              </Text>
+            )}
             {subtitle2 && <Text style={theme.subtitle2}>{subtitle2}</Text>}
           </View>
           <View
