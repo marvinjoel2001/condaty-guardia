@@ -18,7 +18,7 @@ import {
 import {Text} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
-import {getTimeAgoSimple} from '../../../mk/utils/dates';
+import {getDateTimeAgo, getTimeAgoSimple} from '../../../mk/utils/dates';
 import {useEvent} from '../../../mk/hooks/useEvent';
 import {useFocusEffect} from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';
@@ -238,7 +238,7 @@ const Notifications = () => {
               alignItems: 'flex-end',
               flex: 1,
             }}>
-            {getTimeAgoSimple(notifi.created_at)}
+            {getDateTimeAgo(notifi.created_at)}
           </Text>
         }
         // date={getDateTimeStrMes(notifi.created_at)}
