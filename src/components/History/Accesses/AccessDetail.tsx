@@ -182,16 +182,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     }
 
     const item = accessData;
-    const resident = item.owner;
-    const mainVisitor = item.visit;
+    const resident = item.owner;                      
+    const mainVisitor = item.visit;                                                                 
     const driverAccess = item.accesses?.find((acc: any) => acc.taxi === 'C');
-    const driver = driverAccess ? driverAccess.visit : null;
+    const driver = driverAccess ? driverAccess.visit : null;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
     const companions = item.accesses?.filter((acc: any) => acc.taxi !== 'C') || [];
 
     const mainUserFullName = getFullName(mainVisitor) || 'N/A';
     const mainUserCi = mainVisitor?.ci;
 
-    let statusText = '';
+    let statusText = ''; 
     let statusColor = cssVar.cWhite;
     let tipoAccesoText = '';
 
