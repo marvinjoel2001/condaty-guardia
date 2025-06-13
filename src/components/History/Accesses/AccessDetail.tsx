@@ -63,7 +63,7 @@ const CompanionItem = ({ companionAccess, onPress }: CompanionItemProps) => {
         w={40}
         h={40}
         fontSize={cssVar.sL}
-        circle={false}
+        circle={true}
       />
       <View style={styles.personInfoContainer}>
         <Text style={styles.personName}>{companionFullName}</Text>
