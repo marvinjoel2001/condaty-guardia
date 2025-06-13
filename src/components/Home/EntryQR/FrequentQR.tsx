@@ -365,7 +365,7 @@ const FrequentQR = ({
             )}
             
             <TouchableOpacity style={styles.addCompanionButton} onPress={() => setOpenAcom(true)}>
-              <Icon name={IconSimpleAdd} color={cssVar.cSuccess} size={13} />
+              <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
               <Text style={styles.addCompanionText}>Agregar acompañante</Text>
             </TouchableOpacity>
           
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   addCompanionText: {
-    color: cssVar.cSuccess,
+    color: cssVar.cAccent,
     textDecorationLine: 'underline',
     marginLeft: 4,
     fontSize: 12,

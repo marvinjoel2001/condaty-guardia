@@ -341,10 +341,10 @@ const IndividualQR = ({
                   alignItems: 'center',
                 }}
                 onPress={() => setOpenAcom(true)}>
-                <Icon name={IconSimpleAdd} color={cssVar.cSuccess} size={13} />
+                <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
                 <Text
                   style={{
-                    color: cssVar.cSuccess,
+                    color: cssVar.cAccent,
                     textDecorationLine: 'underline',
                     marginLeft: 4,
                   }}>

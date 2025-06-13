@@ -460,7 +460,7 @@ const GroupQR = ({
                 <TouchableOpacity
                     style={styles.addCompanionLinkContainer}
                     onPress={() => setOpenAcom(true)}>
-                    <Icon name={IconSimpleAdd} size={13} color={cssVar.cSuccess} />
+                    <Icon name={IconSimpleAdd} size={13} color={cssVar.cAccent} />
                     <Text style={styles.addCompanionLinkText}>Agregar acompañante</Text>
                 </TouchableOpacity>
               )}
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     textDecorationLine: 'underline',
-    color: '#00e38c',
+    color: cssVar.cAccent,
   },
   observationsOuterContainer: {
     alignSelf: 'stretch',
