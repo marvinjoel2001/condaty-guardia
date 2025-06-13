@@ -213,6 +213,42 @@ export const getDateTimeAgo = (
     return getDateTimeStrMes(dateStr, utc);
   }
 };
+export const getTimeAgoSimple = (
+  dateStr: string | null = '',
+  utc: boolean = false,
+): string => {
+  if (!dateStr || dateStr === '') return '';
+
+  let date: any;
+
+  if (esFormatoISO8601(dateStr) || utc) {
+    date = convertirFechaUTCaLocal(dateStr);
+    if (!date) return 'Fecha inválida';
+  } else {
+    date = new Date(dateStr);
+  }
+
+  if (isNaN(date.getTime())) {
+    return 'Fecha inválida';
+  }
+
+  const now: any = convertirFechaUTCaLocal(new Date().toISOString());
+  const diffMs = now.getTime() - date.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) {
+    return 'Hace un momento';
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes} m`;
+  } else if (diffHours < 24) {
+    return `${diffHours} h`;
+  } else {
+    return `${diffDays} d`;
+  }
+};
 
 export const getHour = (dateStr: string | null): string => {
   if (!dateStr || dateStr === '') return '';
@@ -253,13 +289,26 @@ export const formatToDayDDMMYYYYHHMM = (
     // o que el comportamiento de new Date() es aceptable para ellas.
     let tempDate = new Date(dateStr.replace(' ', 'T'));
     if (isNaN(tempDate.getTime())) {
-        const parts = dateStr.split(/[- :\/]/);
-        if (parts.length >= 6) { // YYYY, MM, DD, HH, MM, SS
-             tempDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), Number(parts[3]), Number(parts[4]), Number(parts[5]));
-        } else if (parts.length >= 3) { // YYYY, MM, DD
-             tempDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        }
-        if (isNaN(tempDate.getTime())) return 'Fecha inválida';
+      const parts = dateStr.split(/[- :\/]/);
+      if (parts.length >= 6) {
+        // YYYY, MM, DD, HH, MM, SS
+        tempDate = new Date(
+          Number(parts[0]),
+          Number(parts[1]) - 1,
+          Number(parts[2]),
+          Number(parts[3]),
+          Number(parts[4]),
+          Number(parts[5]),
+        );
+      } else if (parts.length >= 3) {
+        // YYYY, MM, DD
+        tempDate = new Date(
+          Number(parts[0]),
+          Number(parts[1]) - 1,
+          Number(parts[2]),
+        );
+      }
+      if (isNaN(tempDate.getTime())) return 'Fecha inválida';
     }
     dateForFormatting = tempDate;
   }
@@ -278,15 +327,16 @@ export const formatToDayDDMMYYYYHHMM = (
   // Esto es un poco específico, pero lo replicamos para consistencia.
   if (esFormatoISO8601(dateStr)) {
     hora = dateForFormatting.getHours() - GMT; // Si GMT es -4, esto suma 4.
-                                               // Esto implica que `convertirFechaUTCaLocal` para ISO
-                                               // podría devolver un Date cuyas horas son UTC,
-                                               // y este es el ajuste final para mostrar en GMT-4.
+    // Esto implica que `convertirFechaUTCaLocal` para ISO
+    // podría devolver un Date cuyas horas son UTC,
+    // y este es el ajuste final para mostrar en GMT-4.
     if (hora < 0) {
-        hora += 24;
-        // Aquí podría ser necesario ajustar el día, pero tus otras funciones no lo hacen explícitamente en este punto.
+      hora += 24;
+      // Aquí podría ser necesario ajustar el día, pero tus otras funciones no lo hacen explícitamente en este punto.
     }
-    if (hora >= 24) { // Por si acaso GMT es positivo y la suma da >= 24
-        hora -= 24;
+    if (hora >= 24) {
+      // Por si acaso GMT es positivo y la suma da >= 24
+      hora -= 24;
     }
   }
   // Si la hora es exactamente 24:00, se ajusta a 23:59 (lógica de getDateTimeStrMes)

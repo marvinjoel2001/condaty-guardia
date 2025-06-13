@@ -81,11 +81,12 @@ const HeadTitle = ({
   const effectiveIconContainerWidth = 36;
   const iconContainerBorderRadius = effectiveIconContainerWidth / 2;
 
-
   const renderLeftElement = () => {
     if (route.name === 'Home' && !onlyBack) {
       return (
-        <TouchableOpacity onPress={togleDrawer} accessibilityLabel={'Abrir menú'}>
+        <TouchableOpacity
+          onPress={togleDrawer}
+          accessibilityLabel={'Abrir menú'}>
           <View
             style={{
               width: effectiveIconContainerWidth,
@@ -96,7 +97,7 @@ const HeadTitle = ({
               // alignItems: 'center', // Cubierto por alignItems en View
               padding: 8, // Mantenemos padding si el icono se ajusta dentro
               backgroundColor: cssVar.cWhite,
-              borderRadius: iconContainerBorderRadius, 
+              borderRadius: iconContainerBorderRadius,
             }}>
             <Icon name={IconMenu} color={cssVar.cBlack} />
           </View>
@@ -107,7 +108,7 @@ const HeadTitle = ({
     if (back || route.name !== 'Home' || onlyBack) {
       return (
         <TouchableOpacity onPress={goBack} accessibilityLabel={'Volver atrás'}>
-          <View style={theme.back}> 
+          <View style={theme.back}>
             {/* theme.back ya tiene padding: 8. Asumimos que esto + icono = effectiveIconContainerWidth */}
             <Icon name={IconArrowLeft} color={cssVar.cWhite} />
           </View>
@@ -115,7 +116,14 @@ const HeadTitle = ({
       );
     }
     // Si no hay nada a la izquierda por lógica, renderizar un espaciador para mantener equilibrio
-    return <View style={{width: effectiveIconContainerWidth, height: effectiveIconContainerWidth}} />;
+    return (
+      <View
+        style={{
+          width: effectiveIconContainerWidth,
+          height: effectiveIconContainerWidth,
+        }}
+      />
+    );
   };
 
   const renderRightElement = () => {
@@ -124,7 +132,9 @@ const HeadTitle = ({
     }
     if (route.name === 'Home' && !onlyBack) {
       return (
-        <TouchableOpacity onPress={() => navigation.navigate('Notificaciones')} accessibilityLabel={'Notificaciones'}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Notifications')}
+          accessibilityLabel={'Notificaciones'}>
           <View
             style={{
               width: effectiveIconContainerWidth,
@@ -151,7 +161,14 @@ const HeadTitle = ({
     }
     // Espaciador si 'right' no fue provisto Y no es el icono de notificación de Home.
     // Esto cubre pantallas no-Home, y Home con 'onlyBack = true'.
-    return <View style={{width: effectiveIconContainerWidth, height: effectiveIconContainerWidth}} />;
+    return (
+      <View
+        style={{
+          width: effectiveIconContainerWidth,
+          height: effectiveIconContainerWidth,
+        }}
+      />
+    );
   };
 
   return (
@@ -161,11 +178,7 @@ const HeadTitle = ({
       {customTitle ? (
         <View style={theme.customTitle}>{customTitle}</View>
       ) : (
-        <Text
-          style={theme.title}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
+        <Text style={theme.title} numberOfLines={1} ellipsizeMode="tail">
           {title}
         </Text>
       )}
@@ -192,20 +205,23 @@ const theme: ThemeType = {
     flexDirection: 'row',
     justifyContent: 'space-between', // Esto puede ayudar si los elementos laterales son fijos
   },
-  back: { // Este estilo se usa para el contenedor del icono de flecha atrás
+  back: {
+    // Este estilo se usa para el contenedor del icono de flecha atrás
     padding: 8, // Si el icono es 20x20, esto hace el touch target 36x36
     // El ancho/alto implícito será el tamaño del icono + padding
     // No es necesario width/height explícito si el icono + padding dan el tamaño deseado
     justifyContent: 'center',
     alignItems: 'center',
   },
-  customTitle: { // El contenedor del título personalizado
+  customTitle: {
+    // El contenedor del título personalizado
     flex: 1, // Que tome el espacio restante
     // Si customTitle es un Text, necesitaría textAlign: 'center'
     // Si es un View complejo, ese View debe manejar su propio centrado de texto
     marginHorizontal: cssVar.spXs, // Pequeño margen para que no toque los iconos
   },
-  title: { // El componente Text del título
+  title: {
+    // El componente Text del título
     flex: 1, // Que tome el espacio restante
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
