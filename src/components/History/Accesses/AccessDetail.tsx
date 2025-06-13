@@ -44,24 +44,22 @@ interface ModalPersonData {
 
 interface CompanionItemProps {
   companionAccess: any;
-  isFrequentOrGroup?: boolean;
   onPress: () => void;
 }
 
-const CompanionItem = ({ companionAccess, isFrequentOrGroup, onPress }: CompanionItemProps) => {
-  const visit = companionAccess.visit;
+const CompanionItem = ({ companionAccess, onPress }: CompanionItemProps) => {
+  const person = companionAccess.visit || companionAccess;
 
-  if (!visit) return null;
+  if (!person || !person.id) return null;
 
-  const companionFullName = getFullName(visit) || 'N/A';
-  const companionCi = visit.ci ? `C.I. ${visit.ci}` : 'CI no disponible';
-
+  const companionFullName = getFullName(person) || 'N/A';
+  const companionCi = person.ci ? `C.I. ${person.ci}` : 'CI no disponible';
 
   return (
     <TouchableOpacity style={styles.personBlock} onPress={onPress} activeOpacity={0.7}>
       <Avatar
         name={companionFullName}
-        src={visit.url_avatar ? getUrlImages(visit.url_avatar) : undefined}
+        src={person.url_avatar ? getUrlImages(person.url_avatar) : undefined}
         w={40}
         h={40}
         fontSize={cssVar.sL}
@@ -123,13 +121,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     let dataForModal: ModalPersonData;
     let statusTextForModal = '';
     let statusColorForModal = cssVar.cWhite;
+    
+    const personToShow = typeLabel === 'Acompañante' ? (personData.visit || personData) : personData;
 
     if (typeLabel === 'Acompañante') {
       statusTextForModal = personData.out_at ? 'Completado' : personData.in_at ? 'Dentro' : 'Pendiente';
       if (statusTextForModal === 'Completado' || statusTextForModal === 'Dentro') statusColorForModal = cssVar.cSuccess;
 
       dataForModal = {
-        person: personData.visit,
+        person: personToShow,
         typeLabel: 'Acompañante',
         accessInAt: personData.in_at,
         accessOutAt: personData.out_at,
@@ -138,7 +138,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         statusText: statusTextForModal,
         statusColor: statusColorForModal,
       };
-    } else { // Taxista
+    } else {
       statusTextForModal = mainAccessItem.out_at
         ? 'Completado'
         : !mainAccessItem.confirm_at && mainAccessItem.status !== 'X'
@@ -156,13 +156,13 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       if (statusTextForModal === 'Por confirmar') statusColorForModal = cssVar.cWarning;
 
       dataForModal = {
-        person: personData, 
+        person: personToShow, 
         typeLabel: 'Taxista',
         accessInAt: mainAccessItem.in_at,
         accessOutAt: mainAccessItem.out_at,
         accessObsIn: mainAccessItem.obs_in, 
         accessObsOut: mainAccessItem.obs_out, 
-        plate: mainAccessItem.plate,
+        plate: personData.plate,
         statusText: statusTextForModal,
         statusColor: statusColorForModal,
       };
@@ -176,20 +176,22 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     setModalPersonData(null);
   };
 
-
   const renderContent = () => {
     if (!accessData) {
       return <Loading />;
     }
 
     const item = accessData;
-    const mainUser = item.visit || item.owner;
-    const mainUserFullName = getFullName(mainUser) || 'N/A';
-    const mainUserCi = mainUser?.ci;
-    const mainUserPlate = item.plate && !item.taxi ? item.plate : null;
-    const taxiUser = item.taxi ? item.visit : null;
+    const resident = item.owner;                      
+    const mainVisitor = item.visit;                                                                 
+    const driverAccess = item.accesses?.find((acc: any) => acc.taxi === 'C');
+    const driver = driverAccess ? driverAccess.visit : null;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+    const companions = item.accesses?.filter((acc: any) => acc.taxi !== 'C') || [];
 
-    let statusText = '';
+    const mainUserFullName = getFullName(mainVisitor) || 'N/A';
+    const mainUserCi = mainVisitor?.ci;
+
+    let statusText = ''; 
     let statusColor = cssVar.cWhite;
     let tipoAccesoText = '';
 
@@ -234,32 +236,30 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       }
     }
 
-    const isFrequentOrGroup = item.type === 'G' || item.type === 'F';
-
     return (
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.mainCard}>
           <View style={styles.sectionContainer}>
-            <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>Resumen</Text>
-            <View style={styles.personBlock}>
-              <Avatar
-                name={mainUserFullName}
-                src={mainUser?.url_avatar ? getUrlImages(mainUser.url_avatar) : undefined}
-                w={40}
-                h={40}
-
-                fontSize={cssVar.sL}
-               
-              />
-              <View style={styles.personInfoContainer}>
-                <Text style={styles.personName}>{mainUserFullName}</Text>
-                <Text style={styles.personSubDetail}>
-                  {(mainUserCi ? `C.I. ${mainUserCi}` : '') +
-                  (mainUserCi && mainUserPlate && !taxiUser ? ' • ' : '') +
-                  (mainUserPlate && !taxiUser ? `Placa: ${mainUserPlate}` : '') || (mainUserCi ? '' : 'Datos no disponibles')}
-                </Text>
+            <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>Visitante Principal</Text>
+            
+            {mainVisitor ? (
+              <View style={styles.personBlock}>
+                <Avatar
+                  name={mainUserFullName}
+                  src={mainVisitor?.url_avatar ? getUrlImages(mainVisitor.url_avatar) : undefined}
+                  w={40}
+                  h={40}
+                  fontSize={cssVar.sL}
+                />
+                <View style={styles.personInfoContainer}>
+                  <Text style={styles.personName}>{mainUserFullName}</Text>
+                  <Text style={styles.personSubDetail}>
+                    {(mainUserCi ? `C.I. ${mainUserCi}` : '')}
+                  </Text>
+                </View>
               </View>
-            </View>
+            ) : null}
+
             <View style={styles.detailsGroup}>
               <DetailRow label="Tipo de visita" value={tipoAccesoText} />
               <DetailRow label="Estado" value={statusText} valueStyle={{color: statusColor, fontFamily: FONTS.semiBold}} />
@@ -281,12 +281,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
               {item.type === 'O' && (
                 <>
-                  <DetailRow label="Residente" value={getFullName(item.owner)} />
+                  <DetailRow label="Residente" value={getFullName(resident)} />
                 </>
               )}
               {item.type !== 'O' && (
                 <>
-                  <DetailRow label={item.out_at ? "Visitó a" : "Visita a"} value={getFullName(item.owner)} />
+                  <DetailRow label={item.out_at ? "Visitó a" : "Visita a"} value={getFullName(resident)} />
                   {(item.type === 'I' || item.type === 'G' || item.type === 'F') && item.invitation?.date_event && (
                     <DetailRow label="Fecha de invitación" value={getDateStrMes(item.invitation.date_event)} />
                   )}
@@ -305,25 +305,24 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             </View>
           </View>
 
-          {taxiUser && (
+          {driver && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Taxista</Text>
-              <TouchableOpacity onPress={() => handleOpenPersonDetailModal(taxiUser, 'Taxista', item)} activeOpacity={0.7}>
+              <Text style={styles.sectionTitle}>Conductor</Text>
+              <TouchableOpacity onPress={() => handleOpenPersonDetailModal(driverAccess, 'Taxista', item)} activeOpacity={0.7}>
                 <View style={styles.personBlock}>
                   <Avatar
-                      name={getFullName(taxiUser)}
-                      src={taxiUser.url_avatar ? getUrlImages(taxiUser.url_avatar) : undefined}
+                      name={getFullName(driver)}
+                      src={driver.url_avatar ? getUrlImages(driver.url_avatar) : undefined}
                       w={40}
                       h={40}
                       fontSize={cssVar.sL}
-              
                     />
                     <View style={styles.personInfoContainer}>
-                      <Text style={styles.personName}>{getFullName(taxiUser)}</Text>
+                      <Text style={styles.personName}>{getFullName(driver)}</Text>
                       <Text style={styles.personSubDetail}>
-                          {(taxiUser.ci ? `C.I. ${taxiUser.ci}` : '') +
-                           (taxiUser.ci && item.plate ? ' • ' : '') +
-                           (item.plate ? `Placa: ${item.plate}` : '') || 'Datos no disponibles'}
+                          {(driver.ci ? `C.I. ${driver.ci}` : '') +
+                           (driver.ci && driverAccess.plate ? ' • ' : '') +
+                           (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')}
                       </Text>
                     </View>
                     <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
@@ -332,14 +331,13 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             </View>
           )}
 
-          {item.accesses && item.accesses.length > 0 && (
+          {companions && companions.length > 0 && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Acompañante{item.accesses.length > 1 ? 's' : ''}</Text>
-              {item.accesses.map((companionAccess: any, index: number) => (
+              <Text style={styles.sectionTitle}>Acompañante{companions.length > 1 ? 's' : ''}</Text>
+              {companions.map((companionAccess: any, index: number) => (
                 <View key={`companion-wrapper-${companionAccess.id || index}`} style={index > 0 ? styles.additionalCompanionWrapper : null}>
                   <CompanionItem
                     companionAccess={companionAccess}
-                    isFrequentOrGroup={isFrequentOrGroup}
                     onPress={() => handleOpenPersonDetailModal(companionAccess, 'Acompañante', item)}
                   />
                 </View>
@@ -363,7 +361,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           open={isPersonDetailModalVisible} 
           onClose={handleClosePersonDetailModal}
         >
-          {/* El ScrollView y el contenido principal, sin el encabezado manual */}
           <ScrollView contentContainerStyle={styles.personDetailModalInnerContent}>
             <View style={styles.personDetailModalCardContent}>
               <View style={styles.personBlock}>
@@ -373,7 +370,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   w={40}
                   h={40}
                   fontSize={cssVar.sL}
-                 
                 />
                 <View style={styles.personInfoContainer}>
                   <Text style={styles.personName}>{getFullName(modalPersonData.person)}</Text>
@@ -416,7 +412,6 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     marginBottom: cssVar.spL,
-  
   },
   sectionTitle: {
     fontFamily: FONTS.semiBold,
@@ -466,13 +461,11 @@ const styles = StyleSheet.create({
   detailsGroup: {
     flexDirection: 'column',
     gap: cssVar.spM,
-    
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-
   },
   detailLabel: {
     fontFamily: FONTS.regular,
@@ -525,16 +518,10 @@ const styles = StyleSheet.create({
     padding: cssVar.spL,
     maxHeight: '90%', 
   },
-  personDetailModalInnerContent: { // Nuevo estilo para el contentContainerStyle del ScrollView interno
-    paddingVertical: cssVar.spS, // Un poco de padding si es necesario, Modal ya podría tenerlo
+  personDetailModalInnerContent: {
+    paddingVertical: cssVar.spS,
   },
-  personDetailModalCardContent: { // Nuevo estilo para el View que envuelve el contenido principal del modal
-    // backgroundColor: cssVar.cBlack, // El Modal ya tiene este fondo en su theme.container
-    // borderRadius: cssVar.bRadiusL, // El Modal ya tiene esto
-    // padding: cssVar.spL, // El Modal theme.body ya tiene paddingHorizontal y Vertical
-    // No es necesario repetir estilos que el componente Modal ya aplica.
-    // Solo se necesitarían estilos adicionales si quieres algo específico aquí.
-    // Por ahora, lo dejamos vacío o con ajustes mínimos si son necesarios.
+  personDetailModalCardContent: {
   },
 });
 

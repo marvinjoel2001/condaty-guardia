@@ -3,6 +3,7 @@ import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import IndividualQR from './IndividualQR';
 import GroupQR from './GroupQR';
 import KeyQR from './KeyQR';
+import FrequentQR from './FrequentQR';
 import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
 import {getUTCNow} from '../../../../mk/utils/dates';
@@ -76,7 +77,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     if (type === 'O') {
       getOwner();
     }
-    if (type === 'I' || type === 'G') {
+    if (type === 'I' || type === 'G' || type === 'F') {
       getInvitation();
     }
   }, []);
@@ -103,7 +104,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
 
   const validate = () => {
     let errors: any = {...formState.errors};
-    if (type == 'I' || type == 'G') {
+    if (type == 'I' || type == 'G' || type == 'F') {
       errors = checkRules({
         value: formState.ci,
         rules: ['required', 'ci'],
@@ -190,7 +191,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         begin_at: formState?.begin_at || getUTCNow(),
       };
     }
-    if (type == 'I' || type == 'G') {
+    if (type == 'I' || type == 'G' || type == 'F') {
       parms = {
         type: type,
         invitation_id: data?.id,
@@ -235,7 +236,13 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   return (
     <ModalFull
       title={
-        type === 'I' ? 'QR individual' : type === 'G' ? 'QR grupal' : 'Llave QR'
+        type === 'I' 
+          ? 'QR individual' 
+          : type === 'G' 
+          ? 'QR grupal' 
+          : type === 'F'
+          ? 'QR frecuente'
+          : 'Llave QR'
       }
       open={open}
       onClose={onClose}
@@ -266,6 +273,16 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           setErrors={setErrors}
           setOpenSelected={setOpenSelected}
           openSelected={openSelected}
+        />
+      )}
+      {type === 'F' && (
+        <FrequentQR
+          setFormState={setFormState}
+          formState={formState}
+          handleChange={handleChange}
+          data={data}
+          errors={errors}
+          setErrors={setErrors}
         />
       )}
       {type === 'O' && (
