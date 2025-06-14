@@ -109,7 +109,8 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         fullType: 'L',
         searchBy: formState.ci,
       },
-      // 3
+      false,
+      3,
     );
     setVisit(visitData?.data);
     if (visitData?.data.length === 0) {

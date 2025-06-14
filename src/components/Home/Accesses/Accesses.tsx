@@ -11,6 +11,7 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
 import {buttonPrimary, buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
+import DetAccessesOld from './DetAccessesOld';
 interface PropsType {
   data: any;
   reload: any;
@@ -309,7 +310,7 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
       {dataAcesses?.map((item: any) => renderItemAccess(item))}
       {dataOrders?.map((item: any) => renderItemOrder(item))}
       {openDetail && (
-        <DetAccesses
+        <DetAccessesOld
           id={formState?.id}
           open={openDetail}
           close={() => setOpenDetail(false)}
