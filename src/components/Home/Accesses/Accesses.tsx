@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import ItemListDate from './shares/ItemListDate';
@@ -18,6 +18,18 @@ interface PropsType {
   typeSearch: string;
   loaded: boolean;
 }
+const statusText: any = {
+  E: 'Esperando aprobación',
+  A: 'Dejar entrar',
+  N: 'Rechazado',
+  S: 'Dejar salir',
+};
+const statusColor: any = {
+  E: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
+  A: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
+  N: {color: cssVar.cError, background: cssVar.cHoverError},
+  S: {color: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
+};
 const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
@@ -94,26 +106,56 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
     return (
       <Text
         style={{fontSize: 10, fontFamily: FONTS.regular, color: cssVar.cWhite}}>
-        Esperando Confirmación
+        Esperando aprobación
       </Text>
     );
   };
 
-  const rightAccess = (item: any) => {
+  const getStatus = (item: any) => {
     if (!item?.in_at && !item?.confirm_at) {
-      return waitingConfirmation(item);
+      return 'E';
     }
     if (!item?.in_at && item?.confirm_at) {
       if (item?.confirm === 'Y') {
-        return allowIn(item);
+        return 'A';
       } else if (item?.confirm === 'N') {
-        return notAutorized(item);
+        return 'N';
       }
     }
     if (item?.type !== 'O' && item?.in_at && !item?.out_at) {
-      return allotOut(item);
+      return 'S';
     }
-    return null;
+    return '';
+  };
+
+  const rightAccess = (item: any) => {
+    // if (!item?.in_at && !item?.confirm_at) {
+    //   return waitingConfirmation(item);
+    // }
+    // if (!item?.in_at && item?.confirm_at) {
+    //   if (item?.confirm === 'Y') {
+    //     return allowIn(item);
+    //   } else if (item?.confirm === 'N') {
+    //     return notAutorized(item);
+    //   }
+    // }
+    // if (item?.type !== 'O' && item?.in_at && !item?.out_at) {
+    //   return allotOut(item);
+    // }
+    // return null;
+    return (
+      <Text
+        style={{
+          fontSize: 10,
+          color: statusColor[getStatus(item)].color,
+          backgroundColor: statusColor[getStatus(item)].background,
+          padding: 4,
+          borderRadius: 4,
+          fontFamily: FONTS.regular,
+        }}>
+        {statusText[getStatus(item)]}
+      </Text>
+    );
   };
   const right = (item: any) => {
     // Si el pedido está cancelado, mostramos un texto de "Cancelado"
@@ -310,7 +352,7 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
       {dataAcesses?.map((item: any) => renderItemAccess(item))}
       {dataOrders?.map((item: any) => renderItemOrder(item))}
       {openDetail && (
-        <DetAccessesOld
+        <DetAccesses
           id={formState?.id}
           open={openDetail}
           close={() => setOpenDetail(false)}

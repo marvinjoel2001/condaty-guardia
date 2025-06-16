@@ -1,31 +1,38 @@
 // DetAccesses.tsx
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import LineDetail from './shares/LineDetail';
 import useApi from '../../../../mk/hooks/useApi';
 import {getAccessType} from '../../../../mk/utils/utils';
-import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {getDateTimeStrMes} from '../../../../mk/utils/dates';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import List from '../../../../mk/components/ui/List/List';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import ItemListDate from './shares/ItemListDate';
-import {IconCheck, IconCheckOff} from '../../../icons/IconLibrary';
+import {IconCheck, IconCheckOff, IconExpand} from '../../../icons/IconLibrary';
 import useAuth from '../../../../mk/hooks/useAuth';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
+import ModalAccessExpand from './ModalAccessExpand';
+
+const statusColor: any = {
+  I: cssVar.cAlertMedio,
+  Y: cssVar.cSuccess,
+  N: cssVar.cError,
+  S: cssVar.cSuccess,
+  C: cssVar.cSuccess,
+};
 
 const DetAccesses = ({id, open, close, reload}: any) => {
   const {showToast} = useAuth();
   const {execute, waiting} = useApi();
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
-  const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
+  const [formState, setFormState]: any = useState({});
+  const [openDet, setOpenDet] = useState({open: false, id: null, type: ''});
   const getData = async (id: number) => {
     try {
       const {data} = await execute('/accesses', 'GET', {
@@ -67,7 +74,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       close();
       return;
     }
-    //  console.log('status desde save',acompanSelect)
     if (status === 'I') {
       if (Object.values(acompanSelect).every(value => !value)) {
         console.log(
@@ -162,9 +168,10 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const getStatusText = () => {
     const status = getStatus();
     const statusTexts: Record<string, string> = {
-      I: 'Por salir',
-      Y: 'Por ingresar',
-      S: 'Esperando confirmación',
+      I: 'Dejar salir',
+      Y: 'Dejar ingresar',
+      N: 'Rechazado',
+      S: 'Esperando aprobación',
       C: 'Completado',
     };
     return statusTexts[status] || '';
@@ -176,72 +183,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     const status = getStatus();
     return (
       <>
-        {/* <LineDetail label="Estado:" value={statusText || 'Completado'} />
-        <LineDetail label="Tipo:" value={accessType} />
-        {(data?.type === 'I' || data?.type === 'G') && data?.invitation && (
-          <>
-            {data?.type === 'G' && data?.invitation?.title && (
-              <LineDetail label="Evento:" value={data?.invitation?.title} />
-            )}
-            <LineDetail
-              label="Fecha de invitación:"
-              value={getDateStrMes(data?.invitation?.date_event)}
-            />
-            {data?.invitation?.obs && (
-              <LineDetail label="Descripción:" value={data?.invitation?.obs} />
-            )}
-          </>
-        )}
-        {data?.type === 'P' && (
-          <LineDetail label="Conductor:" value={getFullName(data?.visit)} />
-        )}
-        {data?.plate && !data?.taxi && (
-          <LineDetail label="Placa:" value={data?.plate} />
-        )}
-        <LineDetail
-          label={data?.in_at && data?.out_at ? 'Visitó a:' : 'Visita a:'}
-          value={getFullName(data?.owner)}
-        />
-        {status === 'Denegado' && (
-          <>
-            <LineDetail
-              label="Fecha de denegación:"
-              value={getDateStrMes(data?.confirm_at)}
-            />
-            <LineDetail label="Motivo:" value={data?.obs_confirm} />
-          </>
-        )}
-        {data?.out_at ? (
-          <>
-            <LineDetail
-              label="Guardia de entrada:"
-              value={getFullName(data?.guardia)}
-            />
-            {data?.out_guard && data?.guardia?.id !== data?.out_guard?.id && (
-              <LineDetail
-                label="Guardia de salida:"
-                value={getFullName(data?.out_guard)}
-              />
-            )}
-            {data?.obs_guard && (
-              <LineDetail label="Obs. de solicitud:" value={data?.obs_guard} />
-            )}
-            {data?.obs_in && (
-              <LineDetail label="Obs. de entrada:" value={data?.obs_in} />
-            )}
-            {data?.obs_out && (
-              <LineDetail label="Obs. de salida:" value={data?.obs_out} />
-            )}
-          </>
-        ) : (
-          <>
-            {data?.obs_in ? (
-              <LineDetail label="Obs. de entrada:" value={data?.obs_in} />
-            ) : data?.obs_out ? (
-              <LineDetail label="Obs. de salida:" value={data?.obs_out} />
-            ) : null}
-          </>
-        )} */}
         <Card>
           <Text style={styles.labelAccess}>
             {status == 'I' ? 'Visitó a' : 'Visita a'}
@@ -271,15 +212,45 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       </>
     );
   };
-
-  const getCheckVisit = (visit: any, isSelected: boolean) => {
+  const Br = () => {
+    return (
+      <View
+        style={{
+          height: 0.5,
+          backgroundColor: cssVar.cWhiteV1,
+          marginVertical: 8,
+          width: '100%',
+        }}
+      />
+    );
+  };
+  const getCheckVisit = (
+    visit: any,
+    isSelected: boolean,
+    type: 'A' | 'T' | 'I',
+  ) => {
     const status = getStatus(visit);
 
-    if (status == 'S')
-      return <Text style={{color: cssVar.cWhite}}>Sin confirmar</Text>;
-    if (status == 'N')
-      return <Text style={{color: cssVar.cError}}>No Autorizado</Text>;
-    if (status == 'C') return null;
+    // if (status == 'S')
+    // return (
+    //   <Text style={{color: cssVar.cWhite, fontSize: 10}}>
+    //     Esperando aprobación
+    //   </Text>
+    // );
+    // if (status == 'N')
+    // return (
+    //   <Text style={{color: cssVar.cError, fontSize: 10}}>Rechazado</Text>
+    // );
+    if (status == 'C') {
+      return (
+        <Icon
+          name={IconExpand}
+          onPress={() => setOpenDet({open: true, id: visit?.id, type: type})}
+          color={cssVar.cWhiteV1}
+        />
+      );
+    }
+    if (status == 'S' || status == 'N') return null;
 
     return (
       <Icon
@@ -300,10 +271,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     let visit = data.visit ? data.visit : data.owner;
 
     const isSelected = acompanSelect[data?.id || '0'];
-    console.log(data);
     const acompData = data?.accesses.filter((item: any) => item.taxi != 'C');
     const taxi = data?.accesses.filter((item: any) => item.taxi == 'C');
-
     return (
       <Card>
         <Text style={styles.labelAccess}>Detalle del visitante</Text>
@@ -315,13 +284,19 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           right={
             data?.out_at || status === 'Y'
               ? null
-              : getCheckVisit(data, isSelected)
+              : getCheckVisit(data, isSelected, 'I')
           }
-
           // date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
         />
         <KeyValue keys="Tipo de visita" value={accessType} />
-        <KeyValue keys="Estado" value={statusText} />
+        <KeyValue
+          keys="Estado"
+          value={statusText}
+          colorValue={statusColor[getStatus()]}
+        />
+        {data?.confirm == 'N' && data?.obs_confirm && (
+          <KeyValue keys="Motivo del rechazo" value={data?.obs_confirm} />
+        )}
         {data?.in_at && (
           <>
             <KeyValue
@@ -329,12 +304,19 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               value={getDateTimeStrMes(data?.in_at, true)}
             />
             <KeyValue
-              keys="Guardia de ingreso"
+              keys={
+                !data?.out_guard && !data?.out_at
+                  ? 'Guardia de ingreso'
+                  : 'Guardia de ingreso y salida'
+              }
               value={getFullName(data?.guardia)}
             />
-            {data?.data?.obs_in && (
-              <KeyValue keys="Observación de ingreso" value={data?.obs_in} />
-            )}
+            {/* {data?.obs_in && ( */}
+            <KeyValue
+              keys="Observación de ingreso"
+              value={data?.obs_in || '-/-'}
+            />
+            {/* )} */}
           </>
         )}
         {data?.out_at && (
@@ -343,17 +325,23 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               keys="Fecha y hora de salida"
               value={getDateTimeStrMes(data?.out_at, true)}
             />
-            <KeyValue
-              keys="Guardia de salida"
-              value={getFullName(data?.out_guard)}
-            />
-            {data?.data?.obs_out && (
-              <KeyValue keys="Observación de salida" value={data?.obs_out} />
+            {data?.out_guard && (
+              <KeyValue
+                keys="Guardia de salida"
+                value={getFullName(data?.out_guard)}
+              />
             )}
+            {/* {data?.obs_out && ( */}
+            <KeyValue
+              keys="Observación de salida"
+              value={data?.obs_out || '-/-'}
+            />
+            {/* )} */}
           </>
         )}
         {acompData?.length > 0 && (
           <>
+            <Br />
             <Text style={styles.labelAccess}>Acompañantes</Text>
             {acompData.map((item: any) => (
               <ItemList
@@ -362,9 +350,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 subtitle={'C.I:' + item?.visit?.ci}
                 left={<Avatar name={getFullName(item?.visit)} />}
                 right={
-                  item?.out_at || status === 'Y'
+                  status === 'Y'
                     ? null
-                    : getCheckVisit(item, acompanSelect[item?.id || '0'])
+                    : getCheckVisit(item, acompanSelect[item?.id || '0'], 'A')
                 }
                 // date={<ItemListDate inDate={item?.in_at} outDate={item?.out_at} />}
               />
@@ -373,6 +361,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         )}
         {taxi?.length > 0 && (
           <>
+            <Br />
             <Text style={styles.labelAccess}>Taxista</Text>
             {taxi.map((item: any) => (
               <ItemList
@@ -381,9 +370,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 subtitle={'C.I:' + item?.visit?.ci}
                 left={<Avatar name={getFullName(item?.visit)} />}
                 right={
-                  item?.out_at || status === 'Y'
+                  status === 'Y'
                     ? null
-                    : getCheckVisit(item, acompanSelect[item?.id || '0'])
+                    : getCheckVisit(item, acompanSelect[item?.id || '0'], 'T')
                 }
                 // date={<ItemListDate inDate={item?.in_at} outDate={item?.out_at} />}
               />
@@ -393,16 +382,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       </Card>
     );
   };
-
-  // const detailCompanions = () => {
-  //   if (data?.accesses?.length == 0) return null;
-  //   return (
-  //     <>
-  //       <Text style={styles.labelAccess}>Acompañantes</Text>
-  //       <List data={data?.accesses} renderItem={detailVisit} />
-  //     </>
-  //   );
-  // };
 
   const getObs = () => {
     const status = getStatus();
@@ -427,16 +406,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     return null;
   };
 
-  const typeLabels: Record<'O' | 'P' | 'I' | 'G', string> = {
-    O: 'Residente',
-    P: 'Repartidor',
-    I: 'Visitante individual',
-    G: 'Visitante grupal',
-  };
-
-  const type = typeLabels[data?.type as 'O' | 'P' | 'I' | 'G'] || '';
-
-  // let type =
   return (
     <ModalFull
       onClose={() => close()}
@@ -462,6 +431,14 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           {getObs()}
         </>
         // </Card>
+      )}
+      {openDet.open && (
+        <ModalAccessExpand
+          open={openDet.open}
+          type={openDet.type}
+          id={openDet.id}
+          onClose={() => setOpenDet({open: false, id: null, type: ''})}
+        />
       )}
     </ModalFull>
   );

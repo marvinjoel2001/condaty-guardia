@@ -116,7 +116,8 @@ const theme: ThemeType = {
     backgroundColor: cssVar.cWhiteV2,
     padding: 12,
     borderRadius: 12,
-    marginVertical: 4,
+    // marginVertical: 4,
+    marginBottom: 8,
   },
   container: {
     overflow: 'hidden',
