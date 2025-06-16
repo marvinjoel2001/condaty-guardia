@@ -269,6 +269,7 @@ const IndividualQR = ({
           {!access?.[0]?.in_at && data?.status !== 'X' && (
             <View style={styles.tabsContainer}>
               <TabsButtons
+                style={{marginVertical: 0}}
                 tabs={[
                   {value: 'P', text: 'A pie'},
                   {value: 'V', text: 'En vehículo'},
@@ -310,6 +311,7 @@ const IndividualQR = ({
                     value={formState?.ci_taxi || ''}
                     onBlur={onExistTaxi}
                     onChange={(value: string) => handleChange('ci_taxi', value)}
+                    style={{marginTop:12}}
                     
                   />
                   <InputFullName
@@ -336,7 +338,7 @@ const IndividualQR = ({
               <TouchableOpacity
                 style={{
                   alignSelf: 'flex-start',
-                  marginVertical: 4,
+                 // marginVertical: 4,
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}
@@ -392,9 +394,9 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     paddingTop: 16,
-    paddingBottom: 32, 
+    paddingBottom: 32,
     flexDirection: 'column',
-    gap: 20, 
+    gap: 12,
   },
   residentCard: {
     backgroundColor: '#333536',
@@ -458,6 +460,7 @@ const styles = StyleSheet.create({
     color: cssVar.cWhiteV1 || '#D0D0D0',
   },
   tabsContainer: {
+    marginVertical: 0,
   },
   formSection: { 
     flexDirection: 'column',

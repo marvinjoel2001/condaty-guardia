@@ -8,6 +8,8 @@ import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
 import {getUTCNow} from '../../../../mk/utils/dates';
 import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import Loading from '../../../../mk/components/ui/Loading/Loading';
+
 interface TypeProps {
   code: string;
   open: boolean;
@@ -22,68 +24,102 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [data, setData]: any = useState(null);
   const {execute} = useApi();
   const {showToast} = useAuth();
-  const type = code[2];
+
+  const typeFromQr = code[2];
   const codeId: any = code[3];
+
   const handleChange = (key: string, value: any) => {
-    setFormState({...formState, [key]: value});
-  };
-
-  const getOwner = async () => {
-    const time: any = new Date();
-    const ltime: any =
-      time.getHours() + time.getDate() + time.getMonth() + time.getFullYear();
-    const status =
-      codeId.indexOf(ltime) > -1
-        ? 'A'
-        : codeId.indexOf(ltime - 4) > -1
-        ? 'A'
-        : 'X';
-    let id = codeId.replace(ltime, '');
-    id = id.replace(ltime - 4, '');
-
-    const {data: QR} = await execute('/owners', 'GET', {
-      searchBy: id,
-      fullType: 'KEY',
-    });
-    if (QR?.success == true) {
-      setData({
-        invitation: QR?.data[0],
-        type: 'O',
-        status,
-      });
-    } else {
-      onClose();
-    }
-  };
-  const getInvitation = async () => {
-    const {data: invitation, errors} = await execute(
-      '/invitations',
-      'GET',
-      {
-        perPage: -1,
-        qr: type,
-        searchBy: codeId,
-        fullType: 'L',
-      },
-      false,
-      3,
-    );
-    if (invitation?.success == true) {
-      setData({...invitation?.data[0]});
-    }
+    setFormState((prevState:any) => ({...prevState, [key]: value}));
   };
 
   useEffect(() => {
-    if (type === 'O') {
-      getOwner();
+    const getOwner = async () => {
+      const time: any = new Date();
+      const ltime: any =
+        time.getHours() + time.getDate() + time.getMonth() + time.getFullYear();
+      const status =
+        codeId.indexOf(ltime) > -1
+          ? 'A'
+          : codeId.indexOf(ltime - 4) > -1
+          ? 'A'
+          : 'X';
+      let id = codeId.replace(ltime, '');
+      id = id.replace(ltime - 4, '');
+
+      const {data: QR} = await execute('/owners', 'GET', {
+        searchBy: id,
+        fullType: 'KEY',
+      });
+      if (QR?.success && QR.data?.[0]) {
+        setData({
+          invitation: QR.data[0],
+          type: 'O',
+          status,
+        });
+      } else {
+        showToast(QR?.message || 'Llave QR no válida.', 'error');
+        onClose();
+      }
+    };
+    
+    const getInvitation = async () => {
+      const {data: invitation} = await execute(
+        '/invitations',
+        'GET',
+        {
+          perPage: -1,
+          qr: typeFromQr,
+          searchBy: codeId,
+          fullType: 'L',
+        },
+        false,
+        3,
+      );
+      if (invitation?.success && invitation.data?.[0]) {
+        setData(invitation.data[0]);
+      } else {
+        showToast(invitation?.message || 'Invitación no encontrada.', 'error');
+        onClose();
+      }
+    };
+    
+    if (open) {
+        setData(null);
+        setFormState({});
+        if (typeFromQr === 'O') {
+            getOwner();
+        } else if (['I', 'G', 'F'].includes(typeFromQr)) {
+            getInvitation();
+        } else {
+          showToast('Tipo de QR no reconocido.', 'error');
+          onClose();
+        }
     }
-    if (type === 'I' || type === 'G' || type === 'F') {
-      getInvitation();
+  }, [code, open]);
+
+  useEffect(() => {
+    if (data) {
+      const currentVisit = data.visit;
+      const lastAccessRecord = data.access && data.access.length > 0 ? data.access[data.access.length - 1] : null;
+      const visitorIsInside = lastAccessRecord && lastAccessRecord.in_at && !lastAccessRecord.out_at;
+
+      setFormState((prevState:any) => ({
+        ...prevState,
+        ci: currentVisit?.ci || '',
+        name: currentVisit?.name || '',
+        middle_name: currentVisit?.middle_name || '',
+        last_name: currentVisit?.last_name || '',
+        mother_last_name: currentVisit?.mother_last_name || '',
+        visit_id: currentVisit?.id || null,
+        access_id: visitorIsInside ? lastAccessRecord.id : null,
+        obs_in: visitorIsInside ? lastAccessRecord.obs_in : '',
+        obs_out: '',
+      }));
     }
-  }, []);
+  }, [data]);
 
   const onOut = async () => {
-    const {data: In, error: err} = await execute(
+    const {data: In} = await execute(
       '/accesses/exit',
       'POST',
       {
@@ -93,107 +129,55 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       false,
       3,
     );
-    if (In?.success == true) {
+    if (In?.success) {
       if (reload) reload();
       onClose();
       showToast('El visitante salió', 'success');
     } else {
-      showToast(In.err, 'error');
+      showToast(In.message || 'Error al registrar la salida.', 'error');
     }
   };
 
   const validate = () => {
-    let errors: any = {...formState.errors};
-    if (type == 'I' || type == 'G' || type == 'F') {
-      errors = checkRules({
-        value: formState.ci,
-        rules: ['required', 'ci'],
-        key: 'ci',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.name,
-        rules: ['required', 'alpha'],
-        key: 'name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.middle_name,
-        rules: ['alpha'],
-        key: 'middle_name',
-        errors,
-      });
-
-      errors = checkRules({
-        value: formState.last_name,
-        rules: ['required', 'alpha'],
-        key: 'last_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.mother_last_name,
-        rules: ['alpha'],
-        key: 'mother_last_name',
-        errors,
-      });
-      if (formState?.tab == 'V' || formState?.tab == 'T') {
-        errors = checkRules({
-          value: formState.plate,
-          rules: ['required', 'plate'],
-          key: 'plate',
-          errors,
-        });
-        if (formState?.tab == 'T') {
-          errors = checkRules({
-            value: formState.ci_taxi,
-            rules: ['required', 'ci'],
-            key: 'ci_taxi',
-            errors,
-          });
-          errors = checkRules({
-            value: formState.name_taxi,
-            rules: ['required', 'alpha'],
-            key: 'name_taxi',
-            errors,
-          });
-
-          errors = checkRules({
-            value: formState.middle_name_taxi,
-            rules: ['alpha'],
-            key: 'middle_name_taxi',
-            errors,
-          });
-          errors = checkRules({
-            value: formState.last_name_taxi,
-            rules: ['required', 'alpha'],
-            key: 'last_name_taxi',
-            errors,
-          });
-          errors = checkRules({
-            value: formState.mother_last_name_taxi,
-            rules: ['alpha'],
-            key: 'mother_last_name_taxi',
-            errors,
-          });
+    let currentErrors: any = {};
+    if (!data) return currentErrors;
+    
+    if (['I', 'G', 'F'].includes(data.type)) {
+      currentErrors = checkRules({ value: formState.ci, rules: ['required', 'ci'], key: 'ci', errors: currentErrors });
+      currentErrors = checkRules({ value: formState.name, rules: ['required', 'alpha'], key: 'name', errors: currentErrors });
+      currentErrors = checkRules({ value: formState.middle_name, rules: ['alpha'], key: 'middle_name', errors: currentErrors });
+      currentErrors = checkRules({ value: formState.last_name, rules: ['required', 'alpha'], key: 'last_name', errors: currentErrors });
+      currentErrors = checkRules({ value: formState.mother_last_name, rules: ['alpha'], key: 'mother_last_name', errors: currentErrors });
+      
+      if (formState?.tab === 'V' || formState?.tab === 'T') {
+        currentErrors = checkRules({ value: formState.plate, rules: ['required', 'plate'], key: 'plate', errors: currentErrors });
+        if (formState?.tab === 'T') {
+          currentErrors = checkRules({ value: formState.ci_taxi, rules: ['required', 'ci'], key: 'ci_taxi', errors: currentErrors });
+          currentErrors = checkRules({ value: formState.name_taxi, rules: ['required', 'alpha'], key: 'name_taxi', errors: currentErrors });
+          currentErrors = checkRules({ value: formState.last_name_taxi, rules: ['required', 'alpha'], key: 'last_name_taxi', errors: currentErrors });
         }
       }
     }
-    setErrors(errors);
-    return errors;
+    setErrors(currentErrors);
+    return currentErrors;
   };
 
   const onSaveAccess = async () => {
-    let parms = {};
-    if (type == 'O') {
-      parms = {
-        type: type,
+    if (!data) return;
+    if (hasErrors(validate())) {
+      return;
+    }
+    
+    let params = {};
+    if (data.type === 'O') {
+      params = {
+        type: data.type,
         owner_id: data?.invitation?.id,
         begin_at: formState?.begin_at || getUTCNow(),
       };
-    }
-    if (type == 'I' || type == 'G' || type == 'F') {
-      parms = {
-        type: type,
+    } else if (['I', 'G', 'F'].includes(data.type)) {
+      params = {
+        type: data.type,
         invitation_id: data?.id,
         acompanantes: formState?.acompanantes || [],
         begin_at: formState?.begin_at || getUTCNow(),
@@ -211,18 +195,16 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         mother_last_name_taxi: formState?.mother_last_name_taxi,
         visit_id: formState?.visit_id,
       };
-      if (hasErrors(validate())) {
-        return;
-      }
     }
-    const {data: In, error: err} = await execute(
+
+    const {data: In} = await execute(
       '/accesses/enterqr',
       'POST',
-      parms,
+      params,
       false,
       3,
     );
-    if (In?.success == true) {
+    if (In?.success) {
       if (reload) reload();
       showToast('Registrado con éxito', 'success');
       setFormState({});
@@ -232,67 +214,56 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       onClose();
     }
   };
+  
+  const renderContent = () => {
+    if (!data) {
+      return <Loading/>;
+    }
+    switch (data.type) {
+      case 'I':
+        return <IndividualQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} errors={errors} setErrors={setErrors}/>;
+      case 'G':
+        return <GroupQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} errors={errors} setErrors={setErrors} setOpenSelected={setOpenSelected} openSelected={openSelected} />;
+      case 'F':
+        return <FrequentQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} errors={errors} setErrors={setErrors} />;
+      case 'O':
+        return <KeyQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} />;
+      default:
+        return null;
+    }
+  }
+
+  const getModalTitle = () => {
+    if (!data) return 'Cargando...';
+    switch (data.type) {
+      case 'I': return 'QR Individual';
+      case 'G': return 'QR Grupal';
+      case 'F': return 'QR Frecuente';
+      case 'O': return 'Llave QR';
+      default: return 'Detalle de QR';
+    }
+  }
+  
+  const lastAccess = data?.access && data.access.length > 0 ? data.access[data.access.length - 1] : null;
+  const isCurrentlyInside = lastAccess && lastAccess.in_at && !lastAccess.out_at;
 
   return (
     <ModalFull
-      title={
-        type === 'I' 
-          ? 'QR individual' 
-          : type === 'G' 
-          ? 'QR grupal' 
-          : type === 'F'
-          ? 'QR frecuente'
-          : 'Llave QR'
-      }
+      title={getModalTitle()}
       open={open}
       onClose={onClose}
       onSave={() => {
-        formState?.access_id ? onOut() : onSaveAccess();
+        isCurrentlyInside ? onOut() : onSaveAccess();
       }}
       buttonCancel=""
       buttonText={
-        (!openSelected && type == 'G') || data?.status == 'X' ? '' : 'Dejar ingresar'
+        (!openSelected && data?.type === 'G') || data?.status === 'X' 
+        ? '' 
+        : isCurrentlyInside 
+        ? 'Registrar Salida' 
+        : 'Dejar Ingresar'
       }>
-      {type === 'I' && (
-        <IndividualQR
-          setFormState={setFormState}
-          formState={formState}
-          handleChange={handleChange}
-          data={data}
-          errors={errors}
-          setErrors={setErrors}
-        />
-      )}
-      {type === 'G' && (
-        <GroupQR
-          setFormState={setFormState}
-          formState={formState}
-          handleChange={handleChange}
-          data={data}
-          errors={errors}
-          setErrors={setErrors}
-          setOpenSelected={setOpenSelected}
-          openSelected={openSelected}
-        />
-      )}
-      {type === 'F' && (
-        <FrequentQR
-          setFormState={setFormState}
-          formState={formState}
-          handleChange={handleChange}
-          data={data}
-          errors={errors}
-          setErrors={setErrors}
-        />
-      )}
-      {type === 'O' && (
-        <KeyQR
-          setFormState={setFormState}
-          formState={formState}
-          handleChange={handleChange}
-          data={data}
-        />
-      )}
+      {renderContent()}
     </ModalFull>
   );
 };
