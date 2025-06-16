@@ -360,7 +360,7 @@ const GroupQR = ({
                     : 'C.I. (Sin registrar)'
                 }
                 left={<Avatar name={getFullName(selectedVisit?.visit)} />}
-                style={{marginBottom: 16}}
+                
               />
               {!selectedVisit?.visit?.ci && (
                 <>
@@ -399,7 +399,7 @@ const GroupQR = ({
 
                 {tab == 'V' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
                     <Input
-                      label="Placa"
+                      label="Placalosa"
                       type="text"
                       name="plate"
                       error={errors}
@@ -408,7 +408,7 @@ const GroupQR = ({
                       onChange={(value: any) => {
                         handleChange('plate', value);
                       }}
-                      style={{marginTop:12}}
+                    
                     />
                   )}
                   {tab == 'T' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
@@ -640,8 +640,8 @@ const styles = StyleSheet.create({
   transportButtonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-
     alignSelf: 'stretch',
+    marginVertical: 12,
 
   },
   transportButtonBase: {
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
   addCompanionLinkContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop:12
+
 
   },
   addCompanionLinkText: {

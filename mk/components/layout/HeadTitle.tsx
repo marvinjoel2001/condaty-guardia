@@ -6,17 +6,12 @@ import {
   IconArrowLeft,
   IconMenu,
   IconNotification,
-  IconSingleQr,
+  IconGenericQr,
   IconTrash,
 } from '../../../src/icons/IconLibrary';
-import Avatar from '../ui/Avatar/Avatar';
-import {getFullName, getUrlImages} from '../../utils/strings';
 import useAuth from '../../hooks/useAuth';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../styles/themes';
-import {getPercentajeUser, navigate} from '../../utils/utils';
-import TextLog from '../ui/TextLog/TextLog';
 import {useEvent} from '../../hooks/useEvent';
-import {IconGenericQr} from '../../../src/icons/IconLibrary';
 
 interface HeadTitleProps {
   title: string;
@@ -39,7 +34,6 @@ const HeadTitle = ({
   onBack = null,
   right,
   back = false,
-  avatar = false,
   onlyBack = false,
   iconClose = true,
 }: HeadTitleProps) => {
@@ -50,15 +44,12 @@ const HeadTitle = ({
   const [selected, setSelected]: any = useState({cant: 0, type: ''});
 
   const onNotif = useCallback((data: any) => {
-    console.log('nueva counter', data);
     setCounter(old => old + 1);
   }, []);
   const onResetNotif = useCallback((data: any) => {
-    console.log('nueva counter', data);
     setCounter(0);
   }, []);
   const onSelect = useCallback((data: any) => {
-    console.log('onSelect', data);
     setSelected(data);
   }, []);
 
@@ -83,44 +74,32 @@ const HeadTitle = ({
     navigation.toggleDrawer();
   };
 
-  return (
-    <Animated.View style={{...theme.container, ...style}}>
-      {route.name == 'Home' && !onlyBack ? (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 8,
-            backgroundColor: cssVar.cBlack,
-            borderRadius: '100%',
-          }}
-          onTouchEnd={() => togleDrawer()}>
-          <Icon name={IconMenu} color={cssVar.cWhite} />
-        </View>
-      ) : iconClose ? (
+  const renderLeftComponent = () => {
+    if (route.name === 'Home' && !onlyBack) {
+      return (
+        <TouchableOpacity onPress={togleDrawer}>
+          <View style={theme.sideComponent}>
+            <Icon name={IconMenu} color={cssVar.cWhite} />
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    if (iconClose) {
+      return (
         <TouchableOpacity onPress={goBack} accessibilityLabel={'Volver atrás'}>
-          <View style={theme.back}>
+          <View style={theme.sideComponent}>
             <Icon name={IconArrowLeft} color={cssVar.cWhite} />
           </View>
         </TouchableOpacity>
-      ) : null}
+      );
+    }
+    return <View style={theme.sideComponent} />;
+  };
 
-      {customTitle ? (
-        <View style={theme.customTitle}>{customTitle}</View>
-      ) : (
-        <Text
-          style={{
-            ...theme.title,
-          }}>
-          {selected?.cant == 0 ? title : selected?.cant + ' seleccionados'}
-        </Text>
-      )}
-      {selected?.cant > 0 ? (
-        <View
-          style={{
-            flexDirection: 'row',
-            gap: 12,
-          }}>
+  const renderRightComponent = () => {
+    if (selected?.cant > 0) {
+      return (
+        <View style={theme.rightContainer}>
           <Icon
             onPress={() => {
               dispatch({action: 'delete', type: selected?.type});
@@ -139,36 +118,45 @@ const HeadTitle = ({
             color={cssVar.cWhite}
           />
         </View>
-      ) : (
-        right && <View>{right}</View>
-      )}
-
-      {!right && route.name !== 'Home' && selected?.cant == 0 && (
-        <View style={{width: 34, height: 34}}></View>
-      )}
-      {route.name == 'Home' && !onlyBack && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 8,
-            backgroundColor: cssVar.cBlack,
-            borderRadius: '100%',
-          }}
-          onTouchEnd={() => {
-            navigation.navigate('Notifications');
-          }}>
-          <Icon name={IconNotification} color={cssVar.cWhite} />
-          {counter > 0 && (
-            <View style={theme.notifPoint}>
-              <Text style={theme.notifPointNumber}>
-                {' '}
-                {counter > 99 ? '99+' : counter}
-              </Text>
+      );
+    }
+    if (right) {
+        return <View style={theme.sideComponent}>{right}</View>;
+    }
+    if (route.name === 'Home' && !onlyBack) {
+      return (
+        <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
+            <View style={theme.sideComponent}>
+                <Icon name={IconNotification} color={cssVar.cWhite} />
+                {counter > 0 && (
+                    <View style={theme.notifPoint}>
+                    <Text style={theme.notifPointNumber}>
+                        {counter > 99 ? '99+' : counter}
+                    </Text>
+                    </View>
+                )}
             </View>
-          )}
-        </View>
-      )}
+        </TouchableOpacity>
+      );
+    }
+    return <View style={theme.sideComponent} />;
+  };
+
+  return (
+    <Animated.View style={{...theme.container, ...style}}>
+      <View style={theme.leftContainer}>{renderLeftComponent()}</View>
+
+      <View style={theme.titleContainer}>
+        {customTitle ? (
+          customTitle
+        ) : (
+          <Text style={theme.title} numberOfLines={1}>
+            {selected?.cant === 0 ? title : `${selected?.cant} seleccionados`}
+          </Text>
+        )}
+      </View>
+      
+      <View style={theme.rightSlotContainer}>{renderRightComponent()}</View>
     </Animated.View>
   );
 };
@@ -179,57 +167,53 @@ const theme: ThemeType = {
   container: {
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    borderWidth: 0.5,
-    borderTopWidth: 0,
+    borderBottomWidth: 0.5,
     borderBottomColor: cssVar.cWhiteV1,
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
-    padding: cssVar.spS,
-
+    paddingVertical: cssVar.spS,
+    paddingHorizontal: cssVar.spS,
     alignItems: 'center',
     flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  back: {
+  leftContainer: {
+    justifyContent: 'flex-start',
+  },
+  titleContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: cssVar.cWhite,
-    // borderRadius: '100%',
-    padding: 8,
+    paddingHorizontal: 8,
   },
-  customTitle: {
-    flexGrow: 1,
-    fontFamily: FONTS.bold,
-    fontSize: cssVar.sXl,
-    // paddingTop: cssVar.spL,
+  rightSlotContainer: {
+    justifyContent: 'flex-end',
+  },
+  sideComponent: {
+    minWidth: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
-    flexGrow: 1,
-    // paddingRight: cssVar.spM,
     color: cssVar.cWhite,
     fontFamily: FONTS.bold,
     textAlign: 'center',
     fontSize: cssVar.sXl,
   },
-  bage: {
-    position: 'absolute',
-    top: -5,
-    right: -8,
-    borderRadius: 100,
-    backgroundColor: cssVar.cError,
-    width: 18,
-    height: 18,
+  customTitle: {
+    flex: 1,
+  },
+  rightContainer: {
+    flexDirection: 'row',
+    gap: 12,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  textBage: {
-    fontSize: cssVar.sXs,
-    fontFamily: FONTS.bold,
-    color: cssVar.cWhite,
+    minWidth: 44,
+    height: 44,
   },
   notifPoint: {
     position: 'absolute',
-    top: -5,
-    right: -2,
+    top: 5,
+    right: 5,
     borderRadius: 100,
     backgroundColor: cssVar.cError,
     width: 18,
