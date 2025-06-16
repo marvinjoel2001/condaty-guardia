@@ -1,18 +1,20 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import useApi from '../../../../mk/hooks/useApi';
-import {Text} from 'react-native';
+import {Text, View} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
-import {getFullName} from '../../../../mk/utils/strings';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
-import {getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
 interface PropsType {
   id: string | number | null;
   open: boolean;
   onClose: () => void;
   type: 'A' | 'T' | 'I' | string;
+  invitation?: any;
 }
 const typeInvitation: any = {
   G: 'QR grupal',
@@ -22,18 +24,213 @@ const typeInvitation: any = {
   P: 'Pedido',
   C: 'Sin QR',
 };
-const ModalAccessExpand = ({id, open, onClose, type}: PropsType) => {
-  const {data, loaded} = useApi('/accesses', 'GET', {
-    fullType: 'DET',
-    searchBy: id,
-    perPage: -1,
-    page: 1,
-  });
+const ModalAccessExpand = ({
+  id,
+  open,
+  onClose,
+  type,
+  invitation,
+}: PropsType) => {
+  //   const [invitation, setInvitation] = useState([]);
+  const [data, setData]: any = useState([]);
+  const {loaded, execute} = useApi();
+
+  const getAccess = async () => {
+    const {data} = await execute('/accesses', 'GET', {
+      perPage: -1,
+      page: 1,
+      fullType: 'DET',
+      searchBy: id,
+    });
+    if (data?.success == true) {
+      setData(data?.data?.[0]);
+    }
+  };
+  useEffect(() => {
+    if (type != 'I') {
+      getAccess();
+    }
+  }, []);
+
+  //   const getInvitation = async () => {
+  //     const {data} = await execute('invitations', 'GET', {
+  //       perPage: -1,
+  //       page: 1,
+  //       fullType: 'DET',
+  //       searchBy: id,
+  //     });
+  //     setInvitation(data);
+  //   };
+  //   useEffect(() => {
+  //     if (type === 'I') {
+  //       getInvitation();
+  //     }
+  //   }, []);
 
   //   if (!loaded) {
   //     return;
   //   }
-  console.log(data);
+  const Br = () => {
+    return (
+      <View
+        style={{
+          height: 0.5,
+          backgroundColor: cssVar.cWhiteV1,
+          marginVertical: 8,
+          width: '100%',
+        }}
+      />
+    );
+  };
+  const rendeAccess = () => {
+    return (
+      <>
+        <ItemList
+          key={data?.id}
+          title={getFullName(data?.visit)}
+          subtitle={'C.I:' + data?.visit?.ci}
+          left={<Avatar name={getFullName(data?.visit)} />}
+        />
+        <KeyValue keys="Tipo de acceso" value={typeInvitation[data?.type]} />
+        {data?.plate && <KeyValue keys="Placa" value={data?.plate || '-/-'} />}
+        <KeyValue
+          keys="Fecha y hora de ingreso"
+          value={getDateTimeStrMes(data?.in_at, true)}
+        />
+        <KeyValue
+          keys="Fecha y hora de salida"
+          value={getDateTimeStrMes(data?.out_at, true)}
+        />
+        <KeyValue
+          keys={
+            data?.out_guard || !data?.out_at
+              ? 'Guardia de ingreso'
+              : 'Guardia de ingreso y salida'
+          }
+          value={getFullName(data?.guardia)}
+        />
+        {data?.out_guard && (
+          <KeyValue
+            keys="Guardia de salida"
+            value={getFullName(data?.out_guard)}
+          />
+        )}
+        <KeyValue keys="Observación de ingreso" value={data?.obs_in || '-/-'} />
+        <KeyValue keys="Observación de salida" value={data?.obs_out || '-/-'} />
+      </>
+    );
+  };
+
+  function parseWeekDays(binaryNumber: number): string[] {
+    const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const result: string[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      if (binaryNumber & (1 << i)) {
+        result.push(diasSemana[i]);
+      }
+    }
+    return result;
+  }
+
+  const renderInvitation = () => {
+    return (
+      <>
+        <ItemList
+          title={getFullName(invitation?.owner)}
+          // subtitle={'C.I.' + data?.owner?.ci}
+          subtitle={
+            'Unidad: ' +
+            invitation?.owner?.dptos?.[0]?.nro +
+            ', ' +
+            invitation?.owner?.dptos?.[0]?.description
+          }
+          left={
+            <Avatar
+              name={getFullName(invitation?.owner)}
+              src={getUrlImages(
+                '/OWNER-' +
+                  invitation?.owner?.id +
+                  '.webp?d=' +
+                  invitation?.owner?.updated_at,
+              )}
+            />
+          }
+          style={{marginBottom: 8}}
+        />
+        {invitation.type == 'G' && (
+          <KeyValue
+            keys="Nombre del evento"
+            value={invitation?.title || '-/-'}
+          />
+        )}
+        <KeyValue
+          keys="Tipo de invitación"
+          value={typeInvitation[invitation.type]}
+        />
+        {invitation.type != 'F' && (
+          <>
+            <KeyValue
+              keys="Fecha de invitación"
+              value={getDateStrMes(invitation?.date_event)}
+            />
+            <KeyValue keys="Descripción" value={invitation?.obs || '-/-'} />
+          </>
+        )}
+        {invitation.type == 'F' && (
+          <>
+            {invitation?.start_date && (
+              <>
+                <KeyValue
+                  keys="Periodo de validez"
+                  value={
+                    getDateStrMes(invitation?.start_date) +
+                    ' a ' +
+                    getDateStrMes(invitation?.end_date)
+                  }
+                />
+              </>
+            )}
+            <KeyValue keys="Indicaciones" value={invitation?.obs || '-/-'} />
+            {invitation?.is_advanced == 'Y' && (
+              <>
+                <Br />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: cssVar.cWhite,
+                    fontFamily: FONTS.semiBold,
+                    marginBottom: 12,
+                  }}>
+                  Configuración avanzada
+                </Text>
+                <KeyValue
+                  keys="Días de acceso"
+                  value={
+                    parseWeekDays(invitation?.weekday)?.join(', ') || '-/-'
+                  }
+                />
+                <KeyValue
+                  keys="Horario permitido"
+                  value={
+                    invitation?.start_time.slice(0, 5) +
+                      ' - ' +
+                      invitation?.end_time.slice(0, 5) || '-/-'
+                  }
+                />
+                {invitation?.max_entries && (
+                  <KeyValue
+                    keys="Cantidad de accesos"
+                    value={invitation?.max_entries.toString() || '-/-'}
+                  />
+                )}
+              </>
+            )}
+          </>
+        )}
+      </>
+    );
+  };
   return (
     <Modal
       title={
@@ -47,55 +244,7 @@ const ModalAccessExpand = ({id, open, onClose, type}: PropsType) => {
       }
       open={open}
       onClose={onClose}>
-      {!loaded ? (
-        <Loading />
-      ) : (
-        <>
-          <ItemList
-            key={data?.id}
-            title={getFullName(data?.data?.[0]?.visit)}
-            subtitle={'C.I:' + data?.data?.[0]?.visit?.ci}
-            left={<Avatar name={getFullName(data?.data?.[0]?.visit)} />}
-          />
-          <KeyValue
-            keys="Tipo de acceso"
-            value={typeInvitation[data?.data?.[0]?.type]}
-          />
-          {data?.data?.[0]?.plate && (
-            <KeyValue keys="Placa" value={data?.data?.[0]?.plate || '-/-'} />
-          )}
-          <KeyValue
-            keys="Fecha y hora de ingreso"
-            value={getDateTimeStrMes(data?.data?.[0]?.in_at, true)}
-          />
-          <KeyValue
-            keys="Fecha y hora de salida"
-            value={getDateTimeStrMes(data?.data?.[0]?.out_at, true)}
-          />
-          <KeyValue
-            keys={
-              data?.data?.[0]?.out_guard || !data?.data?.[0]?.out_at
-                ? 'Guardia de ingreso'
-                : 'Guardia de ingreso y salida'
-            }
-            value={getFullName(data?.data?.[0]?.guardia)}
-          />
-          {data?.data?.[0]?.out_guard && (
-            <KeyValue
-              keys="Guardia de salida"
-              value={getFullName(data?.data?.[0]?.out_guard)}
-            />
-          )}
-          <KeyValue
-            keys="Observación de ingreso"
-            value={data?.data?.[0]?.obs_in || '-/-'}
-          />
-          <KeyValue
-            keys="Observación de salida"
-            value={data?.data?.[0]?.obs_out || '-/-'}
-          />
-        </>
-      )}
+      {!loaded ? <Loading /> : type != 'I' ? rendeAccess() : renderInvitation()}
     </Modal>
   );
 };
