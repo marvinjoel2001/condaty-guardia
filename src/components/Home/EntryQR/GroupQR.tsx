@@ -334,9 +334,9 @@ const GroupQR = ({
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  gap: 5,
+              
                   alignItems: 'center',
-                  marginBottom: 15, marginTop:10,
+                  marginBottom: 12, marginTop:12,
                 }}
                 onPress={() => {
                   setOpenSelected(false);
@@ -408,6 +408,7 @@ const GroupQR = ({
                       onChange={(value: any) => {
                         handleChange('plate', value);
                       }}
+                      style={{marginTop:12}}
                     />
                   )}
                   {tab == 'T' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
@@ -530,7 +531,7 @@ const styles = StyleSheet.create({
   ownerInfoMainContainer: {
     width: '100%', // Changed from 388px to be responsive within its parent
     flexDirection: 'column',
-    gap: 12, // Corresponds to gap-3
+
   },
   invitationDetailsSection: {
     flexDirection: 'column',
@@ -540,12 +541,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#333536',
     padding: 12, // p-3
     borderRadius: 12, // rounded-xl
-    marginTop: 16,
+    marginTop: 12,
   },
   invitationDetailsInnerWrapper: {
     flexDirection: 'column',
     // alignItems: 'flex-end', // Original HTML had this, but content seems left-aligned
-    gap: 16, // gap-4
+    gap: 12, // gap-4
     alignSelf: 'stretch',
   },
   invitationDetailsContent: {
@@ -639,9 +640,9 @@ const styles = StyleSheet.create({
   transportButtonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8, // gap-2 from HTML example
+
     alignSelf: 'stretch',
-    marginVertical: 12,
+
   },
   transportButtonBase: {
     flexGrow: 1,
@@ -679,8 +680,8 @@ const styles = StyleSheet.create({
   addCompanionLinkContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4, // gap in HTML is 2 for overall, 2.5 for inner. Average to 4 here.
-    marginVertical: 12,
+    marginTop:12
+
   },
   addCompanionLinkText: {
     fontFamily: FONTS.regular,
@@ -695,8 +696,7 @@ const styles = StyleSheet.create({
   
   
     borderRadius: 8, // rounded-lg
-    marginTop: 12,
-    marginBottom: 12,
+
     minHeight: 105, // h-[105px]
   },
   observationsInnerContainer: {

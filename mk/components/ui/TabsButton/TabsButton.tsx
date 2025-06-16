@@ -23,7 +23,7 @@ const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
       style={{
         width: '100%',
         ...style,
-        marginVertical: 12,
+        //marginVertical: 12,
       }}>
       <ScrollView
         horizontal
