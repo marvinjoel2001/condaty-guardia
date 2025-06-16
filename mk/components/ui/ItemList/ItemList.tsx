@@ -117,6 +117,7 @@ const theme: ThemeType = {
     padding: 12,
     borderRadius: 12,
     marginVertical: 4,
+    // marginBottom: 8,
   },
   container: {
     overflow: 'hidden',
