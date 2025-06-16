@@ -201,6 +201,7 @@ const Alerts = () => {
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
+          style={{marginVertical:12}}
         />
 
         <DataSearch setSearch={onSearch} name="Novedades" value={search} />

@@ -78,6 +78,7 @@ const History = () => {
           : console.log('Tipo de búsqueda no válido:', tab)
       }>
       <TabsButtons
+      style={{marginVertical:12}}
         tabs={[
           {value: 'A', text: 'Accesos'},
           {value: 'Q', text: 'QR'},
