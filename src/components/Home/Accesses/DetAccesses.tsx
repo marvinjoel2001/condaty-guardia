@@ -32,7 +32,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
-  const [openDet, setOpenDet] = useState({open: false, id: null, type: ''});
+  const [openDet, setOpenDet]: any = useState({
+    open: false,
+    id: null,
+    type: '',
+    invitation: null,
+  });
   const getData = async (id: number) => {
     try {
       const {data} = await execute('/accesses', 'GET', {
@@ -207,6 +212,22 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 )}
               />
             }
+            right={
+              data?.type !== 'C' ? (
+                <Icon
+                  name={IconExpand}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    setOpenDet({
+                      open: true,
+                      id: data?.invitation_id,
+                      invitation: {...data?.invitation, owner: data?.owner},
+                      type: 'I',
+                    })
+                  }
+                />
+              ) : null
+            }
           />
         </Card>
       </>
@@ -245,7 +266,14 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       return (
         <Icon
           name={IconExpand}
-          onPress={() => setOpenDet({open: true, id: visit?.id, type: type})}
+          onPress={() =>
+            setOpenDet({
+              open: true,
+              // id: type == 'I' ? visit?.invitation_id : visit?.id,
+              id: visit?.id,
+              type: type,
+            })
+          }
           color={cssVar.cWhiteV1}
         />
       );
@@ -405,7 +433,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       );
     return null;
   };
-
+  console.log(data);
   return (
     <ModalFull
       onClose={() => close()}
@@ -417,27 +445,23 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       {!data ? (
         <Loading />
       ) : (
-        // <Card>
         <>
           {cardDetail()}
-          {/* visita */}
-          {/* <Text style={styles.labelAccess}>{type}</Text> */}
+
           {detailVisit(data)}
-          {/* Lista de acompañantes */}
 
-          {/* {detailCompanions()} */}
-
-          {/* Mostrar textarea según la acción (botón) */}
           {getObs()}
         </>
-        // </Card>
       )}
       {openDet.open && (
         <ModalAccessExpand
           open={openDet.open}
           type={openDet.type}
+          invitation={openDet.invitation}
           id={openDet.id}
-          onClose={() => setOpenDet({open: false, id: null, type: ''})}
+          onClose={() =>
+            setOpenDet({open: false, id: null, type: '', invitation: null})
+          }
         />
       )}
     </ModalFull>
