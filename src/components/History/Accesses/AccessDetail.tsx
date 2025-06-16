@@ -122,9 +122,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     let statusTextForModal = '';
     let statusColorForModal = cssVar.cWhite;
     
-    const personToShow = typeLabel === 'Acompañante' ? (personData.visit || personData) : personData;
-
     if (typeLabel === 'Acompañante') {
+      const personToShow = personData.visit || personData;
       statusTextForModal = personData.out_at ? 'Completado' : personData.in_at ? 'Dentro' : 'Pendiente';
       if (statusTextForModal === 'Completado' || statusTextForModal === 'Dentro') statusColorForModal = cssVar.cSuccess;
 
@@ -156,12 +155,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       if (statusTextForModal === 'Por confirmar') statusColorForModal = cssVar.cWarning;
 
       dataForModal = {
-        person: personToShow, 
+        person: personData.visit, 
         typeLabel: 'Taxista',
-        accessInAt: mainAccessItem.in_at,
-        accessOutAt: mainAccessItem.out_at,
-        accessObsIn: mainAccessItem.obs_in, 
-        accessObsOut: mainAccessItem.obs_out, 
+        accessInAt: personData.in_at,
+        accessOutAt: personData.out_at,
+        accessObsIn: personData.obs_in, 
+        accessObsOut: personData.obs_out, 
         plate: personData.plate,
         statusText: statusTextForModal,
         statusColor: statusColorForModal,

@@ -399,7 +399,7 @@ const GroupQR = ({
 
                 {tab == 'V' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
                     <Input
-                      label="Placalosa"
+                      label="Placa"
                       type="text"
                       name="plate"
                       error={errors}
