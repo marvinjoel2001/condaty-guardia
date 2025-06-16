@@ -196,12 +196,26 @@ const FrequentQR = ({
     return `${day}/${month}/${year}`;
   };
 
-  const formatWeekdays = (weekdayStr: string | null | undefined) => {
-    if (typeof weekdayStr !== 'string' || weekdayStr.trim() === '') {
+  const formatWeekdays = (weekdayValue: number | null | undefined) => {
+    if (typeof weekdayValue !== 'number' || isNaN(weekdayValue)) {
       return '';
     }
-    const map: Record<string, string> = { L: 'Lun', M: 'Mar', X: 'Mié', J: 'Jue', V: 'Vie', S: 'Sáb', D: 'Dom' };
-    return weekdayStr.split(',').map(day => map[day.trim() as keyof typeof map] || day).join(', ');
+  
+    const daysMap = [
+      { value: 1, label: 'Lun' },
+      { value: 2, label: 'Mar' },
+      { value: 4, label: 'Mié' },
+      { value: 8, label: 'Jue' },
+      { value: 16, label: 'Vie' },
+      { value: 32, label: 'Sáb' },
+      { value: 64, label: 'Dom' }
+    ];
+  
+    const selectedDays = daysMap
+      .filter(day => (weekdayValue & day.value) === day.value)
+      .map(day => day.label);
+  
+    return selectedDays.join(', ');
   }
 
   if (!data) {
@@ -222,7 +236,7 @@ const FrequentQR = ({
                         <Text style={styles.personDetail}>Unidad: {getUnitInfo(owner)}</Text>
                     </View>
                 </View>
-             {/*    <DetailRow label="Tipo de invitación" value={invitation.type === 'F' ? 'QR frecuente' : 'Otro'} /> */}
+                <DetailRow label="Tipo de invitación" value={invitation.type === 'F' ? 'QR frecuente' : 'Otro'} />
                 <DetailRow label="Validez del QR" value={invitation.start_date && invitation.end_date ? `${formatSimpleDate(invitation.start_date)} - ${formatSimpleDate(invitation.end_date)}` : null} />
                 <DetailRow label="Días de acceso" value={formatWeekdays(invitation.weekday)} />
                 <DetailRow label="Horario permitido" value={invitation.start_time && invitation.end_time ? `${invitation.start_time.substring(0,5)} - ${invitation.end_time.substring(0,5)}` : null} />
@@ -230,7 +244,7 @@ const FrequentQR = ({
             </View>
 
             <View style={styles.summarySection}>
-                <Text style={styles.summaryTitle}>Invitado</Text>
+                <Text style={styles.summaryTitle}>Invitados</Text>
                 <View style={styles.personCard}>
                     <Avatar src={visit?.url_avatar ? getUrlImages(visit.url_avatar) : undefined} name={getFullName(visit)} w={40} h={40} />
                     <View style={styles.personInfo}>
@@ -413,6 +427,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: cssVar.cWhite,
+    marginBottom: 12
   },
   personCard: {
     backgroundColor: cssVar.cBlackV3,
@@ -454,13 +469,13 @@ const styles = StyleSheet.create({
   },
   textAreaContainer: {},
   taxiFormContainer: {
-    gap: 16,
+    
   },
   addCompanionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingVertical: 4,
+   
   },
   addCompanionText: {
     color: cssVar.cAccent,
