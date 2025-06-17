@@ -230,7 +230,8 @@ const FrequentQR = ({
             <View style={styles.summarySection}>
                 <Text style={styles.summaryTitle}>Visita a</Text>
                 <View style={styles.personCard}>
-                    <Avatar src={owner?.url_avatar ? getUrlImages(owner.url_avatar) : undefined} name={getFullName(owner)} w={40} h={40} />
+               
+                    <Avatar src={getUrlImages('/OWNER-' + owner?.id + '.webp?d=' + owner?.updated_at)} name={getFullName(owner)} w={40} h={40} />
                     <View style={styles.personInfo}>
                         <Text style={styles.personName}>{getFullName(owner)}</Text>
                         <Text style={styles.personDetail}>Unidad: {getUnitInfo(owner)}</Text>
