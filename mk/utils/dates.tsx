@@ -101,31 +101,54 @@ export const formatDateToDDMMYY = (dateString: string): string => {
   return `${day}/${month}/${year}`;
 };
 
+// export const getDateStrMes = (
+//   dateStr: string | null = '',
+//   utc: boolean = false,
+// ): string => {
+//   if (!dateStr || dateStr == '') return '';
+//   if (esFormatoISO8601(dateStr) || utc) {
+//     const fechaLocal: any = convertirFechaUTCaLocal(dateStr);
+//     dateStr = fechaLocal
+//       .toISOString()
+//       .slice(0, 19)
+//       .replace(/-/g, '-')
+//       .replace('T', ' ');
+//   }
+
+//   dateStr = (dateStr + '').replace('T', ' ');
+//   dateStr = dateStr.replace('/', '-');
+//   const datetime = dateStr.split(' ');
+//   const date = datetime[0].split('-');
+//   let year = '';
+//   if (date[0] != getUTCNow().substring(0, 4)) {
+//     year = ` de ${date[0]}`;
+//   }
+//   return `${date[2]} de ${MONTHS[parseInt(date[1])]}${year}`;
+// };
+
 export const getDateStrMes = (
-  dateStr: string | null = '',
+  dateStr: string,
   utc: boolean = false,
 ): string => {
-  if (!dateStr || dateStr == '') return '';
+  if (!dateStr || dateStr === '') return '';
+
   if (esFormatoISO8601(dateStr) || utc) {
     const fechaLocal: any = convertirFechaUTCaLocal(dateStr);
-    dateStr = fechaLocal
-      .toISOString()
-      .slice(0, 19)
-      .replace(/-/g, '-')
-      .replace('T', ' ');
+    dateStr = fechaLocal.toISOString().slice(0, 19).replace('T', ' ');
   }
 
-  dateStr = (dateStr + '').replace('T', ' ');
-  dateStr = dateStr.replace('/', '-');
+  dateStr = dateStr.replace('T', ' ').replace('/', '-');
   const datetime = dateStr.split(' ');
   const date = datetime[0].split('-');
-  let year = '';
-  if (date[0] != getUTCNow().substring(0, 4)) {
-    year = ` de ${date[0]}`;
-  }
-  return `${date[2]} de ${MONTHS[parseInt(date[1])]}${year}`;
-};
 
+  if (date.length < 3) return '';
+
+  const day = date[2].padStart(2, '0');
+  const month = date[1].padStart(2, '0');
+  const year = date[0];
+
+  return `${day}/${month}/${year}`;
+};
 export const getDateStrMesAnio = (
   dateStr: string | null = '',
   utc: boolean = false,
