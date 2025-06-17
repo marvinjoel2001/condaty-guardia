@@ -44,6 +44,7 @@ const FrequentQR = ({
   const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
+  const meesageforUndefined = "Indefinido";
   
   const invitation = data;
   const visit = invitation?.visit;
@@ -238,7 +239,7 @@ const FrequentQR = ({
                     </View>
                 </View>
                 <DetailRow label="Tipo de invitación" value={invitation.type === 'F' ? 'QR frecuente' : 'Otro'} />
-                <DetailRow label="Validez del QR" value={invitation.start_date && invitation.end_date ? `${formatSimpleDate(invitation.start_date)} - ${formatSimpleDate(invitation.end_date)}` : null} />
+                <DetailRow label="Validez del QR" value={invitation.start_date && invitation.end_date ? `${formatSimpleDate(invitation.start_date)} - ${formatSimpleDate(invitation.end_date)}` : meesageforUndefined} />
                 <DetailRow label="Días de acceso" value={formatWeekdays(invitation.weekday)} />
                 <DetailRow label="Horario permitido" value={invitation.start_time && invitation.end_time ? `${invitation.start_time.substring(0,5)} - ${invitation.end_time.substring(0,5)}` : null} />
                 <DetailRow label="Cantidad de accesos" value={invitation.max_entries} />
