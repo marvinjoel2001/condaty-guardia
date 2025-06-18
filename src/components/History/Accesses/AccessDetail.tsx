@@ -262,7 +262,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
             <TouchableOpacity onPress={() => handleOpenPersonDetailModal(resident, 'Residente', item)} activeOpacity={0.7}>
               <View style={styles.personBlock}>
-                <Avatar name={getFullName(resident)} src={getUrlImages('/OWNER-' + resident?.id + '.webp?d=' + resident?.updated_at)} w={40} h={40} />
+                <Avatar 
+                  name={getFullName(resident)} 
+                  src={getUrlImages('/OWNER-' + resident?.id + '.webp?d=' + resident?.updated_at)} 
+                  w={40} 
+                  h={40} 
+                />
                 <View style={styles.personInfoContainer}>
                   <Text style={styles.personName}>{getFullName(resident)}</Text>
                   <Text style={styles.personSubDetail}>Unidad: {resident?.dpto?.[0]?.nro}, {resident?.dpto?.[0]?.description}</Text>
@@ -282,7 +287,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>Visitante Principal</Text>
             {mainVisitor ? (
               <View style={styles.personBlock}>
-                <Avatar name={mainUserFullName} src={mainVisitor?.url_avatar ? getUrlImages(mainVisitor.url_avatar) : undefined} w={40} h={40} />
+                <Avatar 
+                  name={mainUserFullName} 
+                  src={getUrlImages('/VISIT-' + mainVisitor?.id + '.webp?d=' + mainVisitor?.updated_at)} 
+                  w={40} 
+                  h={40} 
+                />
                 <View style={styles.personInfoContainer}>
                   <Text style={styles.personName}>{mainUserFullName}</Text>
                   <Text style={styles.personSubDetail}>{(mainUserCi ? `C.I. ${mainUserCi}` : '')}</Text>
@@ -311,7 +321,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <Text style={styles.sectionTitle}>Taxista</Text>
               <TouchableOpacity onPress={() => handleOpenPersonDetailModal(driverAccess, 'Taxista', item)} activeOpacity={0.7}>
                 <View style={styles.personBlock}>
-                  <Avatar name={getFullName(driver)} src={driver?.url_avatar ? getUrlImages(driver.url_avatar) : undefined} w={40} h={40} />
+                  <Avatar 
+                    name={getFullName(driver)} 
+                    src={getUrlImages('/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at)} 
+                    w={40} 
+                    h={40} 
+                  />
                   <View style={styles.personInfoContainer}>
                     <Text style={styles.personName}>{getFullName(driver)}</Text>
                     <Text style={styles.personSubDetail}>{(driver.ci ? `C.I. ${driver.ci}` : '') + (driver.ci && driverAccess.plate ? ' • ' : '') + (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')}</Text>
@@ -353,7 +368,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <View style={styles.personBlock}>
                 <Avatar
                   name={getFullName(modalPersonData.person)}
-                  src={modalPersonData.person?.url_avatar ? getUrlImages(modalPersonData.person.url_avatar) : undefined}
+                  src={getUrlImages('/OWNER-' + modalPersonData.person?.id + '.webp?d=' + modalPersonData.person?.updated_at)}
                   w={40}
                   h={40}
                 />
