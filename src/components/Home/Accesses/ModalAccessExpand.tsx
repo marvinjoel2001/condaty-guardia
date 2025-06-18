@@ -92,7 +92,9 @@ const ModalAccessExpand = ({
           left={<Avatar name={getFullName(data?.visit)} />}
         />
         <KeyValue keys="Tipo de acceso" value={typeInvitation[data?.type]} />
-        {data?.plate && <KeyValue keys="Placa" value={data?.plate || '-/-'} />}
+        {data?.plate && type == 'T' && (
+          <KeyValue keys="Placa" value={data?.plate || '-/-'} />
+        )}
         <KeyValue
           keys="Fecha y hora de ingreso"
           value={getDateTimeStrMes(data?.in_at, true)}

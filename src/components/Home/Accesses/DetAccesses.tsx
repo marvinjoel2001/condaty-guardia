@@ -433,7 +433,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       );
     return null;
   };
-  console.log(data);
   return (
     <ModalFull
       onClose={() => close()}

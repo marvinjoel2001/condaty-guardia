@@ -39,19 +39,20 @@ const Home = () => {
   const {execute} = useApi();
   const [loaded, setLoaded] = useState(false);
 
-  const reloadNotif = (type: string) => {
-    // if (type === 'I' && typeSearch === 'I') {
-    getAccesses('', '/accesses', 'P');
-    // }
-    // if (type === 'P' && typeSearch === 'P') {
-    //   getAccesses('', '/others', 'L');
-    // }
-  };
+  // const reloadNotif = (type: string) => {
+  //   // if (type === 'I' && typeSearch === 'I') {
+  //   getAccesses('', '/accesses', 'P');
+  //   // }
+  //   // if (type === 'P' && typeSearch === 'P') {
+  //   //   getAccesses('', '/others', 'L');
+  //   // }
+  // };
 
   const onNotif = useCallback(
     (data: any) => {
       if (data?.event === 'confirm' || data?.event === 'in-pedido') {
-        reloadNotif(typeSearch);
+        // reloadNotif();
+        getAccesses('', '/accesses', 'P');
       }
       if (data?.event === 'confirm' && typeSearch !== 'I') {
         setStore({...store, bagePending: true});
@@ -68,7 +69,8 @@ const Home = () => {
     (data: any) => {
       // console.log('data fnewoijn', data);
       if (data?.modulo === 'access' || data?.modulo === 'others') {
-        reloadNotif(typeSearch);
+        // reloadNotif(typeSearch);
+        getAccesses('', '/accesses', 'P');
       }
       if (
         data?.modulo === 'access' &&
@@ -132,26 +134,6 @@ const Home = () => {
 
     set_TypeSearch(typeSearch);
   }, [typeSearch]);
-
-  // Filtrar la data según el término de búsqueda
-  // const filteredData = useMemo(() => {
-  //   // Comprobación de seguridad
-  //   if (!Array.isArray(data)) {
-  //     return [];
-  //   }
-  //   return data.filter((item: any) => {
-  //     const ownerName = item?.owner
-  //       ? getFullName(item.owner).toLowerCase()
-  //       : '';
-  //     const visitName = item?.visit
-  //       ? getFullName(item.visit).toLowerCase()
-  //       : '';
-  //     return (
-  //       ownerName.includes(search.toLowerCase()) ||
-  //       visitName.includes(search.toLowerCase())
-  //     );
-  //   });
-  // }, [data, search]);
 
   const customTitle = () => (
     <View>
