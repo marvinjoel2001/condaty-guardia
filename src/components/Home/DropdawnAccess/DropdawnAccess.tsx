@@ -73,7 +73,7 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
           onTouchEnd={toggleDropdown}
           style={{
             borderWidth: 1,
-            borderBottomWidth: 2,
+            borderBottomWidth: 0,
             borderBottomColor: cssVar.cBlack,
             borderColor: cssVar.cWhiteV1,
             backgroundColor: cssVar.cBlack,
@@ -90,13 +90,13 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
           }}>
           {openDrop ? (
             <Icon
-              style={{marginTop: 4}}
+              style={{marginTop: 2}}
               name={IconArrowDown}
               color={cssVar.cWhite}
             />
           ) : (
             <Icon
-              style={{marginTop: 4}}
+              style={{marginTop: 2}}
               name={IconArrowUp}
               color={cssVar.cWhite}
             />
