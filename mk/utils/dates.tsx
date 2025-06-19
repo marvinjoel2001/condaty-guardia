@@ -349,7 +349,7 @@ export const formatToDayDDMMYYYYHHMM = (
   // El ajuste de hora "- GMT" en tu getDateTimeStrMes se aplica si la CADENA ORIGINAL era ISO.
   // Esto es un poco específico, pero lo replicamos para consistencia.
   if (esFormatoISO8601(dateStr)) {
-    hora = dateForFormatting.getHours() - GMT; // Si GMT es -4, esto suma 4.
+    hora = dateForFormatting.getHours() + GMT; // Si GMT es -4, esto suma 4.
     // Esto implica que `convertirFechaUTCaLocal` para ISO
     // podría devolver un Date cuyas horas son UTC,
     // y este es el ajuste final para mostrar en GMT-4.

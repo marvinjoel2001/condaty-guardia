@@ -27,7 +27,7 @@ const Accesses = ({data, loaded}: Props) => {
       item.type == 'O' ? 'Llave QR' :
       item.type == 'C' ? 'Sin QR' : 
       item.type == 'I' ? 'QR Individual' : 
-      item.type == 'G' ? 'QR Grupal' : 
+      item.type == 'G' ? ('QR Grupal' + (item.invitation?.title ? ' - ' + item.invitation.title : '')) : 
       item.type == 'F' ? 'QR Frecuente' : 
       item.type == 'P' ? 'Pedido'  : '';
 
