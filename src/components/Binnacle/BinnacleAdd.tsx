@@ -62,7 +62,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           type="textArea"
           label="Descripción"
           name="descrip"
-          placeholder="Escribir reporte..."
+          // placeholder="Escribir reporte..."
           error={errors}
           maxLength={250}
           required={true}
