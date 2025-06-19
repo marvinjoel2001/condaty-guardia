@@ -52,13 +52,53 @@ export const convertirFechaUTCaLocal = (fechaUTCString: string | null) => {
 };
 
 // Función para obtener la fecha y la hora en un formato específico
+// export const getDateTimeStrMes = (
+//   dateStr: string | null = '',
+//   utc: boolean = false,
+// ): string => {
+//   if (!dateStr || dateStr === '') return '';
+
+//   let fechaLocal: any;
+
+//   // Convierte la fecha de UTC a la hora local o la toma como es
+//   if (esFormatoISO8601(dateStr) || utc) {
+//     fechaLocal = convertirFechaUTCaLocal(dateStr);
+//   } else {
+//     fechaLocal = new Date(dateStr.replace(' ', 'T'));
+//   }
+
+//   const diaSemana = DAYS_SHORT[fechaLocal.getDay()];
+//   const dia = fechaLocal.getDate();
+//   const mes = MONTHS[fechaLocal.getMonth() + 1];
+
+//   // Ajuste para la hora
+//   let hora;
+//   if (esFormatoISO8601(dateStr)) {
+//     hora = fechaLocal.getHours() - GMT;
+//   } else {
+//     hora = fechaLocal.getHours();
+//   }
+//   let minutos = fechaLocal.getMinutes();
+
+//   // Si la hora es exactamente las 24:00 horas, se ajusta a las 23:59 horas
+//   if (hora === 24 && minutos === 0) {
+//     hora = 23;
+//     minutos = 59;
+//   }
+
+//   // Convertimos la hora y los minutos a un formato de dos dígitos
+//   const horaStr = hora.toString().padStart(2, '0');
+//   const minutosStr = minutos.toString().padStart(2, '0');
+
+//   return `${diaSemana}, ${dia} ${mes} - ${horaStr}:${minutosStr}`;
+// };
 export const getDateTimeStrMes = (
   dateStr: string | null = '',
   utc: boolean = false,
 ): string => {
   if (!dateStr || dateStr === '') return '';
 
-  let fechaLocal: any;
+  let fechaLocal: Date | any;
 
   // Convierte la fecha de UTC a la hora local o la toma como es
   if (esFormatoISO8601(dateStr) || utc) {
@@ -67,12 +107,12 @@ export const getDateTimeStrMes = (
     fechaLocal = new Date(dateStr.replace(' ', 'T'));
   }
 
-  const diaSemana = DAYS_SHORT[fechaLocal.getDay()];
-  const dia = fechaLocal.getDate();
-  const mes = MONTHS[fechaLocal.getMonth() + 1];
+  const diaSemana = DAYS_SHORT[fechaLocal.getDay()]; // e.g., 'Lun'
+  const dia = fechaLocal.getDate(); // 1
+  const mes = (fechaLocal.getMonth() + 1).toString().padStart(2, '0'); // 04
+  const anio = fechaLocal.getFullYear(); // 2025
 
-  // Ajuste para la hora
-  let hora;
+  let hora: number;
   if (esFormatoISO8601(dateStr)) {
     hora = fechaLocal.getHours() - GMT;
   } else {
@@ -80,17 +120,16 @@ export const getDateTimeStrMes = (
   }
   let minutos = fechaLocal.getMinutes();
 
-  // Si la hora es exactamente las 24:00 horas, se ajusta a las 23:59 horas
   if (hora === 24 && minutos === 0) {
     hora = 23;
     minutos = 59;
   }
 
-  // Convertimos la hora y los minutos a un formato de dos dígitos
   const horaStr = hora.toString().padStart(2, '0');
   const minutosStr = minutos.toString().padStart(2, '0');
 
-  return `${diaSemana}, ${dia} ${mes} - ${horaStr}:${minutosStr}`;
+  // Formato final: Lun, 1/04/2025 - 15:12
+  return `${diaSemana}, ${dia}/${mes}/${anio} - ${horaStr}:${minutosStr}`;
 };
 
 export const formatDateToDDMMYY = (dateString: string): string => {
