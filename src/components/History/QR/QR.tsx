@@ -25,11 +25,12 @@ const QR = ({data, loaded}: Props) => {
 
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
+    const groupTitle = item.invitation?.title || item.access?.invitation?.title;
     const subTitle =
       item.type == 'O' ? 'Llave QR' :
       item.type == 'C' ? 'Sin QR' : 
       item.type == 'I' ? 'QR Individual' : 
-      item.type == 'G' ? ('QR Grupal' + (item.invitation?.title ? ' - ' + item.invitation.title : '')) : 
+      item.type == 'G' ? ('QR Grupal' + (groupTitle ? ' - ' + groupTitle : '')) : 
       item.type == 'F' ? 'QR Frecuente' : 
       item.type == 'P' ? 'Pedido'  : '';
 
