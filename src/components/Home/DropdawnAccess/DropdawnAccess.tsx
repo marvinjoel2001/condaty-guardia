@@ -179,6 +179,8 @@ const styles = StyleSheet.create({
     backgroundColor: cssVar.cBlackV1,
     paddingVertical: cssVar.spL,
     paddingHorizontal: cssVar.spXxl,
+    justifyContent: 'center',
+    alignItems: 'center',
     // overflow: 'hidden',
     borderRadius: cssVar.bRadius,
   },
