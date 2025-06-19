@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {Image, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import {getDateTimeStrMes} from '../../../mk/utils/dates';
 import {getUrlImages} from '../../../mk/utils/strings';
-import {cssVar} from '../../../mk/styles/themes';
+import {cssVar, FONTS} from '../../../mk/styles/themes';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
+import Card from '../../../mk/components/ui/Card/Card';
 type PropsType = {
   open: boolean;
   onClose: () => void;
@@ -14,26 +15,15 @@ type PropsType = {
 const BinnacleDetail = ({open, onClose, item}: PropsType) => {
   // console.log(item,'ssss')
   const [imageError, setImageError] = useState(false);
-  const RowData = ({title, value}: any) => {
+  const Br = () => {
     return (
-      <View style={{alignItems: 'flex-start', gap: 5, width: '100%'}}>
-        <Text
-          style={{
-            color: cssVar.cWhite,
-            textAlign: 'left',
-            fontWeight: '500',
-          }}>
-          {title}
-        </Text>
-        <Text
-          style={{
-            color: cssVar.cWhiteV1,
-            flexWrap: 'wrap',
-            flexShrink: 1,
-          }}>
-          {value}
-        </Text>
-      </View>
+      <View
+        style={{
+          marginVertical: 16,
+          backgroundColor: cssVar.cWhiteV1,
+          height: 0.5,
+        }}
+      />
     );
   };
 
@@ -44,79 +34,68 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
       onClose={onClose}
       buttonCancel=""
       buttonText="">
-      <View style={{padding: 2, gap: 10}}>
-        {/* <Card> */}
-        <View
-          style={{
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-          }}>
-          <RowData
-            title="Fecha:"
-            value={getDateTimeStrMes(item.created_at, true)}
-          />
-          <RowData title="Descripción:" value={item.descrip} />
-        </View>
-
-        <>
-          {imageError ? (
-            <Text
+      <Card>
+        <Text style={styles.text}>Reporte</Text>
+        <Text style={{...styles.textV1}}>{item?.descrip}</Text>
+        <Br />
+        {imageError ? (
+          <Text
+            style={{
+              color: cssVar.cWhiteV1,
+              textAlign: 'center',
+              marginVertical: 16,
+              fontSize: 14,
+            }}>
+            No se encontró la imagen
+          </Text>
+        ) : (
+          <>
+            <Text style={styles.text}>Imagen del reporte</Text>
+            <View
               style={{
-                color: cssVar.cWhiteV1,
-                textAlign: 'center',
-                marginVertical: 16,
-                fontSize: 14,
+                flex: 1,
+                justifyContent: 'center',
+                marginTop: 16,
+                borderRadius: 10,
+                height: 180,
+                width: '100%',
+                backgroundColor: cssVar.cWhiteV2,
               }}>
-              No se encontró la imagen
-            </Text>
-          ) : (
-            <>
-              <Text
-                style={{
-                  color: cssVar.cWhite,
-                }}>
-                Imagen:
-              </Text>
-              <View
+              <Image
+                source={{
+                  uri: getUrlImages(
+                    `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
+                  ),
+                }}
+                resizeMode="contain"
                 style={{
                   flex: 1,
+                  borderRadius: 8,
                   justifyContent: 'center',
-                  marginTop: 16,
-                  borderRadius: 10,
-                }}>
-                <Image
-                  source={{
-                    uri: getUrlImages(
-                      `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
-                    ),
-                  }}
-                  style={{
-                    flex: 1,
-                    borderRadius: 8,
-                    justifyContent: 'center',
-                    width: 300,
-                    height: 350,
-                  }}
-                  onError={() => setImageError(true)}
-                />
-                {/* <Avatar
-            src={ getUrlImages(
-                `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
-              )}
-              w={300}
-              h={350}
-            style={{ flex:1,borderRadius:8,justifyContent:'center'}}
-            circle={false}
-            onError={() => setImageError(true)}
-            resizeMode="cover"
-          /> */}
-              </View>
-            </>
-          )}
-        </>
-      </View>
+                  width: '100%',
+                }}
+                onError={() => setImageError(true)}
+              />
+            </View>
+          </>
+        )}
+      </Card>
     </ModalFull>
   );
 };
 
 export default BinnacleDetail;
+
+const styles = StyleSheet.create({
+  text: {
+    color: cssVar.cWhite,
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
+  },
+  textV1: {
+    color: cssVar.cWhiteV1,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    marginTop: 12,
+  },
+});
