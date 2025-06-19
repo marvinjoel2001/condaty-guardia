@@ -114,8 +114,8 @@ export const ItemList = (props: PropsType) => {
 const theme: ThemeType = {
   itemList: {
     backgroundColor: cssVar.cWhiteV2,
-    padding: 12,
-    borderRadius: 12,
+    padding: 8,
+    borderRadius: 8,
     marginVertical: 4,
     // marginBottom: 8,
   },
