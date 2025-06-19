@@ -16,7 +16,7 @@ type PropsType = {
 };
 
 const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
-  const [errors, setErrors]: any = useState();
+  const [errors, setErrors]: any = useState({});
   const [formState, setFormState]: any = useState();
   const {showToast} = useAuth();
   const {execute} = useApi();

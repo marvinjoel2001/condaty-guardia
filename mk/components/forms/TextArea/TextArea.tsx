@@ -11,7 +11,7 @@ interface PropsType extends PropsTypeInputBase {
 export const TextArea = (props: PropsType) => {
   const {value, maxLength, multiline} = props;
   const [isFocused, setIsFocused] = useState(false);
-  const [textLength, setTextLength] = useState(value?.length || 0);
+  // const [textLength, setTextLength] = useState(value?.length || 0);
   const lineHeight = 20;
   const lines = props?.lines || 4;
 
@@ -33,14 +33,14 @@ export const TextArea = (props: PropsType) => {
 
   const handleTextChange = (text: string) => {
     if (maxLength === undefined || text?.length <= maxLength) {
-      setTextLength(text?.length);
+      // setTextLength(text?.length);
       props.onChange?.(text);
     }
   };
 
-  useEffect(() => {
-    setTextLength(value?.length || 0);
-  }, [value]);
+  // useEffect(() => {
+  //   setTextLength(value?.length || 0);
+  // }, [value]);
 
   return (
     <ControlLabel
