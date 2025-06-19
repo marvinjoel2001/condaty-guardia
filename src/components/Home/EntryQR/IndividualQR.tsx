@@ -35,6 +35,7 @@ const IndividualQR = ({
   const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
+  const [editAcom, setEditAcom] = useState(null);
 
   const visit = data?.visit;
   const owner = data?.owner;
@@ -106,32 +107,33 @@ const IndividualQR = ({
   const acompanantesList = (acompanante: any) => {
     if (!acompanante) return null;
     return (
-      <TouchableOpacity>
-        <ItemList
-          title={getFullName(acompanante)}
-          subtitle={'C.I. ' + (acompanante.ci || 'N/A')}
-          subtitle2={
-            acompanante.obs_in
-              ? 'Observaciones de entrada: ' + acompanante.obs_in
-              : ''
-          }
-          left={<Avatar name={getFullName(acompanante)} />}
-          right={
-            <Icon
-              name={IconX}
-              color={cssVar.cError}
-              size={20}
-              style={{
-                
-                borderRadius: 20,
-                padding: 4,
-                elevation: 2,
-              }}
-              onPress={() => onDelAcom(acompanante)}
-            />
-          }
-        />
-      </TouchableOpacity>
+      <ItemList
+        title={getFullName(acompanante)}
+        subtitle={'C.I. ' + (acompanante.ci || 'N/A')}
+        subtitle2={
+          acompanante.obs_in
+            ? 'Observaciones de entrada: ' + acompanante.obs_in
+            : ''
+        }
+        left={<Avatar name={getFullName(acompanante)} />}
+        right={
+          <Icon
+            name={IconX}
+            color={cssVar.cError}
+            size={20}
+            style={{
+              
+              padding: 4,
+             
+            }}
+            onPress={() => onDelAcom(acompanante)}
+          />
+        }
+        onPress={() => {
+          setEditAcom(acompanante);
+          setOpenAcom(true);
+        }}
+      />
     );
   };
 
@@ -385,9 +387,13 @@ const IndividualQR = ({
 
       <AccompaniedAdd
         open={openAcom}
-        onClose={() => setOpenAcom(false)}
+        onClose={() => {
+          setOpenAcom(false);
+          setEditAcom(null);
+        }}
         item={formState}
         setItem={setFormState}
+        editItem={editAcom}
       />
     </>
   );

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import Input from '../../../../mk/components/forms/Input/Input';
@@ -10,13 +10,30 @@ type TypeProps = {
   onClose: () => void;
   item: any;
   setItem: any;
+  editItem?: any;
 };
 
-export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
+export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors]: any = useState({});
   const {execute} = useApi();
   const {showToast} = useAuth();
+
+  useEffect(() => {
+    if (open && editItem) {
+      setFormState({
+        ci: editItem.ci,
+        name: editItem.name,
+        middle_name: editItem.middle_name,
+        last_name: editItem.last_name,
+        mother_last_name: editItem.mother_last_name,
+        ciDisabled: false,
+      });
+    } else if (open) {
+      setFormState({});
+    }
+  }, [open, editItem]);
+
   const handleChange = (key: string, value: any) => {
     setFormState({...formState, [key]: value});
   };
@@ -130,7 +147,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
   };
   return (
     <Modal
-      title="Agregar acompañante"
+      title={editItem ? 'Editar acompañante' : 'Agregar acompañante'}
       open={open}
       onClose={_onClose}
       buttonText="Guardar"
