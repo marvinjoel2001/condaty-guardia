@@ -60,12 +60,12 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       <View style={{marginTop: 12}}>
         <TextArea
           type="textArea"
-          label="Descripción"
+          label="Escribir reporte..."
           name="descrip"
           // placeholder="Escribir reporte..."
           error={errors}
           maxLength={250}
-          required={true}
+          required={false}
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}
         />

@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    bottom: isIos() ? 68.5 : 74,
+    bottom: isIos() ? 68.5 : 72.5,
     borderTopRightRadius: cssVar.bRadius,
     borderTopLeftRadius: cssVar.bRadius,
     // overflow: 'hidden',
