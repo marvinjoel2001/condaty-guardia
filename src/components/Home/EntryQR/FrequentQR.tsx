@@ -174,7 +174,14 @@ const FrequentQR = ({
           right={
             <Icon
               name={IconX}
-              color={cssVar.cWhiteV2}
+              color={cssVar.cError}
+              size={20}
+              style={{
+                
+                borderRadius: 20,
+                padding: 4,
+                elevation: 2,
+              }}
               onPress={() => onDelAcom(acompanante)}
             />
           }

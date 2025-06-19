@@ -36,7 +36,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
         middle_name: exist?.data?.middle_name,
         last_name: exist?.data?.last_name,
         mother_last_name: exist?.data?.mother_last_name,
-        disabled: true,
+        ciDisabled: true,
       });
     } else {
       setFormState({
@@ -45,7 +45,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
         middle_name: '',
         last_name: '',
         mother_last_name: '',
-        disabled: false,
+        ciDisabled: false,
       });
     }
   };
@@ -146,13 +146,14 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
         required={true}
         onChange={(value: any) => handleChange('ci', value)}
         onBlur={() => onExist()}
+        disabled={formState?.ciDisabled}
       />
       <InputFullName
         formState={formState}
         errors={errors}
         // name_prefijo="_a"
         handleChangeInput={handleChange}
-        disabled={formState?.disabled}
+        disabled={false}
         inputGrid={false}
       />
     </Modal>

@@ -119,7 +119,14 @@ const IndividualQR = ({
           right={
             <Icon
               name={IconX}
-              color={cssVar.cWhiteV2}
+              color={cssVar.cError}
+              size={20}
+              style={{
+                
+                borderRadius: 20,
+                padding: 4,
+                elevation: 2,
+              }}
               onPress={() => onDelAcom(acompanante)}
             />
           }
@@ -311,7 +318,7 @@ const IndividualQR = ({
                     value={formState?.ci_taxi || ''}
                     onBlur={onExistTaxi}
                     onChange={(value: string) => handleChange('ci_taxi', value)}
-                    style={{marginTop:12}}
+                  
                     
                   />
                   <InputFullName
@@ -470,5 +477,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONTS.semiBold,
     color: cssVar.cWhiteV1 || '#D0D0D0',
+    marginBottom: 12,
   },
 });
