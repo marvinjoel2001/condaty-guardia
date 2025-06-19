@@ -1,7 +1,5 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
-
-import {useContext} from 'react';
 import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
 
 interface Tab {
