@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import Input from '../../../../mk/components/forms/Input/Input';
@@ -10,13 +10,30 @@ type TypeProps = {
   onClose: () => void;
   item: any;
   setItem: any;
+  editItem?: any;
 };
 
-export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
+export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors]: any = useState({});
   const {execute} = useApi();
   const {showToast} = useAuth();
+
+  useEffect(() => {
+    if (open && editItem) {
+      setFormState({
+        ci: editItem.ci,
+        name: editItem.name,
+        middle_name: editItem.middle_name,
+        last_name: editItem.last_name,
+        mother_last_name: editItem.mother_last_name,
+        ciDisabled: false,
+      });
+    } else if (open) {
+      setFormState({});
+    }
+  }, [open, editItem]);
+
   const handleChange = (key: string, value: any) => {
     setFormState({...formState, [key]: value});
   };
@@ -41,10 +58,10 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
     } else {
       setFormState({
         ...formState,
-        name: '',
-        middle_name: '',
-        last_name: '',
-        mother_last_name: '',
+        name: editItem ? formState.name : '',
+        middle_name: editItem ? formState.middle_name : '',
+        last_name: editItem ? formState.last_name : '',
+        mother_last_name: editItem ? formState.mother_last_name : '',
         ciDisabled: false,
       });
     }
@@ -90,6 +107,24 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
   // console.log(item,'item aad')
   const onSave = async () => {
     let acompanantes = item?.acompanantes || [];
+    if (editItem) {
+      acompanantes = acompanantes.map((acompanante: any) =>
+        acompanante.ci === editItem.ci
+          ? {
+              ci: formState.ci,
+              name: formState.name,
+              middle_name: formState.middle_name,
+              last_name: formState.last_name,
+              mother_last_name: formState.mother_last_name,
+            }
+          : acompanante
+      );
+      setItem({...item, acompanantes});
+      _onClose();
+      setFormState({});
+      showToast('Acompañante editado');
+      return;
+    }
     if (acompanantes?.length > 0) {
       const exist = acompanantes.find(
         (acompanante: any) => acompanante.ci === formState.ci,
@@ -130,7 +165,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem}: TypeProps) => {
   };
   return (
     <Modal
-      title="Agregar acompañante"
+      title={editItem ? 'Editar acompañante' : 'Agregar acompañante'}
       open={open}
       onClose={_onClose}
       buttonText="Guardar"
