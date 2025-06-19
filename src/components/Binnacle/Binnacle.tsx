@@ -11,6 +11,7 @@ import {cssVar} from '../../../mk/styles/themes';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import BinnacleAdd from './BinnacleAdd';
 import BinnacleDetail from './BinnacleDetail';
+import {getDateStrMes, getDateTimeStrMes} from '../../../mk/utils/dates';
 
 const Binnacle = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -34,43 +35,35 @@ const Binnacle = () => {
     return (
       <ItemList
         onPress={() => setOpenView({open: true, item: novedad})}
-        title={getFullName(novedad?.guardia)}
-        subtitle={'Bitácoras'}
-        // right={
-        //   <Icon
-        //     style={{padding: 5}}
-        //     name={IconOptions}
-        //     color={"white"}
-        //     onPress={() => {
-        //       setOpenDropdown(true);
-        //     }}
+        // title={getFullName(novedad?.guardia)}
+        title={novedad.descrip}
+        subtitle={getDateTimeStrMes(novedad?.created_at)}
+        // left={
+        //   <Avatar
+        //     src={getUrlImages(
+        //       '/GUARD-' +
+        //         novedad?.guard_id +
+        //         '.webp?d=' +
+        //         novedad?.guardia?.updated_at,
+        //     )}
+        //     name={getFullName(novedad?.guardia)}
         //   />
         // }
-        left={
-          <Avatar
-            src={getUrlImages(
-              '/GUARD-' +
-                novedad?.guard_id +
-                '.webp?d=' +
-                novedad?.guardia?.updated_at,
-            )}
-            name={getFullName(novedad?.guardia)}
-          />
-        }>
-        <View style={{paddingTop: 8}}>
-          <Text style={{color: cssVar.cWhite}}>Descripción</Text>
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={{
-              color: cssVar.cWhiteV1,
-              fontSize: 10,
-              fontWeight: '400',
-            }}>
-            {novedad.descrip}
-          </Text>
-        </View>
-      </ItemList>
+      />
+      //    <View style={{paddingTop: 8}}>
+      //     <Text style={{color: cssVar.cWhite}}>Descripción</Text>
+      //     <Text
+      //       numberOfLines={1}
+      //       ellipsizeMode="tail"
+      //       style={{
+      //         color: cssVar.cWhiteV1,
+      //         fontSize: 10,
+      //         fontWeight: '400',
+      //       }}>
+      //       {novedad.descrip}
+      //     </Text>
+      //   </View>
+      //  </ItemList>
     );
   };
 

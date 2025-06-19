@@ -22,6 +22,7 @@ interface PropsType {
   truncateSubtitle?: boolean;
   onPressTitle?: () => void;
   onLongPress?: () => void;
+  variant?: 'V1' | 'V2';
 }
 
 export const ItemList = (props: PropsType) => {
@@ -38,6 +39,7 @@ export const ItemList = (props: PropsType) => {
     onPressTitle,
     onLongPress,
     widthMain,
+    variant,
     check = null,
   } = props;
 
@@ -47,10 +49,11 @@ export const ItemList = (props: PropsType) => {
       onLongPress={onLongPress ? () => onLongPress() : undefined}>
       <View
         style={{
-          ...theme.itemList,
-          // paddingHorizontal: 0,
-          // borderRadius: 0,
-          // marginBottom: 0,
+          ...(variant == 'V1'
+            ? theme.ItemListV1
+            : variant == 'V2'
+            ? theme.ItemListV2
+            : theme.itemList),
           ...style,
         }}>
         <View style={theme.container}>
@@ -98,13 +101,13 @@ export const ItemList = (props: PropsType) => {
         </View>
         {children && <View style={{}}>{children}</View>}
         {date && (
-          <View style={theme.date}>
+          <>
             {typeof date == 'string' ? (
               <Text style={theme.date}>{date}</Text>
             ) : (
-              <Text>{date}</Text>
+              date
             )}
-          </View>
+          </>
         )}
       </View>
     </TouchableOpacity>
@@ -114,10 +117,22 @@ export const ItemList = (props: PropsType) => {
 const theme: ThemeType = {
   itemList: {
     backgroundColor: cssVar.cWhiteV2,
-    padding: 12,
-    borderRadius: 12,
+    padding: 8,
+    borderRadius: 8,
     marginVertical: 4,
     // marginBottom: 8,
+  },
+  ItemListV1: {
+    backgroundColor: 'transparent',
+    padding: 0,
+    borderRadius: 0,
+    marginVertical: 4,
+  },
+  ItemListV2: {
+    borderWidth: 0.5,
+    padding: 8,
+    borderRadius: 12,
+    borderColor: cssVar.cWhiteV1,
   },
   container: {
     overflow: 'hidden',
@@ -137,12 +152,14 @@ const theme: ThemeType = {
     color: cssVar.cWhite,
     fontSize: cssVar.sM,
     fontFamily: FONTS.medium,
+    marginTop: 4,
   },
   subtitle: {
     color: cssVar.cWhiteV1,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
     textAlign: 'left',
+    marginTop: 2,
   },
   subtitle2: {
     color: cssVar.cWhiteV1,
