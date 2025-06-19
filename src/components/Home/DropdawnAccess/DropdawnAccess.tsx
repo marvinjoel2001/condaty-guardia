@@ -72,7 +72,7 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
         <View
           onTouchEnd={toggleDropdown}
           style={{
-            borderWidth: 1,
+            borderWidth: 0.5,
             borderBottomWidth: 0,
             borderBottomColor: cssVar.cBlack,
             borderColor: cssVar.cWhiteV1,
