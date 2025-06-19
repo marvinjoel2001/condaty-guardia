@@ -52,6 +52,23 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
   return (
     <PanGestureHandler onGestureEvent={handlePanGesture}>
       <Animated.View style={[styles.container, animatedStyle]}>
+        <View
+          style={{
+            borderWidth: 1,
+            borderBottomWidth: 2,
+            borderBottomColor: cssVar.cBlack,
+            borderColor: cssVar.cWhiteV1,
+            width: 94,
+            height: 31,
+            margin: 'auto',
+            borderTopLeftRadius: 47,
+            borderTopRightRadius: 47,
+            position: 'absolute',
+            top: -30,
+            left: Dimensions.get('window').width / 2 - 47,
+          }}>
+          <Text style={{color: 'white'}}>aaaa</Text>
+        </View>
         <View onTouchEnd={toggleDropdown} style={styles.containerLine}>
           <View style={styles.line}></View>
         </View>
@@ -94,7 +111,7 @@ const styles = StyleSheet.create({
     bottom: isIos() ? 68.5 : 74,
     borderTopRightRadius: cssVar.bRadius,
     borderTopLeftRadius: cssVar.bRadius,
-    overflow: 'hidden',
+    // overflow: 'hidden',
     borderWidth: 0.5,
     borderBottomWidth: 0,
     borderTopColor: cssVar.cWhiteV1,
