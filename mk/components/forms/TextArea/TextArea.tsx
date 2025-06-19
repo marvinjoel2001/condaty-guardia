@@ -101,7 +101,11 @@ const theme: ThemeType = {
   counter: {
     fontSize: cssVar.spM,
     color: cssVar.cWhite,
-    textAlign: 'right',
+    // textAlign: 'right',
+    bottom: -18,
+    position: 'absolute',
     marginTop: 4,
+
+    right: 0,
   },
 };

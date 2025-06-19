@@ -88,10 +88,6 @@ const ControlLabel = ({
             <Text
               style={{
                 ...theme.textLength,
-                color:
-                  maxLength <= (value + '').length
-                    ? cssVar.cError
-                    : cssVar.cBlack,
               }}>
               {(value + '').length} / {maxLength}
             </Text>
@@ -133,7 +129,6 @@ const theme: ThemeType = {
   },
   error: {
     marginHorizontal: cssVar.spS,
-
     fontSize: cssVar.sXs,
     color: cssVar.cError,
     fontFamily: FONTS.medium,
@@ -143,9 +138,11 @@ const theme: ThemeType = {
     fontFamily: FONTS.regular,
     textAlign: 'right',
     marginBottom: cssVar.spS,
+    color: cssVar.cWhite,
   },
   viewBottom: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     width: '100%',
   },
   iconLeft: {

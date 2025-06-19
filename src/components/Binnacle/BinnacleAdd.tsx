@@ -59,6 +59,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       buttonCancel="">
       <View style={{marginTop: 12}}>
         <TextArea
+          type="textArea"
           label="Descripción"
           name="descrip"
           placeholder="Escribir reporte..."
@@ -68,7 +69,9 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}
         />
+
         <UploadImage
+          style={{marginTop: 0}}
           setFormState={setFormState}
           formState={formState}
           label="Adjuntar imagen"
