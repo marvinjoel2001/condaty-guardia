@@ -51,16 +51,7 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
         ) : (
           <>
             <Text style={styles.text}>Imagen del reporte</Text>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                marginTop: 16,
-                borderRadius: 10,
-                height: 180,
-                width: '100%',
-                backgroundColor: cssVar.cWhiteV2,
-              }}>
+            <View style={styles.containerImage}>
               <Image
                 source={{
                   uri: getUrlImages(
@@ -97,5 +88,14 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     fontSize: 14,
     marginTop: 12,
+  },
+  containerImage: {
+    flex: 1,
+    justifyContent: 'center',
+    marginTop: 16,
+    borderRadius: 10,
+    height: 180,
+    width: '100%',
+    backgroundColor: cssVar.cWhiteV2,
   },
 });
