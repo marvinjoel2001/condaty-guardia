@@ -58,10 +58,10 @@ export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypePro
     } else {
       setFormState({
         ...formState,
-        name: '',
-        middle_name: '',
-        last_name: '',
-        mother_last_name: '',
+        name: editItem ? formState.name : '',
+        middle_name: editItem ? formState.middle_name : '',
+        last_name: editItem ? formState.last_name : '',
+        mother_last_name: editItem ? formState.mother_last_name : '',
         ciDisabled: false,
       });
     }
@@ -107,6 +107,24 @@ export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypePro
   // console.log(item,'item aad')
   const onSave = async () => {
     let acompanantes = item?.acompanantes || [];
+    if (editItem) {
+      acompanantes = acompanantes.map((acompanante: any) =>
+        acompanante.ci === editItem.ci
+          ? {
+              ci: formState.ci,
+              name: formState.name,
+              middle_name: formState.middle_name,
+              last_name: formState.last_name,
+              mother_last_name: formState.mother_last_name,
+            }
+          : acompanante
+      );
+      setItem({...item, acompanantes});
+      _onClose();
+      setFormState({});
+      showToast('Acompañante editado');
+      return;
+    }
     if (acompanantes?.length > 0) {
       const exist = acompanantes.find(
         (acompanante: any) => acompanante.ci === formState.ci,
