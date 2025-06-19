@@ -8,7 +8,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconGenericQr, IconNoQr} from '../../../icons/IconLibrary';
+import {
+  IconArrowDown,
+  IconArrowUp,
+  IconGenericQr,
+  IconNoQr,
+} from '../../../icons/IconLibrary';
 import {isIos} from '../../../../mk/utils/utils';
 
 const CLOSED_HEIGHT = 40;
@@ -22,6 +27,7 @@ type PropsType = {
 const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
   const [openDrop, setOpenDrop] = useState(false);
   const translateY = useSharedValue(CLOSED_HEIGHT);
+  const [showButtons, setShowButtons] = useState(false);
 
   const animatedStyle = useAnimatedStyle(() => ({
     height: translateY.value,
@@ -31,6 +37,13 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
     const newHeight = openDrop ? CLOSED_HEIGHT : OPEN_HEIGHT;
     translateY.value = withSpring(newHeight, {damping: 15, stiffness: 120});
     setOpenDrop(!openDrop);
+    if (!openDrop) {
+      setTimeout(() => {
+        setShowButtons(true);
+      }, 300);
+    } else {
+      setShowButtons(false);
+    }
   };
 
   const handlePanGesture = ({nativeEvent}: any) => {
@@ -40,12 +53,16 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
         stiffness: 120,
       });
       setOpenDrop(true);
+      setTimeout(() => {
+        setShowButtons(true);
+      }, 300);
     } else if (nativeEvent.translationY > 10) {
       translateY.value = withSpring(CLOSED_HEIGHT, {
         damping: 15,
         stiffness: 120,
       });
       setOpenDrop(false);
+      setShowButtons(false);
     }
   };
 
@@ -53,28 +70,46 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
     <PanGestureHandler onGestureEvent={handlePanGesture}>
       <Animated.View style={[styles.container, animatedStyle]}>
         <View
+          onTouchEnd={toggleDropdown}
           style={{
             borderWidth: 1,
             borderBottomWidth: 2,
             borderBottomColor: cssVar.cBlack,
             borderColor: cssVar.cWhiteV1,
+            backgroundColor: cssVar.cBlack,
             width: 94,
             height: 31,
             margin: 'auto',
-            borderTopLeftRadius: 47,
-            borderTopRightRadius: 47,
+            borderTopLeftRadius: 38,
+            borderTopRightRadius: 38,
+            justifyContent: 'center',
+            alignItems: 'center',
             position: 'absolute',
             top: -30,
             left: Dimensions.get('window').width / 2 - 47,
           }}>
-          <Text style={{color: 'white'}}>aaaa</Text>
+          {openDrop ? (
+            <Icon
+              style={{marginTop: 4}}
+              name={IconArrowDown}
+              color={cssVar.cWhite}
+            />
+          ) : (
+            <Icon
+              style={{marginTop: 4}}
+              name={IconArrowUp}
+              color={cssVar.cWhite}
+            />
+          )}
         </View>
-        <View onTouchEnd={toggleDropdown} style={styles.containerLine}>
+        {/* <View onTouchEnd={toggleDropdown} style={styles.containerLine}>
           <View style={styles.line}></View>
-        </View>
-        {openDrop && (
+        </View> */}
+        {showButtons && (
           <>
-            <Text style={styles.text}>Permitir ingreso</Text>
+            <Text style={{...styles.text, marginTop: 20}}>
+              Permitir ingreso
+            </Text>
             <View
               onTouchEnd={e => {
                 e.stopPropagation();
@@ -116,18 +151,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
     borderTopColor: cssVar.cWhiteV1,
   },
-  containerLine: {
-    alignItems: 'center',
-    width: '100%',
-    justifyContent: 'center',
-    height: 40,
-  },
-  line: {
-    backgroundColor: cssVar.cWhiteV1,
-    height: 6,
-    width: 54,
-    borderRadius: cssVar.bRadiusL,
-  },
+  // containerLine: {
+  //   alignItems: 'center',
+  //   width: '100%',
+  //   justifyContent: 'center',
+  //   height: 40,
+  // },
+  // line: {
+  //   backgroundColor: cssVar.cWhiteV1,
+  //   height: 6,
+  //   width: 54,
+  //   borderRadius: cssVar.bRadiusL,
+  // },
   text: {
     color: cssVar.cWhite,
     textAlign: 'center',
@@ -138,11 +173,13 @@ const styles = StyleSheet.create({
   containerButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    // overflow: 'hidden',
   },
   buttons: {
     backgroundColor: cssVar.cBlackV1,
     paddingVertical: cssVar.spL,
     paddingHorizontal: cssVar.spXxl,
+    // overflow: 'hidden',
     borderRadius: cssVar.bRadius,
   },
 });
