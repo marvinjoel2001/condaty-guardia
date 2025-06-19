@@ -152,7 +152,6 @@ const theme: ThemeType = {
     color: cssVar.cWhite,
     fontSize: cssVar.sM,
     fontFamily: FONTS.medium,
-    marginTop: 4,
   },
   subtitle: {
     color: cssVar.cWhiteV1,
