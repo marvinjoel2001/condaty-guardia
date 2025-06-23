@@ -2281,7 +2281,7 @@ SPEC CHECKSUMS:
   OneSignalXCFramework: f5b2a3c4f130e4c910ead7bb25bed7455e976fbf
   pusher-websocket-react-native: e40c49a1e4ec96d4157375aebcf44943f0f8f62f
   PusherSwift: cad631bad86cfff4b8458dce1310a7774e469b1f
-  RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
+  RCT-Folly: 36fe2295e44b10d831836cc0d1daec5f8abcf809
   RCTDeprecation: 664055db806cce35c3c1b43c84414dd66e117ae6
   RCTRequired: dc9a83fa1012054f94430d210337ca3a1afe6fc0
   RCTTypeSafety: 031cefa254a1df313a196f105b8fcffdab1c5ab6
@@ -2366,4 +2366,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ebd3c60c31743c29d3bb19d655c677b10146c238
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
