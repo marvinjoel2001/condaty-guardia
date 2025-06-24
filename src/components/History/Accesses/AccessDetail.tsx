@@ -258,7 +258,37 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow label="Observación de salida" value={item.obs_out} />
             </View>
           </View>
-          <View style={styles.mainCard}>
+          {driver && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Taxista</Text>
+              <TouchableOpacity onPress={() => handleOpenPersonDetailModal(driverAccess, 'Taxista', item)} activeOpacity={0.7}>
+                <View style={styles.personBlock}>
+                  <Avatar 
+                    name={getFullName(driver)} 
+                    src={getUrlImages('/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at)} 
+                    w={40} 
+                    h={40} 
+                  />
+                  <View style={styles.personInfoContainer}>
+                    <Text style={styles.personName}>{getFullName(driver)}</Text>
+                    <Text style={styles.personSubDetail}>{(driver.ci ? `C.I. ${driver.ci}` : '') + (driver.ci && driverAccess.plate ? ' • ' : '') + (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')}</Text>
+                  </View>
+                  <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+          {companions && companions.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Acompañante{companions.length > 1 ? 's' : ''}</Text>
+              {companions.map((companionAccess: any, index: number) => (
+                <View key={`companion-wrapper-${companionAccess.id || index}`} style={index > 0 ? styles.additionalCompanionWrapper : null}>
+                  <CompanionItem companionAccess={companionAccess} onPress={() => handleOpenPersonDetailModal(companionAccess, 'Acompañante', item)} />
+                </View>
+              ))}
+            </View>
+          )}
+          <View style={styles.mainCardR}>
             <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
             <TouchableOpacity onPress={() => handleOpenPersonDetailModal(resident, 'Residente', item)} activeOpacity={0.7}>
               <View style={styles.personBlock}>
@@ -309,7 +339,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow label="Guardia de salida" value={getFullName(item.out_guard)} />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
-              <DetailRow label={item.out_at ? "Visitó a" : "Visita a"} value={getFullName(resident)} />
+              {!(item.type === 'I' || item.type === 'G') && (
+                <DetailRow label={item.out_at ? "Visitó a" : "Visita a"} value={getFullName(resident)} />
+              )}
               {(item.type === 'I' || item.type === 'G') && item.invitation?.date_event && <DetailRow label="Fecha de invitación" value={getDateStrMes(item.invitation.date_event)} />}
               {(item.type === 'I' || item.type === 'G') && item.invitation?.obs && <DetailRow label="Descripción (Invitación)" value={item.invitation.obs} />}
               {statusText === 'Denegado' && (<><DetailRow label="Fecha de denegación" value={getDateTimeStrMes(item.confirm_at)} /><DetailRow label="Motivo" value={item.obs_confirm} /></>)}
@@ -347,6 +379,26 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             </View>
           )}
         </View>
+        {(item.type === 'I' || item.type === 'G' || item.type === 'F') && (
+          <View style={styles.mainCardR}>
+            <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+            <TouchableOpacity onPress={() => handleOpenPersonDetailModal(resident, 'Residente', item)} activeOpacity={0.7}>
+              <View style={styles.personBlock}>
+                <Avatar 
+                  name={getFullName(resident)} 
+                  src={getUrlImages('/OWNER-' + resident?.id + '.webp?d=' + resident?.updated_at)} 
+                  w={40} 
+                  h={40} 
+                />
+                <View style={styles.personInfoContainer}>
+                  <Text style={styles.personName}>{getFullName(resident)}</Text>
+                  <Text style={styles.personSubDetail}>Unidad: {resident?.dpto?.[0]?.nro}, {resident?.dpto?.[0]?.description}</Text>
+                </View>
+                <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     );
   };
@@ -410,6 +462,13 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     gap: 16,
+  },
+  mainCardR: {
+    backgroundColor: cssVar.cBlackV2,
+    padding:12,
+    borderRadius: 12,
+    gap: 16,
+    marginBottom:12
   },
   sectionContainer: {
     gap: 12,
