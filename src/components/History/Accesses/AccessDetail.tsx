@@ -74,6 +74,18 @@ const CompanionItem = ({ companionAccess, onPress }: CompanionItemProps) => {
   );
 };
 
+// Helper para días de la semana en QR frecuente
+function parseWeekDays(binaryNumber: number): string[] {
+  const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  const result: string[] = [];
+  for (let i = 0; i < 7; i++) {
+    if (binaryNumber & (1 << i)) {
+      result.push(diasSemana[i]);
+    }
+  }
+  return result;
+}
+
 const AccessDetail = ({open, onClose, id}: Props) => {
   const [accessData, setAccessData] = useState<any>(null);
   const {execute} = useApi();
@@ -258,7 +270,37 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow label="Observación de salida" value={item.obs_out} />
             </View>
           </View>
-          <View style={styles.mainCard}>
+          {driver && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Taxista</Text>
+              <TouchableOpacity onPress={() => handleOpenPersonDetailModal(driverAccess, 'Taxista', item)} activeOpacity={0.7}>
+                <View style={styles.personBlock}>
+                  <Avatar 
+                    name={getFullName(driver)} 
+                    src={getUrlImages('/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at)} 
+                    w={40} 
+                    h={40} 
+                  />
+                  <View style={styles.personInfoContainer}>
+                    <Text style={styles.personName}>{getFullName(driver)}</Text>
+                    <Text style={styles.personSubDetail}>{(driver.ci ? `C.I. ${driver.ci}` : '') + (driver.ci && driverAccess.plate ? ' • ' : '') + (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')}</Text>
+                  </View>
+                  <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+          {companions && companions.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Acompañante{companions.length > 1 ? 's' : ''}</Text>
+              {companions.map((companionAccess: any, index: number) => (
+                <View key={`companion-wrapper-${companionAccess.id || index}`} style={index > 0 ? styles.additionalCompanionWrapper : null}>
+                  <CompanionItem companionAccess={companionAccess} onPress={() => handleOpenPersonDetailModal(companionAccess, 'Acompañante', item)} />
+                </View>
+              ))}
+            </View>
+          )}
+          <View style={styles.mainCardR}>
             <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
             <TouchableOpacity onPress={() => handleOpenPersonDetailModal(resident, 'Residente', item)} activeOpacity={0.7}>
               <View style={styles.personBlock}>
@@ -309,7 +351,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow label="Guardia de salida" value={getFullName(item.out_guard)} />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
-              <DetailRow label={item.out_at ? "Visitó a" : "Visita a"} value={getFullName(resident)} />
+              {!(item.type === 'I' || item.type === 'G') && (
+                <DetailRow label={item.out_at ? "Visitó a" : "Visita a"} value={getFullName(resident)} />
+              )}
               {(item.type === 'I' || item.type === 'G') && item.invitation?.date_event && <DetailRow label="Fecha de invitación" value={getDateStrMes(item.invitation.date_event)} />}
               {(item.type === 'I' || item.type === 'G') && item.invitation?.obs && <DetailRow label="Descripción (Invitación)" value={item.invitation.obs} />}
               {statusText === 'Denegado' && (<><DetailRow label="Fecha de denegación" value={getDateTimeStrMes(item.confirm_at)} /><DetailRow label="Motivo" value={item.obs_confirm} /></>)}
@@ -347,6 +391,26 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             </View>
           )}
         </View>
+        {(item.type === 'I' || item.type === 'G' || item.type === 'F') && (
+          <View style={styles.mainCardR}>
+            <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+            <TouchableOpacity onPress={() => handleOpenPersonDetailModal(resident, 'Residente', item)} activeOpacity={0.7}>
+              <View style={styles.personBlock}>
+                <Avatar 
+                  name={getFullName(resident)} 
+                  src={getUrlImages('/OWNER-' + resident?.id + '.webp?d=' + resident?.updated_at)} 
+                  w={40} 
+                  h={40} 
+                />
+                <View style={styles.personInfoContainer}>
+                  <Text style={styles.personName}>{getFullName(resident)}</Text>
+                  <Text style={styles.personSubDetail}>Unidad: {resident?.dpto?.[0]?.nro}, {resident?.dpto?.[0]?.description}</Text>
+                </View>
+                <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     );
   };
@@ -359,38 +423,88 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
       {isPersonDetailModalVisible && modalPersonData && (
         <Modal 
-          title={`Detalle del ${modalPersonData.typeLabel}`} 
+          title={modalPersonData.typeLabel === 'Residente' ? 'Detalle de invitación' : `Detalle del ${modalPersonData.typeLabel}`}
           open={isPersonDetailModalVisible} 
           onClose={handleClosePersonDetailModal}
         >
           <ScrollView contentContainerStyle={styles.personDetailModalInnerContent}>
             <View style={styles.personDetailModalCardContent}>
-              <View style={styles.personBlock}>
-                <Avatar
-                  name={getFullName(modalPersonData.person)}
-                  src={getUrlImages('/OWNER-' + modalPersonData.person?.id + '.webp?d=' + modalPersonData.person?.updated_at)}
-                  w={40}
-                  h={40}
-                />
-                <View style={styles.personInfoContainer}>
-                  <Text style={styles.personName}>{getFullName(modalPersonData.person)}</Text>
-                  <Text style={styles.personSubDetail}>
-                    {(modalPersonData.person?.ci ? `C.I. ${modalPersonData.person.ci}` : '') +
-                     (modalPersonData.typeLabel === 'Taxista' && modalPersonData.person?.ci && modalPersonData.plate ? ' • ' : '') +
-                     (modalPersonData.typeLabel === 'Taxista' && modalPersonData.plate ? `Placa: ${modalPersonData.plate}`: '')
-                    }
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.detailsGroup}>
-                <DetailRow label="Estado" value={modalPersonData.statusText} valueStyle={{color: modalPersonData.statusColor, fontFamily: FONTS.semiBold}} />
-                <DetailRow label="Fecha y hora de ingreso" value={getDateTimeStrMes(modalPersonData.accessInAt)} />
-                <DetailRow label="Fecha y hora de salida" value={getDateTimeStrMes(modalPersonData.accessOutAt)} />
-                <DetailRow label="Guardia de ingreso" value={getFullName(accessData?.guardia)} />
-                <DetailRow label="Guardia de salida" value={getFullName(accessData?.out_guard)} />
-                <DetailRow label="Observación de ingreso" value={modalPersonData.accessObsIn} />
-                <DetailRow label="Observación de salida" value={modalPersonData.accessObsOut} />
-              </View>
+              {modalPersonData.typeLabel === 'Residente' && accessData ? (
+                <>
+                  <View style={styles.personBlock}>
+                    <Avatar
+                      name={getFullName(modalPersonData.person)}
+                      src={getUrlImages('/OWNER-' + modalPersonData.person?.id + '.webp?d=' + modalPersonData.person?.updated_at)}
+                      w={40}
+                      h={40}
+                    />
+                    <View style={styles.personInfoContainer}>
+                      <Text style={styles.personName}>{getFullName(modalPersonData.person)}</Text>
+                      <Text style={styles.personSubDetail}>
+                        Unidad: {modalPersonData.person?.dpto?.[0]?.nro}, {modalPersonData.person?.dpto?.[0]?.description}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.detailsGroup}>
+                    {accessData.type === 'I' && (
+                      <>
+                        <DetailRow label="Tipo de invitación" value={accessData.invitation?.type_name || 'QR Individual'} />
+                        <DetailRow label="Fecha de invitación" value={getDateStrMes(accessData.invitation?.date_event)} />
+                        <DetailRow label="Descripción" value={accessData.invitation?.obs} />
+                      </>
+                    )}
+                    {accessData.type === 'G' && (
+                      <>
+                        <DetailRow label="Tipo de invitación" value={accessData.invitation?.type_name || 'QR Grupal'} />
+                        <DetailRow label="Evento" value={accessData.invitation?.title} />
+                        <DetailRow label="Cantidad de invitados" value={accessData.invitation?.max_companions?.toString()} />
+                        <DetailRow label="Descripción" value={accessData.invitation?.obs} />
+                      </>
+                    )}
+                    {accessData.type === 'F' && (
+                      <>
+                        <DetailRow label="Tipo de invitación" value={accessData.invitation?.type_name || 'QR Frecuente'} />
+                        <DetailRow label="Periodo de validez" value={accessData.invitation?.start_date && accessData.invitation?.end_date ? `${getDateStrMes(accessData.invitation?.start_date)} a ${getDateStrMes(accessData.invitation?.end_date)}` : undefined} />
+                        <DetailRow label="Indicaciones" value={accessData.invitation?.obs} />
+                        <View style={{height: 0.5 , backgroundColor: cssVar.cWhiteV1}} />
+                        <Text style={{fontSize: 16, color: cssVar.cWhite, fontFamily: FONTS.semiBold, marginBottom: 12}}>Configuración avanzada</Text>
+                        <DetailRow label="Días de acceso" value={accessData.invitation?.weekday ? parseWeekDays(accessData.invitation?.weekday).join(', ') : undefined} />
+                        <DetailRow label="Horario permitido" value={accessData.invitation?.start_time && accessData.invitation?.end_time ? `${accessData.invitation?.start_time.slice(0,5)} - ${accessData.invitation?.end_time.slice(0,5)}` : undefined} />
+                        <DetailRow label="Cantidad de accesos" value={accessData.invitation?.max_entries?.toString()} />
+                      </>
+                    )}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View style={styles.personBlock}>
+                    <Avatar
+                      name={getFullName(modalPersonData.person)}
+                      src={getUrlImages('/OWNER-' + modalPersonData.person?.id + '.webp?d=' + modalPersonData.person?.updated_at)}
+                      w={40}
+                      h={40}
+                    />
+                    <View style={styles.personInfoContainer}>
+                      <Text style={styles.personName}>{getFullName(modalPersonData.person)}</Text>
+                      <Text style={styles.personSubDetail}>
+                        {(modalPersonData.person?.ci ? `C.I. ${modalPersonData.person.ci}` : '') +
+                         (modalPersonData.typeLabel === 'Taxista' && modalPersonData.person?.ci && modalPersonData.plate ? ' • ' : '') +
+                         (modalPersonData.typeLabel === 'Taxista' && modalPersonData.plate ? `Placa: ${modalPersonData.plate}`: '')
+                        }
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.detailsGroup}>
+                    <DetailRow label="Estado" value={modalPersonData.statusText} valueStyle={{color: modalPersonData.statusColor, fontFamily: FONTS.semiBold}} />
+                    <DetailRow label="Fecha y hora de ingreso" value={getDateTimeStrMes(modalPersonData.accessInAt)} />
+                    <DetailRow label="Fecha y hora de salida" value={getDateTimeStrMes(modalPersonData.accessOutAt)} />
+                    <DetailRow label="Guardia de ingreso" value={getFullName(accessData?.guardia)} />
+                    <DetailRow label="Guardia de salida" value={getFullName(accessData?.out_guard)} />
+                    <DetailRow label="Observación de ingreso" value={modalPersonData.accessObsIn} />
+                    <DetailRow label="Observación de salida" value={modalPersonData.accessObsOut} />
+                  </View>
+                </>
+              )}
             </View>
           </ScrollView>
         </Modal>
@@ -410,6 +524,13 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     gap: 16,
+  },
+  mainCardR: {
+    backgroundColor: cssVar.cBlackV2,
+    padding:12,
+    borderRadius: 12,
+    gap: 16,
+    marginBottom:12
   },
   sectionContainer: {
     gap: 12,
@@ -438,12 +559,14 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     gap: 8,
+    marginBottom:12
   },
   personInfoContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     gap: 2,
+    marginTop: 12
   },
   personName: {
     fontFamily: FONTS.medium,
