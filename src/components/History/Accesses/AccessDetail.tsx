@@ -559,12 +559,14 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     gap: 8,
+    marginBottom:12
   },
   personInfoContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     gap: 2,
+    marginTop: 12
   },
   personName: {
     fontFamily: FONTS.medium,
