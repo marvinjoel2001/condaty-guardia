@@ -26,7 +26,7 @@ const HeadDashboardTitle = ({user, stop, setOpenDropdown, theme}: Props) => {
           navigation.navigate('Profile');
         }}
         src={getUrlImages('/GUARD-' + user?.id + '.webp?d=' + user?.updated_at)}
-        name={getFullName(user)}
+        name={getFullName(user, 'NsLm')}
       />
 
       <View style={{width: 200}}>
