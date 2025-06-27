@@ -94,7 +94,7 @@ export const convertirFechaUTCaLocal = (fechaUTCString: string | null) => {
 // };
 export const getDateTimeStrMes = (
   dateStr: string | null = '',
-  utc: boolean = false,
+  utc: boolean = true,
 ): string => {
   if (!dateStr || dateStr === '') return '';
 
