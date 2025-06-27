@@ -13,6 +13,7 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 
 type PropsType = {
   setFormState: any;
@@ -267,17 +268,25 @@ const FrequentQR = ({
         </View>
 
         {!visit?.ci && data?.status !== 'X' && (
-          <Input
-            label="Carnet del visitante*"
-            name="ci"
-            maxLength={10}
-            keyboardType="numeric"
-            value={formState?.ci || ''}
-            error={errors}
-            required
-            onChange={(value: string) => handleChange('ci', value)}
-            onBlur={onExistVisits}
-          />
+          <>
+            <InputFullName
+              formState={formState}
+              errors={errors}
+              handleChangeInput={handleChange}
+              inputGrid={true}
+            />
+            <Input
+              label="Carnet del visitante"
+              name="ci"
+              maxLength={10}
+              keyboardType="numeric"
+              value={formState?.ci || ''}
+              error={errors}
+              required
+              onChange={(value: string) => handleChange('ci', value)}
+              onBlur={onExistVisits}
+            />
+          </>
         )}
 
         {data?.status !== 'X' && (

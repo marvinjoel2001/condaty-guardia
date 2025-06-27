@@ -164,7 +164,11 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
 
   const onSaveAccess = async () => {
     if (!data) return;
-    if (hasErrors(validate())) {
+    console.log('formState antes de validar:', formState);
+    const validationErrors = validate();
+    if (hasErrors(validationErrors)) {
+      showToast('Errores: ' + JSON.stringify(validationErrors), 'error');
+      console.log('Errores de validación:', validationErrors);
       return;
     }
     
@@ -210,7 +214,15 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       setFormState({});
       onClose();
     } else {
-      showToast(In.message, 'error');
+      let errorMsg = '';
+      if (typeof In.message === 'string') {
+        errorMsg = In.message;
+      } else if (typeof In.message === 'object') {
+        errorMsg = JSON.stringify(In.message);
+      } else {
+        errorMsg = 'Error desconocido';
+      }
+      showToast(errorMsg, 'error');
       onClose();
     }
   };
