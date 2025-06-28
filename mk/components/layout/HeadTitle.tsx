@@ -121,21 +121,21 @@ const HeadTitle = ({
       );
     }
     if (right) {
-        return <View style={theme.sideComponent}>{right}</View>;
+      return <View style={theme.sideComponent}>{right}</View>;
     }
     if (route.name === 'Home' && !onlyBack) {
       return (
         <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
-            <View style={theme.sideComponent}>
-                <Icon name={IconNotification} color={cssVar.cWhite} />
-                {counter > 0 && (
-                    <View style={theme.notifPoint}>
-                    <Text style={theme.notifPointNumber}>
-                        {counter > 99 ? '99+' : counter}
-                    </Text>
-                    </View>
-                )}
-            </View>
+          <View style={theme.sideComponent}>
+            <Icon name={IconNotification} color={cssVar.cWhite} />
+            {counter > 0 && (
+              <View style={theme.notifPoint}>
+                <Text style={theme.notifPointNumber}>
+                  {counter > 99 ? '99+' : counter}
+                </Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
       );
     }
@@ -155,7 +155,7 @@ const HeadTitle = ({
           </Text>
         )}
       </View>
-      
+
       <View style={theme.rightSlotContainer}>{renderRightComponent()}</View>
     </Animated.View>
   );
