@@ -29,7 +29,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const codeId: any = code[3];
 
   const handleChange = (key: string, value: any) => {
-    setFormState((prevState:any) => ({...prevState, [key]: value}));
+    setFormState((prevState: any) => ({...prevState, [key]: value}));
   };
 
   useEffect(() => {
@@ -56,12 +56,15 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           type: 'O',
           status,
         });
+      } else if (QR?.success && (!QR.data || QR.data.length === 0)) {
+        showToast('Llave QR no encontrada o no válida.', 'error');
+        onClose();
       } else {
-        showToast(QR?.message || 'Llave QR no válida.', 'error');
+        showToast(QR?.message || 'Error al consultar la llave QR.', 'error');
         onClose();
       }
     };
-    
+
     const getInvitation = async () => {
       const {data: invitation} = await execute(
         '/invitations',
@@ -82,28 +85,32 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         onClose();
       }
     };
-    
+
     if (open) {
-        setData(null);
-        setFormState({});
-        if (typeFromQr === 'O') {
-            getOwner();
-        } else if (['I', 'G', 'F'].includes(typeFromQr)) {
-            getInvitation();
-        } else {
-          showToast('Tipo de QR no reconocido.', 'error');
-          onClose();
-        }
+      setData(null);
+      setFormState({});
+      if (typeFromQr === 'O') {
+        getOwner();
+      } else if (['I', 'G', 'F'].includes(typeFromQr)) {
+        getInvitation();
+      } else {
+        showToast('Tipo de QR no reconocido.', 'error');
+        onClose();
+      }
     }
   }, [code, open]);
 
   useEffect(() => {
     if (data) {
       const currentVisit = data.visit;
-      const lastAccessRecord = data.access && data.access.length > 0 ? data.access[data.access.length - 1] : null;
-      const visitorIsInside = lastAccessRecord && lastAccessRecord.in_at && !lastAccessRecord.out_at;
+      const lastAccessRecord =
+        data.access && data.access.length > 0
+          ? data.access[data.access.length - 1]
+          : null;
+      const visitorIsInside =
+        lastAccessRecord && lastAccessRecord.in_at && !lastAccessRecord.out_at;
 
-      setFormState((prevState:any) => ({
+      setFormState((prevState: any) => ({
         ...prevState,
         ci: currentVisit?.ci || '',
         name: currentVisit?.name || '',
@@ -141,20 +148,65 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const validate = () => {
     let currentErrors: any = {};
     if (!data) return currentErrors;
-    
+
     if (['I', 'G', 'F'].includes(data.type)) {
-      currentErrors = checkRules({ value: formState.ci, rules: ['required', 'ci'], key: 'ci', errors: currentErrors });
-      currentErrors = checkRules({ value: formState.name, rules: ['required', 'alpha'], key: 'name', errors: currentErrors });
-      currentErrors = checkRules({ value: formState.middle_name, rules: ['alpha'], key: 'middle_name', errors: currentErrors });
-      currentErrors = checkRules({ value: formState.last_name, rules: ['required', 'alpha'], key: 'last_name', errors: currentErrors });
-      currentErrors = checkRules({ value: formState.mother_last_name, rules: ['alpha'], key: 'mother_last_name', errors: currentErrors });
-      
+      currentErrors = checkRules({
+        value: formState.ci,
+        rules: ['required', 'ci'],
+        key: 'ci',
+        errors: currentErrors,
+      });
+      currentErrors = checkRules({
+        value: formState.name,
+        rules: ['required', 'alpha'],
+        key: 'name',
+        errors: currentErrors,
+      });
+      currentErrors = checkRules({
+        value: formState.middle_name,
+        rules: ['alpha'],
+        key: 'middle_name',
+        errors: currentErrors,
+      });
+      currentErrors = checkRules({
+        value: formState.last_name,
+        rules: ['required', 'alpha'],
+        key: 'last_name',
+        errors: currentErrors,
+      });
+      currentErrors = checkRules({
+        value: formState.mother_last_name,
+        rules: ['alpha'],
+        key: 'mother_last_name',
+        errors: currentErrors,
+      });
+
       if (formState?.tab === 'V' || formState?.tab === 'T') {
-        currentErrors = checkRules({ value: formState.plate, rules: ['required', 'plate'], key: 'plate', errors: currentErrors });
+        currentErrors = checkRules({
+          value: formState.plate,
+          rules: ['required', 'plate'],
+          key: 'plate',
+          errors: currentErrors,
+        });
         if (formState?.tab === 'T') {
-          currentErrors = checkRules({ value: formState.ci_taxi, rules: ['required', 'ci'], key: 'ci_taxi', errors: currentErrors });
-          currentErrors = checkRules({ value: formState.name_taxi, rules: ['required', 'alpha'], key: 'name_taxi', errors: currentErrors });
-          currentErrors = checkRules({ value: formState.last_name_taxi, rules: ['required', 'alpha'], key: 'last_name_taxi', errors: currentErrors });
+          currentErrors = checkRules({
+            value: formState.ci_taxi,
+            rules: ['required', 'ci'],
+            key: 'ci_taxi',
+            errors: currentErrors,
+          });
+          currentErrors = checkRules({
+            value: formState.name_taxi,
+            rules: ['required', 'alpha'],
+            key: 'name_taxi',
+            errors: currentErrors,
+          });
+          currentErrors = checkRules({
+            value: formState.last_name_taxi,
+            rules: ['required', 'alpha'],
+            key: 'last_name_taxi',
+            errors: currentErrors,
+          });
         }
       }
     }
@@ -171,7 +223,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       console.log('Errores de validación:', validationErrors);
       return;
     }
-    
+
     let params = {};
     if (data.type === 'O') {
       params = {
@@ -226,38 +278,83 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       onClose();
     }
   };
-  
+
   const renderContent = () => {
     if (!data) {
-      return <Loading/>;
+      return <Loading />;
     }
     switch (data.type) {
       case 'I':
-        return <IndividualQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} errors={errors} setErrors={setErrors}/>;
+        return (
+          <IndividualQR
+            setFormState={setFormState}
+            formState={formState}
+            handleChange={handleChange}
+            data={data}
+            errors={errors}
+            setErrors={setErrors}
+          />
+        );
       case 'G':
-        return <GroupQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} errors={errors} setErrors={setErrors} setOpenSelected={setOpenSelected} openSelected={openSelected} />;
+        return (
+          <GroupQR
+            setFormState={setFormState}
+            formState={formState}
+            handleChange={handleChange}
+            data={data}
+            errors={errors}
+            setErrors={setErrors}
+            setOpenSelected={setOpenSelected}
+            openSelected={openSelected}
+          />
+        );
       case 'F':
-        return <FrequentQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} errors={errors} setErrors={setErrors} />;
+        return (
+          <FrequentQR
+            setFormState={setFormState}
+            formState={formState}
+            handleChange={handleChange}
+            data={data}
+            errors={errors}
+            setErrors={setErrors}
+          />
+        );
       case 'O':
-        return <KeyQR setFormState={setFormState} formState={formState} handleChange={handleChange} data={data} />;
+        return (
+          <KeyQR
+            setFormState={setFormState}
+            formState={formState}
+            handleChange={handleChange}
+            data={data}
+          />
+        );
       default:
         return null;
     }
-  }
+  };
 
   const getModalTitle = () => {
     if (!data) return 'Cargando...';
     switch (data.type) {
-      case 'I': return 'QR Individual';
-      case 'G': return 'QR Grupal';
-      case 'F': return 'QR Frecuente';
-      case 'O': return 'Llave QR';
-      default: return 'Detalle de QR';
+      case 'I':
+        return 'QR Individual';
+      case 'G':
+        return 'QR Grupal';
+      case 'F':
+        return 'QR Frecuente';
+      case 'O':
+        return 'Llave QR';
+      default:
+        return 'Detalle de QR';
     }
-  }
-  
-  const lastAccess = data?.access && data.access.length > 0 ? data.access[data.access.length - 1] : null;
-  const isCurrentlyInside = lastAccess && lastAccess.in_at && !lastAccess.out_at;
+  };
+
+  const lastAccess =
+    data?.access && data.access.length > 0
+      ? data.access[data.access.length - 1]
+      : null;
+  const isCurrentlyInside =
+    lastAccess && lastAccess.in_at && !lastAccess.out_at;
 
   return (
     <ModalFull
@@ -269,11 +366,11 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       }}
       buttonCancel=""
       buttonText={
-        (!openSelected && data?.type === 'G') || data?.status === 'X' 
-        ? '' 
-        : isCurrentlyInside 
-        ? 'Registrar Salida' 
-        : 'Dejar Ingresar'
+        (!openSelected && data?.type === 'G') || data?.status === 'X'
+          ? ''
+          : isCurrentlyInside
+          ? 'Registrar Salida'
+          : 'Dejar Ingresar'
       }>
       {renderContent()}
     </ModalFull>

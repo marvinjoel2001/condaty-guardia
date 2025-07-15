@@ -65,15 +65,15 @@ const KeyQR = ({formState, setFormState, handleChange, data}: PropsType) => {
 
   return (
     <View style={{marginTop: 20, gap: 20}}>
-      {!data?.invitation ? (
+      {!data?.invitation || Object.keys(data?.invitation).length === 0 ? (
         <Text
           style={{
             textAlign: 'center',
-            color: cssVar.cWhite,
+            color: cssVar.cError,
             fontSize: 16,
             fontWeight: 'bold',
           }}>
-          Cargando...
+          Llave QR no encontrada o no válida.
         </Text>
       ) : (
         <>
