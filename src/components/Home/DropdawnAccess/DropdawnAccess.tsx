@@ -17,7 +17,7 @@ import {
 import {isIos} from '../../../../mk/utils/utils';
 
 const CLOSED_HEIGHT = 40;
-const OPEN_HEIGHT = 234;
+const OPEN_HEIGHT = 204;
 
 type PropsType = {
   onPressQr: () => void;
@@ -166,17 +166,19 @@ const styles = StyleSheet.create({
   text: {
     color: cssVar.cWhite,
     textAlign: 'center',
-    fontFamily: FONTS.semiBold,
-    fontSize: cssVar.sXxl,
+    fontFamily: FONTS.medium,
+    fontSize: cssVar.sL,
     marginBottom: cssVar.spL,
   },
   containerButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent:'center',
+    gap:32
+    // justifyContent: 'space-around',
     // overflow: 'hidden',
   },
   buttons: {
-    backgroundColor: cssVar.cBlackV1,
+    backgroundColor: cssVar.cBlackV2,
     paddingVertical: cssVar.spL,
     paddingHorizontal: cssVar.spXxl,
     justifyContent: 'center',
