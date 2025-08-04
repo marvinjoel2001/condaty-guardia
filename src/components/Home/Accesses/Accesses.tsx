@@ -20,7 +20,7 @@ interface PropsType {
 }
 const statusText: any = {
   E: 'Esperando aprobación',
-  A: 'Dejar entrar',
+  A: 'Dejar ingresar',
   N: 'Rechazado',
   S: 'Dejar salir',
 };
@@ -37,23 +37,53 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
   const [dataOrders, setDataOrders] = useState([]);
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
 
+  console.log("mi data1",data)
+  // useEffect(() => {
+  //   let _dataAccesses = [];
+  //   let _dataOrders = [];
+  //   if (typeSearch === 'I') {
+  //     _dataAccesses = data?.accesses?.filter(
+  //       (item: any) => !item?.in_at && !item?.out_at,
+  //     );
+  //     _dataOrders = data?.others?.filter(
+  //       (item: any) => !item?.access?.in_at && !item?.access?.out_at,
+  //     );
+  //   } else if (typeSearch === 'S') {
+  //     _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
+  //     _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
+  //   }
+  //   setDataAccesses(_dataAccesses);
+  //   setDataOrders(_dataOrders);
+  // }, [typeSearch, data]);
+
   useEffect(() => {
     let _dataAccesses = [];
     let _dataOrders = [];
+
     if (typeSearch === 'I') {
       _dataAccesses = data?.accesses?.filter(
-        (item: any) => !item?.in_at && !item?.out_at,
+        (item: any) => !item?.in_at && !item?.out_at && getStatus(item) !== 'N'
       );
+
       _dataOrders = data?.others?.filter(
-        (item: any) => !item?.access?.in_at && !item?.access?.out_at,
+        (item: any) => !item?.access?.in_at && !item?.access?.out_at && getStatus(item?.access) !== 'N'
       );
     } else if (typeSearch === 'S') {
-      _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
-      _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
+      _dataAccesses = data?.accesses?.filter(
+        (item: any) => item?.in_at && getStatus(item) !== 'N'
+      );
+
+      _dataOrders = data?.others?.filter(
+        (item: any) => item?.access?.in_at && getStatus(item?.access) !== 'N'
+      );
     }
+
     setDataAccesses(_dataAccesses);
     setDataOrders(_dataOrders);
   }, [typeSearch, data]);
+
+
+  // console.log("mi data2",data)
 
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
@@ -186,7 +216,14 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
         <TouchableOpacity
           style={{borderRadius: 10}}
           onPress={() => onPressDetail(item, 'O')}>
-          <Text style={buttonPrimary}>Dejar Entrar</Text>
+          <Text style={{
+              color: cssVar.cWarning,
+              backgroundColor: 'rgba(225, 193, 81, 0.2)',
+              borderRadius: 4,
+              padding: 4,
+              fontSize: 10,
+              fontFamily: FONTS.regular,
+          }}>Registrar ingreso</Text>
         </TouchableOpacity>
       );
     }
@@ -298,9 +335,9 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
     return (
       <Icon
         style={{
-          backgroundColor: cssVar.cWhite,
-          padding: 8,
-          borderRadius: 50,
+          backgroundColor: cssVar.cWhiteV1,
+          padding: 10,
+          borderRadius: 100,
         }}
         name={iconName}
         size={24}
@@ -328,20 +365,20 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
       <ItemList
         key={item?.id}
         onPress={() => onPressDetail(item, 'O')}
-        title={getFullName(
-          item?.access?.in_at ? item?.access?.visit : item?.owner,
-        )}
+        title={'Pedido/'+item?.other_type?.name}
         subtitle={
           !item?.access?.in_at
-            ? 'Detalle: ' + item?.descrip
+            ? 'Para: ' + getFullName(item?.owner)
             : 'Entregó a: ' + getFullName(item?.owner)
         }
+        // truncateSubtitle={true}
         left={iconOrder(item)}
         right={right(item)}
         // date={hours(item)}
       />
     );
   };
+  // console.log("dataacces",dataAcesses)
   return (
     <>
       {/* <List

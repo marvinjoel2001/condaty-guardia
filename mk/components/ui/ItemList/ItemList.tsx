@@ -60,10 +60,10 @@ export const ItemList = (props: PropsType) => {
           {left && <View style={theme.left}>{left}</View>}
           <View
             style={{
-              width: widthMain || 150,
-              flexGrow: 1,
+              // width: widthMain || 150,
+              flex: 1,
               overflow: 'hidden',
-              flexWrap: 'nowrap',
+              // flexWrap: 'nowrap',
             }}>
             <Text
               onPress={onPressTitle}
@@ -72,10 +72,18 @@ export const ItemList = (props: PropsType) => {
               style={theme.title}>
               {title}
             </Text>
-            {subtitle && (
+            {/* {subtitle && (
               <Text
                 ellipsizeMode={truncateSubtitle ? 'tail' : undefined}
                 numberOfLines={truncateSubtitle ? 1 : undefined}
+                style={theme.subtitle}>
+                {subtitle}
+              </Text>
+            )} */}
+            {subtitle && (
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
                 style={theme.subtitle}>
                 {subtitle}
               </Text>
