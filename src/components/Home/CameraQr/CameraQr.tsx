@@ -55,8 +55,9 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
 
     const codes = _codes[0].value;
     const data = (codes + '||').split('|');
+    console.log(data);
     if (data[0] === 'condaty' && data[1] === 'qr') {
-      const time: any = data[3].substring(data[3].length - 12);
+      const time: any = data[3].substring(data[3].length - 10);
       console.log('codes02', time);
       if (time * 1 > 2024 + 10 + 27 + 9 + 27) {
         // if (isValidTimeTemp(time) == false) {
@@ -71,7 +72,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
         //   data[3] = '';
         //   setId(null);
         // }
-        data[3] = data[3].slice(0, -12);
+        data[3] = data[3].slice(0, -10);
       }
       console.log('codes03', data[3]);
       await setCode(data);

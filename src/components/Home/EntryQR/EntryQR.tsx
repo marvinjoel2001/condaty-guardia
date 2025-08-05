@@ -45,7 +45,6 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           : 'X';
       let id = codeId.replace(ltime, '');
       id = id.replace(ltime - 4, '');
-
       const {data: QR} = await execute('/owners', 'GET', {
         searchBy: id,
         fullType: 'KEY',
@@ -367,7 +366,9 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       buttonCancel=""
       buttonText={
         (!openSelected && data?.type === 'G') || data?.status === 'X'
-          ? ''
+          ? data?.type == 'O'
+            ? 'Dejar Ingresar'
+            : ''
           : isCurrentlyInside
           ? 'Registrar Salida'
           : 'Dejar Ingresar'
