@@ -23,7 +23,7 @@ const KeyQR = ({formState, setFormState, handleChange, data}: PropsType) => {
 
   const _onDetail = (item: any) => {
     const data: ItemInfoType[] = [];
-
+    console.log(item);
     data.push({
       l: 'Propietario:',
       v: getFullName(item.invitation),

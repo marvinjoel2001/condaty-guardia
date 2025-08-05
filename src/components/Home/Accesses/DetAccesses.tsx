@@ -187,50 +187,48 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const cardDetail = () => {
     const status = getStatus();
     return (
-      <>
-        <Card>
-          <Text style={styles.labelAccess}>
-            {status == 'I' ? 'Visitó a' : 'Visita a'}
-          </Text>
-          <ItemList
-            title={getFullName(data?.owner)}
-            // subtitle={'C.I.' + data?.owner?.ci}
-            subtitle={
-              'Unidad: ' +
-              data?.owner?.dptos?.[0]?.nro +
-              ', ' +
-              data?.owner?.dptos?.[0]?.description
-            }
-            left={
-              <Avatar
-                name={getFullName(data?.owner)}
-                src={getUrlImages(
-                  '/OWNER-' +
-                    data?.owner?.id +
-                    '.webp?d=' +
-                    data?.owner?.updated_at,
-                )}
+      <Card>
+        <Text style={styles.labelAccess}>
+          {status == 'I' ? 'Visitó a' : 'Visita a'}
+        </Text>
+        <ItemList
+          title={getFullName(data?.owner)}
+          // subtitle={'C.I.' + data?.owner?.ci}
+          subtitle={
+            'Unidad: ' +
+            data?.owner?.dptos?.[0]?.nro +
+            ', ' +
+            data?.owner?.dptos?.[0]?.description
+          }
+          left={
+            <Avatar
+              name={getFullName(data?.owner)}
+              src={getUrlImages(
+                '/OWNER-' +
+                  data?.owner?.id +
+                  '.webp?d=' +
+                  data?.owner?.updated_at,
+              )}
+            />
+          }
+          right={
+            data?.type !== 'C' ? (
+              <Icon
+                name={IconExpand}
+                color={cssVar.cWhiteV1}
+                onPress={() =>
+                  setOpenDet({
+                    open: true,
+                    id: data?.invitation_id,
+                    invitation: {...data?.invitation, owner: data?.owner},
+                    type: 'I',
+                  })
+                }
               />
-            }
-            right={
-              data?.type !== 'C' ? (
-                <Icon
-                  name={IconExpand}
-                  color={cssVar.cWhiteV1}
-                  onPress={() =>
-                    setOpenDet({
-                      open: true,
-                      id: data?.invitation_id,
-                      invitation: {...data?.invitation, owner: data?.owner},
-                      type: 'I',
-                    })
-                  }
-                />
-              ) : null
-            }
-          />
-        </Card>
-      </>
+            ) : null
+          }
+        />
+      </Card>
     );
   };
   const Br = () => {
