@@ -38,49 +38,49 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
 
   console.log("mi data1",data)
-  // useEffect(() => {
-  //   let _dataAccesses = [];
-  //   let _dataOrders = [];
-  //   if (typeSearch === 'I') {
-  //     _dataAccesses = data?.accesses?.filter(
-  //       (item: any) => !item?.in_at && !item?.out_at,
-  //     );
-  //     _dataOrders = data?.others?.filter(
-  //       (item: any) => !item?.access?.in_at && !item?.access?.out_at,
-  //     );
-  //   } else if (typeSearch === 'S') {
-  //     _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
-  //     _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
-  //   }
-  //   setDataAccesses(_dataAccesses);
-  //   setDataOrders(_dataOrders);
-  // }, [typeSearch, data]);
-
   useEffect(() => {
     let _dataAccesses = [];
     let _dataOrders = [];
-
     if (typeSearch === 'I') {
       _dataAccesses = data?.accesses?.filter(
-        (item: any) => !item?.in_at && !item?.out_at && getStatus(item) !== 'N'
+        (item: any) => !item?.in_at && !item?.out_at,
       );
-
       _dataOrders = data?.others?.filter(
-        (item: any) => !item?.access?.in_at && !item?.access?.out_at && getStatus(item?.access) !== 'N'
+        (item: any) => !item?.access?.in_at && !item?.access?.out_at,
       );
     } else if (typeSearch === 'S') {
-      _dataAccesses = data?.accesses?.filter(
-        (item: any) => item?.in_at && getStatus(item) !== 'N'
-      );
-
-      _dataOrders = data?.others?.filter(
-        (item: any) => item?.access?.in_at && getStatus(item?.access) !== 'N'
-      );
+      _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
+      _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
     }
-
     setDataAccesses(_dataAccesses);
     setDataOrders(_dataOrders);
   }, [typeSearch, data]);
+
+  // useEffect(() => {
+  //   let _dataAccesses = [];
+  //   let _dataOrders = [];
+
+  //   if (typeSearch === 'I') {
+  //     _dataAccesses = data?.accesses?.filter(
+  //       (item: any) => !item?.in_at && !item?.out_at && getStatus(item) !== 'N'
+  //     );
+
+  //     _dataOrders = data?.others?.filter(
+  //       (item: any) => !item?.access?.in_at && !item?.access?.out_at && getStatus(item?.access) !== 'N'
+  //     );
+  //   } else if (typeSearch === 'S') {
+  //     _dataAccesses = data?.accesses?.filter(
+  //       (item: any) => item?.in_at && getStatus(item) !== 'N'
+  //     );
+
+  //     _dataOrders = data?.others?.filter(
+  //       (item: any) => item?.access?.in_at && getStatus(item?.access) !== 'N'
+  //     );
+  //   }
+
+  //   setDataAccesses(_dataAccesses);
+  //   setDataOrders(_dataOrders);
+  // }, [typeSearch, data]);
 
 
   // console.log("mi data2",data)
