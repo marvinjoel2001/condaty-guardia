@@ -190,7 +190,7 @@ const GroupQR = ({
                   fontWeight: '500',
                   fontSize: 8,
                 }}>
-                Dejar entrar
+                Dejar ingresar
               </Text>
             </View>
           ))

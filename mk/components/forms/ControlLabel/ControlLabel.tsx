@@ -68,10 +68,7 @@ const ControlLabel = ({
     ...(error?.[name] ? {color: cssVar.cError} : {}),
     ...(disabled ? theme.disabled : {}),
   };
-  const _label =
-    label +
-    ' ' +
-    (required ? '*' : required === false || disabled ? '' : '(opcional)');
+  const _label = label + (required ? ' *' : '');
   return (
     <View style={theme.container}>
       {iconLeft && <View style={theme.iconLeft}>{iconLeft}</View>}

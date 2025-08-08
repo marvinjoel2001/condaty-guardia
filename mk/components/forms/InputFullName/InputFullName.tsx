@@ -88,7 +88,7 @@ const InputFullName = ({
                 onChange={(value: any) => _onChange('last_name' + prefijo, value)}
               />
               </View>
-   <View style={input2}>
+  <View style={input2}>
       <Input
         label="Apellido materno"
         type="text"

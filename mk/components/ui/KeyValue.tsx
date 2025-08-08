@@ -26,8 +26,8 @@ const KeyValue = ({keys, value, colorValue, style}: PropsType) => {
 const theme: ThemeType = {
   container: {
     flexDirection: 'row',
-    gap: 8,
     marginBottom: 12,
+    marginTop:12
   },
   key: {
     flex: 1,

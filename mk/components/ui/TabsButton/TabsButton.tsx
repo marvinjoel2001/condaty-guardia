@@ -46,7 +46,7 @@ const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
                 backgroundColor: cssVar.cHoverBlackV2,
                 ...(sel === tab.value
                   ? {
-                      backgroundColor: cssVar.cHoverSuccess,
+                      backgroundColor: cssVar.cFillSidebar,
                       borderWidth: 1,
                       borderColor: cssVar.cSidebar,
                     }

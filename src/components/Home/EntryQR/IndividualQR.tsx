@@ -124,7 +124,7 @@ const IndividualQR = ({
             style={{
               
               padding: 4,
-             
+            
             }}
             onPress={() => onDelAcom(acompanante)}
           />

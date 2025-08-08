@@ -164,7 +164,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     const status = getStatus();
     const buttonTexts: Record<string, string> = {
       I: 'Dejar salir',
-      Y: 'Dejar entrar',
+      Y: 'Dejar ingresar',
       S: '',
       C: '',
     };
@@ -186,10 +186,15 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
   const cardDetail = () => {
     const status = getStatus();
+    console.log("mi data", data)
     return (
       <Card>
         <Text style={styles.labelAccess}>
-          {status == 'I' ? 'Visitó a' : 'Visita a'}
+            {status === 'I'
+              ? 'Visitó a'
+              : status === 'N'
+              ? 'Residente'
+              : 'Visita a'}
         </Text>
         <ItemList
           title={getFullName(data?.owner)}
@@ -228,6 +233,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             ) : null
           }
         />
+        {data?.confirm == 'N' && data?.obs_confirm && (
+          <KeyValue keys="Motivo del rechazo" value={data?.obs_confirm} />
+        )}
+        <Br />
+        {detailVisit(data)}
+
       </Card>
     );
   };
@@ -294,18 +305,19 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
 
   const detailVisit = (data: any) => {
+    console.log("Mi data - 1" , data)
     let visit = data.visit ? data.visit : data.owner;
 
     const isSelected = acompanSelect[data?.id || '0'];
     const acompData = data?.accesses.filter((item: any) => item.taxi != 'C');
     const taxi = data?.accesses.filter((item: any) => item.taxi == 'C');
     return (
-      <Card>
-        <Text style={styles.labelAccess}>Detalle del visitante</Text>
+      <View>
+        <Text style={styles.labelAccess}>Visitante</Text>
         <ItemList
           key={data?.visit?.id}
           title={getFullName(visit)}
-          subtitle={'C.I: ' + visit?.ci}
+          subtitle={'C.I: ' + visit?.ci + (data?.plate ? ' - Placa: ' + data?.plate : '')}
           left={<Avatar name={getFullName(visit)} />}
           right={
             data?.out_at || status === 'Y'
@@ -314,15 +326,15 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           }
           // date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
         />
-        <KeyValue keys="Tipo de visita" value={accessType} />
-        <KeyValue
+        {/* <KeyValue keys="Tipo de visita" value={accessType} /> */}
+        {/* <KeyValue
           keys="Estado"
           value={statusText}
           colorValue={statusColor[getStatus()]}
-        />
-        {data?.confirm == 'N' && data?.obs_confirm && (
+        /> */}
+        {/* {data?.confirm == 'N' && data?.obs_confirm && (
           <KeyValue keys="Motivo del rechazo" value={data?.obs_confirm} />
-        )}
+        )} */}
         {data?.in_at && (
           <>
             <KeyValue
@@ -393,7 +405,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               <ItemList
                 key={item?.id}
                 title={getFullName(item?.visit)}
-                subtitle={'C.I:' + item?.visit?.ci}
+                subtitle={'C.I:' + item?.visit?.ci + ' - ' + 'Placa: '+item?.plate}
                 left={<Avatar name={getFullName(item?.visit)} />}
                 right={
                   status === 'Y'
@@ -405,7 +417,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             ))}
           </>
         )}
-      </Card>
+      </View>
     );
   };
 
@@ -418,6 +430,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           name="obs_in"
           value={formState?.obs_in}
           onChange={(e: any) => handleInputChange('obs_in', e)}
+          placeholder='Ej: El visitante está ingresando con 2 mascotas'
         />
       );
     if (status == 'I')
@@ -435,7 +448,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     <ModalFull
       onClose={() => close()}
       open={open}
-      title={'Detalle'}
+      title={'Visitante sin QR'}
       onSave={handleSave}
       // buttonCancel={getStatus() === 'C' ? '' : 'cancelar'}
       buttonText={getButtonText()}>
@@ -445,7 +458,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         <>
           {cardDetail()}
 
-          {detailVisit(data)}
+          {/* {detailVisit(data)} */}
 
           {getObs()}
         </>
