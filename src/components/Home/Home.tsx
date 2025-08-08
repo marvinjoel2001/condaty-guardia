@@ -110,7 +110,7 @@ const Home = () => {
     setData(data?.data || []);
   };
 
-  console.log("data3",data)
+  console.log('data3', data);
   // Actualizar data cuando cambia el tipo de búsqueda
   useEffect(() => {
     setData([]);

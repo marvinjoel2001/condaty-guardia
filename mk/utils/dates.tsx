@@ -22,11 +22,12 @@ export const getDateStr = (dateStr: string | null): string =>
   (dateStr + 'T').split('T')[0];
 
 export const getUTCNow = (dias = 0) => {
-  let d = new Date();
+  const d = new Date();
   if (dias !== 0) d.setDate(d.getDate() + dias);
-  d.setHours(d.getHours() - GMT);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // convierte a UTC
   return d.toISOString().slice(0, 19).replace('T', ' ');
 };
+
 export const resetTime = (dateStr: any | null) => {
   const newDate = new Date(dateStr);
   newDate.setHours(0, 0, 0, 0); // Resetea las horas, minutos, segundos y milisegundos
@@ -112,12 +113,12 @@ export const getDateTimeStrMes = (
   const mes = (fechaLocal.getMonth() + 1).toString().padStart(2, '0'); // 04
   const anio = fechaLocal.getFullYear(); // 2025
 
-  let hora: number;
-  if (esFormatoISO8601(dateStr)) {
-    hora = fechaLocal.getHours() - GMT;
-  } else {
-    hora = fechaLocal.getHours();
-  }
+  let hora: number = fechaLocal.getHours() - GMT;
+  // if (esFormatoISO8601(dateStr)) {
+  //   hora = fechaLocal.getHours() - GMT;
+  // } else {
+  //   hora = fechaLocal.getHours();
+  // }
   let minutos = fechaLocal.getMinutes();
 
   if (hora === 24 && minutos === 0) {

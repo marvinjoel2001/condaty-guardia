@@ -339,7 +339,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           <>
             <KeyValue
               keys="Fecha y hora de ingreso"
-              value={getDateTimeStrMes(data?.in_at, true)}
+              value={getDateTimeStrMes(data?.in_at)}
             />
             <KeyValue
               keys={
@@ -349,12 +349,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               }
               value={getFullName(data?.guardia)}
             />
-            {/* {data?.obs_in && ( */}
+
             <KeyValue
               keys="Observación de ingreso"
               value={data?.obs_in || '-/-'}
             />
-            {/* )} */}
           </>
         )}
         {data?.out_at && (
