@@ -1,17 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import List from '../../../../mk/components/ui/List/List';
+import {Text, TouchableOpacity} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
-import ItemListDate from './shares/ItemListDate';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
-import {buttonPrimary, buttonSecondary} from './shares/styles';
+import {buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
-import DetAccessesOld from './DetAccessesOld';
+import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 interface PropsType {
   data: any;
   reload: any;
@@ -33,11 +31,10 @@ const statusColor: any = {
 const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
-  const [dataAcesses, setDataAccesses] = useState([]);
+  const [dataAccesses, setDataAccesses] = useState([]);
   const [dataOrders, setDataOrders] = useState([]);
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
 
-  console.log("mi data1",data)
   useEffect(() => {
     let _dataAccesses = [];
     let _dataOrders = [];
@@ -56,89 +53,10 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
     setDataOrders(_dataOrders);
   }, [typeSearch, data]);
 
-  // useEffect(() => {
-  //   let _dataAccesses = [];
-  //   let _dataOrders = [];
-
-  //   if (typeSearch === 'I') {
-  //     _dataAccesses = data?.accesses?.filter(
-  //       (item: any) => !item?.in_at && !item?.out_at && getStatus(item) !== 'N'
-  //     );
-
-  //     _dataOrders = data?.others?.filter(
-  //       (item: any) => !item?.access?.in_at && !item?.access?.out_at && getStatus(item?.access) !== 'N'
-  //     );
-  //   } else if (typeSearch === 'S') {
-  //     _dataAccesses = data?.accesses?.filter(
-  //       (item: any) => item?.in_at && getStatus(item) !== 'N'
-  //     );
-
-  //     _dataOrders = data?.others?.filter(
-  //       (item: any) => item?.access?.in_at && getStatus(item?.access) !== 'N'
-  //     );
-  //   }
-
-  //   setDataAccesses(_dataAccesses);
-  //   setDataOrders(_dataOrders);
-  // }, [typeSearch, data]);
-
-
-  // console.log("mi data2",data)
-
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
     if (type == 'O') setOpenDetailOrders(true);
     setFormState({id: item.id});
-  };
-
-  const handleAction = (item: any) => {
-    if (!item?.in_at && item?.confirm_at && item?.confirm === 'Y') {
-      onPressDetail(item, 'A');
-    } else if (item.in_at && !item.out_at) {
-      onPressDetail(item, 'A');
-    } else {
-      onPressDetail(item, 'A');
-    }
-  };
-
-  const allowIn = (item: any) => {
-    return (
-      <TouchableOpacity
-        style={{borderRadius: 10}}
-        onPress={() => handleAction(item)}
-        accessibilityLabel={`Dejar entrar a ${getFullName(item.visit)}`}>
-        <Text style={buttonPrimary}>Dejar entrar</Text>
-      </TouchableOpacity>
-    );
-  };
-
-  const allotOut = (item: any) => {
-    return (
-      <TouchableOpacity
-        style={{borderRadius: 10}}
-        onPress={() => handleAction(item)}
-        accessibilityLabel={`Dejar salir a ${getFullName(item.visit)}`}>
-        <Text style={buttonSecondary}>Dejar salir</Text>
-      </TouchableOpacity>
-    );
-  };
-
-  const notAutorized = (item: any) => {
-    return (
-      <Text
-        style={{fontSize: 10, fontFamily: FONTS.regular, color: cssVar.cError}}>
-        No Autorizado
-      </Text>
-    );
-  };
-
-  const waitingConfirmation = (item: any) => {
-    return (
-      <Text
-        style={{fontSize: 10, fontFamily: FONTS.regular, color: cssVar.cWhite}}>
-        Esperando aprobación
-      </Text>
-    );
   };
 
   const getStatus = (item: any) => {
@@ -159,20 +77,6 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
   };
 
   const rightAccess = (item: any) => {
-    // if (!item?.in_at && !item?.confirm_at) {
-    //   return waitingConfirmation(item);
-    // }
-    // if (!item?.in_at && item?.confirm_at) {
-    //   if (item?.confirm === 'Y') {
-    //     return allowIn(item);
-    //   } else if (item?.confirm === 'N') {
-    //     return notAutorized(item);
-    //   }
-    // }
-    // if (item?.type !== 'O' && item?.in_at && !item?.out_at) {
-    //   return allotOut(item);
-    // }
-    // return null;
     return (
       <Text
         style={{
@@ -216,14 +120,17 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
         <TouchableOpacity
           style={{borderRadius: 10}}
           onPress={() => onPressDetail(item, 'O')}>
-          <Text style={{
+          <Text
+            style={{
               color: cssVar.cWarning,
               backgroundColor: 'rgba(225, 193, 81, 0.2)',
               borderRadius: 4,
               padding: 4,
               fontSize: 10,
               fontFamily: FONTS.regular,
-          }}>Registrar ingreso</Text>
+            }}>
+            Registrar ingreso
+          </Text>
         </TouchableOpacity>
       );
     }
@@ -263,25 +170,6 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
     }
     return <Text>{prefix + getFullName(item.owner)}</Text>;
   };
-
-  // const hoursAccess = (item: any) => {
-  //   return (
-  //     <ItemListDate
-  //       inDate={item.in_at}
-  //       outDate={item.type !== 'O' ? item.out_at : null}
-  //     />
-  //   );
-  // };
-
-  // const hours = (item: any) => {
-  //   console.log(item, 'item pedidos pipipi');
-  //   return (
-  //     <ItemListDate
-  //       inDate={item?.access?.in_at}
-  //       outDate={item?.access?.out_at}
-  //     />
-  //   );
-  // };
 
   const iconAccess = (item: any) => {
     const isOrder = item.type === 'P';
@@ -329,7 +217,6 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
       Delivery: IconDelivery,
       Otro: IconOther,
     };
-    // console.log(item?.other_type?.name,'icono')
 
     const iconName = orderIcons[item?.other_type?.name] || IconOther;
     return (
@@ -365,7 +252,7 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
       <ItemList
         key={item?.id}
         onPress={() => onPressDetail(item, 'O')}
-        title={'Pedido/'+item?.other_type?.name}
+        title={'Pedido/' + item?.other_type?.name}
         subtitle={
           !item?.access?.in_at
             ? 'Para: ' + getFullName(item?.owner)
@@ -378,15 +265,10 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
       />
     );
   };
-  // console.log("dataacces",dataAcesses)
   return (
     <>
-      {/* <List
-        data={data?.accesses}
-        renderItem={item => renderItemAccess(item)}
-        refreshing={loaded}
-      /> */}
-      {dataAcesses?.map((item: any) => renderItemAccess(item))}
+      {loaded && <Skeleton type="list" />}
+      {dataAccesses?.map((item: any) => renderItemAccess(item))}
       {dataOrders?.map((item: any) => renderItemOrder(item))}
       {openDetail && (
         <DetAccesses
