@@ -319,7 +319,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         <ItemList
           key={data?.visit?.id}
           title={getFullName(visit)}
-          subtitle={'C.I: ' + visit?.ci + (data?.plate ? ' - Placa: ' + data?.plate : '')}
+          subtitle={'C.I: ' + visit?.ci + (data?.plate && taxi?.length === 0 ? ' - Placa: ' + data?.plate : '')}
           left={<Avatar name={getFullName(visit)} />}
           right={
             data?.out_at || status === 'Y' || data?.accesses?.length == 0

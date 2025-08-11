@@ -223,7 +223,7 @@ const Home = () => {
               reload={() => getAccesses(search, '/accesses', 'P')}
               // setDataID={setDataID}
               typeSearch={typeSearch}
-              loaded={loaded}
+              isLoading={loaded}
             />
           )}
 
