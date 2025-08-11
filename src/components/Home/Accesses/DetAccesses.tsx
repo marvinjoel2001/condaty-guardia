@@ -71,7 +71,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       getData(id);
     }
   }, [id]);
-  // console.log(data,'data dataaaa')
+  console.log(data?.accesses?.length, 'data dataaaa');
   const handleSave = async () => {
     const status = getStatus();
     if (status === 'C') {
@@ -80,20 +80,22 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       return;
     }
     if (status === 'I') {
-      if (Object.values(acompanSelect).every(value => !value)) {
-        console.log(
-          'Debe seleccionar al menos un acompañante para dejar salir',
-        );
-        showToast(
-          'Debe seleccionar al menos un acompañante para dejar salir',
-          'error',
-        );
+      let ids = [];
+      if (
+        Object.values(acompanSelect).every(value => !value) &&
+        data?.accesses?.length > 0
+      ) {
+        showToast('Debe seleccionar para dejar salir', 'error');
         return;
       }
       // const ids = acompanSelect.map((item: any) => item.id);
-      const ids = Object.keys(acompanSelect)
-        .filter(id => acompanSelect[id])
-        .map(id => Number(id));
+      if (data?.accesses?.length > 0) {
+        ids = Object.keys(acompanSelect)
+          .filter(id => acompanSelect[id])
+          .map(id => Number(id));
+      } else {
+        ids.push(data?.id);
+      }
 
       // console.log(ids,'idsss')
       const {data: result, error} = await execute(
@@ -320,7 +322,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           subtitle={'C.I: ' + visit?.ci + (data?.plate ? ' - Placa: ' + data?.plate : '')}
           left={<Avatar name={getFullName(visit)} />}
           right={
-            data?.out_at || status === 'Y'
+            data?.out_at || status === 'Y' || data?.accesses?.length == 0
               ? null
               : getCheckVisit(data, isSelected, 'I')
           }
