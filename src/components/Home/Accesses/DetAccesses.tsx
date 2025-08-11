@@ -5,7 +5,6 @@ import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import useApi from '../../../../mk/hooks/useApi';
-import {getAccessType} from '../../../../mk/utils/utils';
 import {getDateTimeStrMes} from '../../../../mk/utils/dates';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
@@ -18,17 +17,21 @@ import Loading from '../../../../mk/components/ui/Loading/Loading';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import ModalAccessExpand from './ModalAccessExpand';
 
-const statusColor: any = {
-  I: cssVar.cAlertMedio,
-  Y: cssVar.cSuccess,
-  N: cssVar.cError,
-  S: cssVar.cSuccess,
-  C: cssVar.cSuccess,
+const Br = () => {
+  return (
+    <View
+      style={{
+        height: 0.5,
+        backgroundColor: cssVar.cWhiteV1,
+        marginVertical: 8,
+        width: '100%',
+      }}
+    />
+  );
 };
-
 const DetAccesses = ({id, open, close, reload}: any) => {
   const {showToast} = useAuth();
-  const {execute, waiting} = useApi();
+  const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
@@ -38,7 +41,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     type: '',
     invitation: null,
   });
-  const getData = async (id: number) => {
+  const getData = async () => {
     try {
       const {data} = await execute('/accesses', 'GET', {
         fullType: 'DET',
@@ -46,7 +49,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       });
 
       if (data.success && data.data.length > 0) {
-        // If there's a linked access_id, use that instead of the current data
         const accessData = data.data[0];
         if (accessData.access_id) {
           const {data: linkedData} = await execute('/accesses', 'GET', {
@@ -63,81 +65,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       }
     } catch (error) {
       console.error('Error fetching access data:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      getData(id);
-    }
-  }, [id]);
-  console.log(data?.accesses?.length, 'data dataaaa');
-  const handleSave = async () => {
-    const status = getStatus();
-    if (status === 'C') {
-      // Si está completado, significa que todos han salido
-      close();
-      return;
-    }
-    if (status === 'I') {
-      let ids = [];
-      if (
-        Object.values(acompanSelect).every(value => !value) &&
-        data?.accesses?.length > 0
-      ) {
-        showToast('Debe seleccionar para dejar salir', 'error');
-        return;
-      }
-      // const ids = acompanSelect.map((item: any) => item.id);
-      if (data?.accesses?.length > 0) {
-        ids = Object.keys(acompanSelect)
-          .filter(id => acompanSelect[id])
-          .map(id => Number(id));
-      } else {
-        ids.push(data?.id);
-      }
-
-      // console.log(ids,'idsss')
-      const {data: result, error} = await execute(
-        '/accesses/exit',
-        'POST',
-        {
-          ids,
-          obs_out: formState?.obs_out || '',
-        },
-        false,
-        3,
-      );
-      if (result?.success) {
-        if (reload) reload();
-        close();
-        showToast('El visitante salió', 'success');
-      } else {
-        console.log('Error en dejar salir:', error);
-        showToast('Error al dejar salir', 'error');
-      }
-    } else {
-      const {data: result, error} = await execute('/accesses/enter', 'POST', {
-        id: data?.id,
-        obs_in: formState?.obs_in || '',
-      });
-      if (result?.success) {
-        if (reload) reload();
-        close();
-      } else {
-        console.log('Error en dejar entrar:', error);
-      }
+      showToast('Error al obtener los datos', 'error');
     }
   };
 
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
-    //status
-    // S=Solicitud de confirmacion
-    // Y = solicitud confirmada
-    // N = Solicitid rechazada
-    // I=Ingreso falta que salga
-    // C=completado
+
     if (!_data?.in_at && !_data?.out_at && !_data?.confirm_at) return 'S';
     if (!_data?.in_at && !_data?.out_at && _data.confirm) return _data.confirm;
     if (_data?.in_at && !_data?.out_at) return 'I';
@@ -153,17 +87,76 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     }
     return '';
   };
+
   const status = getStatus();
 
-  let accessType = getAccessType(data);
+  useEffect(() => {
+    if (id) {
+      getData();
+    }
+  }, [id]);
 
-  // Actualiza formState para las observaciones
+  const saveEntry = async () => {
+    const {data: result} = await execute('/accesses/enter', 'POST', {
+      id: data?.id,
+      obs_in: formState?.obs_in || '',
+    });
+    if (result?.success) {
+      if (reload) reload();
+      close();
+    } else {
+      showToast('Error al dejar entrar', 'error');
+    }
+  };
+
+  const saveExit = async () => {
+    let ids = [];
+
+    if (
+      Object.values(acompanSelect).every(value => !value) &&
+      data?.accesses?.length > 0
+    ) {
+      showToast('Debe seleccionar para dejar salir', 'error');
+      return;
+    }
+
+    if (data?.accesses?.length > 0) {
+      ids = Object.keys(acompanSelect)
+        .filter(id => acompanSelect[id])
+        .map(id => Number(id));
+    } else {
+      ids.push(data?.id);
+    }
+
+    const {data: result} = await execute('/accesses/exit', 'POST', {
+      ids,
+      obs_out: formState?.obs_out || '',
+    });
+    if (result?.success) {
+      if (reload) reload();
+      close();
+      showToast('El visitante salió', 'success');
+    } else {
+      showToast('Error al dejar salir', 'error');
+    }
+  };
+  const handleSave = async () => {
+    if (status === 'C') {
+      close();
+      return;
+    }
+    if (status === 'I') {
+      saveExit();
+    } else {
+      saveEntry();
+    }
+  };
+
   const handleInputChange = (name: string, value: string) => {
     setFormState({...formState, [name]: value});
   };
 
   const getButtonText = () => {
-    const status = getStatus();
     const buttonTexts: Record<string, string> = {
       I: 'Dejar salir',
       Y: 'Dejar ingresar',
@@ -172,32 +165,22 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     };
     return buttonTexts[status] || '';
   };
-  const getStatusText = () => {
-    const status = getStatus();
-    const statusTexts: Record<string, string> = {
-      I: 'Dejar salir',
-      Y: 'Dejar ingresar',
-      N: 'Rechazado',
-      S: 'Esperando aprobación',
-      C: 'Completado',
-    };
-    return statusTexts[status] || '';
+
+  const labelAccess = () => {
+    if (status === 'I') {
+      return 'Visitó a';
+    }
+    if (status === 'N') {
+      return 'Residente';
+    }
+
+    return 'Visita a';
   };
 
-  const statusText = getStatusText();
-
   const cardDetail = () => {
-    const status = getStatus();
-    console.log("mi data", data)
     return (
       <Card>
-        <Text style={styles.labelAccess}>
-            {status === 'I'
-              ? 'Visitó a'
-              : status === 'N'
-              ? 'Residente'
-              : 'Visita a'}
-        </Text>
+        <Text style={styles.labelAccess}>{labelAccess()}</Text>
         <ItemList
           title={getFullName(data?.owner)}
           // subtitle={'C.I.' + data?.owner?.ci}
@@ -240,39 +223,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         )}
         <Br />
         {detailVisit(data)}
-
       </Card>
     );
   };
-  const Br = () => {
-    return (
-      <View
-        style={{
-          height: 0.5,
-          backgroundColor: cssVar.cWhiteV1,
-          marginVertical: 8,
-          width: '100%',
-        }}
-      />
-    );
-  };
+
   const getCheckVisit = (
     visit: any,
     isSelected: boolean,
     type: 'A' | 'T' | 'I',
   ) => {
     const status = getStatus(visit);
-
-    // if (status == 'S')
-    // return (
-    //   <Text style={{color: cssVar.cWhite, fontSize: 10}}>
-    //     Esperando aprobación
-    //   </Text>
-    // );
-    // if (status == 'N')
-    // return (
-    //   <Text style={{color: cssVar.cError, fontSize: 10}}>Rechazado</Text>
-    // );
     if (status == 'C') {
       return (
         <Icon
@@ -307,12 +267,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
 
   const detailVisit = (data: any) => {
-    console.log("Mi data - 1" , data)
     let visit = data.visit ? data.visit : data.owner;
 
     const isSelected = acompanSelect[data?.id || '0'];
     const acompData = data?.accesses.filter((item: any) => item.taxi != 'C');
     const taxi = data?.accesses.filter((item: any) => item.taxi == 'C');
+
     return (
       <View>
         <Text style={styles.labelAccess}>Visitante</Text>
@@ -326,17 +286,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               ? null
               : getCheckVisit(data, isSelected, 'I')
           }
-          // date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
         />
-        {/* <KeyValue keys="Tipo de visita" value={accessType} /> */}
-        {/* <KeyValue
-          keys="Estado"
-          value={statusText}
-          colorValue={statusColor[getStatus()]}
-        /> */}
-        {/* {data?.confirm == 'N' && data?.obs_confirm && (
-          <KeyValue keys="Motivo del rechazo" value={data?.obs_confirm} />
-        )} */}
         {data?.in_at && (
           <>
             <KeyValue
@@ -370,12 +320,10 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={getFullName(data?.out_guard)}
               />
             )}
-            {/* {data?.obs_out && ( */}
             <KeyValue
               keys="Observación de salida"
               value={data?.obs_out || '-/-'}
             />
-            {/* )} */}
           </>
         )}
         {acompData?.length > 0 && (
@@ -393,7 +341,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                     ? null
                     : getCheckVisit(item, acompanSelect[item?.id || '0'], 'A')
                 }
-                // date={<ItemListDate inDate={item?.in_at} outDate={item?.out_at} />}
               />
             ))}
           </>
@@ -406,14 +353,15 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               <ItemList
                 key={item?.id}
                 title={getFullName(item?.visit)}
-                subtitle={'C.I:' + item?.visit?.ci + ' - ' + 'Placa: '+item?.plate}
+                subtitle={
+                  'C.I:' + item?.visit?.ci + ' - ' + 'Placa: ' + item?.plate
+                }
                 left={<Avatar name={getFullName(item?.visit)} />}
                 right={
                   status === 'Y'
                     ? null
                     : getCheckVisit(item, acompanSelect[item?.id || '0'], 'T')
                 }
-                // date={<ItemListDate inDate={item?.in_at} outDate={item?.out_at} />}
               />
             ))}
           </>
@@ -431,7 +379,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           name="obs_in"
           value={formState?.obs_in}
           onChange={(e: any) => handleInputChange('obs_in', e)}
-          placeholder='Ej: El visitante está ingresando con 2 mascotas'
+          placeholder="Ej: El visitante está ingresando con 2 mascotas"
         />
       );
     if (status == 'I')
@@ -451,16 +399,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       open={open}
       title={'Visitante sin QR'}
       onSave={handleSave}
-      // buttonCancel={getStatus() === 'C' ? '' : 'cancelar'}
       buttonText={getButtonText()}>
       {!data ? (
         <Loading />
       ) : (
         <>
           {cardDetail()}
-
-          {/* {detailVisit(data)} */}
-
           {getObs()}
         </>
       )}
@@ -480,7 +424,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 };
 
 const styles = StyleSheet.create({
-  // Definiciones básicas
   label: {
     color: cssVar.cWhiteV1,
     fontSize: 12,
