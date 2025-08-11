@@ -59,19 +59,13 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     data: owners,
     loaded,
     execute,
-  } = useApi(
-    '/owners',
-    'GET',
-    {
-      perPage: -1,
-      sortBy: 'name',
-      orderBy: 'asc',
-      searchBy: '',
-      fullType: 'L',
-    },
-    3,
-    true,
-  );
+  } = useApi('/owners', 'GET', {
+    perPage: -1,
+    sortBy: 'name',
+    orderBy: 'asc',
+    searchBy: '',
+    fullType: 'L',
+  });
 
   useEffect(() => {
     if (owners?.data) {
@@ -258,7 +252,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             color={cssVar.cError}
             size={20}
             style={{
-             
               borderRadius: 20,
               padding: 4,
               elevation: 2,
@@ -290,7 +283,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       fullType: 'L',
       ci_visit: formState?.ci_taxi,
     });
-    console.log(exist, 'exist');
     if (exist?.data) {
       setFormState({
         ...formState,
