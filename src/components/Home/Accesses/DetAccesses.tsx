@@ -29,6 +29,14 @@ const Br = () => {
     />
   );
 };
+const typeInvitation: any = {
+  I: 'QR Individual',
+  G: 'QR Grupal',
+  C: 'Sin QR',
+  O: 'Llave virtual',
+  P: 'Pedido',
+  F: 'QR Frecuente',
+};
 const DetAccesses = ({id, open, close, reload}: any) => {
   const {showToast} = useAuth();
   const {execute} = useApi();
@@ -179,51 +187,59 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
   const cardDetail = () => {
     return (
-      <Card>
-        <Text style={styles.labelAccess}>{labelAccess()}</Text>
-        <ItemList
-          title={getFullName(data?.owner)}
-          // subtitle={'C.I.' + data?.owner?.ci}
-          subtitle={
-            'Unidad: ' +
-            data?.owner?.dptos?.[0]?.nro +
-            ', ' +
-            data?.owner?.dptos?.[0]?.description
-          }
-          left={
-            <Avatar
-              name={getFullName(data?.owner)}
-              src={getUrlImages(
-                '/OWNER-' +
-                  data?.owner?.id +
-                  '.webp?d=' +
-                  data?.owner?.updated_at,
-              )}
-            />
-          }
-          right={
-            data?.type !== 'C' ? (
-              <Icon
-                name={IconExpand}
-                color={cssVar.cWhiteV1}
-                onPress={() =>
-                  setOpenDet({
-                    open: true,
-                    id: data?.invitation_id,
-                    invitation: {...data?.invitation, owner: data?.owner},
-                    type: 'I',
-                  })
-                }
+      <>
+        <Card>
+          <Text style={styles.labelAccess}>{labelAccess()}</Text>
+          <ItemList
+            title={getFullName(data?.owner)}
+            // subtitle={'C.I.' + data?.owner?.ci}
+            subtitle={
+              'Unidad: ' +
+              data?.owner?.dptos?.[0]?.nro +
+              ', ' +
+              data?.owner?.dptos?.[0]?.description
+            }
+            left={
+              <Avatar
+                name={getFullName(data?.owner)}
+                src={getUrlImages(
+                  '/OWNER-' +
+                    data?.owner?.id +
+                    '.webp?d=' +
+                    data?.owner?.updated_at,
+                )}
               />
-            ) : null
-          }
-        />
-        {data?.confirm == 'N' && data?.obs_confirm && (
-          <KeyValue keys="Motivo del rechazo" value={data?.obs_confirm} />
+            }
+            right={
+              data?.type !== 'C' ? (
+                <Icon
+                  name={IconExpand}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    setOpenDet({
+                      open: true,
+                      id: data?.invitation_id,
+                      invitation: {...data?.invitation, owner: data?.owner},
+                      type: 'I',
+                    })
+                  }
+                />
+              ) : null
+            }
+          />
+        </Card>
+        {data?.accesses?.length > 0 && (
+          <Text
+            style={{
+              color: cssVar.cWhite,
+              fontSize: 16,
+              fontFamily: FONTS.medium,
+            }}>
+            Selecciona al visitante que esté por salir
+          </Text>
         )}
-        <Br />
-        {detailVisit(data)}
-      </Card>
+        <Card>{detailVisit(data)}</Card>
+      </>
     );
   };
 
@@ -266,6 +282,29 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     );
   };
 
+  const rightDetailVisit = (data: any, isSelected: any) => {
+    if (data?.out_at) {
+      return (
+        <Icon
+          name={IconExpand}
+          color={cssVar.cWhiteV1}
+          onPress={() =>
+            setOpenDet({
+              open: true,
+              // id: type == 'I' ? visit?.invitation_id : visit?.id,
+              id: data?.id,
+              type: 'V',
+            })
+          }
+        />
+      );
+    }
+    if (data?.accesses?.length == 0) {
+      return;
+    }
+    return getCheckVisit(data, isSelected, 'I');
+  };
+
   const detailVisit = (data: any) => {
     let visit = data.visit ? data.visit : data.owner;
 
@@ -279,53 +318,69 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         <ItemList
           key={data?.visit?.id}
           title={getFullName(visit)}
-          subtitle={'C.I: ' + visit?.ci + (data?.plate && taxi?.length === 0 ? ' - Placa: ' + data?.plate : '')}
-          left={<Avatar name={getFullName(visit)} />}
-          right={
-            data?.out_at || status === 'Y' || data?.accesses?.length == 0
-              ? null
-              : getCheckVisit(data, isSelected, 'I')
+          style={{marginBottom: 12}}
+          subtitle={
+            'C.I: ' +
+            visit?.ci +
+            (data?.plate && taxi?.length === 0
+              ? ' - Placa: ' + data?.plate
+              : '')
           }
+          left={<Avatar name={getFullName(visit)} />}
+          right={rightDetailVisit(data, isSelected)}
         />
-        {data?.in_at && (
+        {!data?.out_at && (
           <>
             <KeyValue
-              keys="Fecha y hora de ingreso"
-              value={getDateTimeStrMes(data?.in_at)}
+              keys="Tipo de visita"
+              value={typeInvitation[data?.type] || '-/-'}
             />
-            <KeyValue
-              keys={
-                !data?.out_guard && !data?.out_at
-                  ? 'Guardia de ingreso'
-                  : 'Guardia de ingreso y salida'
-              }
-              value={getFullName(data?.guardia)}
-            />
-
-            <KeyValue
-              keys="Observación de ingreso"
-              value={data?.obs_in || '-/-'}
-            />
-          </>
-        )}
-        {data?.out_at && (
-          <>
-            <KeyValue
-              keys="Fecha y hora de salida"
-              value={getDateTimeStrMes(data?.out_at, true)}
-            />
-            {data?.out_guard && (
+            {data?.confirm == 'N' && data?.obs_confirm && (
+              <KeyValue keys="Motivo del rechazo" value={data?.obs_confirm} />
+            )}
+            {data?.in_at && (
               <KeyValue
-                keys="Guardia de salida"
-                value={getFullName(data?.out_guard)}
+                keys="Fecha y hora de ingreso"
+                value={getDateTimeStrMes(data?.in_at) || '-/-'}
               />
             )}
-            <KeyValue
-              keys="Observación de salida"
-              value={data?.obs_out || '-/-'}
-            />
+            {/* {data?.out_at && (
+              <KeyValue
+                keys="Fecha y hora de salida"
+                value={getDateTimeStrMes(data?.out_at, true) || '-/-'}
+              />
+            )} */}
+            {data?.guardia && (
+              <>
+                <KeyValue
+                  keys={'Guardia de ingreso'}
+                  value={getFullName(data?.guardia)}
+                />
+                {/* <KeyValue
+                  keys="Guardia de salida"
+                  value={
+                    data?.out_at
+                      ? getFullName(data?.out_guard || data?.guardia)
+                      : '-/-'
+                  }
+                /> */}
+              </>
+            )}
+            {data?.in_at && (
+              <KeyValue
+                keys="Observación de ingreso"
+                value={data?.obs_in || '-/-'}
+              />
+            )}
+            {/* {data?.out_at && (
+              <KeyValue
+                keys="Observación de salida"
+                value={data?.obs_out || '-/-'}
+              />
+            )} */}
           </>
         )}
+
         {acompData?.length > 0 && (
           <>
             <Br />
