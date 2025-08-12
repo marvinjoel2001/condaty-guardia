@@ -13,7 +13,7 @@ interface PropsType {
   id: string | number | null;
   open: boolean;
   onClose: () => void;
-  type: 'A' | 'T' | 'I' | string;
+  type: 'A' | 'T' | 'I' | 'V' | string;
   invitation?: any;
 }
 const typeInvitation: any = {
@@ -242,6 +242,8 @@ const ModalAccessExpand = ({
           ? 'Detalle del taxista'
           : type === 'I'
           ? 'Detalle de la invitación'
+          : type === 'V'
+          ? 'Detalle del visitante'
           : ''
       }
       open={open}

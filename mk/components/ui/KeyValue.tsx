@@ -27,7 +27,6 @@ const theme: ThemeType = {
   container: {
     flexDirection: 'row',
     marginBottom: 12,
-    marginTop:12
   },
   key: {
     flex: 1,
