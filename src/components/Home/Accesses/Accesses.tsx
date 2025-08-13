@@ -279,7 +279,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
         widthMain={150}
         onPress={() => onPressDetail(item, 'A')}
         style={{
-          borderWidth: hasColoredBorder ? 0.5 : 0, 
+          borderWidth: hasColoredBorder ? 0.5 : 0,
           borderColor: hasColoredBorder
             ? statusColor[status]?.color
             : 'transparent',
