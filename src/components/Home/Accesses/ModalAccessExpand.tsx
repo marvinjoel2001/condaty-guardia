@@ -13,7 +13,7 @@ interface PropsType {
   id: string | number | null;
   open: boolean;
   onClose: () => void;
-  type: 'A' | 'T' | 'I' | 'V' | string;
+  type: 'A' | 'T' | 'I' | 'V' | 'P' | string;
   invitation?: any;
 }
 const typeInvitation: any = {
@@ -47,7 +47,7 @@ const ModalAccessExpand = ({
     }
   };
   useEffect(() => {
-    if (type != 'I') {
+    if (type != 'I' && type != 'P') {
       getAccess();
     }
   }, []);
@@ -233,6 +233,44 @@ const ModalAccessExpand = ({
       </>
     );
   };
+  const renderPedido = () => {
+    return (
+      <>
+        <ItemList
+          title={getFullName(invitation?.owner)}
+          // subtitle={'C.I.' + data?.owner?.ci}
+          subtitle={
+            'Unidad: ' +
+            invitation?.owner?.dpto?.nro +
+            ', ' +
+            invitation?.owner?.dpto?.description
+          }
+          left={
+            <Avatar
+              name={getFullName(invitation?.owner)}
+              src={getUrlImages(
+                '/OWNER-' +
+                  invitation?.owner?.id +
+                  '.webp?d=' +
+                  invitation?.owner?.updated_at,
+              )}
+            />
+          }
+          style={{marginBottom: 8}}
+        />
+        {/* <KeyValue
+          keys="Tipo de invitación"
+          value={typeInvitation[invitation.type]}
+        /> */}
+        <KeyValue keys="Tipo de pedido" value={invitation?.other_type?.name} />
+        <KeyValue
+          keys="Fecha de notificación"
+          value={getDateStrMes(invitation?.created_at)}
+        />
+        <KeyValue keys="Descripción" value={invitation?.descrip || '-/-'} />
+      </>
+    );
+  };
   return (
     <Modal
       title={
@@ -240,7 +278,7 @@ const ModalAccessExpand = ({
           ? 'Detalle del acompañante'
           : type === 'T'
           ? 'Detalle del taxista'
-          : type === 'I'
+          : type === 'I' || type === 'P'
           ? 'Detalle de la invitación'
           : type === 'V'
           ? 'Detalle del visitante'
@@ -248,7 +286,15 @@ const ModalAccessExpand = ({
       }
       open={open}
       onClose={onClose}>
-      {!loaded ? <Loading /> : type != 'I' ? rendeAccess() : renderInvitation()}
+      {!loaded ? (
+        <Loading />
+      ) : type === 'I' ? (
+        renderInvitation()
+      ) : type == 'P' ? (
+        renderPedido()
+      ) : (
+        rendeAccess()
+      )}
     </Modal>
   );
 };

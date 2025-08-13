@@ -16,6 +16,7 @@ import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconExpand, IconX} from '../../../icons/IconLibrary';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 
 type Props = {
   open: boolean;
@@ -70,24 +71,44 @@ const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
   const companionCi = person.ci ? `C.I. ${person.ci}` : 'CI no disponible';
 
   return (
-    <TouchableOpacity
-      style={styles.personBlock}
-      onPress={onPress}
-      activeOpacity={0.7}>
-      <Avatar
-        name={companionFullName}
-        src={person.url_avatar ? getUrlImages(person.url_avatar) : undefined}
-        w={40}
-        h={40}
-        fontSize={cssVar.sL}
-        circle={true}
-      />
-      <View style={styles.personInfoContainer}>
-        <Text style={styles.personName}>{companionFullName}</Text>
-        <Text style={styles.personSubDetail}>{companionCi}</Text>
-      </View>
-      <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
-    </TouchableOpacity>
+    // <TouchableOpacity
+    //   style={styles.personBlock}
+    //   onPress={onPress}
+    //   activeOpacity={0.7}>
+    //   <Avatar
+    //     name={companionFullName}
+    //     src={person.url_avatar ? getUrlImages(person.url_avatar) : undefined}
+    //     w={40}
+    //     h={40}
+    //     fontSize={cssVar.sL}
+    //     circle={true}
+    //   />
+    //   <View style={styles.personInfoContainer}>
+    //     <Text style={styles.personName}>{companionFullName}</Text>
+    //     <Text style={styles.personSubDetail}>{companionCi}</Text>
+    //   </View>
+    //   <Icon name={IconExpand} size={cssVar.sXl} color={cssVar.cWhiteV1} />
+    // </TouchableOpacity>
+    <ItemList
+      title={companionFullName}
+      subtitle={companionCi}
+      left={
+        <Avatar
+          name={companionFullName}
+          src={person.url_avatar ? getUrlImages(person.url_avatar) : undefined}
+          w={40}
+          h={40}
+        />
+      }
+      right={
+        <Icon
+          name={IconExpand}
+          size={cssVar.sXl}
+          color={cssVar.cWhiteV1}
+          onPress={onPress}
+        />
+      }
+    />
   );
 };
 
@@ -300,7 +321,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             <Text style={styles.sectionTitleNoBorder}>
               Resumen de la visita
             </Text>
-            <View style={styles.personBlock}>
+            {/* <View style={styles.personBlock}>
               <Avatar
                 name={mainUserFullName}
                 src={
@@ -319,7 +340,27 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     (item.plate ? `Placa: ${item.plate}` : '')}
                 </Text>
               </View>
-            </View>
+            </View> */}
+            <ItemList
+              title={mainUserFullName}
+              subtitle={
+                (mainUserCi ? `C.I. ${mainUserCi}` : '') +
+                (mainUserCi && item.plate ? ' • ' : '') +
+                (item.plate ? `Placa: ${item.plate}` : '')
+              }
+              left={
+                <Avatar
+                  name={mainUserFullName}
+                  src={
+                    mainVisitor?.url_avatar
+                      ? getUrlImages(mainVisitor.url_avatar)
+                      : undefined
+                  }
+                  w={40}
+                  h={40}
+                />
+              }
+            />
             <View style={styles.detailsGroup}>
               <DetailRow label="Tipo de visita" value={tipoAccesoText} />
               <DetailRow
@@ -408,7 +449,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           )}
           <View style={styles.mainCardR}>
             <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() =>
                 handleOpenPersonDetailModal(resident, 'Residente', item)
               }
@@ -438,7 +479,39 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   color={cssVar.cWhiteV1}
                 />
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            <ItemList
+              title={getFullName(resident)}
+              subtitle2={
+                'Unidad:' +
+                resident?.dpto?.[0]?.nro +
+                ', ' +
+                resident?.dpto?.[0]?.description
+              }
+              left={
+                <Avatar
+                  name={getFullName(resident)}
+                  src={getUrlImages(
+                    '/OWNER-' +
+                      resident?.id +
+                      '.webp?d=' +
+                      resident?.updated_at,
+                  )}
+                  w={40}
+                  h={40}
+                />
+              }
+              right={
+                <Icon
+                  name={IconExpand}
+                  size={cssVar.sXl}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    handleOpenPersonDetailModal(resident, 'Residente', item)
+                  }
+                />
+              }
+            />
           </View>
         </ScrollView>
       );
@@ -449,28 +522,45 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         <View style={styles.mainCard}>
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>
-              Visitante Principal
+              Resumen de la visita
             </Text>
             {mainVisitor ? (
-              <View style={styles.personBlock}>
-                <Avatar
-                  name={mainUserFullName}
-                  src={getUrlImages(
-                    '/VISIT-' +
-                      mainVisitor?.id +
-                      '.webp?d=' +
-                      mainVisitor?.updated_at,
-                  )}
-                  w={40}
-                  h={40}
-                />
-                <View style={styles.personInfoContainer}>
-                  <Text style={styles.personName}>{mainUserFullName}</Text>
-                  <Text style={styles.personSubDetail}>
-                    {mainUserCi ? `C.I. ${mainUserCi}` : ''}
-                  </Text>
-                </View>
-              </View>
+              // <View style={styles.personBlock}>
+              //   <Avatar
+              //     name={mainUserFullName}
+              //     src={getUrlImages(
+              //       '/VISIT-' +
+              //         mainVisitor?.id +
+              //         '.webp?d=' +
+              //         mainVisitor?.updated_at,
+              //     )}
+              //     w={40}
+              //     h={40}
+              //   />
+              //   <View style={styles.personInfoContainer}>
+              //     <Text style={styles.personName}>{mainUserFullName}</Text>
+              //     <Text style={styles.personSubDetail}>
+              //       {mainUserCi ? `C.I. ${mainUserCi}` : ''}
+              //     </Text>
+              //   </View>
+              // </View>
+              <ItemList
+                title={mainUserFullName}
+                subtitle={mainUserCi ? `C.I. ${mainUserCi}` : ''}
+                left={
+                  <Avatar
+                    name={mainUserFullName}
+                    src={getUrlImages(
+                      '/VISIT-' +
+                        mainVisitor?.id +
+                        '.webp?d=' +
+                        mainVisitor?.updated_at,
+                    )}
+                    w={40}
+                    h={40}
+                  />
+                }
+              />
             ) : null}
             <View style={styles.detailsGroup}>
               <DetailRow label="Tipo de visita" value={tipoAccesoText} />
@@ -539,7 +629,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           {driver && (
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Taxista</Text>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() =>
                   handleOpenPersonDetailModal(driverAccess, 'Taxista', item)
                 }
@@ -569,7 +659,35 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     color={cssVar.cWhiteV1}
                   />
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
+              <ItemList
+                title={getFullName(driver)}
+                subtitle={
+                  (driver.ci ? `C.I. ${driver.ci}` : '') +
+                  (driver.ci && driverAccess.plate ? ' • ' : '') +
+                  (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')
+                }
+                left={
+                  <Avatar
+                    name={getFullName(driver)}
+                    src={getUrlImages(
+                      '/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at,
+                    )}
+                    w={40}
+                    h={40}
+                  />
+                }
+                right={
+                  <Icon
+                    name={IconExpand}
+                    size={cssVar.sXl}
+                    color={cssVar.cWhiteV1}
+                    onPress={() =>
+                      handleOpenPersonDetailModal(driverAccess, 'Taxista', item)
+                    }
+                  />
+                }
+              />
             </View>
           )}
           {companions && companions.length > 0 && (
@@ -599,7 +717,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         {(item.type === 'I' || item.type === 'G' || item.type === 'F') && (
           <View style={styles.mainCardR}>
             <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() =>
                 handleOpenPersonDetailModal(resident, 'Residente', item)
               }
@@ -629,7 +747,39 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   color={cssVar.cWhiteV1}
                 />
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            <ItemList
+              title={getFullName(resident)}
+              subtitle={
+                'Unidad:' +
+                resident?.dpto?.[0]?.nro +
+                ', ' +
+                resident?.dpto?.[0]?.description
+              }
+              left={
+                <Avatar
+                  name={getFullName(resident)}
+                  src={getUrlImages(
+                    '/OWNER-' +
+                      resident?.id +
+                      '.webp?d=' +
+                      resident?.updated_at,
+                  )}
+                  w={40}
+                  h={40}
+                />
+              }
+              right={
+                <Icon
+                  name={IconExpand}
+                  size={cssVar.sXl}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    handleOpenPersonDetailModal(resident, 'Residente', item)
+                  }
+                />
+              }
+            />
           </View>
         )}
       </ScrollView>
