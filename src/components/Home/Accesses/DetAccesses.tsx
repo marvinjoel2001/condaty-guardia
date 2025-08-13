@@ -322,7 +322,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           subtitle={
             'C.I: ' +
             visit?.ci +
-            (data?.plate ? ' - Placa: ' + data?.plate : '')
+            (data?.plate && taxi?.length === 0
+              ? ' - Placa: ' + data?.plate
+              : '')
           }
           left={<Avatar name={getFullName(visit)} />}
           right={rightDetailVisit(data, isSelected)}

@@ -1,20 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDelivery, IconOther, IconTaxi} from '../../../icons/IconLibrary';
+import {IconDelivery, IconOther, IconSearch, IconSearchDefault, IconTaxi} from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
 import {buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
+import DataSearch from '../../../../mk/components/ui/DataSearch';
+import { View } from 'react-native';
 interface PropsType {
   data: any;
   reload: any;
   typeSearch: string;
-  loaded: boolean;
+  isLoading: boolean;
 }
 const statusText: any = {
   E: 'Esperando aprobación',
@@ -28,12 +30,13 @@ const statusColor: any = {
   N: {color: cssVar.cError, background: cssVar.cHoverError},
   S: {color: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
 };
-const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
+const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
   const [dataAccesses, setDataAccesses] = useState([]);
   const [dataOrders, setDataOrders] = useState([]);
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     let _dataAccesses = [];
@@ -49,9 +52,30 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
       _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
       _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
     }
-    setDataAccesses(_dataAccesses);
-    setDataOrders(_dataOrders);
+    setDataAccesses(_dataAccesses || []);
+    setDataOrders(_dataOrders || []);
   }, [typeSearch, data]);
+
+    const filteredAccesses = useMemo(() => {
+    if (!search) return dataAccesses; // Devuelve todo si la búsqueda está vacía
+    const lowercasedSearch = search.toLowerCase();
+    
+    return dataAccesses.filter((item: any) => {
+      const visitName = getFullName(item.visit).toLowerCase();
+      return visitName.includes(lowercasedSearch);
+    });
+  }, [search, dataAccesses]);
+
+  const filteredOrders = useMemo(() => {
+    if (!search) return dataOrders; // Devuelve todo si la búsqueda está vacía
+    const lowercasedSearch = search.toLowerCase();
+    
+    return dataOrders.filter((item: any) => {
+      const ownerName = getFullName(item.owner).toLowerCase();
+      const orderType = item?.other_type?.name?.toLowerCase() || '';
+      return ownerName.includes(lowercasedSearch) || orderType.includes(lowercasedSearch);
+    });
+  }, [search, dataOrders]);
 
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
@@ -240,14 +264,13 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
         subtitle={subtitleAccess(item)}
         left={iconAccess(item)}
         right={rightAccess(item)}
-        // date={hoursAccess(item)}
         widthMain={150}
         onPress={() => onPressDetail(item, 'A')}
       />
     );
   };
+
   const renderItemOrder = (item: any) => {
-    // console.log(item , 'item pedidos pipipi')
     return (
       <ItemList
         key={item?.id}
@@ -258,18 +281,43 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
             ? 'Para: ' + getFullName(item?.owner)
             : 'Entregó a: ' + getFullName(item?.owner)
         }
-        // truncateSubtitle={true}
         left={iconOrder(item)}
         right={right(item)}
-        // date={hours(item)}
       />
     );
   };
+  const NoResults = () => (
+    <View style={styles.noResultsContainer} >
+        <Icon name={IconSearch} size={48} color={cssVar.cWhiteV1}/> 
+        <Text style={styles.noResultsText}>No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente</Text>
+    </View>
+  );
   return (
     <>
-      {loaded && <Skeleton type="list" />}
+      {isLoading && <Skeleton type="list" />}
+      {!isLoading && (
+        <>
+            <DataSearch
+                setSearch={setSearch}
+                name="home"
+                value={search}
+                style={{marginBottom: 8}}
+            />
+            {filteredAccesses.map((item: any) => renderItemAccess(item))}
+            {filteredOrders.map((item: any) => renderItemOrder(item))}
+            {filteredAccesses.length === 0 && filteredOrders.length === 0 && (
+                <NoResults />
+            )}
+        </>
+      )}
+      {/* <DataSearch
+        setSearch={setSearch}
+        name="home"
+        value={search}
+        style={{marginBottom: 8}}
+      />
       {dataAccesses?.map((item: any) => renderItemAccess(item))}
-      {dataOrders?.map((item: any) => renderItemOrder(item))}
+      {dataOrders?.map((item: any) => renderItemOrder(item))} */}
       {openDetail && (
         <DetAccesses
           id={formState?.id}
@@ -290,5 +338,20 @@ const Accesses = ({data, reload, typeSearch, loaded}: PropsType) => {
     </>
   );
 };
-
+const styles = StyleSheet.create({
+    noResultsContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 40,
+        marginTop: 80,
+    },
+    noResultsText: {
+        marginTop: 8,
+        fontSize: 14,
+        color: cssVar.cWhiteV1,
+        fontFamily: FONTS.regular,
+        textAlign:'center'
+    }
+})
 export default Accesses;

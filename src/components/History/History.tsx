@@ -92,7 +92,7 @@ const History = () => {
       {_tab === 'A' && <Accesses data={data} loaded={loaded} />}
       {_tab === 'Q' && <QR data={data} loaded={loaded} />}
       {_tab === 'WQ' && <WithoutQR data={data} loaded={loaded} />}
-      {_tab === 'I' && <Invitations data={data} loaded={loaded} />}
+      {/* {_tab === 'I' && <Invitations data={data} loaded={loaded} />} */}
       {_tab === 'P' && <Orders data={data} loaded={loaded} />}
     </Layout>
   );
