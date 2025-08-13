@@ -94,7 +94,7 @@ const KeyQR = ({formState, setFormState, handleChange, data}: PropsType) => {
           {!data?.invitation?.access && (
             <TextArea
               label="Observaciones de entrada"
-              placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
+              placeholder="Ej: El residente está ingresando con 1 mascota y 2 bicicletas."
               name="obs_in"
               value={formState['obs_in']}
               onChange={value => handleChange('obs_in', value)}
