@@ -233,12 +233,6 @@ const IndividualQR = ({
 
           {!visit?.ci && data?.status !== 'X' && (
             <View style={styles.formSection}>
-              <InputFullName
-                formState={formState}
-                errors={errors}
-                handleChangeInput={handleChange}
-                inputGrid={true}
-              />
               <Input
                   label="Carnet del visitante*"
                   name="ci"
@@ -249,6 +243,12 @@ const IndividualQR = ({
                   required
                   onChange={(value: string) => handleChange('ci', value)}
                   onBlur={onExistVisits}
+              />
+              <InputFullName
+                formState={formState}
+                errors={errors}
+                handleChangeInput={handleChange}
+                inputGrid={true}
               />
             </View>
           )}
@@ -320,8 +320,6 @@ const IndividualQR = ({
                     value={formState?.ci_taxi || ''}
                     onBlur={onExistTaxi}
                     onChange={(value: string) => handleChange('ci_taxi', value)}
-                  
-                    
                   />
                   <InputFullName
                     formState={formState}

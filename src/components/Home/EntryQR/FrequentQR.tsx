@@ -269,12 +269,6 @@ const FrequentQR = ({
 
         {!visit?.ci && data?.status !== 'X' && (
           <>
-            <InputFullName
-              formState={formState}
-              errors={errors}
-              handleChangeInput={handleChange}
-              inputGrid={true}
-            />
             <Input
               label="Carnet del visitante"
               name="ci"
@@ -285,6 +279,12 @@ const FrequentQR = ({
               required
               onChange={(value: string) => handleChange('ci', value)}
               onBlur={onExistVisits}
+            />
+            <InputFullName
+              formState={formState}
+              errors={errors}
+              handleChangeInput={handleChange}
+              inputGrid={true}
             />
           </>
         )}

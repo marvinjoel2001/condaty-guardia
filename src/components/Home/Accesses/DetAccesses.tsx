@@ -186,6 +186,64 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
 
   const cardDetail = () => {
+    if (status != 'I') {
+      return (
+      <>
+        <Card>
+          <Text style={styles.labelAccess}>{labelAccess()}</Text>
+          <ItemList
+            title={getFullName(data?.owner)}
+            // subtitle={'C.I.' + data?.owner?.ci}
+            subtitle={
+              'Unidad: ' +
+              data?.owner?.dptos?.[0]?.nro +
+              ', ' +
+              data?.owner?.dptos?.[0]?.description
+            }
+            left={
+              <Avatar
+                name={getFullName(data?.owner)}
+                src={getUrlImages(
+                  '/OWNER-' +
+                    data?.owner?.id +
+                    '.webp?d=' +
+                    data?.owner?.updated_at,
+                )}
+              />
+            }
+            right={
+              data?.type !== 'C' ? (
+                <Icon
+                  name={IconExpand}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    setOpenDet({
+                      open: true,
+                      id: data?.invitation_id,
+                      invitation: {...data?.invitation, owner: data?.owner},
+                      type: 'I',
+                    })
+                  }
+                />
+              ) : null
+            }
+          />
+          <Br/>
+        <View>{detailVisit(data)}</View>
+        </Card>
+        {/* {data?.accesses?.length > 0 && (
+          <Text
+            style={{
+              color: cssVar.cWhite,
+              fontSize: 16,
+              fontFamily: FONTS.medium,
+            }}>
+            Selecciona al visitante que esté por salir
+          </Text>
+        )} */}
+      </>
+    );
+    }else{
     return (
       <>
         <Card>
@@ -238,9 +296,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             Selecciona al visitante que esté por salir
           </Text>
         )}
-        <Card>{detailVisit(data)}</Card>
+        <Card>
+          <View>{detailVisit(data)}</View>
+        </Card>
       </>
     );
+    }
   };
 
   const getCheckVisit = (
@@ -314,7 +375,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
     return (
       <View>
-        <Text style={styles.labelAccess}>Visitante</Text>
+        <Text style={styles.labelAccess}>
+          {status !== 'I' ? 'Visitante' : 'Detalle del visitante'}
+        </Text>
         <ItemList
           key={data?.visit?.id}
           title={getFullName(visit)}
@@ -350,21 +413,18 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={getDateTimeStrMes(data?.out_at, true) || '-/-'}
               />
             )} */}
-            {data?.guardia && (
-              <>
+            {getStatus() === 'S' || getStatus() === 'Y' ? (
+              <KeyValue
+                keys={'Notificado por'}
+                value={getFullName(data?.guardia)}
+              />
+            ) : (
+              data?.guardia && (
                 <KeyValue
                   keys={'Guardia de ingreso'}
                   value={getFullName(data?.guardia)}
                 />
-                {/* <KeyValue
-                  keys="Guardia de salida"
-                  value={
-                    data?.out_at
-                      ? getFullName(data?.out_guard || data?.guardia)
-                      : '-/-'
-                  }
-                /> */}
-              </>
+              )
             )}
             {data?.in_at && (
               <KeyValue
@@ -448,11 +508,19 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       );
     return null;
   };
+
+    //   const buttonTexts: Record<string, string> = {
+    //   I: 'Dejar salir',
+    //   Y: 'Dejar ingresar',
+    //   S: 'Esperando aprobacion',
+    //   C: 'Rechazado',
+    // };
+  console.log("mi estatus - 2",status)
   return (
     <ModalFull
       onClose={() => close()}
       open={open}
-      title={'Visitante sin QR'}
+      title={status != 'I' ? 'Visitante sin QR' : 'Detalle del ingreso'}
       onSave={handleSave}
       buttonText={getButtonText()}>
       {!data ? (

@@ -257,6 +257,8 @@ const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
   };
 
   const renderItemAccess = (item: any) => {
+    const status = getStatus(item);
+    const hasColoredBorder = status === 'N' || status === 'A';
     return (
       <ItemList
         key={item.id}
@@ -266,6 +268,12 @@ const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
         right={rightAccess(item)}
         widthMain={150}
         onPress={() => onPressDetail(item, 'A')}
+        style={{
+          borderWidth: hasColoredBorder ? 0.5 : 0, 
+          borderColor: hasColoredBorder
+            ? statusColor[status]?.color
+            : 'transparent',
+        }}
       />
     );
   };

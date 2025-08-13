@@ -380,13 +380,6 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
               )}
               {getStatus() === 'Y' && (
                 <>
-                  <InputFullName
-                    formState={formState}
-                    errors={errors}
-                    handleChangeInput={handleInputChange}
-                    disabled={formState?.disbled}
-                    inputGrid={true}
-                  />
                   <Input
                     label="Carnet del visitante"
                     type="date"
@@ -397,6 +390,13 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
                     error={errors}
                     onChange={(value: any) => handleInputChange('ci', value)}
                     onBlur={() => onExist()}
+                  />
+                  <InputFullName
+                    formState={formState}
+                    errors={errors}
+                    handleChangeInput={handleInputChange}
+                    disabled={formState?.disbled}
+                    inputGrid={true}
                   />
                   {/* <TextArea
                     label="Observaciones"
