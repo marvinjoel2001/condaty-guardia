@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import {getDateTimeStrMes} from '../../../../mk/utils/dates';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
@@ -8,87 +8,37 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import { IconArrowDown, IconArrowUp } from '../../../icons/IconLibrary';
+import {IconExpand} from '../../../icons/IconLibrary';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ModalAccessExpand from '../../Home/Accesses/ModalAccessExpand';
+import Card from '../../../../mk/components/ui/Card/Card';
+import KeyValue from '../../../../mk/components/ui/KeyValue';
 
 type Props = {
   open: boolean;
   onClose: () => void;
   id: number | null;
 };
-
-const DetailRow = ({label, value, valueStyle}: {label: string; value: string | undefined | null; valueStyle?: object}) => {
-  let displayValue = value;
-  if (value === undefined || value === null || value === '') {
-    displayValue = '-/-';
-  }
-  return (
-    <View style={styles.detailRow}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
-    </View>
-  );
+const statusOrder: any = {
+  C: {text: 'Completado', color: cssVar.cSuccess},
+  S: {text: 'Por salir', color: cssVar.cPrimary},
+  I: {text: 'Por ingresar', color: cssVar.cWarning},
+  X: {text: 'Anulado', color: cssVar.cError},
 };
-
-interface RepartidorItemProps {
-  deliveryAccessData: any;
-}
-
-const RepartidorItem = ({ deliveryAccessData }: RepartidorItemProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const repartidor = deliveryAccessData?.visit;
-
-  if (!repartidor && !deliveryAccessData) {
-    return (
-        <View style={styles.repartidorCard}>
-            <Text style={styles.repartidorName}>Datos del repartidor no disponibles.</Text>
-        </View>
-    );
-  }
-  
-  const repartidorFullName = getFullName(repartidor) || 'Nombre no disponible';
-  const repartidorCi = repartidor?.ci ? `C.I. ${repartidor.ci}` : 'CI no disponible';
-
-  return (
-    <View style={styles.repartidorCard}>
-      <TouchableOpacity style={styles.repartidorHeader} onPress={() => setIsExpanded(!isExpanded)} activeOpacity={0.7}>
-        <Avatar
-          name={repartidorFullName}
-          src={repartidor?.url_avatar ? getUrlImages(repartidor.url_avatar) : undefined}
-          w={40}
-          h={40}
-          fontSize={cssVar.sM}
-
-        />
-        <View style={styles.repartidorInfo}>
-          <Text style={styles.repartidorName}>{repartidorFullName}</Text>
-          <Text style={styles.repartidorCi}>{repartidorCi}</Text>
-        </View>
-        <Icon name={isExpanded ? IconArrowUp : IconArrowDown} size={20} color={cssVar.cWhiteV1} />
-      </TouchableOpacity>
-
-      {isExpanded && (
-        <View style={styles.repartidorDetails}>
-          <DetailRow label="Hora y fecha de ingreso" value={getDateTimeStrMes(deliveryAccessData?.in_at)} />
-          <DetailRow label="Hora y fecha de salida" value={getDateTimeStrMes(deliveryAccessData?.out_at)} />
-          <DetailRow label="Observación de ingreso (Rep.)" value={deliveryAccessData?.obs_in} />
-          <DetailRow label="Observación de salida (Rep.)" value={deliveryAccessData?.obs_out} />
-        </View>
-      )}
-    </View>
-  );
-};
-
 
 const OrdersDetail = ({open, onClose, id}: Props) => {
   const [orderData, setOrderData] = useState<any>(null);
   const {execute} = useApi();
+  const [openDetail, setOpenDetail]: any = useState({
+    open: false,
+    id: null,
+    type: '',
+    invitation: null,
+  });
 
-  // LÓGICA DE CARGA DE DATOS EXACTAMENTE COMO EL "ANTIGUO AccessDetail"
   useEffect(() => {
     const getOrderDetails = async () => {
-      // No se establece orderData a null aquí al inicio de getOrderDetails.
-      // El estado de carga se maneja mostrando <Loading /> cuando orderData es null.
-      if (!id) { // Protección adicional, aunque el useEffect ya lo verifica.
+      if (!id) {
         setOrderData(null); // Si el id se vuelve null dentro de un ciclo, limpiar.
         return;
       }
@@ -98,36 +48,42 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
           section: 'ACT',
           searchBy: id, // 'id' de las props/clausura del useEffect
         });
-        // Solo actualizar si el modal sigue abierto.
-        // La comprobación de si 'id' sigue siendo el mismo es implícita
-        // porque este efecto solo se re-ejecuta si 'id' cambia.
-        if (open) { 
-            setOrderData(apiResponse.data?.[0] || null);
+        if (open) {
+          setOrderData(apiResponse.data?.[0] || null);
         }
       } catch (error) {
-        console.error("Failed to fetch order details:", error);
-        if (open) { // Solo limpiar si sigue abierto
-            setOrderData(null);
+        console.error('Failed to fetch order details:', error);
+        if (open) {
+          // Solo limpiar si sigue abierto
+          setOrderData(null);
         }
       }
     };
 
-    if (id) { // Si hay un ID, intenta obtener los detalles.
+    if (id) {
+      // Si hay un ID, intenta obtener los detalles.
       setOrderData(null); // ESTE ES EL PUNTO CLAVE: Limpiar datos anteriores para mostrar Loading para el nuevo ID.
       getOrderDetails();
-    } else { // Si no hay ID (es null o undefined)
+    } else {
       setOrderData(null); // Asegurar que los datos estén limpios.
     }
-  }, [id]); // <<--- DEPENDENCIA ÚNICA: 'id', como en el "antiguo componente" que funcionaba.
+  }, [id]);
 
-  // Efecto adicional para limpiar cuando el modal se cierra explícitamente.
   useEffect(() => {
     if (!open) {
       setOrderData(null);
     }
   }, [open]);
-  // FIN DE LA LÓGICA DE CARGA DE DATOS
 
+  const getStatus = () => {
+    if (orderData?.access?.out_at) {
+      return 'C';
+    }
+    if (orderData?.access?.in_at) {
+      return 'S';
+    }
+    return 'I';
+  };
   const renderContent = () => {
     if (!orderData) {
       return <Loading />;
@@ -137,39 +93,138 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
     const accessInfo = item.access;
 
     return (
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Detalle del pedido</Text>
+      <View>
+        <Card>
+          <Text style={styles.cardTitle}>Resumen de la visita</Text>
+          <ItemList
+            title={getFullName(accessInfo?.visit)}
+            style={{marginBottom: 12}}
+            subtitle={
+              'C.I: ' +
+              accessInfo?.visit?.ci +
+              (accessInfo.plate ? ' - Placa: ' + accessInfo.plate : '')
+            }
+            left={
+              <Avatar
+                name={getFullName(accessInfo?.visit)}
+                src={getUrlImages(
+                  '/VISIT-' +
+                    accessInfo?.visit?.id +
+                    '.webp?d=' +
+                    accessInfo?.visit?.updated_at,
+                )}
+              />
+            }
+          />
+          <KeyValue
+            keys="Tipo de pedido"
+            value={item.other_type?.name || 'No especificado'}
+          />
+          <KeyValue
+            keys="Estado"
+            value={statusOrder[getStatus()]?.text || 'No especificado'}
+            colorValue={statusOrder[getStatus()]?.color || cssVar.cPrimary}
+          />
+          <KeyValue
+            keys="Fecha y hora de ingreso"
+            value={getDateTimeStrMes(accessInfo?.in_at)}
+          />
+          <KeyValue
+            keys="Fecha y hora de salida"
+            value={getDateTimeStrMes(accessInfo?.out_at || '-/-')}
+          />
+          {/* {accessInfo?.plate && (
+            <KeyValue
+              keys="Placa (Vehículo Entrega)"
+              value={accessInfo.plate}
+            />
+          )} */}
+          <KeyValue
+            keys="Guardia de entrada"
+            value={getFullName(accessInfo?.guardia) || '-/-'}
+          />
+          {accessInfo?.out_at && (
+            <KeyValue
+              keys="Guardia de salida"
+              value={
+                getFullName(accessInfo?.out_guard || accessInfo?.guardia) ||
+                '-/-'
+              }
+            />
+          )}
+          {accessInfo?.in_at && (
+            <KeyValue
+              keys="Observación de entrada"
+              value={accessInfo?.obs_in || '-/-'}
+            />
+          )}
+        </Card>
 
-          <DetailRow label="Tipo de pedido" value={item.other_type?.name || 'No especificado'} />
-          <DetailRow label="Descripción" value={item.descrip} />
-          <DetailRow label="Entregó a" value={getFullName(item.owner)} />
-          
-          {accessInfo?.plate && (
-            <DetailRow label="Placa (Vehículo Entrega)" value={accessInfo.plate} />
-          )}
-
-          <DetailRow label="Guardia de entrada" value={getFullName(accessInfo?.guardia)} />
-          {accessInfo?.out_guard && ( // Mostrar solo si existe out_guard
-            <DetailRow label="Guardia de salida" value={getFullName(accessInfo.out_guard)} />
-          )}
-          
-          {(accessInfo?.visit || accessInfo) && <View style={styles.separator} />} 
-          
-          {(accessInfo?.visit || accessInfo) && (
-            <>
-              <Text style={styles.repartidorGeneralTitle}>Repartidor</Text>
-              <RepartidorItem deliveryAccessData={accessInfo} />
-            </>
-          )}
-        </View>
-      </ScrollView>
+        <Card>
+          <Text style={styles.repartidorGeneralTitle}>Residente visitado</Text>
+          <ItemList
+            title={getFullName(item?.owner)}
+            subtitle={item?.owner?.ci}
+            left={
+              <Avatar
+                name={getFullName(item?.owner)}
+                src={getUrlImages(
+                  '/OWNER-' +
+                    item?.owner?.id +
+                    '.webp?d=' +
+                    item?.owner?.updated_at,
+                )}
+                w={40}
+                h={40}
+              />
+            }
+            right={
+              <Icon
+                name={IconExpand}
+                size={20}
+                color={cssVar.cWhiteV1}
+                onPress={() =>
+                  setOpenDetail({
+                    open: true,
+                    id: item?.id,
+                    type: 'P',
+                    invitation: {
+                      owner: item.owner,
+                      type: accessInfo?.type,
+                      descrip: item.descrip,
+                      other_type: item.other_type,
+                      created_at: item.created_at,
+                    },
+                  })
+                }
+              />
+            }
+          />
+        </Card>
+      </View>
     );
   };
 
   return (
     <ModalFull title={'Detalle de pedido'} open={open} onClose={onClose}>
-      {(open && id) ? renderContent() : (open && !id ? <View style={styles.noDataContainer}><Text style={styles.noDataText}>ID no proporcionado.</Text></View> : null) }
+      {open && id ? (
+        renderContent()
+      ) : open && !id ? (
+        <View style={styles.noDataContainer}>
+          <Text style={styles.noDataText}>ID no proporcionado.</Text>
+        </View>
+      ) : null}
+      {openDetail.open && (
+        <ModalAccessExpand
+          open={openDetail.open}
+          type={openDetail.type}
+          invitation={openDetail.invitation}
+          id={openDetail.id}
+          onClose={() =>
+            setOpenDetail({open: false, id: null, type: '', invitation: null})
+          }
+        />
+      )}
     </ModalFull>
   );
 };
@@ -177,7 +232,7 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
 const styles = StyleSheet.create({
   scrollContent: {
     paddingVertical: cssVar.spL,
-   
+
     alignItems: 'center',
     flexGrow: 1,
   },
@@ -275,7 +330,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     fontSize: cssVar.sM,
     color: cssVar.cWhiteV1,
-  }
+  },
 });
 
 export default OrdersDetail;

@@ -1,23 +1,13 @@
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  useMemo,
-  useCallback,
-} from 'react';
-import {StyleSheet, View, Text, Keyboard} from 'react-native';
+import React, {useEffect, useState, useContext, useCallback} from 'react';
+import {StyleSheet, View, Keyboard} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import Accesses from './Accesses/Accesses';
-import Orders from './Orders/Orders';
 import DropdawnAccess from './DropdawnAccess/DropdawnAccess';
 import CameraQr from './CameraQr/CameraQr';
 import {ThemeContext} from '../../../mk/contexts/ThemeContext';
 import useApi from '../../../mk/hooks/useApi';
-import {cssVar} from '../../../mk/styles/themes';
-import {getFullName} from '../../../mk/utils/strings';
-import DataSearch from '../../../mk/components/ui/DataSearch';
 import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
@@ -31,22 +21,11 @@ const Home = () => {
   const [code, setCode]: any = useState(null);
   const [showEntryQR, setShowEntryQR] = useState(false);
   const [data, setData]: any = useState([]);
-  // const [dataID, setDataID] = useState(0);
-  const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('I');
   const [_typeSearch, set_TypeSearch] = useState('I');
   const {theme} = useContext(ThemeContext);
   const {execute} = useApi();
   const [loaded, setLoaded] = useState(false);
-
-  // const reloadNotif = (type: string) => {
-  //   // if (type === 'I' && typeSearch === 'I') {
-  //   getAccesses('', '/accesses', 'P');
-  //   // }
-  //   // if (type === 'P' && typeSearch === 'P') {
-  //   //   getAccesses('', '/others', 'L');
-  //   // }
-  // };
 
   const onNotif = useCallback(
     (data: any) => {
@@ -110,26 +89,8 @@ const Home = () => {
     setData(data?.data || []);
   };
 
-  console.log('data3', data);
-  // Actualizar data cuando cambia el tipo de búsqueda
   useEffect(() => {
     setData([]);
-    // switch (typeSearch) {
-    //   case 'I':
-    //     getAccesses('', '/accesses', 'P');
-    //     setStore({...store, bagePending: false});
-    //     break;
-    //   case 'S':
-    //     getAccesses('', '/accesses', 'P');
-    //     break;
-    //   case 'P':
-    //     getAccesses('', '/others', 'L');
-    //     setStore({...store, bageOthers: false});
-    //     break;
-    //   default:
-    //     console.log('Tipo de búsqueda no válido:', typeSearch);
-    //     break;
-    // }
     getAccesses('', '/accesses', 'P');
     setStore({...store, bagePending: false});
 
@@ -177,23 +138,12 @@ const Home = () => {
     };
   }, []);
 
-  // console.log(data);
-
   return (
     <>
       <Layout
         title="Home"
         customTitle={customTitle()}
-        // refresh={() =>
-        //   typeSearch == 'I'
-        //     ? getAccesses('', '/accesses', 'P')
-        //     : typeSearch == 'A'
-        //     ? getAccesses('', '/accesses', 'AD')
-        //     : getAccesses('', '/others', 'L')
-        // }
-        refresh={() => getAccesses('', '/accesses', 'P')}
-        // style={openSlide ? {paddingBottom: 40} : {paddingBottom: 30}}
-      >
+        refresh={() => getAccesses('', '/accesses', 'P')}>
         <TabsButtons
           tabs={[
             {
@@ -202,39 +152,19 @@ const Home = () => {
               isNew: store?.bagePending,
             },
             {value: 'S', text: 'Pendiente de salida'},
-            // {value: 'P', text: 'Pedidos', isNew: store?.bageOthers},
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
         />
-
-        {/* Buscador */}
-
         <View style={styles.listContainer}>
-          {/* <DataSearch
-            setSearch={setSearch}
-            name="home"
-            value={search}
-            style={{marginBottom: 8}}
-          /> */}
           {(_typeSearch === 'S' || typeSearch == 'I') && (
             <Accesses
               data={data}
-              reload={() => getAccesses(search, '/accesses', 'P')}
-              // setDataID={setDataID}
+              reload={() => getAccesses('', '/accesses', 'P')}
               typeSearch={typeSearch}
               isLoading={loaded}
             />
           )}
-
-          {/* {_typeSearch === 'P' && (
-            <Orders
-              data={data}
-              reload={() => getAccesses(search, '/others', 'L')}
-              setDataID={setDataID}
-              loaded={loaded}
-            />
-          )} */}
         </View>
         {openQr && (
           <CameraQr

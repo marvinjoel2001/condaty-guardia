@@ -4,14 +4,21 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDelivery, IconOther, IconSearch, IconSearchDefault, IconTaxi} from '../../../icons/IconLibrary';
+import {
+  IconDelivery,
+  IconEmpty,
+  IconOther,
+  IconSearch,
+  IconSearchDefault,
+  IconTaxi,
+} from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
 import {buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import { View } from 'react-native';
+import {View} from 'react-native';
 interface PropsType {
   data: any;
   reload: any;
@@ -30,7 +37,7 @@ const statusColor: any = {
   N: {color: cssVar.cError, background: cssVar.cHoverError},
   S: {color: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
 };
-const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
+const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
   const [dataAccesses, setDataAccesses] = useState([]);
@@ -56,10 +63,10 @@ const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
     setDataOrders(_dataOrders || []);
   }, [typeSearch, data]);
 
-    const filteredAccesses = useMemo(() => {
+  const filteredAccesses = useMemo(() => {
     if (!search) return dataAccesses; // Devuelve todo si la búsqueda está vacía
     const lowercasedSearch = search.toLowerCase();
-    
+
     return dataAccesses.filter((item: any) => {
       const visitName = getFullName(item.visit).toLowerCase();
       return visitName.includes(lowercasedSearch);
@@ -69,11 +76,14 @@ const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
   const filteredOrders = useMemo(() => {
     if (!search) return dataOrders; // Devuelve todo si la búsqueda está vacía
     const lowercasedSearch = search.toLowerCase();
-    
+
     return dataOrders.filter((item: any) => {
       const ownerName = getFullName(item.owner).toLowerCase();
       const orderType = item?.other_type?.name?.toLowerCase() || '';
-      return ownerName.includes(lowercasedSearch) || orderType.includes(lowercasedSearch);
+      return (
+        ownerName.includes(lowercasedSearch) ||
+        orderType.includes(lowercasedSearch)
+      );
     });
   }, [search, dataOrders]);
 
@@ -294,10 +304,10 @@ const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
       />
     );
   };
-  const NoResults = () => (
-    <View style={styles.noResultsContainer} >
-        <Icon name={IconSearch} size={48} color={cssVar.cWhiteV1}/> 
-        <Text style={styles.noResultsText}>No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente</Text>
+  const NoResults = ({text, icon}: any) => (
+    <View style={styles.noResultsContainer}>
+      <Icon name={icon} color={cssVar.cWhiteV1} size={60} />
+      <Text style={styles.noResultsText}>{text}</Text>
     </View>
   );
   return (
@@ -305,27 +315,32 @@ const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
       {isLoading && <Skeleton type="list" />}
       {!isLoading && (
         <>
-            <DataSearch
-                setSearch={setSearch}
-                name="home"
-                value={search}
-                style={{marginBottom: 8}}
+          <DataSearch
+            setSearch={setSearch}
+            name="home"
+            value={search}
+            style={{marginBottom: 8}}
+          />
+          {(filteredAccesses.length > 0 || filteredOrders.length > 0) && (
+            <>
+              {filteredAccesses.map((item: any) => renderItemAccess(item))}
+              {filteredOrders.map((item: any) => renderItemOrder(item))}
+            </>
+          )}
+
+          {filteredAccesses.length === 0 && filteredOrders.length === 0 && (
+            <NoResults
+              icon={search ? IconSearch : IconEmpty}
+              text={
+                search
+                  ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
+                  : 'No hay datos'
+              }
             />
-            {filteredAccesses.map((item: any) => renderItemAccess(item))}
-            {filteredOrders.map((item: any) => renderItemOrder(item))}
-            {filteredAccesses.length === 0 && filteredOrders.length === 0 && (
-                <NoResults />
-            )}
+          )}
         </>
       )}
-      {/* <DataSearch
-        setSearch={setSearch}
-        name="home"
-        value={search}
-        style={{marginBottom: 8}}
-      />
-      {dataAccesses?.map((item: any) => renderItemAccess(item))}
-      {dataOrders?.map((item: any) => renderItemOrder(item))} */}
+
       {openDetail && (
         <DetAccesses
           id={formState?.id}
@@ -347,19 +362,19 @@ const Accesses = ({data, reload, typeSearch, isLoading }: PropsType) => {
   );
 };
 const styles = StyleSheet.create({
-    noResultsContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 40,
-        marginTop: 80,
-    },
-    noResultsText: {
-        marginTop: 8,
-        fontSize: 14,
-        color: cssVar.cWhiteV1,
-        fontFamily: FONTS.regular,
-        textAlign:'center'
-    }
-})
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+    marginTop: 80,
+  },
+  noResultsText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: cssVar.cWhiteV1,
+    fontFamily: FONTS.regular,
+    textAlign: 'center',
+  },
+});
 export default Accesses;
