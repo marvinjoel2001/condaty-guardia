@@ -188,50 +188,50 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const cardDetail = () => {
     if (status != 'I') {
       return (
-      <>
-        <Card>
-          <Text style={styles.labelAccess}>{labelAccess()}</Text>
-          <ItemList
-            title={getFullName(data?.owner)}
-            // subtitle={'C.I.' + data?.owner?.ci}
-            subtitle={
-              'Unidad: ' +
-              data?.owner?.dptos?.[0]?.nro +
-              ', ' +
-              data?.owner?.dptos?.[0]?.description
-            }
-            left={
-              <Avatar
-                name={getFullName(data?.owner)}
-                src={getUrlImages(
-                  '/OWNER-' +
-                    data?.owner?.id +
-                    '.webp?d=' +
-                    data?.owner?.updated_at,
-                )}
-              />
-            }
-            right={
-              data?.type !== 'C' ? (
-                <Icon
-                  name={IconExpand}
-                  color={cssVar.cWhiteV1}
-                  onPress={() =>
-                    setOpenDet({
-                      open: true,
-                      id: data?.invitation_id,
-                      invitation: {...data?.invitation, owner: data?.owner},
-                      type: 'I',
-                    })
-                  }
+        <>
+          <Card>
+            <Text style={styles.labelAccess}>{labelAccess()}</Text>
+            <ItemList
+              title={getFullName(data?.owner)}
+              // subtitle={'C.I.' + data?.owner?.ci}
+              subtitle={
+                'Unidad: ' +
+                data?.owner?.dptos?.[0]?.nro +
+                ', ' +
+                data?.owner?.dptos?.[0]?.description
+              }
+              left={
+                <Avatar
+                  name={getFullName(data?.owner)}
+                  src={getUrlImages(
+                    '/OWNER-' +
+                      data?.owner?.id +
+                      '.webp?d=' +
+                      data?.owner?.updated_at,
+                  )}
                 />
-              ) : null
-            }
-          />
-          <Br/>
-        <View>{detailVisit(data)}</View>
-        </Card>
-        {/* {data?.accesses?.length > 0 && (
+              }
+              right={
+                data?.type !== 'C' ? (
+                  <Icon
+                    name={IconExpand}
+                    color={cssVar.cWhiteV1}
+                    onPress={() =>
+                      setOpenDet({
+                        open: true,
+                        id: data?.invitation_id,
+                        invitation: {...data?.invitation, owner: data?.owner},
+                        type: 'I',
+                      })
+                    }
+                  />
+                ) : null
+              }
+            />
+            <Br />
+            <View>{detailVisit(data)}</View>
+          </Card>
+          {/* {data?.accesses?.length > 0 && (
           <Text
             style={{
               color: cssVar.cWhite,
@@ -241,66 +241,66 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             Selecciona al visitante que esté por salir
           </Text>
         )} */}
-      </>
-    );
-    }else{
-    return (
-      <>
-        <Card>
-          <Text style={styles.labelAccess}>{labelAccess()}</Text>
-          <ItemList
-            title={getFullName(data?.owner)}
-            // subtitle={'C.I.' + data?.owner?.ci}
-            subtitle={
-              'Unidad: ' +
-              data?.owner?.dptos?.[0]?.nro +
-              ', ' +
-              data?.owner?.dptos?.[0]?.description
-            }
-            left={
-              <Avatar
-                name={getFullName(data?.owner)}
-                src={getUrlImages(
-                  '/OWNER-' +
-                    data?.owner?.id +
-                    '.webp?d=' +
-                    data?.owner?.updated_at,
-                )}
-              />
-            }
-            right={
-              data?.type !== 'C' ? (
-                <Icon
-                  name={IconExpand}
-                  color={cssVar.cWhiteV1}
-                  onPress={() =>
-                    setOpenDet({
-                      open: true,
-                      id: data?.invitation_id,
-                      invitation: {...data?.invitation, owner: data?.owner},
-                      type: 'I',
-                    })
-                  }
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Card>
+            <Text style={styles.labelAccess}>{labelAccess()}</Text>
+            <ItemList
+              title={getFullName(data?.owner)}
+              // subtitle={'C.I.' + data?.owner?.ci}
+              subtitle={
+                'Unidad: ' +
+                data?.owner?.dptos?.[0]?.nro +
+                ', ' +
+                data?.owner?.dptos?.[0]?.description
+              }
+              left={
+                <Avatar
+                  name={getFullName(data?.owner)}
+                  src={getUrlImages(
+                    '/OWNER-' +
+                      data?.owner?.id +
+                      '.webp?d=' +
+                      data?.owner?.updated_at,
+                  )}
                 />
-              ) : null
-            }
-          />
-        </Card>
-        {data?.accesses?.length > 0 && (
-          <Text
-            style={{
-              color: cssVar.cWhite,
-              fontSize: 16,
-              fontFamily: FONTS.medium,
-            }}>
-            Selecciona al visitante que esté por salir
-          </Text>
-        )}
-        <Card>
-          <View>{detailVisit(data)}</View>
-        </Card>
-      </>
-    );
+              }
+              right={
+                data?.type !== 'C' ? (
+                  <Icon
+                    name={IconExpand}
+                    color={cssVar.cWhiteV1}
+                    onPress={() =>
+                      setOpenDet({
+                        open: true,
+                        id: data?.invitation_id,
+                        invitation: {...data?.invitation, owner: data?.owner},
+                        type: 'I',
+                      })
+                    }
+                  />
+                ) : null
+              }
+            />
+          </Card>
+          {data?.accesses?.length > 0 && (
+            <Text
+              style={{
+                color: cssVar.cWhite,
+                fontSize: 16,
+                fontFamily: FONTS.medium,
+              }}>
+              Selecciona al visitante que esté por salir
+            </Text>
+          )}
+          <Card>
+            <View>{detailVisit(data)}</View>
+          </Card>
+        </>
+      );
     }
   };
 
@@ -344,6 +344,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
 
   const rightDetailVisit = (data: any, isSelected: any) => {
+    console.log(data);
     if (data?.out_at) {
       return (
         <Icon
@@ -360,9 +361,10 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         />
       );
     }
-    if (data?.accesses?.length == 0) {
+    if (data?.accesses?.length == 0 || !data?.in_at) {
       return;
     }
+
     return getCheckVisit(data, isSelected, 'I');
   };
 
@@ -509,13 +511,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     return null;
   };
 
-    //   const buttonTexts: Record<string, string> = {
-    //   I: 'Dejar salir',
-    //   Y: 'Dejar ingresar',
-    //   S: 'Esperando aprobacion',
-    //   C: 'Rechazado',
-    // };
-  console.log("mi estatus - 2",status)
+  //   const buttonTexts: Record<string, string> = {
+  //   I: 'Dejar salir',
+  //   Y: 'Dejar ingresar',
+  //   S: 'Esperando aprobacion',
+  //   C: 'Rechazado',
+  // };
+  console.log('mi estatus - 2', status);
   return (
     <ModalFull
       onClose={() => close()}
