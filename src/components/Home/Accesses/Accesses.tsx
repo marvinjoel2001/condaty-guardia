@@ -39,31 +39,28 @@ const statusColor: any = {
 const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
-  const [dataAccesses, setDataAccesses]: any = useState(null);
-  const [dataOrders, setDataOrders]: any = useState(null);
+  // const [dataAccesses, setDataAccesses]: any = useState(null);
+  // const [dataOrders, setDataOrders]: any = useState(null);
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    if (!data) return; // no sobrescribir mientras no llegue
-    setDataAccesses(null);
-    setDataOrders(null);
-    let _dataAccesses = [];
-    let _dataOrders = [];
-    if (typeSearch === 'I') {
-      _dataAccesses = data?.accesses?.filter(
-        (item: any) => !item?.in_at && !item?.out_at,
-      );
-      _dataOrders = data?.others?.filter(
-        (item: any) => !item?.access?.in_at && !item?.access?.out_at,
-      );
-    } else if (typeSearch === 'S') {
-      _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
-      _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
-    }
-    setDataAccesses(_dataAccesses || null);
-    setDataOrders(_dataOrders || null);
-  }, [typeSearch, data]);
+  const {dataAccesses, dataOrders} = useMemo(() => {
+    if (!data) return {dataAccesses: null, dataOrders: null};
+
+    const filterByType = (items: any[], type: string) => {
+      if (type === 'I') {
+        return items?.filter(item => !item?.in_at && !item?.out_at);
+      } else if (type === 'S') {
+        return items?.filter(item => item?.in_at);
+      }
+      return [];
+    };
+
+    return {
+      dataAccesses: filterByType(data?.accesses, typeSearch),
+      dataOrders: filterByType(data?.others, typeSearch),
+    };
+  }, [data, typeSearch]);
 
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
@@ -310,6 +307,35 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       <Text style={styles.noResultsText}>{text}</Text>
     </View>
   );
+
+  const filterBySearch = (items: any[], searchTerm: string) => {
+    if (!searchTerm) return items;
+
+    return items?.filter(item => {
+      const name = item.visit
+        ? getFullName(item.visit)
+        : getFullName(item.owner);
+      const otherTypeName = item?.other_type?.name || '';
+
+      return (
+        removeAccents(name)?.includes(removeAccents(searchTerm)) ||
+        removeAccents(otherTypeName)?.includes(removeAccents(searchTerm))
+      );
+    });
+  };
+
+  const filteredAccesses = useMemo(
+    () => filterBySearch(dataAccesses || [], search),
+    [dataAccesses, search],
+  );
+
+  const filteredOrders = useMemo(
+    () => filterBySearch(dataOrders || [], search),
+    [dataOrders, search],
+  );
+  // const hasNoResults =
+  //   (!filteredAccesses || filteredAccesses.length === 0) &&
+  //   (!filteredOrders || filteredOrders.length === 0);
   return (
     <>
       {isLoading && !dataAccesses && !dataOrders ? (
@@ -323,14 +349,14 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             style={{marginBottom: 8}}
           />
 
-          {(dataAccesses?.length > 0 || dataOrders?.length > 0) && (
+          {(filteredAccesses?.length > 0 || filteredOrders?.length > 0) && (
             <>
-              {dataAccesses?.map((item: any) => renderItemAccess(item))}
-              {dataOrders?.map((item: any) => renderItemOrder(item))}
+              {filteredAccesses?.map((item: any) => renderItemAccess(item))}
+              {filteredOrders?.map((item: any) => renderItemOrder(item))}
             </>
           )}
 
-          {dataAccesses?.length === 0 && dataOrders?.length === 0 && (
+          {filteredAccesses?.length === 0 && filteredOrders?.length === 0 && (
             <NoResults
               icon={search ? IconSearch : IconEmpty}
               text={
