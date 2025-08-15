@@ -310,8 +310,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       <Text style={styles.noResultsText}>{text}</Text>
     </View>
   );
-  console.log(dataOrders, 'dataOrders');
-  console.log(dataAccesses, 'dataAccesses');
   return (
     <>
       {isLoading && !dataAccesses && !dataOrders ? (
