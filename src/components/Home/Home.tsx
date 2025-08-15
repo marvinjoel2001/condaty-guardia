@@ -161,7 +161,7 @@ const Home = () => {
             <Accesses
               data={data}
               reload={() => getAccesses('', '/accesses', 'P')}
-              typeSearch={typeSearch}
+              typeSearch={_typeSearch}
               isLoading={loaded}
             />
           )}
