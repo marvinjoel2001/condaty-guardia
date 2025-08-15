@@ -8,7 +8,7 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconExpand, IconX} from '../../../icons/IconLibrary';
+import {IconExpand} from '../../../icons/IconLibrary';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 
