@@ -3,10 +3,7 @@ import {Text, View, StyleSheet} from 'react-native';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconArrowLeft, IconArrowRight} from '../../../icons/IconLibrary';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {
-  formatToDayDDMMYYYYHHMM,
-  getDateTimeStrMes,
-} from '../../../../mk/utils/dates';
+import {getDateTimeStrMes} from '../../../../mk/utils/dates';
 
 type Props = {
   access: any;

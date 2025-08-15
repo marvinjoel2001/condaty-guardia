@@ -1,11 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
@@ -167,11 +161,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       statusTextForModal = personData.out_at
         ? 'Completado'
         : personData.in_at
-        ? 'Dentro'
+        ? 'Por salir'
         : 'Pendiente';
       if (
         statusTextForModal === 'Completado' ||
-        statusTextForModal === 'Dentro'
+        statusTextForModal === 'Por salir'
       )
         statusColorForModal = cssVar.cSuccess;
 
@@ -348,67 +342,74 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
-            </View>
-          </View>
-          {driver && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Taxista</Text>
-              <TouchableOpacity
-                onPress={() =>
-                  handleOpenPersonDetailModal(driverAccess, 'Taxista', item)
-                }
-                activeOpacity={0.7}>
-                <View style={styles.personBlock}>
-                  <Avatar
-                    name={getFullName(driver)}
-                    src={getUrlImages(
-                      '/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at,
-                    )}
-                    w={40}
-                    h={40}
-                  />
-                  <View style={styles.personInfoContainer}>
-                    <Text style={styles.personName}>{getFullName(driver)}</Text>
-                    <Text style={styles.personSubDetail}>
-                      {(driver.ci ? `C.I. ${driver.ci}` : '') +
-                        (driver.ci && driverAccess.plate ? ' • ' : '') +
-                        (driverAccess.plate
-                          ? `Placa: ${driverAccess.plate}`
-                          : '')}
-                    </Text>
-                  </View>
-                  <Icon
-                    name={IconExpand}
-                    size={cssVar.sXl}
-                    color={cssVar.cWhiteV1}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
-          )}
-          {companions && companions.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>
-                Acompañante{companions.length > 1 ? 's' : ''}
-              </Text>
-              {companions.map((companionAccess: any, index: number) => (
-                <View
-                  key={`companion-wrapper-${companionAccess.id || index}`}
-                  style={index > 0 ? styles.additionalCompanionWrapper : null}>
-                  <CompanionItem
-                    companionAccess={companionAccess}
-                    onPress={() =>
-                      handleOpenPersonDetailModal(
-                        companionAccess,
-                        'Acompañante',
-                        item,
-                      )
+
+              {driver && (
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>Taxista</Text>
+                  <ItemList
+                    title={getFullName(driver)}
+                    subtitle={
+                      (driver.ci ? `C.I. ${driver.ci}` : '') +
+                      (driver.ci && driverAccess.plate ? ' • ' : '') +
+                      (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')
+                    }
+                    left={
+                      <Avatar
+                        name={getFullName(driver)}
+                        src={getUrlImages(
+                          '/VISIT-' +
+                            driver?.id +
+                            '.webp?d=' +
+                            driver?.updated_at,
+                        )}
+                        w={40}
+                        h={40}
+                      />
+                    }
+                    right={
+                      <Icon
+                        name={IconExpand}
+                        size={cssVar.sXl}
+                        color={cssVar.cWhiteV1}
+                        onPress={() =>
+                          handleOpenPersonDetailModal(
+                            driverAccess,
+                            'Taxista',
+                            item,
+                          )
+                        }
+                      />
                     }
                   />
                 </View>
-              ))}
+              )}
+              {companions && companions.length > 0 && (
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>
+                    Acompañante{companions.length > 1 ? 's' : ''}
+                  </Text>
+                  {companions.map((companionAccess: any, index: number) => (
+                    <View
+                      key={`companion-wrapper-${companionAccess.id || index}`}
+                      style={
+                        index > 0 ? styles.additionalCompanionWrapper : null
+                      }>
+                      <CompanionItem
+                        companionAccess={companionAccess}
+                        onPress={() =>
+                          handleOpenPersonDetailModal(
+                            companionAccess,
+                            'Acompañante',
+                            item,
+                          )
+                        }
+                      />
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
-          )}
+          </View>
           <View style={styles.mainCardR}>
             <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
             <ItemList
@@ -659,28 +660,29 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <View style={styles.personDetailModalCardContent}>
                 {modalPersonData.typeLabel === 'Residente' && accessData ? (
                   <>
-                    <View style={styles.personBlock}>
-                      <Avatar
-                        name={getFullName(modalPersonData.person)}
-                        src={getUrlImages(
-                          '/OWNER-' +
-                            modalPersonData.person?.id +
-                            '.webp?d=' +
-                            modalPersonData.person?.updated_at,
-                        )}
-                        w={40}
-                        h={40}
-                      />
-                      <View style={styles.personInfoContainer}>
-                        <Text style={styles.personName}>
-                          {getFullName(modalPersonData.person)}
-                        </Text>
-                        <Text style={styles.personSubDetail}>
-                          Unidad: {modalPersonData.person?.dpto?.[0]?.nro},{' '}
-                          {modalPersonData.person?.dpto?.[0]?.description}
-                        </Text>
-                      </View>
-                    </View>
+                    <ItemList
+                      style={{marginBottom: 12}}
+                      title={getFullName(modalPersonData.person)}
+                      subtitle={
+                        'Unidad:' +
+                        modalPersonData.person?.dpto?.[0]?.nro +
+                        ', ' +
+                        modalPersonData.person?.dpto?.[0]?.description
+                      }
+                      left={
+                        <Avatar
+                          name={getFullName(modalPersonData.person)}
+                          src={getUrlImages(
+                            '/OWNER-' +
+                              modalPersonData.person?.id +
+                              '.webp?d=' +
+                              modalPersonData.person?.updated_at,
+                          )}
+                          w={40}
+                          h={40}
+                        />
+                      }
+                    />
                     <View style={styles.detailsGroup}>
                       {accessData.type === 'I' && (
                         <>
@@ -800,38 +802,37 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   </>
                 ) : (
                   <>
-                    <View style={styles.personBlock}>
-                      <Avatar
-                        name={getFullName(modalPersonData.person)}
-                        src={getUrlImages(
-                          '/OWNER-' +
-                            modalPersonData.person?.id +
-                            '.webp?d=' +
-                            modalPersonData.person?.updated_at,
-                        )}
-                        w={40}
-                        h={40}
-                      />
-                      <View style={styles.personInfoContainer}>
-                        <Text style={styles.personName}>
-                          {getFullName(modalPersonData.person)}
-                        </Text>
-                        <Text style={styles.personSubDetail}>
-                          {(modalPersonData.person?.ci
-                            ? `C.I. ${modalPersonData.person.ci}`
-                            : '') +
-                            (modalPersonData.typeLabel === 'Taxista' &&
-                            modalPersonData.person?.ci &&
-                            modalPersonData.plate
-                              ? ' • '
-                              : '') +
-                            (modalPersonData.typeLabel === 'Taxista' &&
-                            modalPersonData.plate
-                              ? `Placa: ${modalPersonData.plate}`
-                              : '')}
-                        </Text>
-                      </View>
-                    </View>
+                    <ItemList
+                      style={{marginBottom: 12}}
+                      title={getFullName(modalPersonData.person)}
+                      subtitle={
+                        (modalPersonData.person?.ci
+                          ? `C.I. ${modalPersonData.person.ci}`
+                          : '') +
+                        (modalPersonData.typeLabel === 'Taxista' &&
+                        modalPersonData.person?.ci &&
+                        modalPersonData.plate
+                          ? ' • '
+                          : '') +
+                        (modalPersonData.typeLabel === 'Taxista' &&
+                        modalPersonData.plate
+                          ? `Placa: ${modalPersonData.plate}`
+                          : '')
+                      }
+                      left={
+                        <Avatar
+                          name={getFullName(modalPersonData.person)}
+                          src={getUrlImages(
+                            '/OWNER-' +
+                              modalPersonData.person?.id +
+                              '.webp?d=' +
+                              modalPersonData.person?.updated_at,
+                          )}
+                          w={40}
+                          h={40}
+                        />
+                      }
+                    />
                     <View style={styles.detailsGroup}>
                       <DetailRow
                         label="Estado"
