@@ -39,15 +39,15 @@ const statusColor: any = {
 const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
-  const [dataAccesses, setDataAccesses] = useState([]);
-  const [dataOrders, setDataOrders] = useState([]);
+  const [dataAccesses, setDataAccesses]: any = useState(null);
+  const [dataOrders, setDataOrders]: any = useState(null);
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
     if (!data) return; // no sobrescribir mientras no llegue
-    setDataAccesses([]);
-    setDataOrders([]);
+    setDataAccesses(null);
+    setDataOrders(null);
     let _dataAccesses = [];
     let _dataOrders = [];
     if (typeSearch === 'I') {
@@ -61,8 +61,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
       _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
     }
-    setDataAccesses(_dataAccesses || []);
-    setDataOrders(_dataOrders || []);
+    setDataAccesses(_dataAccesses || null);
+    setDataOrders(_dataOrders || null);
   }, [typeSearch, data]);
 
   const onPressDetail = (item: any, type: string) => {
@@ -310,9 +310,11 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       <Text style={styles.noResultsText}>{text}</Text>
     </View>
   );
+  console.log(dataOrders, 'dataOrders');
+  console.log(dataAccesses, 'dataAccesses');
   return (
     <>
-      {isLoading || (dataAccesses.length === 0 && dataOrders.length === 0) ? (
+      {isLoading && !dataAccesses && !dataOrders ? (
         <Skeleton type="list" />
       ) : (
         <>
@@ -323,14 +325,14 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             style={{marginBottom: 8}}
           />
 
-          {(dataAccesses.length > 0 || dataOrders.length > 0) && (
+          {(dataAccesses?.length > 0 || dataOrders?.length > 0) && (
             <>
-              {dataAccesses.map((item: any) => renderItemAccess(item))}
-              {dataOrders.map((item: any) => renderItemOrder(item))}
+              {dataAccesses?.map((item: any) => renderItemAccess(item))}
+              {dataOrders?.map((item: any) => renderItemOrder(item))}
             </>
           )}
 
-          {(dataAccesses.length === 0 || dataOrders.length === 0) && (
+          {dataAccesses?.length === 0 && dataOrders?.length === 0 && (
             <NoResults
               icon={search ? IconSearch : IconEmpty}
               text={
