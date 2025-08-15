@@ -9,7 +9,6 @@ import {
   IconEmpty,
   IconOther,
   IconSearch,
-  IconSearchDefault,
   IconTaxi,
 } from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -46,6 +45,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
+    if (!data) return; // no sobrescribir mientras no llegue
+    setDataAccesses([]);
+    setDataOrders([]);
     let _dataAccesses = [];
     let _dataOrders = [];
     if (typeSearch === 'I') {
@@ -62,36 +64,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     setDataAccesses(_dataAccesses || []);
     setDataOrders(_dataOrders || []);
   }, [typeSearch, data]);
-  const removeAccents = (str: string) => {
-    return str
-      ?.normalize('NFD')
-      ?.replace(/[\u0300-\u036f]/g, '')
-      ?.toLowerCase();
-  };
-
-  const filteredAccesses = useMemo(() => {
-    if (!search) return dataAccesses; // Devuelve todo si la búsqueda está vacía
-    const lowercasedSearch = removeAccents(search);
-
-    return dataAccesses.filter((item: any) => {
-      const visitName = removeAccents(getFullName(item.visit));
-      return visitName.includes(lowercasedSearch);
-    });
-  }, [search, dataAccesses]);
-
-  const filteredOrders = useMemo(() => {
-    if (!search) return dataOrders; // Devuelve todo si la búsqueda está vacía
-    const lowercasedSearch = removeAccents(search);
-
-    return dataOrders.filter((item: any) => {
-      const ownerName = removeAccents(getFullName(item.owner));
-      const orderType = removeAccents(item?.other_type?.name) || '';
-      return (
-        ownerName.includes(lowercasedSearch) ||
-        orderType.includes(lowercasedSearch)
-      );
-    });
-  }, [search, dataOrders]);
 
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
@@ -272,9 +244,22 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     );
   };
 
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
+
   const renderItemAccess = (item: any) => {
     const status = getStatus(item);
     const hasColoredBorder = status === 'N' || status === 'A';
+    if (
+      search &&
+      !removeAccents(getFullName(item.visit))?.includes(removeAccents(search))
+    ) {
+      return null;
+    }
     return (
       <ItemList
         key={item.id}
@@ -295,6 +280,15 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const renderItemOrder = (item: any) => {
+    if (
+      search &&
+      !removeAccents(getFullName(item?.owner))?.includes(
+        removeAccents(search),
+      ) &&
+      !removeAccents(item?.other_type?.name)?.includes(removeAccents(search))
+    ) {
+      return null;
+    }
     return (
       <ItemList
         key={item?.id}
@@ -318,8 +312,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   );
   return (
     <>
-      {isLoading && <Skeleton type="list" />}
-      {!isLoading && (
+      {isLoading || (dataAccesses.length === 0 && dataOrders.length === 0) ? (
+        <Skeleton type="list" />
+      ) : (
         <>
           <DataSearch
             setSearch={setSearch}
@@ -327,14 +322,15 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             value={search}
             style={{marginBottom: 8}}
           />
-          {(filteredAccesses.length > 0 || filteredOrders.length > 0) && (
+
+          {(dataAccesses.length > 0 || dataOrders.length > 0) && (
             <>
-              {filteredAccesses.map((item: any) => renderItemAccess(item))}
-              {filteredOrders.map((item: any) => renderItemOrder(item))}
+              {dataAccesses.map((item: any) => renderItemAccess(item))}
+              {dataOrders.map((item: any) => renderItemOrder(item))}
             </>
           )}
 
-          {filteredAccesses.length === 0 && filteredOrders.length === 0 && (
+          {(dataAccesses.length === 0 || dataOrders.length === 0) && (
             <NoResults
               icon={search ? IconSearch : IconEmpty}
               text={
@@ -353,7 +349,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
           open={openDetail}
           close={() => setOpenDetail(false)}
           reload={reload}
-          // execute={execute}
         />
       )}
       {openDetailOrders && (
