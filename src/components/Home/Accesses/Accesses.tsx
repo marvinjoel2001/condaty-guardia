@@ -62,24 +62,30 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     setDataAccesses(_dataAccesses || []);
     setDataOrders(_dataOrders || []);
   }, [typeSearch, data]);
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
 
   const filteredAccesses = useMemo(() => {
     if (!search) return dataAccesses; // Devuelve todo si la búsqueda está vacía
-    const lowercasedSearch = search.toLowerCase();
+    const lowercasedSearch = removeAccents(search);
 
     return dataAccesses.filter((item: any) => {
-      const visitName = getFullName(item.visit).toLowerCase();
+      const visitName = removeAccents(getFullName(item.visit));
       return visitName.includes(lowercasedSearch);
     });
   }, [search, dataAccesses]);
 
   const filteredOrders = useMemo(() => {
     if (!search) return dataOrders; // Devuelve todo si la búsqueda está vacía
-    const lowercasedSearch = search.toLowerCase();
+    const lowercasedSearch = removeAccents(search);
 
     return dataOrders.filter((item: any) => {
-      const ownerName = getFullName(item.owner).toLowerCase();
-      const orderType = item?.other_type?.name?.toLowerCase() || '';
+      const ownerName = removeAccents(getFullName(item.owner));
+      const orderType = removeAccents(item?.other_type?.name) || '';
       return (
         ownerName.includes(lowercasedSearch) ||
         orderType.includes(lowercasedSearch)
