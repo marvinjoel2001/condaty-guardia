@@ -15,6 +15,14 @@ type Props = {
 const Accesses = ({data, loaded}: Props) => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
+  const [filteredData, setFilteredData] = useState(data);
+
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
     const groupTitle = item.invitation?.title || item.access?.invitation?.title;
@@ -35,9 +43,8 @@ const Accesses = ({data, loaded}: Props) => {
 
     if (search && search !== '') {
       if (
-        user.name?.toLowerCase()?.includes(search?.toLowerCase()) === false &&
-        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) ===
-          false
+        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
+        false
       ) {
         return null;
       }
