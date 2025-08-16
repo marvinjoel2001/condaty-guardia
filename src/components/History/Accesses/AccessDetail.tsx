@@ -537,6 +537,30 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
             </View>
           </View>
+
+          {companions && companions.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>
+                Acompañante{companions.length > 1 ? 's' : ''}
+              </Text>
+              {companions.map((companionAccess: any, index: number) => (
+                <View
+                  key={`companion-wrapper-${companionAccess.id || index}`}
+                  style={index > 0 ? styles.additionalCompanionWrapper : null}>
+                  <CompanionItem
+                    companionAccess={companionAccess}
+                    onPress={() =>
+                      handleOpenPersonDetailModal(
+                        companionAccess,
+                        'Acompañante',
+                        item,
+                      )
+                    }
+                  />
+                </View>
+              ))}
+            </View>
+          )}
           {driver && (
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Taxista</Text>
@@ -568,29 +592,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   />
                 }
               />
-            </View>
-          )}
-          {companions && companions.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>
-                Acompañante{companions.length > 1 ? 's' : ''}
-              </Text>
-              {companions.map((companionAccess: any, index: number) => (
-                <View
-                  key={`companion-wrapper-${companionAccess.id || index}`}
-                  style={index > 0 ? styles.additionalCompanionWrapper : null}>
-                  <CompanionItem
-                    companionAccess={companionAccess}
-                    onPress={() =>
-                      handleOpenPersonDetailModal(
-                        companionAccess,
-                        'Acompañante',
-                        item,
-                      )
-                    }
-                  />
-                </View>
-              ))}
             </View>
           )}
         </View>
