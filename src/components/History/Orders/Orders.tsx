@@ -31,11 +31,20 @@ export const Orders = ({data, loaded}: Props) => {
     id: null as number | string | null,
   });
   const [search, setSearch] = useState('');
-
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
   const renderItem = (item: any) => {
+    console.log(item);
     if (search && search !== '') {
       if (
-        !getFullName(item?.owner).toLowerCase().includes(search.toLowerCase())
+        !removeAccents(getFullName(item?.access?.visit)).includes(
+          removeAccents(search),
+        ) &&
+        !removeAccents(item?.other_type?.name).includes(removeAccents(search))
       ) {
         return null;
       }

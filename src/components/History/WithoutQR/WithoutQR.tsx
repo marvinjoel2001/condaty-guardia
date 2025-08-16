@@ -22,21 +22,33 @@ const WithoutQR = ({data, loaded}: Props) => {
   const {execute} = useApi();
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
-
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
     const subTitle =
-      item.type == 'O' ? 'Llave QR' :
-      item.type == 'C' ? 'Sin QR' : 
-      item.type == 'I' ? 'QR Individual' : 
-      item.type == 'G' ? 'QR Grupal' : 
-      item.type == 'F' ? 'QR Frecuente' : 
-      item.type == 'P' ? 'Pedido'  : '';     
+      item.type == 'O'
+        ? 'Llave QR'
+        : item.type == 'C'
+        ? 'Sin QR'
+        : item.type == 'I'
+        ? 'QR Individual'
+        : item.type == 'G'
+        ? 'QR Grupal'
+        : item.type == 'F'
+        ? 'QR Frecuente'
+        : item.type == 'P'
+        ? 'Pedido'
+        : '';
 
     if (search && search !== '') {
       if (
-        user.name?.toLowerCase()?.includes(search?.toLowerCase()) === false &&
-        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) === false
+        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
+        false
       ) {
         return null;
       }
@@ -101,7 +113,7 @@ const WithoutQR = ({data, loaded}: Props) => {
           value={search}
           style={{flex: 1}}
         />
-       {/*  <Icon
+        {/*  <Icon
           name={IconDownload}
           onPress={onExport}
           fillStroke={cssVar.cWhiteV2}
@@ -125,4 +137,4 @@ const WithoutQR = ({data, loaded}: Props) => {
   );
 };
 
-export default WithoutQR; 
+export default WithoutQR;

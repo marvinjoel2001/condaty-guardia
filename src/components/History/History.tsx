@@ -22,12 +22,18 @@ const History = () => {
     setLoaded(true);
     setData([]);
     try {
-      const {data} = await execute(endpoint, 'GET', {
-        perPage: -1,
-        page: 1,
-        fullType,
-        section: 'ACT',
-      });
+      const {data} = await execute(
+        endpoint,
+        'GET',
+        {
+          perPage: -1,
+          page: 1,
+          fullType,
+          section: 'ACT',
+        },
+        false,
+        3,
+      );
       setData(data?.data || []);
     } catch (error) {
       console.error(error);

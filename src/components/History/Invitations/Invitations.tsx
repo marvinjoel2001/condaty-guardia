@@ -50,13 +50,19 @@ const Invitations = ({data, loaded}: Props) => {
     if (item.type == 'G') subtitle = `Creado por: ${getFullName(item.owner)}`;
     return <Text>{subtitle}</Text>;
   };
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
   const renderItem = (item: any) => {
     if (search && search !== '') {
       if (
-        !getFullName(item?.visit)
-          .toLowerCase()
-          .includes(search.toLowerCase()) &&
-        !getFullName(item?.owner).toLowerCase().includes(search.toLowerCase())
+        !removeAccents(getFullName(item?.visit)).includes(
+          removeAccents(search),
+        ) &&
+        !removeAccents(getFullName(item?.owner)).includes(removeAccents(search))
       ) {
         return null;
       }
