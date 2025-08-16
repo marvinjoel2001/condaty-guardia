@@ -39,8 +39,6 @@ const statusColor: any = {
 const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
-  // const [dataAccesses, setDataAccesses]: any = useState(null);
-  // const [dataOrders, setDataOrders]: any = useState(null);
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -61,6 +59,10 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       dataOrders: filterByType(data?.others, typeSearch),
     };
   }, [data, typeSearch]);
+
+  useEffect(() => {
+    setSearch('');
+  }, [typeSearch]);
 
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
