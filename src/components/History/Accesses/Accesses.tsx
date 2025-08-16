@@ -6,16 +6,13 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
-import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import {openLink} from '../../../../mk/utils/utils';
 
 type Props = {
   data: any;
   loaded: boolean;
 };
 const Accesses = ({data, loaded}: Props) => {
-  // const {execute} = useApi();
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const renderItem = (item: any) => {
