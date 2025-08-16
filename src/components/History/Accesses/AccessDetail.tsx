@@ -155,7 +155,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
     const personToShow =
       typeLabel === 'Acompañante' ? personData.visit || personData : personData;
-    const isDriver = typeLabel === 'Taxista';
 
     if (typeLabel === 'Acompañante' || typeLabel === 'Residente') {
       statusTextForModal = personData.out_at

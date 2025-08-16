@@ -335,9 +335,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     () => filterBySearch(dataOrders || [], search),
     [dataOrders, search],
   );
-  // const hasNoResults =
-  //   (!filteredAccesses || filteredAccesses.length === 0) &&
-  //   (!filteredOrders || filteredOrders.length === 0);
   return (
     <>
       {isLoading && !dataAccesses && !dataOrders ? (

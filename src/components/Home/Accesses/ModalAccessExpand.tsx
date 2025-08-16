@@ -31,7 +31,6 @@ const ModalAccessExpand = ({
   type,
   invitation,
 }: PropsType) => {
-  //   const [invitation, setInvitation] = useState([]);
   const [data, setData]: any = useState([]);
   const {loaded, execute} = useApi();
 
@@ -52,24 +51,6 @@ const ModalAccessExpand = ({
     }
   }, []);
 
-  //   const getInvitation = async () => {
-  //     const {data} = await execute('invitations', 'GET', {
-  //       perPage: -1,
-  //       page: 1,
-  //       fullType: 'DET',
-  //       searchBy: id,
-  //     });
-  //     setInvitation(data);
-  //   };
-  //   useEffect(() => {
-  //     if (type === 'I') {
-  //       getInvitation();
-  //     }
-  //   }, []);
-
-  //   if (!loaded) {
-  //     return;
-  //   }
   const Br = () => {
     return (
       <View
@@ -238,7 +219,6 @@ const ModalAccessExpand = ({
       <>
         <ItemList
           title={getFullName(invitation?.owner)}
-          // subtitle={'C.I.' + data?.owner?.ci}
           subtitle={
             'Unidad: ' +
             invitation?.owner?.dpto?.nro +
@@ -258,10 +238,6 @@ const ModalAccessExpand = ({
           }
           style={{marginBottom: 8}}
         />
-        {/* <KeyValue
-          keys="Tipo de invitación"
-          value={typeInvitation[invitation.type]}
-        /> */}
         <KeyValue keys="Tipo de pedido" value={invitation?.other_type?.name} />
         <KeyValue
           keys="Fecha de notificación"

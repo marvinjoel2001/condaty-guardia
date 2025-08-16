@@ -312,7 +312,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           onPress={() =>
             setOpenDet({
               open: true,
-              // id: type == 'I' ? visit?.invitation_id : visit?.id,
               id: visit?.id,
               type: type,
             })
@@ -347,7 +346,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           onPress={() =>
             setOpenDet({
               open: true,
-              // id: type == 'I' ? visit?.invitation_id : visit?.id,
               id: data?.id,
               type: 'V',
             })
@@ -402,12 +400,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={getDateTimeStrMes(data?.in_at) || '-/-'}
               />
             )}
-            {/* {data?.out_at && (
-              <KeyValue
-                keys="Fecha y hora de salida"
-                value={getDateTimeStrMes(data?.out_at, true) || '-/-'}
-              />
-            )} */}
             {getStatus() === 'S' || getStatus() === 'Y' ? (
               <KeyValue
                 keys={'Notificado por'}
@@ -428,12 +420,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={data?.obs_in || '-/-'}
               />
             )}
-            {/* {data?.out_at && (
-              <KeyValue
-                keys="Observación de salida"
-                value={data?.obs_out || '-/-'}
-              />
-            )} */}
           </>
         )}
 
