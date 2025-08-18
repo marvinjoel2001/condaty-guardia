@@ -59,7 +59,7 @@ interface CompanionItemProps {
 const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
   const person = companionAccess.visit || companionAccess;
 
-  if (!person || !person.id) return null;
+  if (!person || !person.id) return null; // esto?
 
   const companionFullName = getFullName(person) || 'N/A';
   const companionCi = person.ci ? `C.I. ${person.ci}` : 'CI no disponible';
@@ -90,6 +90,7 @@ const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
 
 // Helper para días de la semana en QR frecuente
 function parseWeekDays(binaryNumber: number): string[] {
+  // esto? esta funcion se repite en varios lugares, mejor hacerlo un utilitario en dates
   const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   const result: string[] = [];
   for (let i = 0; i < 7; i++) {
@@ -118,11 +119,13 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           searchBy: id,
         });
         if (open && id === id) {
+          // esto? no se entiende porque id debe ser iguala  id, siempre lo sera
           setAccessData(apiResponse.data?.[0] || null);
         }
       } catch (error) {
         console.error('Failed to fetch access details:', error);
         if (open && id === id) {
+          // esto? esta bien esta logica?
           setAccessData(null);
         }
       }
@@ -159,7 +162,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     if (typeLabel === 'Acompañante' || typeLabel === 'Residente') {
       statusTextForModal = personData.out_at
         ? 'Completado'
-        : personData.in_at
+        : personData.in_at // esto? convertir en funcion
         ? 'Por salir'
         : 'Pendiente';
       if (
@@ -182,7 +185,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       // Taxista
       statusTextForModal = mainAccessItem.out_at
         ? 'Completado'
-        : !mainAccessItem.confirm_at && mainAccessItem.status !== 'X'
+        : !mainAccessItem.confirm_at && mainAccessItem.status !== 'X' // esto? convertir en funcion
         ? 'Por confirmar'
         : mainAccessItem.in_at
         ? 'Por Salir'
@@ -245,7 +248,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
     statusText = item.out_at
       ? 'Completado'
-      : !item.confirm_at && item.status !== 'X'
+      : !item.confirm_at && item.status !== 'X' // esto? convertir en funcion
       ? 'Por confirmar'
       : item.in_at
       ? 'Dentro del condominio'
@@ -596,6 +599,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           )}
         </View>
         {/* {(item.type === 'I' || item.type === 'G' || item.type === 'F') && ( */}
+        {/* // esto? */}
         <View style={styles.mainCardR}>
           <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
           <ItemList
@@ -631,16 +635,18 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           />
         </View>
         {/* )} */}
+        {/* // esto? */}
       </ScrollView>
     );
   };
 
   return (
     <>
+      {/* // esto? quitar el <></> */}
       <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose}>
         {open && id ? (
           renderContent()
-        ) : open && !id ? (
+        ) : open && !id ? ( // esto? crear funcion
           <View style={styles.noDataContainer}>
             <Text style={styles.noDataText}>ID no proporcionado.</Text>
           </View>

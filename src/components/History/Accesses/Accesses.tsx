@@ -15,7 +15,7 @@ type Props = {
 const Accesses = ({data, loaded}: Props) => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState(data); // esto? si no se usa se elimina
 
   const removeAccents = (str: string) => {
     return str
@@ -29,7 +29,7 @@ const Accesses = ({data, loaded}: Props) => {
     const subTitle =
       item.type == 'O'
         ? 'Llave QR'
-        : item.type == 'C'
+        : item.type == 'C' // esto? crear funcion con case
         ? 'Sin QR'
         : item.type == 'I'
         ? 'QR Individual'
@@ -80,7 +80,7 @@ const Accesses = ({data, loaded}: Props) => {
     setSearch(value);
   };
 
-  // const onExport = async () => {
+  // const onExport = async () => { // esto? si no se usa s borrar
   //   const {data: file} = await execute('/accesses', 'GET', {
   //     perPage: -1,
   //     page: 1,
@@ -108,7 +108,7 @@ const Accesses = ({data, loaded}: Props) => {
           value={search}
           style={{flex: 1}}
         />
-        {/*  <Icon
+        {/*  <Icon // esto? sino se usa se borrar
           name={IconDownload}
           onPress={onExport}
           fillStroke={cssVar.cWhiteV2}

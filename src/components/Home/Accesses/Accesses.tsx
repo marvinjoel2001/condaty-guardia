@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native'; // esto? unificar todos los import de react-native
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
@@ -17,7 +17,7 @@ import {buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import {View} from 'react-native';
+import {View} from 'react-native'; // esto?
 interface PropsType {
   data: any;
   reload: any;
@@ -31,6 +31,7 @@ const statusText: any = {
   S: 'Dejar salir',
 };
 const statusColor: any = {
+  // esto? ver si este type ya no se usa en otro archivo y llevarlo a un archivo types que los exporte
   E: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
   A: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
   N: {color: cssVar.cError, background: cssVar.cHoverError},
@@ -149,6 +150,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const titleAccess = (item: any) => {
+    // estos? se puede mover fuera del componente
     return item.type === 'O' ? (
       <Text>{getFullName(item.owner)}</Text>
     ) : (
@@ -157,6 +159,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const subtitleAccess = (item: any) => {
+    // estos? se puede sacar fuera
     if (item.type === 'O') {
       return 'USO LLAVE VIRTUAL QR';
     }
@@ -303,7 +306,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       />
     );
   };
-  const NoResults = ({text, icon}: any) => (
+  const NoResults = (
+    {text, icon}: any, // estos? s puede sacar fuera del componente
+  ) => (
     <View style={styles.noResultsContainer}>
       <Icon name={icon} color={cssVar.cWhiteV1} size={60} />
       <Text style={styles.noResultsText}>{text}</Text>

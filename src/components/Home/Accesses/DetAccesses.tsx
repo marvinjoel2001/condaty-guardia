@@ -18,6 +18,7 @@ import KeyValue from '../../../../mk/components/ui/KeyValue';
 import ModalAccessExpand from './ModalAccessExpand';
 
 const Br = () => {
+  // esto?  ya existe una funcion o componebte BR reutiliar
   return (
     <View
       style={{
@@ -30,6 +31,7 @@ const Br = () => {
   );
 };
 const typeInvitation: any = {
+  // estos? ver si ya existe o se unifican los types
   I: 'QR Individual',
   G: 'QR Grupal',
   C: 'Sin QR',

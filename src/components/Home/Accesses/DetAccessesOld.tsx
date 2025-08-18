@@ -19,7 +19,7 @@ import useAuth from '../../../../mk/hooks/useAuth';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 const DetAccessesOld = ({id, open, close, reload}: any) => {
   const {showToast} = useAuth();
-  const {execute, waiting} = useApi();
+  const {execute, waiting} = useApi(); // estos? lo que no se usa se elimina
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
@@ -53,15 +53,15 @@ const DetAccessesOld = ({id, open, close, reload}: any) => {
       getData(id);
     }
   }, [id]);
-  // console.log(data,'data dataaaa')
+  // console.log(data,'data dataaaa') // esto?
   const handleSave = async () => {
     const status = getStatus();
     if (status === 'C') {
-      // Si está completado, significa que todos han salido
+      // Si está completado, significa que todos han salido// esto?
       close();
       return;
     }
-    //  console.log('status desde save',acompanSelect)
+    //  console.log('status desde save',acompanSelect)// esto?
     if (status === 'I') {
       if (Object.values(acompanSelect).every(value => !value)) {
         console.log(
@@ -73,7 +73,7 @@ const DetAccessesOld = ({id, open, close, reload}: any) => {
         );
         return;
       }
-      // const ids = acompanSelect.map((item: any) => item.id);
+      // const ids = acompanSelect.map((item: any) => item.id);// esto?
       const ids = Object.keys(acompanSelect)
         .filter(id => acompanSelect[id])
         .map(id => Number(id));
@@ -111,7 +111,7 @@ const DetAccessesOld = ({id, open, close, reload}: any) => {
   };
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
-    //status
+    //status// esto?
     // S=Solicitud de confirmacion
     // Y = solicitud confirmada
     // N = Solicitid rechazada
@@ -222,7 +222,7 @@ const DetAccessesOld = ({id, open, close, reload}: any) => {
           <>
             {data?.obs_in ? (
               <LineDetail label="Obs. de entrada:" value={data?.obs_in} />
-            ) : data?.obs_out ? (
+            ) : data?.obs_out ? ( // esto? SE PUEDA CREAR UNA FUNCION
               <LineDetail label="Obs. de salida:" value={data?.obs_out} />
             ) : null}
           </>
@@ -301,6 +301,7 @@ const DetAccessesOld = ({id, open, close, reload}: any) => {
     return null;
   };
   const typeLabels: Record<'O' | 'P' | 'I' | 'G', string> = {
+    // esto? esto se podria sacar fuera del compnente
     O: 'Residente',
     P: 'Repartidor',
     I: 'Visitante individual',

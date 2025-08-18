@@ -13,7 +13,7 @@ interface PropsType {
   id: string | number | null;
   open: boolean;
   onClose: () => void;
-  type: 'A' | 'T' | 'I' | 'V' | 'P' | string;
+  type: 'A' | 'T' | 'I' | 'V' | 'P' | string; // esto?quitar el string
   invitation?: any;
 }
 const typeInvitation: any = {
@@ -42,6 +42,7 @@ const ModalAccessExpand = ({
       searchBy: id,
     });
     if (data?.success == true) {
+      // esto?
       setData(data?.data?.[0]);
     }
   };
@@ -52,6 +53,7 @@ const ModalAccessExpand = ({
   }, []);
 
   const Br = () => {
+    // esto? ya esite esta funcion
     return (
       <View
         style={{
@@ -121,7 +123,7 @@ const ModalAccessExpand = ({
       <>
         <ItemList
           title={getFullName(invitation?.owner)}
-          // subtitle={'C.I.' + data?.owner?.ci}
+          // subtitle={'C.I.' + data?.owner?.ci}// esto?
           subtitle={
             'Unidad: ' +
             invitation?.owner?.dptos?.[0]?.nro +
@@ -164,6 +166,7 @@ const ModalAccessExpand = ({
           <>
             {invitation?.start_date && (
               <>
+                {/* // esto? quitar <></> */}
                 <KeyValue
                   keys="Periodo de validez"
                   value={
@@ -252,7 +255,7 @@ const ModalAccessExpand = ({
       title={
         type === 'A'
           ? 'Detalle del acompañante'
-          : type === 'T'
+          : type === 'T' // esto? crear funcion
           ? 'Detalle del taxista'
           : type === 'I' || type === 'P'
           ? 'Detalle de la invitación'
@@ -264,7 +267,7 @@ const ModalAccessExpand = ({
       onClose={onClose}>
       {!loaded ? (
         <Loading />
-      ) : type === 'I' ? (
+      ) : type === 'I' ? ( // esto? crear funcion
         renderInvitation()
       ) : type == 'P' ? (
         renderPedido()

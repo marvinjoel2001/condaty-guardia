@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react'; // esto? lo que no se usa se elimina
 import useAuth from '../../../../mk/hooks/useAuth';
 import ItemInfo, {
   ItemInfoType,
@@ -43,29 +43,29 @@ const DetailAccess = ({
   const [details, setDetails] = useState<TypeDetails>({title: '', data: []});
   const [acompSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = React.useState({});
-  // const {theme} = useContext(ThemeContext);
+  // const {theme} = useContext(ThemeContext);// esto? si no se usa se elimina
   const [_id, setID] = useState(0);
   const [acompanantes, setAcompanantes]: any = useState([]);
-  const {showToast, setStore} = useAuth();
+  const {showToast, setStore} = useAuth(); // esto? lo que no se eusa se elimina
   const {execute} = useApi();
   const [dataScreen, setDataScreen]: any = screenParams;
 
   const getData = async (id: number) => {
-    // console.log(id, "ID");
+    // console.log(id, "ID");// esto?
     const {data, error} = await execute('/accesses', 'GET', {
       fullType: 'DET',
       searchBy: id,
     });
 
     if (data?.success) {
-      setFormState((old: any) => data.data);
+      setFormState((old: any) => data.data); // esto?
 
       _onDetail(data.data);
-      // console.log("DATAAAA", JSON.stringify(data.data, null, 5));
+      // console.log("DATAAAA", JSON.stringify(data.data, null, 5));// esto?
     } else {
       showToast(data?.message, 'error');
       console.log('Error:', error);
-      return;
+      return; // esto?
     }
   };
 
@@ -106,6 +106,7 @@ const DetailAccess = ({
     }
     if (item?.access_id) {
       const paramsInitialA = {
+        // esto? bsi no se usa se elimina
         perPage: 1,
         page: 1,
         sortBy: 'accesses.created_at,in_at',
@@ -118,7 +119,7 @@ const DetailAccess = ({
         searchBy: _item?.access_id,
       };
 
-      // const {data: row} = await execute('/accesses', 'GET', paramsInitialA);
+      // const {data: row} = await execute('/accesses', 'GET', paramsInitialA);// esto?
 
       const {data: row} = await execute('/accesses', 'GET', {
         fullType: 'AD',
@@ -126,6 +127,7 @@ const DetailAccess = ({
       });
 
       if (row?.success == true) {
+        // esto?
         item = row?.data;
         setFormState(item);
       }
@@ -140,7 +142,7 @@ const DetailAccess = ({
     const _data: ItemInfoType[] = [];
     let v = '';
     let buttonText = '';
-    // setFormState({...item, id: item?.id});
+    // setFormState({...item, id: item?.id});// esto?
     if (item?.type == 'O') {
       _data.push({
         l: 'Tipo de acceso',
@@ -161,7 +163,7 @@ const DetailAccess = ({
     } else {
       v = item?.out_at
         ? 'Completado'
-        : !item?.confirm_at
+        : !item?.confirm_at // esto? crear funcion
         ? 'Por confirmar'
         : item?.in_at
         ? 'Por Salir'
@@ -181,7 +183,7 @@ const DetailAccess = ({
         v:
           item?.type == 'P'
             ? 'Pedido-' + item?.other?.other_type.name
-            : item?.type == 'I'
+            : item?.type == 'I' // esto? crear funcion
             ? 'QR Individual'
             : item?.type == 'C'
             ? 'Sin QR'
@@ -204,7 +206,7 @@ const DetailAccess = ({
       if (item?.type == 'P') {
         _data.push({l: 'Conductor', v: getFullName(item?.visit)});
       } else {
-        // _data.push({l: "Visitante", v: item?.visit?.name});
+        // _data.push({l: "Visitante", v: item?.visit?.name});// esto?
       }
 
       if (item?.plate && !item?.taxi) _data.push({l: 'Placa', v: item?.plate});
@@ -231,7 +233,7 @@ const DetailAccess = ({
             l: 'Guardia de salida',
             v: getFullName(item?.out_guard),
           });
-        (item?.obs_in ||
+        (item?.obs_in || // esto? crear funcion
           item?.obs_out ||
           item?.obs_confirm ||
           item?.obs_guard) &&
@@ -241,7 +243,7 @@ const DetailAccess = ({
         item?.obs_in && _data.push({l: 'Obs. de entrada', v: item?.obs_in});
         item?.obs_out && _data.push({l: 'Obs. de salida', v: item?.obs_out});
       } else {
-        (item?.obs_in || item?.obs_out || item?.obs_confirm) && item?.obs_in
+        (item?.obs_in || item?.obs_out || item?.obs_confirm) && item?.obs_in // esto? crear funcion
           ? _data.push({l: 'Obs. de entrada', v: item?.obs_in})
           : item?.obs_out
           ? _data.push({l: 'Obs. de salida', v: item?.obs_out})
@@ -253,7 +255,7 @@ const DetailAccess = ({
       edit &&
         (buttonText = canS
           ? 'Dejar salir'
-          : item?.confirm_at && item?.confirm == 'Y'
+          : item?.confirm_at && item?.confirm == 'Y' // esto? crear funcion
           ? !item?.in_at
             ? 'Dejar entrar'
             : ''
@@ -267,17 +269,17 @@ const DetailAccess = ({
       buttonText,
       buttonCancel,
     });
-    //setOpenDetail(true);
+    //setOpenDetail(true);// esto?
   };
   const handleSelectAcomp = (id: any) => {
     const isSelected = acompSelect.some((a: any) => a.id === id);
 
     if (!isSelected) {
       const updatedAcompanantes = [...acompSelect, {id}];
-      setAcompSelect((old: any) => updatedAcompanantes);
+      setAcompSelect((old: any) => updatedAcompanantes); // esto?
     } else {
       const updatedAcompanantes = acompSelect.filter((a: any) => a.id !== id);
-      setAcompSelect((old: any) => updatedAcompanantes);
+      setAcompSelect((old: any) => updatedAcompanantes); // esto?
     }
   };
 
@@ -300,6 +302,7 @@ const DetailAccess = ({
   };
 
   const Horas1 = ({acompanante, fecha = ''}: any) => {
+    // esto? si no se usa se elimina
     return (
       <ItemListDate
         inDate={acompanante?.in_at}
@@ -351,12 +354,14 @@ const DetailAccess = ({
   };
 
   const onIn = async (acceso: any) => {
-    // console.log("acceso", acceso);
+    // esto?
+    // console.log("acceso", acceso);// esto?
     const {data: In, error: err} = await execute('/accesses/enter', 'POST', {
       id: formState?.id,
       obs_in: formState?.obs_in,
     });
     if (In?.success == true) {
+      // esto?
       reload();
       close();
       showToast('El visitante ingresó', 'success');
@@ -365,6 +370,7 @@ const DetailAccess = ({
     }
   };
   const onOut = async (acceso: any) => {
+    // esto?
     let idAcom: any = [];
     acompSelect.map((acom: any) => {
       idAcom.push(acom.id);
@@ -385,6 +391,7 @@ const DetailAccess = ({
       3,
     );
     if (In?.success == true) {
+      // esto?
       reload();
       close();
       setAcompSelect([]);
@@ -408,6 +415,7 @@ const DetailAccess = ({
       open={open}>
       {formState?.id != _id ? (
         <>
+          {/* // esto? quitar <></> */}
           <ActivityIndicator
             style={{height: 220}}
             color={cssVar.cSuccess}
