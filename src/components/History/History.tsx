@@ -3,11 +3,9 @@ import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import useApi from '../../../mk/hooks/useApi';
 import Accesses from './Accesses/Accesses';
-import Invitations from './Invitations/Invitations';
 import {Orders} from './Orders/Orders';
 import QR from './QR/QR';
 import WithoutQR from './WithoutQR/WithoutQR';
-import {useFocusEffect} from '@react-navigation/native';
 
 const History = () => {
   const [tab, setTab] = useState('A');
@@ -24,12 +22,18 @@ const History = () => {
     setLoaded(true);
     setData([]);
     try {
-      const {data} = await execute(endpoint, 'GET', {
-        perPage: -1,
-        page: 1,
-        fullType,
-        section: 'ACT',
-      });
+      const {data} = await execute(
+        endpoint,
+        'GET',
+        {
+          perPage: -1,
+          page: 1,
+          fullType,
+          section: 'ACT',
+        },
+        false,
+        3,
+      );
       setData(data?.data || []);
     } catch (error) {
       console.error(error);
@@ -78,7 +82,7 @@ const History = () => {
           : console.log('Tipo de búsqueda no válido:', tab)
       }>
       <TabsButtons
-      style={{marginVertical:12}}
+        style={{marginVertical: 12}}
         tabs={[
           {value: 'A', text: 'Accesos'},
           {value: 'Q', text: 'QR'},

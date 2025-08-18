@@ -9,7 +9,6 @@ import {
   IconEmpty,
   IconOther,
   IconSearch,
-  IconSearchDefault,
   IconTaxi,
 } from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -40,52 +39,30 @@ const statusColor: any = {
 const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
-  const [dataAccesses, setDataAccesses] = useState([]);
-  const [dataOrders, setDataOrders] = useState([]);
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
+  const {dataAccesses, dataOrders} = useMemo(() => {
+    if (!data) return {dataAccesses: null, dataOrders: null};
+
+    const filterByType = (items: any[], type: string) => {
+      if (type === 'I') {
+        return items?.filter(item => !item?.in_at && !item?.out_at);
+      } else if (type === 'S') {
+        return items?.filter(item => item?.in_at);
+      }
+      return [];
+    };
+
+    return {
+      dataAccesses: filterByType(data?.accesses, typeSearch),
+      dataOrders: filterByType(data?.others, typeSearch),
+    };
+  }, [data, typeSearch]);
+
   useEffect(() => {
-    let _dataAccesses = [];
-    let _dataOrders = [];
-    if (typeSearch === 'I') {
-      _dataAccesses = data?.accesses?.filter(
-        (item: any) => !item?.in_at && !item?.out_at,
-      );
-      _dataOrders = data?.others?.filter(
-        (item: any) => !item?.access?.in_at && !item?.access?.out_at,
-      );
-    } else if (typeSearch === 'S') {
-      _dataAccesses = data?.accesses?.filter((item: any) => item?.in_at);
-      _dataOrders = data?.others?.filter((item: any) => item?.access?.in_at);
-    }
-    setDataAccesses(_dataAccesses || []);
-    setDataOrders(_dataOrders || []);
-  }, [typeSearch, data]);
-
-  const filteredAccesses = useMemo(() => {
-    if (!search) return dataAccesses; // Devuelve todo si la búsqueda está vacía
-    const lowercasedSearch = search.toLowerCase();
-
-    return dataAccesses.filter((item: any) => {
-      const visitName = getFullName(item.visit).toLowerCase();
-      return visitName.includes(lowercasedSearch);
-    });
-  }, [search, dataAccesses]);
-
-  const filteredOrders = useMemo(() => {
-    if (!search) return dataOrders; // Devuelve todo si la búsqueda está vacía
-    const lowercasedSearch = search.toLowerCase();
-
-    return dataOrders.filter((item: any) => {
-      const ownerName = getFullName(item.owner).toLowerCase();
-      const orderType = item?.other_type?.name?.toLowerCase() || '';
-      return (
-        ownerName.includes(lowercasedSearch) ||
-        orderType.includes(lowercasedSearch)
-      );
-    });
-  }, [search, dataOrders]);
+    setSearch('');
+  }, [typeSearch]);
 
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
@@ -266,9 +243,22 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     );
   };
 
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
+
   const renderItemAccess = (item: any) => {
     const status = getStatus(item);
     const hasColoredBorder = status === 'N' || status === 'A';
+    if (
+      search &&
+      !removeAccents(getFullName(item.visit))?.includes(removeAccents(search))
+    ) {
+      return null;
+    }
     return (
       <ItemList
         key={item.id}
@@ -289,6 +279,15 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const renderItemOrder = (item: any) => {
+    if (
+      search &&
+      !removeAccents(getFullName(item?.owner))?.includes(
+        removeAccents(search),
+      ) &&
+      !removeAccents(item?.other_type?.name)?.includes(removeAccents(search))
+    ) {
+      return null;
+    }
     return (
       <ItemList
         key={item?.id}
@@ -310,10 +309,37 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       <Text style={styles.noResultsText}>{text}</Text>
     </View>
   );
+
+  const filterBySearch = (items: any[], searchTerm: string) => {
+    if (!searchTerm) return items;
+
+    return items?.filter(item => {
+      const name = item.visit
+        ? getFullName(item.visit)
+        : getFullName(item.owner);
+      const otherTypeName = item?.other_type?.name || '';
+
+      return (
+        removeAccents(name)?.includes(removeAccents(searchTerm)) ||
+        removeAccents(otherTypeName)?.includes(removeAccents(searchTerm))
+      );
+    });
+  };
+
+  const filteredAccesses = useMemo(
+    () => filterBySearch(dataAccesses || [], search),
+    [dataAccesses, search],
+  );
+
+  const filteredOrders = useMemo(
+    () => filterBySearch(dataOrders || [], search),
+    [dataOrders, search],
+  );
   return (
     <>
-      {isLoading && <Skeleton type="list" />}
-      {!isLoading && (
+      {isLoading && !dataAccesses && !dataOrders ? (
+        <Skeleton type="list" />
+      ) : (
         <>
           <DataSearch
             setSearch={setSearch}
@@ -321,14 +347,15 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             value={search}
             style={{marginBottom: 8}}
           />
-          {(filteredAccesses.length > 0 || filteredOrders.length > 0) && (
+
+          {(filteredAccesses?.length > 0 || filteredOrders?.length > 0) && (
             <>
-              {filteredAccesses.map((item: any) => renderItemAccess(item))}
-              {filteredOrders.map((item: any) => renderItemOrder(item))}
+              {filteredAccesses?.map((item: any) => renderItemAccess(item))}
+              {filteredOrders?.map((item: any) => renderItemOrder(item))}
             </>
           )}
 
-          {filteredAccesses.length === 0 && filteredOrders.length === 0 && (
+          {filteredAccesses?.length === 0 && filteredOrders?.length === 0 && (
             <NoResults
               icon={search ? IconSearch : IconEmpty}
               text={
@@ -347,7 +374,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
           open={openDetail}
           close={() => setOpenDetail(false)}
           reload={reload}
-          // execute={execute}
         />
       )}
       {openDetailOrders && (

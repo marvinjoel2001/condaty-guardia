@@ -39,14 +39,14 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
   useEffect(() => {
     const getOrderDetails = async () => {
       if (!id) {
-        setOrderData(null); // Si el id se vuelve null dentro de un ciclo, limpiar.
+        setOrderData(null);
         return;
       }
       try {
         const {data: apiResponse} = await execute('/others', 'GET', {
           fullType: 'DET',
           section: 'ACT',
-          searchBy: id, // 'id' de las props/clausura del useEffect
+          searchBy: id,
         });
         if (open) {
           setOrderData(apiResponse.data?.[0] || null);
@@ -54,18 +54,16 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
       } catch (error) {
         console.error('Failed to fetch order details:', error);
         if (open) {
-          // Solo limpiar si sigue abierto
           setOrderData(null);
         }
       }
     };
 
     if (id) {
-      // Si hay un ID, intenta obtener los detalles.
-      setOrderData(null); // ESTE ES EL PUNTO CLAVE: Limpiar datos anteriores para mostrar Loading para el nuevo ID.
+      setOrderData(null);
       getOrderDetails();
     } else {
-      setOrderData(null); // Asegurar que los datos estén limpios.
+      setOrderData(null);
     }
   }, [id]);
 
@@ -133,12 +131,6 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
             keys="Fecha y hora de salida"
             value={getDateTimeStrMes(accessInfo?.out_at || '-/-')}
           />
-          {/* {accessInfo?.plate && (
-            <KeyValue
-              keys="Placa (Vehículo Entrega)"
-              value={accessInfo.plate}
-            />
-          )} */}
           <KeyValue
             keys="Guardia de entrada"
             value={getFullName(accessInfo?.guardia) || '-/-'}

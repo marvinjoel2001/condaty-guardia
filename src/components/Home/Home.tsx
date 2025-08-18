@@ -157,11 +157,11 @@ const Home = () => {
           setSel={setTypeSearch}
         />
         <View style={styles.listContainer}>
-          {(_typeSearch === 'S' || typeSearch == 'I') && (
+          {(_typeSearch === 'S' || _typeSearch == 'I') && (
             <Accesses
               data={data}
               reload={() => getAccesses('', '/accesses', 'P')}
-              typeSearch={typeSearch}
+              typeSearch={_typeSearch}
               isLoading={loaded}
             />
           )}

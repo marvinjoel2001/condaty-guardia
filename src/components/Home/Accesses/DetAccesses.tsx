@@ -93,11 +93,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       const todosHanSalido = _data.accesses.every((acomp: any) => acomp.out_at);
       return todosHanSalido ? 'C' : 'I';
     }
+    if (_data?.confirm === 'N') return 'N';
     return '';
   };
 
   const status = getStatus();
-
   useEffect(() => {
     if (id) {
       getData();
@@ -149,7 +149,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     }
   };
   const handleSave = async () => {
-    if (status === 'C') {
+    if (status === 'C' || status === 'N') {
       close();
       return;
     }
@@ -170,6 +170,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       Y: 'Dejar ingresar',
       S: '',
       C: '',
+      N: 'Cerrar',
     };
     return buttonTexts[status] || '';
   };
@@ -188,60 +189,55 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const cardDetail = () => {
     if (status != 'I') {
       return (
-        <>
-          <Card>
-            <Text style={styles.labelAccess}>{labelAccess()}</Text>
-            <ItemList
-              title={getFullName(data?.owner)}
-              // subtitle={'C.I.' + data?.owner?.ci}
-              subtitle={
-                'Unidad: ' +
-                data?.owner?.dptos?.[0]?.nro +
-                ', ' +
-                data?.owner?.dptos?.[0]?.description
-              }
-              left={
-                <Avatar
-                  name={getFullName(data?.owner)}
-                  src={getUrlImages(
-                    '/OWNER-' +
-                      data?.owner?.id +
-                      '.webp?d=' +
-                      data?.owner?.updated_at,
-                  )}
+        <Card>
+          <Text style={styles.labelAccess}>{labelAccess()}</Text>
+          <ItemList
+            title={getFullName(data?.owner)}
+            // subtitle={'C.I.' + data?.owner?.ci}
+            subtitle={
+              'Unidad: ' +
+              data?.owner?.dptos?.[0]?.nro +
+              ', ' +
+              data?.owner?.dptos?.[0]?.description
+            }
+            left={
+              <Avatar
+                name={getFullName(data?.owner)}
+                src={getUrlImages(
+                  '/OWNER-' +
+                    data?.owner?.id +
+                    '.webp?d=' +
+                    data?.owner?.updated_at,
+                )}
+              />
+            }
+            right={
+              data?.type !== 'C' ? (
+                <Icon
+                  name={IconExpand}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    setOpenDet({
+                      open: true,
+                      id: data?.invitation_id,
+                      invitation: {...data?.invitation, owner: data?.owner},
+                      type: 'I',
+                    })
+                  }
                 />
-              }
-              right={
-                data?.type !== 'C' ? (
-                  <Icon
-                    name={IconExpand}
-                    color={cssVar.cWhiteV1}
-                    onPress={() =>
-                      setOpenDet({
-                        open: true,
-                        id: data?.invitation_id,
-                        invitation: {...data?.invitation, owner: data?.owner},
-                        type: 'I',
-                      })
-                    }
-                  />
-                ) : null
-              }
+              ) : null
+            }
+          />
+          {data?.confirm == 'N' && data?.obs_confirm && (
+            <KeyValue
+              style={{marginTop: 12}}
+              keys="Motivo del rechazo"
+              value={data?.obs_confirm}
             />
-            <Br />
-            <View>{detailVisit(data)}</View>
-          </Card>
-          {/* {data?.accesses?.length > 0 && (
-          <Text
-            style={{
-              color: cssVar.cWhite,
-              fontSize: 16,
-              fontFamily: FONTS.medium,
-            }}>
-            Selecciona al visitante que esté por salir
-          </Text>
-        )} */}
-        </>
+          )}
+          <Br />
+          <View>{detailVisit(data)}</View>
+        </Card>
       );
     } else {
       return (
@@ -250,7 +246,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             <Text style={styles.labelAccess}>{labelAccess()}</Text>
             <ItemList
               title={getFullName(data?.owner)}
-              // subtitle={'C.I.' + data?.owner?.ci}
               subtitle={
                 'Unidad: ' +
                 data?.owner?.dptos?.[0]?.nro +
@@ -317,7 +312,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           onPress={() =>
             setOpenDet({
               open: true,
-              // id: type == 'I' ? visit?.invitation_id : visit?.id,
               id: visit?.id,
               type: type,
             })
@@ -344,7 +338,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
 
   const rightDetailVisit = (data: any, isSelected: any) => {
-    console.log(data);
     if (data?.out_at) {
       return (
         <Icon
@@ -353,7 +346,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           onPress={() =>
             setOpenDet({
               open: true,
-              // id: type == 'I' ? visit?.invitation_id : visit?.id,
               id: data?.id,
               type: 'V',
             })
@@ -396,12 +388,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         />
         {!data?.out_at && (
           <>
-            <KeyValue
-              keys="Tipo de visita"
-              value={typeInvitation[data?.type] || '-/-'}
-            />
-            {data?.confirm == 'N' && data?.obs_confirm && (
-              <KeyValue keys="Motivo del rechazo" value={data?.obs_confirm} />
+            {data?.confirm != 'N' && (
+              <KeyValue
+                keys="Tipo de visita"
+                value={typeInvitation[data?.type] || '-/-'}
+              />
             )}
             {data?.in_at && (
               <KeyValue
@@ -409,19 +400,14 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={getDateTimeStrMes(data?.in_at) || '-/-'}
               />
             )}
-            {/* {data?.out_at && (
-              <KeyValue
-                keys="Fecha y hora de salida"
-                value={getDateTimeStrMes(data?.out_at, true) || '-/-'}
-              />
-            )} */}
             {getStatus() === 'S' || getStatus() === 'Y' ? (
               <KeyValue
                 keys={'Notificado por'}
                 value={getFullName(data?.guardia)}
               />
             ) : (
-              data?.guardia && (
+              data?.guardia &&
+              data?.confirm != 'N' && (
                 <KeyValue
                   keys={'Guardia de ingreso'}
                   value={getFullName(data?.guardia)}
@@ -434,12 +420,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={data?.obs_in || '-/-'}
               />
             )}
-            {/* {data?.out_at && (
-              <KeyValue
-                keys="Observación de salida"
-                value={data?.obs_out || '-/-'}
-              />
-            )} */}
           </>
         )}
 
@@ -511,13 +491,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     return null;
   };
 
-  //   const buttonTexts: Record<string, string> = {
-  //   I: 'Dejar salir',
-  //   Y: 'Dejar ingresar',
-  //   S: 'Esperando aprobacion',
-  //   C: 'Rechazado',
-  // };
-  console.log('mi estatus - 2', status);
   return (
     <ModalFull
       onClose={() => close()}

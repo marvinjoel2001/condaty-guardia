@@ -6,37 +6,45 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
-import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import {openLink} from '../../../../mk/utils/utils';
-import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDownload} from '../../../icons/IconLibrary';
-import {cssVar} from '../../../../mk/styles/themes';
 
 type Props = {
   data: any;
   loaded: boolean;
 };
 const Accesses = ({data, loaded}: Props) => {
-  const {execute} = useApi();
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
+  const [filteredData, setFilteredData] = useState(data);
+
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
     const groupTitle = item.invitation?.title || item.access?.invitation?.title;
     const subTitle =
-      item.type == 'O' ? 'Llave QR' :
-      item.type == 'C' ? 'Sin QR' : 
-      item.type == 'I' ? 'QR Individual' : 
-      item.type == 'G' ? ('QR Grupal' + (groupTitle ? ' - ' + groupTitle : '')) : 
-      item.type == 'F' ? 'QR Frecuente' : 
-      item.type == 'P' ? 'Pedido'  : '';
+      item.type == 'O'
+        ? 'Llave QR'
+        : item.type == 'C'
+        ? 'Sin QR'
+        : item.type == 'I'
+        ? 'QR Individual'
+        : item.type == 'G'
+        ? 'QR Grupal' + (groupTitle ? ' - ' + groupTitle : '')
+        : item.type == 'F'
+        ? 'QR Frecuente'
+        : item.type == 'P'
+        ? 'Pedido'
+        : '';
 
     if (search && search !== '') {
       if (
-        user.name?.toLowerCase()?.includes(search?.toLowerCase()) === false &&
-        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) ===
-          false
+        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
+        false
       ) {
         return null;
       }
@@ -72,21 +80,21 @@ const Accesses = ({data, loaded}: Props) => {
     setSearch(value);
   };
 
-  const onExport = async () => {
-    const {data: file} = await execute('/accesses', 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType: 'L',
-      section: 'ACT',
-      _export: 'pdf',
-    });
-    if (file?.success == true) {
-      openLink(getUrlImages('/' + file?.data.path));
-    }
-  };
+  // const onExport = async () => {
+  //   const {data: file} = await execute('/accesses', 'GET', {
+  //     perPage: -1,
+  //     page: 1,
+  //     fullType: 'L',
+  //     section: 'ACT',
+  //     _export: 'pdf',
+  //   });
+  //   if (file?.success == true) {
+  //     openLink(getUrlImages('/' + file?.data.path));
+  //   }
+  // };
 
   return (
-    <View >
+    <View>
       <View
         style={{
           flexDirection: 'row',
@@ -100,7 +108,7 @@ const Accesses = ({data, loaded}: Props) => {
           value={search}
           style={{flex: 1}}
         />
-       {/*  <Icon
+        {/*  <Icon
           name={IconDownload}
           onPress={onExport}
           fillStroke={cssVar.cWhiteV2}

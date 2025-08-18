@@ -5,7 +5,6 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import OrdersDetail from './OrdersDetail';
-import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 import DateAccess from '../DateAccess/DateAccess';
 
@@ -32,11 +31,20 @@ export const Orders = ({data, loaded}: Props) => {
     id: null as number | string | null,
   });
   const [search, setSearch] = useState('');
-
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
   const renderItem = (item: any) => {
+    console.log(item);
     if (search && search !== '') {
       if (
-        !getFullName(item?.owner).toLowerCase().includes(search.toLowerCase())
+        !removeAccents(getFullName(item?.access?.visit)).includes(
+          removeAccents(search),
+        ) &&
+        !removeAccents(item?.other_type?.name).includes(removeAccents(search))
       ) {
         return null;
       }
@@ -92,7 +100,6 @@ export const Orders = ({data, loaded}: Props) => {
   );
 };
 
-// --- Estilos ---
 const styles = StyleSheet.create({
   pageContainer: {
     flex: 1,
@@ -109,10 +116,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 12,
-    // marginVertical: 5, // ItemList ya tiene un marginVertical por defecto
   },
   avatarView: {
-    // Usado en 'leftElement'
     width: 40,
     height: 40,
     borderRadius: 6,
@@ -120,7 +125,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarText: {
-    // Usado en 'leftElement'
     color: '#212121',
     fontSize: 16,
     fontWeight: '600',
