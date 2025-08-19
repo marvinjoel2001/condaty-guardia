@@ -1,7 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
-import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {
+  getDateStrMes,
+  getDateTimeStrMes,
+  parseWeekDays,
+} from '../../../../mk/utils/dates';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import useApi from '../../../../mk/hooks/useApi';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -58,9 +62,6 @@ interface CompanionItemProps {
 
 const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
   const person = companionAccess.visit || companionAccess;
-
-  if (!person || !person.id) return null; // esto?
-
   const companionFullName = getFullName(person) || 'N/A';
   const companionCi = person.ci ? `C.I. ${person.ci}` : 'CI no disponible';
 
@@ -88,19 +89,6 @@ const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
   );
 };
 
-// Helper para días de la semana en QR frecuente
-function parseWeekDays(binaryNumber: number): string[] {
-  // esto? esta funcion se repite en varios lugares, mejor hacerlo un utilitario en dates
-  const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-  const result: string[] = [];
-  for (let i = 0; i < 7; i++) {
-    if (binaryNumber & (1 << i)) {
-      result.push(diasSemana[i]);
-    }
-  }
-  return result;
-}
-
 const AccessDetail = ({open, onClose, id}: Props) => {
   const [accessData, setAccessData] = useState<any>(null);
   const {execute} = useApi();
@@ -110,27 +98,23 @@ const AccessDetail = ({open, onClose, id}: Props) => {
   const [isPersonDetailModalVisible, setIsPersonDetailModalVisible] =
     useState(false);
 
-  useEffect(() => {
-    const getAccess = async () => {
-      try {
-        const {data: apiResponse} = await execute('/accesses', 'GET', {
-          fullType: 'DET',
-          section: 'ACT',
-          searchBy: id,
-        });
-        if (open && id === id) {
-          // esto? no se entiende porque id debe ser iguala  id, siempre lo sera
-          setAccessData(apiResponse.data?.[0] || null);
-        }
-      } catch (error) {
-        console.error('Failed to fetch access details:', error);
-        if (open && id === id) {
-          // esto? esta bien esta logica?
-          setAccessData(null);
-        }
+  const getAccess = async () => {
+    try {
+      const {data: apiResponse} = await execute('/accesses', 'GET', {
+        fullType: 'DET',
+        section: 'ACT',
+        searchBy: id,
+      });
+      if (apiResponse?.success) {
+        setAccessData(apiResponse.data?.[0] || null);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch access details:', error);
 
+      setAccessData(null);
+    }
+  };
+  useEffect(() => {
     if (id && open) {
       setAccessData(null);
       getAccess();
@@ -147,64 +131,61 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     }
   }, [open]);
 
+  const getStatusForCompanionOrResident = (personData: any) => {
+    if (personData.out_at) return {text: 'Completado', color: cssVar.cSuccess};
+    if (personData.in_at) return {text: 'Por salir', color: cssVar.cSuccess};
+    return {text: 'Pendiente', color: cssVar.cWhite};
+  };
+
+  const getStatusForTaxiDriver = (mainAccessItem: any) => {
+    let text = 'Denegado';
+    let color = cssVar.cError;
+
+    if (mainAccessItem.out_at) {
+      text = 'Completado';
+      color = cssVar.cSuccess;
+    } else if (!mainAccessItem.confirm_at && mainAccessItem.status !== 'X') {
+      text = 'Por confirmar';
+      color = cssVar.cWarning;
+    } else if (mainAccessItem.in_at) {
+      text = 'Por salir';
+      color = cssVar.cSuccess;
+    } else if (mainAccessItem.confirm === 'Y') {
+      text = 'Por ingresar';
+      color = cssVar.cSuccess;
+    } else if (mainAccessItem.status === 'X') {
+      text = 'Anulado';
+      color = cssVar.cError;
+    }
+
+    return {text, color};
+  };
+
   const handleOpenPersonDetailModal = (
     personData: any,
     typeLabel: 'Acompañante' | 'Taxista' | 'Residente',
     mainAccessItem: any,
   ) => {
     let dataForModal: ModalPersonData;
-    let statusTextForModal = '';
-    let statusColorForModal = cssVar.cWhite;
 
     const personToShow =
       typeLabel === 'Acompañante' ? personData.visit || personData : personData;
 
     if (typeLabel === 'Acompañante' || typeLabel === 'Residente') {
-      statusTextForModal = personData.out_at
-        ? 'Completado'
-        : personData.in_at // esto? convertir en funcion
-        ? 'Por salir'
-        : 'Pendiente';
-      if (
-        statusTextForModal === 'Completado' ||
-        statusTextForModal === 'Por salir'
-      )
-        statusColorForModal = cssVar.cSuccess;
+      const {text, color} = getStatusForCompanionOrResident(personData);
 
       dataForModal = {
         person: personToShow,
-        typeLabel: typeLabel,
+        typeLabel,
         accessInAt: personData.in_at,
         accessOutAt: personData.out_at,
         accessObsIn: personData.obs_in,
         accessObsOut: personData.obs_out,
-        statusText: statusTextForModal,
-        statusColor: statusColorForModal,
+        statusText: text,
+        statusColor: color,
       };
     } else {
-      // Taxista
-      statusTextForModal = mainAccessItem.out_at
-        ? 'Completado'
-        : !mainAccessItem.confirm_at && mainAccessItem.status !== 'X' // esto? convertir en funcion
-        ? 'Por confirmar'
-        : mainAccessItem.in_at
-        ? 'Por Salir'
-        : mainAccessItem.confirm === 'Y'
-        ? 'Por Entrar'
-        : mainAccessItem.status === 'X'
-        ? 'Anulado'
-        : 'Denegado';
-
-      if (
-        statusTextForModal === 'Completado' ||
-        statusTextForModal === 'Por Salir' ||
-        statusTextForModal === 'Por Entrar'
-      )
-        statusColorForModal = cssVar.cSuccess;
-      if (statusTextForModal === 'Anulado' || statusTextForModal === 'Denegado')
-        statusColorForModal = cssVar.cError;
-      if (statusTextForModal === 'Por confirmar')
-        statusColorForModal = cssVar.cWarning;
+      const {text, color} = getStatusForTaxiDriver(mainAccessItem);
 
       dataForModal = {
         person: personToShow.visit,
@@ -214,10 +195,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         accessObsIn: personToShow.obs_in,
         accessObsOut: personToShow.obs_out,
         plate: personToShow.plate,
-        statusText: statusTextForModal,
-        statusColor: statusColorForModal,
+        statusText: text,
+        statusColor: color,
       };
     }
+
     setModalPersonData(dataForModal);
     setIsPersonDetailModalVisible(true);
   };
@@ -248,12 +230,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
     statusText = item.out_at
       ? 'Completado'
-      : !item.confirm_at && item.status !== 'X' // esto? convertir en funcion
+      : !item.confirm_at && item.status !== 'X'
       ? 'Por confirmar'
       : item.in_at
       ? 'Dentro del condominio'
       : item.confirm === 'Y'
-      ? 'Por Entrar'
+      ? 'Por ingresar'
       : item.status === 'X'
       ? 'Anulado'
       : 'Denegado';
@@ -261,7 +243,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     if (
       statusText === 'Completado' ||
       statusText === 'Dentro del condominio' ||
-      statusText === 'Por Entrar'
+      statusText === 'Por ingresar'
     )
       statusColor = cssVar.cSuccess;
     if (statusText === 'Anulado' || statusText === 'Denegado')
@@ -598,8 +580,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             </View>
           )}
         </View>
-        {/* {(item.type === 'I' || item.type === 'G' || item.type === 'F') && ( */}
-        {/* // esto? */}
         <View style={styles.mainCardR}>
           <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
           <ItemList
@@ -634,252 +614,250 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             }
           />
         </View>
-        {/* )} */}
-        {/* // esto? */}
       </ScrollView>
     );
   };
 
+  const renderBody = () => {
+    if (!open) return null;
+    if (id) return renderContent();
+
+    return (
+      <View style={styles.noDataContainer}>
+        <Text style={styles.noDataText}>ID no proporcionado.</Text>
+      </View>
+    );
+  };
   return (
-    <>
-      {/* // esto? quitar el <></> */}
-      <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose}>
-        {open && id ? (
-          renderContent()
-        ) : open && !id ? ( // esto? crear funcion
-          <View style={styles.noDataContainer}>
-            <Text style={styles.noDataText}>ID no proporcionado.</Text>
-          </View>
-        ) : null}
-        {isPersonDetailModalVisible && modalPersonData && (
-          <Modal
-            title={
-              modalPersonData.typeLabel === 'Residente'
-                ? 'Detalle de invitación'
-                : `Detalle del ${modalPersonData.typeLabel}`
-            }
-            open={isPersonDetailModalVisible}
-            onClose={handleClosePersonDetailModal}>
-            <ScrollView
-              contentContainerStyle={styles.personDetailModalInnerContent}>
-              <View style={styles.personDetailModalCardContent}>
-                {modalPersonData.typeLabel === 'Residente' && accessData ? (
-                  <>
-                    <ItemList
-                      style={{marginBottom: 12}}
-                      title={getFullName(modalPersonData.person)}
-                      subtitle={
-                        'Unidad:' +
-                        modalPersonData.person?.dpto?.[0]?.nro +
-                        ', ' +
-                        modalPersonData.person?.dpto?.[0]?.description
-                      }
-                      left={
-                        <Avatar
-                          name={getFullName(modalPersonData.person)}
-                          src={getUrlImages(
-                            '/OWNER-' +
-                              modalPersonData.person?.id +
-                              '.webp?d=' +
-                              modalPersonData.person?.updated_at,
-                          )}
-                          w={40}
-                          h={40}
+    <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose}>
+      {renderBody()}
+      {isPersonDetailModalVisible && modalPersonData && (
+        <Modal
+          title={
+            modalPersonData.typeLabel === 'Residente'
+              ? 'Detalle de invitación'
+              : `Detalle del ${modalPersonData.typeLabel}`
+          }
+          open={isPersonDetailModalVisible}
+          onClose={handleClosePersonDetailModal}>
+          <ScrollView
+            contentContainerStyle={styles.personDetailModalInnerContent}>
+            <View style={styles.personDetailModalCardContent}>
+              {modalPersonData.typeLabel === 'Residente' && accessData ? (
+                <>
+                  <ItemList
+                    style={{marginBottom: 12}}
+                    title={getFullName(modalPersonData.person)}
+                    subtitle={
+                      'Unidad:' +
+                      modalPersonData.person?.dpto?.[0]?.nro +
+                      ', ' +
+                      modalPersonData.person?.dpto?.[0]?.description
+                    }
+                    left={
+                      <Avatar
+                        name={getFullName(modalPersonData.person)}
+                        src={getUrlImages(
+                          '/OWNER-' +
+                            modalPersonData.person?.id +
+                            '.webp?d=' +
+                            modalPersonData.person?.updated_at,
+                        )}
+                        w={40}
+                        h={40}
+                      />
+                    }
+                  />
+                  <View style={styles.detailsGroup}>
+                    {accessData.type === 'I' && (
+                      <>
+                        <DetailRow
+                          label="Tipo de invitación"
+                          value={
+                            accessData.invitation?.type_name || 'QR Individual'
+                          }
                         />
-                      }
-                    />
-                    <View style={styles.detailsGroup}>
-                      {accessData.type === 'I' && (
-                        <>
-                          <DetailRow
-                            label="Tipo de invitación"
-                            value={
-                              accessData.invitation?.type_name ||
-                              'QR Individual'
-                            }
-                          />
-                          <DetailRow
-                            label="Fecha de invitación"
-                            value={getDateStrMes(
-                              accessData.invitation?.date_event,
-                            )}
-                          />
-                          <DetailRow
-                            label="Descripción"
-                            value={accessData.invitation?.obs}
-                          />
-                        </>
-                      )}
-                      {accessData.type === 'G' && (
-                        <>
-                          <DetailRow
-                            label="Tipo de invitación"
-                            value={
-                              accessData.invitation?.type_name || 'QR Grupal'
-                            }
-                          />
-                          <DetailRow
-                            label="Evento"
-                            value={accessData.invitation?.title}
-                          />
-                          <DetailRow
-                            label="Cantidad de invitados"
-                            value={accessData.invitation?.max_companions?.toString()}
-                          />
-                          <DetailRow
-                            label="Descripción"
-                            value={accessData.invitation?.obs}
-                          />
-                        </>
-                      )}
-                      {accessData.type === 'F' && (
-                        <>
-                          <DetailRow
-                            label="Tipo de invitación"
-                            value={
-                              accessData.invitation?.type_name || 'QR Frecuente'
-                            }
-                          />
-                          <DetailRow
-                            label="Periodo de validez"
-                            value={
-                              accessData.invitation?.start_date &&
-                              accessData.invitation?.end_date
-                                ? `${getDateStrMes(
-                                    accessData.invitation?.start_date,
-                                  )} a ${getDateStrMes(
-                                    accessData.invitation?.end_date,
-                                  )}`
-                                : undefined
-                            }
-                          />
-                          <DetailRow
-                            label="Indicaciones"
-                            value={accessData.invitation?.obs}
-                          />
-                          <View
-                            style={{
-                              height: 0.5,
-                              backgroundColor: cssVar.cWhiteV1,
-                            }}
-                          />
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              color: cssVar.cWhite,
-                              fontFamily: FONTS.semiBold,
-                              marginBottom: 12,
-                            }}>
-                            Configuración avanzada
-                          </Text>
-                          <DetailRow
-                            label="Días de acceso"
-                            value={
-                              accessData.invitation?.weekday
-                                ? parseWeekDays(
-                                    accessData.invitation?.weekday,
-                                  ).join(', ')
-                                : undefined
-                            }
-                          />
-                          <DetailRow
-                            label="Horario permitido"
-                            value={
-                              accessData.invitation?.start_time &&
-                              accessData.invitation?.end_time
-                                ? `${accessData.invitation?.start_time.slice(
-                                    0,
-                                    5,
-                                  )} - ${accessData.invitation?.end_time.slice(
-                                    0,
-                                    5,
-                                  )}`
-                                : undefined
-                            }
-                          />
-                          <DetailRow
-                            label="Cantidad de accesos"
-                            value={accessData.invitation?.max_entries?.toString()}
-                          />
-                        </>
-                      )}
-                    </View>
-                  </>
-                ) : (
-                  <>
-                    <ItemList
-                      style={{marginBottom: 12}}
-                      title={getFullName(modalPersonData.person)}
-                      subtitle={
-                        (modalPersonData.person?.ci
-                          ? `C.I. ${modalPersonData.person.ci}`
-                          : '') +
-                        (modalPersonData.typeLabel === 'Taxista' &&
-                        modalPersonData.person?.ci &&
-                        modalPersonData.plate
-                          ? ' • '
-                          : '') +
-                        (modalPersonData.typeLabel === 'Taxista' &&
-                        modalPersonData.plate
-                          ? `Placa: ${modalPersonData.plate}`
-                          : '')
-                      }
-                      left={
-                        <Avatar
-                          name={getFullName(modalPersonData.person)}
-                          src={getUrlImages(
-                            '/OWNER-' +
-                              modalPersonData.person?.id +
-                              '.webp?d=' +
-                              modalPersonData.person?.updated_at,
+                        <DetailRow
+                          label="Fecha de invitación"
+                          value={getDateStrMes(
+                            accessData.invitation?.date_event,
                           )}
-                          w={40}
-                          h={40}
                         />
-                      }
+                        <DetailRow
+                          label="Descripción"
+                          value={accessData.invitation?.obs}
+                        />
+                      </>
+                    )}
+                    {accessData.type === 'G' && (
+                      <>
+                        <DetailRow
+                          label="Tipo de invitación"
+                          value={
+                            accessData.invitation?.type_name || 'QR Grupal'
+                          }
+                        />
+                        <DetailRow
+                          label="Evento"
+                          value={accessData.invitation?.title}
+                        />
+                        <DetailRow
+                          label="Cantidad de invitados"
+                          value={accessData.invitation?.max_companions?.toString()}
+                        />
+                        <DetailRow
+                          label="Descripción"
+                          value={accessData.invitation?.obs}
+                        />
+                      </>
+                    )}
+                    {accessData.type === 'F' && (
+                      <>
+                        <DetailRow
+                          label="Tipo de invitación"
+                          value={
+                            accessData.invitation?.type_name || 'QR Frecuente'
+                          }
+                        />
+                        <DetailRow
+                          label="Periodo de validez"
+                          value={
+                            accessData.invitation?.start_date &&
+                            accessData.invitation?.end_date
+                              ? `${getDateStrMes(
+                                  accessData.invitation?.start_date,
+                                )} a ${getDateStrMes(
+                                  accessData.invitation?.end_date,
+                                )}`
+                              : undefined
+                          }
+                        />
+                        <DetailRow
+                          label="Indicaciones"
+                          value={accessData.invitation?.obs}
+                        />
+                        <View
+                          style={{
+                            height: 0.5,
+                            backgroundColor: cssVar.cWhiteV1,
+                          }}
+                        />
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            color: cssVar.cWhite,
+                            fontFamily: FONTS.semiBold,
+                            marginBottom: 12,
+                          }}>
+                          Configuración avanzada
+                        </Text>
+                        <DetailRow
+                          label="Días de acceso"
+                          value={
+                            accessData.invitation?.weekday
+                              ? parseWeekDays(
+                                  accessData.invitation?.weekday,
+                                ).join(', ')
+                              : undefined
+                          }
+                        />
+                        <DetailRow
+                          label="Horario permitido"
+                          value={
+                            accessData.invitation?.start_time &&
+                            accessData.invitation?.end_time
+                              ? `${accessData.invitation?.start_time.slice(
+                                  0,
+                                  5,
+                                )} - ${accessData.invitation?.end_time.slice(
+                                  0,
+                                  5,
+                                )}`
+                              : undefined
+                          }
+                        />
+                        <DetailRow
+                          label="Cantidad de accesos"
+                          value={accessData.invitation?.max_entries?.toString()}
+                        />
+                      </>
+                    )}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <ItemList
+                    style={{marginBottom: 12}}
+                    title={getFullName(modalPersonData.person)}
+                    subtitle={
+                      (modalPersonData.person?.ci
+                        ? `C.I. ${modalPersonData.person.ci}`
+                        : '') +
+                      (modalPersonData.typeLabel === 'Taxista' &&
+                      modalPersonData.person?.ci &&
+                      modalPersonData.plate
+                        ? ' • '
+                        : '') +
+                      (modalPersonData.typeLabel === 'Taxista' &&
+                      modalPersonData.plate
+                        ? `Placa: ${modalPersonData.plate}`
+                        : '')
+                    }
+                    left={
+                      <Avatar
+                        name={getFullName(modalPersonData.person)}
+                        src={getUrlImages(
+                          '/OWNER-' +
+                            modalPersonData.person?.id +
+                            '.webp?d=' +
+                            modalPersonData.person?.updated_at,
+                        )}
+                        w={40}
+                        h={40}
+                      />
+                    }
+                  />
+                  <View style={styles.detailsGroup}>
+                    <DetailRow
+                      label="Estado"
+                      value={modalPersonData.statusText}
+                      valueStyle={{
+                        color: modalPersonData.statusColor,
+                        fontFamily: FONTS.semiBold,
+                      }}
                     />
-                    <View style={styles.detailsGroup}>
-                      <DetailRow
-                        label="Estado"
-                        value={modalPersonData.statusText}
-                        valueStyle={{
-                          color: modalPersonData.statusColor,
-                          fontFamily: FONTS.semiBold,
-                        }}
-                      />
-                      <DetailRow
-                        label="Fecha y hora de ingreso"
-                        value={getDateTimeStrMes(modalPersonData.accessInAt)}
-                      />
-                      <DetailRow
-                        label="Fecha y hora de salida"
-                        value={getDateTimeStrMes(modalPersonData.accessOutAt)}
-                      />
-                      <DetailRow
-                        label="Guardia de ingreso"
-                        value={getFullName(accessData?.guardia)}
-                      />
-                      <DetailRow
-                        label="Guardia de salida"
-                        value={getFullName(accessData?.out_guard)}
-                      />
-                      <DetailRow
-                        label="Observación de ingreso"
-                        value={modalPersonData.accessObsIn}
-                      />
-                      <DetailRow
-                        label="Observación de salida"
-                        value={modalPersonData.accessObsOut}
-                      />
-                    </View>
-                  </>
-                )}
-              </View>
-            </ScrollView>
-          </Modal>
-        )}
-      </ModalFull>
-    </>
+                    <DetailRow
+                      label="Fecha y hora de ingreso"
+                      value={getDateTimeStrMes(modalPersonData.accessInAt)}
+                    />
+                    <DetailRow
+                      label="Fecha y hora de salida"
+                      value={getDateTimeStrMes(modalPersonData.accessOutAt)}
+                    />
+                    <DetailRow
+                      label="Guardia de ingreso"
+                      value={getFullName(accessData?.guardia)}
+                    />
+                    <DetailRow
+                      label="Guardia de salida"
+                      value={getFullName(accessData?.out_guard)}
+                    />
+                    <DetailRow
+                      label="Observación de ingreso"
+                      value={modalPersonData.accessObsIn}
+                    />
+                    <DetailRow
+                      label="Observación de salida"
+                      value={modalPersonData.accessObsOut}
+                    />
+                  </View>
+                </>
+              )}
+            </View>
+          </ScrollView>
+        </Modal>
+      )}
+    </ModalFull>
   );
 };
 

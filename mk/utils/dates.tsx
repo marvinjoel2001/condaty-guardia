@@ -390,3 +390,14 @@ export const formatToDayDDMMYYYYHHMM = (
 
   return `${diaSemana}, ${dia}/${mesNum}/${año} - ${horaStr}:${minutosStr}`;
 };
+
+export function parseWeekDays(binaryNumber: number): string[] {
+  const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  const result: string[] = [];
+  for (let i = 0; i < 7; i++) {
+    if (binaryNumber & (1 << i)) {
+      result.push(diasSemana[i]);
+    }
+  }
+  return result;
+}

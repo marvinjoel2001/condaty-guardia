@@ -20,7 +20,6 @@ type Props = {
   id: number | null;
 };
 const statusOrder: any = {
-  // esto? ver si no se repite o mover a archivo de types
   C: {text: 'Completado', color: cssVar.cSuccess},
   S: {text: 'Por salir', color: cssVar.cPrimary},
   I: {text: 'Por ingresar', color: cssVar.cWarning},
@@ -198,15 +197,20 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
     );
   };
 
+  const renderBody = () => {
+    if (!open) return null;
+    if (id) return renderContent();
+
+    return (
+      <View style={styles.noDataContainer}>
+        <Text style={styles.noDataText}>ID no proporcionado.</Text>
+      </View>
+    );
+  };
+
   return (
     <ModalFull title={'Detalle de pedido'} open={open} onClose={onClose}>
-      {open && id ? (
-        renderContent()
-      ) : open && !id ? ( // esto? crear funcion
-        <View style={styles.noDataContainer}>
-          <Text style={styles.noDataText}>ID no proporcionado.</Text>
-        </View>
-      ) : null}
+      {renderBody()}
       {openDetail.open && (
         <ModalAccessExpand
           open={openDetail.open}

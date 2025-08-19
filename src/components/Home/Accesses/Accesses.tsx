@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native'; // esto? unificar todos los import de react-native
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
@@ -17,7 +17,7 @@ import {buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import {View} from 'react-native'; // esto?
+
 interface PropsType {
   data: any;
   reload: any;
@@ -31,12 +31,52 @@ const statusText: any = {
   S: 'Dejar salir',
 };
 const statusColor: any = {
-  // esto? ver si este type ya no se usa en otro archivo y llevarlo a un archivo types que los exporte
   E: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
   A: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
   N: {color: cssVar.cError, background: cssVar.cHoverError},
   S: {color: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
 };
+
+const NoResults = ({text, icon}: any) => (
+  <View style={styles.noResultsContainer}>
+    <Icon name={icon} color={cssVar.cWhiteV1} size={60} />
+    <Text style={styles.noResultsText}>{text}</Text>
+  </View>
+);
+
+const subtitleAccess = (item: any) => {
+  if (item.type === 'O') {
+    return 'USO LLAVE VIRTUAL QR';
+  }
+  let prefix = 'Visitó a: ';
+  if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {
+    prefix = 'Recogió a: ';
+  }
+  if (item.type === 'P' && item.other?.otherType?.name === 'Mensajeria') {
+    prefix = 'Entregó a: ';
+  }
+  if (item.type === 'P' && item.other?.otherType?.name === 'Delivery') {
+    prefix = 'Entregó a: ';
+  }
+  if (item.type === 'P' && item.other?.otherType?.name === 'Otro') {
+    prefix = 'Para: ';
+  }
+  if (item?.confirm === 'N' && item?.obs_confirm) {
+    prefix = 'Denegado por: ';
+  }
+  if (!item?.in_at) {
+    prefix = 'Visita a: ';
+  }
+  return <Text>{prefix + getFullName(item.owner)}</Text>;
+};
+const titleAccess = (item: any) => {
+  return item.type === 'O' ? (
+    <Text>{getFullName(item.owner)}</Text>
+  ) : (
+    <Text>{getFullName(item.visit)}</Text>
+  );
+};
+
 const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
@@ -147,42 +187,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       );
     }
     return null;
-  };
-
-  const titleAccess = (item: any) => {
-    // estos? se puede mover fuera del componente
-    return item.type === 'O' ? (
-      <Text>{getFullName(item.owner)}</Text>
-    ) : (
-      <Text>{getFullName(item.visit)}</Text>
-    );
-  };
-
-  const subtitleAccess = (item: any) => {
-    // estos? se puede sacar fuera
-    if (item.type === 'O') {
-      return 'USO LLAVE VIRTUAL QR';
-    }
-    let prefix = 'Visitó a: ';
-    if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {
-      prefix = 'Recogió a: ';
-    }
-    if (item.type === 'P' && item.other?.otherType?.name === 'Mensajeria') {
-      prefix = 'Entregó a: ';
-    }
-    if (item.type === 'P' && item.other?.otherType?.name === 'Delivery') {
-      prefix = 'Entregó a: ';
-    }
-    if (item.type === 'P' && item.other?.otherType?.name === 'Otro') {
-      prefix = 'Para: ';
-    }
-    if (item?.confirm === 'N' && item?.obs_confirm) {
-      prefix = 'Denegado por: ';
-    }
-    if (!item?.in_at) {
-      prefix = 'Visita a: ';
-    }
-    return <Text>{prefix + getFullName(item.owner)}</Text>;
   };
 
   const iconAccess = (item: any) => {
@@ -306,14 +310,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       />
     );
   };
-  const NoResults = (
-    {text, icon}: any, // estos? s puede sacar fuera del componente
-  ) => (
-    <View style={styles.noResultsContainer}>
-      <Icon name={icon} color={cssVar.cWhiteV1} size={60} />
-      <Text style={styles.noResultsText}>{text}</Text>
-    </View>
-  );
 
   const filterBySearch = (items: any[], searchTerm: string) => {
     if (!searchTerm) return items;

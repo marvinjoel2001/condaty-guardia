@@ -9,11 +9,12 @@ import KeyValue from '../../../../mk/components/ui/KeyValue';
 import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import Br from '../../Profile/Br';
 interface PropsType {
   id: string | number | null;
   open: boolean;
   onClose: () => void;
-  type: 'A' | 'T' | 'I' | 'V' | 'P' | string; // esto?quitar el string
+  type: 'A' | 'T' | 'I' | 'V' | 'P';
   invitation?: any;
 }
 const typeInvitation: any = {
@@ -24,6 +25,7 @@ const typeInvitation: any = {
   P: 'Pedido',
   C: 'Sin QR',
 };
+
 const ModalAccessExpand = ({
   id,
   open,
@@ -41,8 +43,7 @@ const ModalAccessExpand = ({
       fullType: 'DET',
       searchBy: id,
     });
-    if (data?.success == true) {
-      // esto?
+    if (data?.success) {
       setData(data?.data?.[0]);
     }
   };
@@ -52,19 +53,6 @@ const ModalAccessExpand = ({
     }
   }, []);
 
-  const Br = () => {
-    // esto? ya esite esta funcion
-    return (
-      <View
-        style={{
-          height: 0.5,
-          backgroundColor: cssVar.cWhiteV1,
-          marginVertical: 8,
-          width: '100%',
-        }}
-      />
-    );
-  };
   const rendeAccess = () => {
     return (
       <>
@@ -123,7 +111,6 @@ const ModalAccessExpand = ({
       <>
         <ItemList
           title={getFullName(invitation?.owner)}
-          // subtitle={'C.I.' + data?.owner?.ci}// esto?
           subtitle={
             'Unidad: ' +
             invitation?.owner?.dptos?.[0]?.nro +
@@ -165,17 +152,14 @@ const ModalAccessExpand = ({
         {invitation.type == 'F' && (
           <>
             {invitation?.start_date && (
-              <>
-                {/* // esto? quitar <></> */}
-                <KeyValue
-                  keys="Periodo de validez"
-                  value={
-                    getDateStrMes(invitation?.start_date) +
-                    ' a ' +
-                    getDateStrMes(invitation?.end_date)
-                  }
-                />
-              </>
+              <KeyValue
+                keys="Periodo de validez"
+                value={
+                  getDateStrMes(invitation?.start_date) +
+                  ' a ' +
+                  getDateStrMes(invitation?.end_date)
+                }
+              />
             )}
             <KeyValue keys="Indicaciones" value={invitation?.obs || '-/-'} />
             {invitation?.is_advanced == 'Y' && (
@@ -250,30 +234,37 @@ const ModalAccessExpand = ({
       </>
     );
   };
+  const getModalTitle = (type: string): string => {
+    switch (type) {
+      case 'A':
+        return 'Detalle del acompañante';
+      case 'T':
+        return 'Detalle del taxista';
+      case 'I':
+      case 'P':
+        return 'Detalle de la invitación';
+      case 'V':
+        return 'Detalle del visitante';
+      default:
+        return '';
+    }
+  };
+
+  const renderModalContent = () => {
+    if (!loaded) return <Loading />;
+
+    switch (type) {
+      case 'I':
+        return renderInvitation();
+      case 'P':
+        return renderPedido();
+      default:
+        return rendeAccess();
+    }
+  };
   return (
-    <Modal
-      title={
-        type === 'A'
-          ? 'Detalle del acompañante'
-          : type === 'T' // esto? crear funcion
-          ? 'Detalle del taxista'
-          : type === 'I' || type === 'P'
-          ? 'Detalle de la invitación'
-          : type === 'V'
-          ? 'Detalle del visitante'
-          : ''
-      }
-      open={open}
-      onClose={onClose}>
-      {!loaded ? (
-        <Loading />
-      ) : type === 'I' ? ( // esto? crear funcion
-        renderInvitation()
-      ) : type == 'P' ? (
-        renderPedido()
-      ) : (
-        rendeAccess()
-      )}
+    <Modal title={getModalTitle(type)} open={open} onClose={onClose}>
+      {renderModalContent()}
     </Modal>
   );
 };

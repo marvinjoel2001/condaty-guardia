@@ -16,22 +16,9 @@ import useAuth from '../../../../mk/hooks/useAuth';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import ModalAccessExpand from './ModalAccessExpand';
+import Br from '../../Profile/Br';
 
-const Br = () => {
-  // esto?  ya existe una funcion o componebte BR reutiliar
-  return (
-    <View
-      style={{
-        height: 0.5,
-        backgroundColor: cssVar.cWhiteV1,
-        marginVertical: 8,
-        width: '100%',
-      }}
-    />
-  );
-};
 const typeInvitation: any = {
-  // estos? ver si ya existe o se unifican los types
   I: 'QR Individual',
   G: 'QR Grupal',
   C: 'Sin QR',
@@ -74,7 +61,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         }
       }
     } catch (error) {
-      console.error('Error fetching access data:', error);
       showToast('Error al obtener los datos', 'error');
     }
   };
@@ -86,12 +72,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (!_data?.in_at && !_data?.out_at && _data.confirm) return _data.confirm;
     if (_data?.in_at && !_data?.out_at) return 'I';
 
-    // Verificar si el visitante principal y todos los acompañantes han salido
     if (_data?.out_at) {
-      // Si no hay acompañantes, está completado
       if (!_data?.accesses || _data.accesses.length === 0) return 'C';
-
-      // Verificar que todos los acompañantes hayan salido
       const todosHanSalido = _data.accesses.every((acomp: any) => acomp.out_at);
       return todosHanSalido ? 'C' : 'I';
     }
@@ -195,7 +177,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           <Text style={styles.labelAccess}>{labelAccess()}</Text>
           <ItemList
             title={getFullName(data?.owner)}
-            // subtitle={'C.I.' + data?.owner?.ci}
             subtitle={
               'Unidad: ' +
               data?.owner?.dptos?.[0]?.nro +

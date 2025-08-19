@@ -32,43 +32,39 @@ import AccessEdit from './AccessEdit'; // Asegúrate que esta ruta sea correcta
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 import AvatarPreview from './AvatarPreview'; // Asegúrate que esta ruta sea correcta
 import configApp from '../../config/config';
-
-// Componente separador simple, si no tienes Br definido globalmente
-const Br = () => (
-  <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 4}} />
-);
+import Br from './Br';
 
 const Profile = () => {
   const navigation: any = useNavigation();
   const [isEdit, setIsEdit] = useState(false);
   const [imagePreview, setImagePreview] = useState(false);
   // imageData no se usa consistentemente, formState.avatar es el principal.
-  // const [imageData, setImageData] = useState(''); 
+  // const [imageData, setImageData] = useState('');
   const {user, getUser, showToast, logout}: any = useAuth();
   const [formState, setFormState]: any = useState({});
   const [type, setType] = useState({}); // Para el modal AccessEdit
   const [openModal, setOpenModal] = useState(false);
   const [errors, setErrors]: any = useState({});
   const {execute} = useApi();
-  
+
   // Estas definiciones son específicas de Guardias/Residentes, las mantenemos si son necesarias
   // const lDpto: any = {C: 'Casa', L: 'Lote', D: 'Departamento'}; // No parece usarse en Guardias
   const lCondo: any = {C: 'Condominio', E: 'Edificio', U: 'Urbanización'}; // Usado en modo vista
-  
+
   const client: any = user?.clients?.find((e: any) => e.id == user.client_id);
 
   useFocusEffect(
     React.useCallback(() => {
       // Carga inicial de datos del usuario al enfocar la pantalla
-      init(); 
+      init();
       if (!isEdit) {
         // Si no estamos en modo edición (ej. al volver de otra pantalla),
         // asegurarse que isEdit esté en false para mostrar el modo vista.
-        setIsEdit(false); 
+        setIsEdit(false);
       }
       // Si formState.avatar está vacío (ej. después de cancelar una selección previa sin guardar)
       // se resetea a null. Esto podría necesitar revisión si causa que una previsualización válida desaparezca.
-      if (!formState.avatar) { 
+      if (!formState.avatar) {
         setFormState((prevState: any) => ({
           ...prevState,
           avatar: null,
@@ -77,7 +73,7 @@ const Profile = () => {
       const onBackPress = () => {
         if (isEdit) {
           // Si estamos editando y se presiona atrás, salir del modo edición
-          setIsEdit(false); 
+          setIsEdit(false);
           return true; // Previene la acción por defecto (salir de la app/pantalla)
         }
         return false; // Permite la acción por defecto
@@ -98,8 +94,11 @@ const Profile = () => {
         setFormState((prevState: any) => ({
           ...prevState, // Mantener cualquier estado previo (útil si hay campos no en userData)
           ...(userData || {}), // Sobrescribir/añadir con los datos de userData
-          avatar: // Lógica para preservar la previsualización del avatar si ya es base64
-            prevState?.avatar && typeof prevState.avatar === 'string' && prevState.avatar.startsWith('data:image')
+          // Lógica para preservar la previsualización del avatar si ya es base64
+          avatar:
+            prevState?.avatar &&
+            typeof prevState.avatar === 'string' &&
+            prevState.avatar.startsWith('data:image')
               ? prevState.avatar
               : userData?.avatar || null,
         }));
@@ -113,20 +112,25 @@ const Profile = () => {
   // Efecto para sincronizar formState con 'user' cuando 'user' o 'isEdit' cambian.
   // Se asegura que al entrar/salir del modo edición, formState refleje el estado correcto.
   useEffect(() => {
-    if (!isEdit) { // Si no estamos editando (modo vista)
-      setFormState({ // Usar directamente los datos de 'user'
+    if (!isEdit) {
+      // Si no estamos editando (modo vista)
+      setFormState({
+        // Usar directamente los datos de 'user'
         ...user,
-        avatar: user?.avatar || null, 
+        avatar: user?.avatar || null,
       });
-    } else { // Si estamos editando
+    } else {
+      // Si estamos editando
       // Al entrar en modo edición, popular formState desde 'user'.
       // Si ya había una previsualización de avatar en formState (base64), se intenta mantener.
       setFormState((prevState: any) => ({
         ...user, // Base son los datos del usuario
-        avatar: 
-          prevState?.avatar && typeof prevState.avatar === 'string' && prevState.avatar.startsWith('data:image')
-          ? prevState.avatar // Mantener previsualización si existe
-          : user?.avatar || null, // Sino, usar el avatar del servidor
+        avatar:
+          prevState?.avatar &&
+          typeof prevState.avatar === 'string' &&
+          prevState.avatar.startsWith('data:image')
+            ? prevState.avatar // Mantener previsualización si existe
+            : user?.avatar || null, // Sino, usar el avatar del servidor
       }));
     }
   }, [user, isEdit]); // Ejecutar si 'user' o 'isEdit' cambian.
@@ -135,7 +139,7 @@ const Profile = () => {
   const handleEdit = () => {
     // Al presionar "Editar", se carga formState con los datos actuales de 'user'
     // Esto asegura que empezamos a editar desde un estado limpio y conocido.
-    setFormState({...user, avatar: user?.avatar || null}); 
+    setFormState({...user, avatar: user?.avatar || null});
     setIsEdit(!isEdit); // Cambia el estado de edición
     setErrors({}); // Limpia errores previos
   };
@@ -151,11 +155,36 @@ const Profile = () => {
   // Valida el formulario
   const validate = () => {
     let currentErrors: any = {};
-    currentErrors = checkRules({ value: formState.name, rules: ['required', 'alpha'], key: 'name', errors: currentErrors });
-    currentErrors = checkRules({ value: formState.middle_name, rules: ['alpha'], key: 'middle_name', errors: currentErrors });
-    currentErrors = checkRules({ value: formState.last_name, rules: ['required', 'alpha'], key: 'last_name', errors: currentErrors });
-    currentErrors = checkRules({ value: formState.mother_last_name, rules: ['alpha'], key: 'mother_last_name', errors: currentErrors });
-    currentErrors = checkRules({ value: formState.phone, rules: ['required', 'phone'], key: 'phone', errors: currentErrors });
+    currentErrors = checkRules({
+      value: formState.name,
+      rules: ['required', 'alpha'],
+      key: 'name',
+      errors: currentErrors,
+    });
+    currentErrors = checkRules({
+      value: formState.middle_name,
+      rules: ['alpha'],
+      key: 'middle_name',
+      errors: currentErrors,
+    });
+    currentErrors = checkRules({
+      value: formState.last_name,
+      rules: ['required', 'alpha'],
+      key: 'last_name',
+      errors: currentErrors,
+    });
+    currentErrors = checkRules({
+      value: formState.mother_last_name,
+      rules: ['alpha'],
+      key: 'mother_last_name',
+      errors: currentErrors,
+    });
+    currentErrors = checkRules({
+      value: formState.phone,
+      rules: ['required', 'phone'],
+      key: 'phone',
+      errors: currentErrors,
+    });
     setErrors(currentErrors);
     return currentErrors;
   };
@@ -166,7 +195,11 @@ const Profile = () => {
 
     let avatarPayload;
     // Si formState.avatar es una cadena base64 (nueva imagen seleccionada)
-    if (formState.avatar && typeof formState.avatar === 'string' && formState.avatar.startsWith('data:image')) {
+    if (
+      formState.avatar &&
+      typeof formState.avatar === 'string' &&
+      formState.avatar.startsWith('data:image')
+    ) {
       // Extraer solo la parte base64 de la cadena
       const base64Data = formState.avatar.split(',')[1] || formState.avatar;
       avatarPayload = {ext: 'webp', file: encodeURIComponent(base64Data)};
@@ -199,7 +232,10 @@ const Profile = () => {
       setIsEdit(false); // Salir del modo edición
       setErrors({});
     } else {
-      showToast(err?.data?.message || 'Ocurrió un error al actualizar', 'error');
+      showToast(
+        err?.data?.message || 'Ocurrió un error al actualizar',
+        'error',
+      );
       if (err?.data?.errors) {
         setErrors(err.data.errors);
       }
@@ -210,7 +246,7 @@ const Profile = () => {
   const onOpenModal = (modalType: 'M' | 'P') => {
     setType(modalType); // 'M' para mail, 'P' para password
     // Resetear campos del formulario del modal
-    setFormState((prevState: any) => ({ 
+    setFormState((prevState: any) => ({
       ...prevState,
       newEmail: '',
       password: '',
@@ -223,7 +259,11 @@ const Profile = () => {
 
   // Determina la URL del avatar a mostrar
   const getAvatarSource = () => {
-    if (isEdit && formState.avatar && formState.avatar.startsWith('data:image')) {
+    if (
+      isEdit &&
+      formState.avatar &&
+      formState.avatar.startsWith('data:image')
+    ) {
       return formState.avatar; // Muestra la previsualización base64 si está editando y hay una nueva imagen
     }
     // Sino, muestra la imagen actual del servidor para Guardias
@@ -236,7 +276,7 @@ const Profile = () => {
       onBack={() => {
         // Si está en modo edición, al presionar atrás, solo sale del modo edición.
         // Sino, navega hacia atrás (Home).
-        isEdit ? setIsEdit(false) : navigation.goBack(); 
+        isEdit ? setIsEdit(false) : navigation.goBack();
       }}
       title={'Mi perfil'}
       /* rigth={ // Icono de editar en la cabecera, solo visible si no está en modo edición
@@ -251,8 +291,7 @@ const Profile = () => {
       } */
       // El scroll se maneja internamente dependiendo de si está en modo edición o no
       scroll={!isEdit} // Layout se encarga del scroll solo si NO estamos editando
-      >
-
+    >
       {/* Contenedor del Avatar y botón de cámara */}
       <View style={styles.avatarContainer}>
         <Avatar
@@ -296,7 +335,7 @@ const Profile = () => {
 
       {isEdit ? (
         // ---------- MODO EDICIÓN ----------
-        <View style={{flex: 1}}> 
+        <View style={{flex: 1}}>
           <ScrollView
             style={{flex: 1}}
             contentContainerStyle={styles.editScrollContent}
@@ -345,9 +384,7 @@ const Profile = () => {
                   <Input
                     label="Dirección"
                     value={
-                      user?.address
-                        ? `${user.address || ''}`
-                        : 'No asignada'
+                      user?.address ? `${user.address || ''}` : 'No asignada'
                     }
                     name="unidad_display"
                     multiline={false}
@@ -355,9 +392,9 @@ const Profile = () => {
                 </View>
               </View>
               <Text style={styles.infoText}>
-                   Los datos bloqueados son delicados, solo pueden ser modificados con permiso de administración de Condaty.
+                Los datos bloqueados son delicados, solo pueden ser modificados
+                con permiso de administración de Condaty.
               </Text>
-              
             </Form>
           </ScrollView>
           {/* Contenedor para los botones de acción, fijo abajo */}
@@ -367,7 +404,7 @@ const Profile = () => {
                 setIsEdit(false); // Salir del modo edición
                 setErrors({});
                 // Restaura formState a los valores originales del usuario
-                setFormState({...user, avatar: user?.avatar || null}); 
+                setFormState({...user, avatar: user?.avatar || null});
               }}
               style={{...styles.buttonBase, ...styles.cancelButton}}>
               <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
@@ -393,17 +430,21 @@ const Profile = () => {
             <Text style={styles.textValue}>{user?.ci || 'Sin registrar'}</Text>
             <Br />
             <Text style={styles.label}>Teléfono</Text>
-            <Text style={styles.textValue}>{user?.phone || 'Sin teléfono'}</Text>
+            <Text style={styles.textValue}>
+              {user?.phone || 'Sin teléfono'}
+            </Text>
             <Br />
             <Text style={styles.label}>{lCondo[client?.type]}</Text>
-            <Text style={styles.textValue}>{client?.name || 'No asignado'}</Text>
+            <Text style={styles.textValue}>
+              {client?.name || 'No asignado'}
+            </Text>
             <Br />
 
             <Text style={styles.label}>Dirección</Text>
             <Text style={styles.textValue}>
               {user?.address || 'No asignado'}
             </Text>
-            
+
             {user?.dpto && user?.dpto?.length > 0 && (
               <>
                 {/* <Text style={styles.label}>{lDpto[client?.type_dpto]}</Text> */}
@@ -416,14 +457,32 @@ const Profile = () => {
 
           <Text style={styles.sectionTitle}>Datos de acceso</Text>
           <View style={styles.card}>
-            <View style={styles.accessRow} onTouchEnd={() => { onOpenModal('M'); }}>
-              <Icon name={IconEmail} fillStroke={cssVar.cWhiteV1} color={'transparent'} size={20} />
+            <View
+              style={styles.accessRow}
+              onTouchEnd={() => {
+                onOpenModal('M');
+              }}>
+              <Icon
+                name={IconEmail}
+                fillStroke={cssVar.cWhiteV1}
+                color={'transparent'}
+                size={20}
+              />
               <Text style={styles.accessText}>Cambiar correo electrónico</Text>
               <Icon name={IconArrowRight} color={cssVar.cWhiteV1} size={18} />
             </View>
             <Br />
-            <View style={[styles.accessRow, {borderBottomWidth: 0}]} onTouchEnd={() => { onOpenModal('P'); }}>
-              <Icon name={IconPassword} fillStroke={cssVar.cWhiteV1} color={'transparent'} size={20} />
+            <View
+              style={[styles.accessRow, {borderBottomWidth: 0}]}
+              onTouchEnd={() => {
+                onOpenModal('P');
+              }}>
+              <Icon
+                name={IconPassword}
+                fillStroke={cssVar.cWhiteV1}
+                color={'transparent'}
+                size={20}
+              />
               <Text style={styles.accessText}>Cambiar contraseña</Text>
               <Icon name={IconArrowRight} color={cssVar.cWhiteV1} size={18} />
             </View>
@@ -435,7 +494,7 @@ const Profile = () => {
               style={styles.logoutText}
               onPress={() => {
                 Alert.alert('', '¿Cerrar la sesión de tu cuenta?', [
-                  { text: 'Cancelar', style: 'cancel' },
+                  {text: 'Cancelar', style: 'cancel'},
                   {text: 'Salir', style: 'destructive', onPress: logout},
                 ]);
               }}>
@@ -484,7 +543,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: cssVar.cWhiteV2,
   },
-  cameraButtonText: { // Estilo para el texto "Agregar" si lo llevase
+  cameraButtonText: {
+    // Estilo para el texto "Agregar" si lo llevase
     color: cssVar.cWhiteV1,
     fontFamily: FONTS.semiBold,
     fontSize: 12,
@@ -500,11 +560,10 @@ const styles = StyleSheet.create({
   // Tarjeta contenedora de información en modo vista
   card: {
     borderRadius: 12,
-   
+
     paddingHorizontal: 12,
     backgroundColor: cssVar.cBlackV2, // Color de fondo de la tarjeta
     paddingVertical: 12,
-    
   },
   // Etiqueta de un campo de información (ej. "Nombre completo")
   label: {
@@ -554,7 +613,8 @@ const styles = StyleSheet.create({
     flex: 1, // Para que los inputs en la misma fila compartan espacio
     // paddingHorizontal: 5, // Si se usa marginHorizontal negativo en row
   },
-  inputContainerFullWidth: { // Para inputs que ocupan todo el ancho
+  inputContainerFullWidth: {
+    // Para inputs que ocupan todo el ancho
     flex: 1,
   },
   // Texto informativo en modo edición
