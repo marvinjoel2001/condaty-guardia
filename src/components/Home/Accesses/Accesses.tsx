@@ -52,7 +52,7 @@ const subtitleAccess = (item: any) => {
   if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {
     prefix = 'Recogió a: ';
   }
-  if (item.type === 'P' && item.other?.otherType?.name === 'Mensajeria') {
+  if (item.type === 'P' && item.other?.otherType?.name === 'Mensajería') {
     prefix = 'Entregó a: ';
   }
   if (item.type === 'P' && item.other?.otherType?.name === 'Delivery') {
