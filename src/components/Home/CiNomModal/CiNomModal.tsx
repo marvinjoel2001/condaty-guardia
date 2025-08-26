@@ -29,7 +29,7 @@ interface CiNomModalProps {
 }
 
 const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
-  const {user, showToast} = useAuth();
+  const {showToast} = useAuth();
   const [visit, setVisit]: any = useState([]);
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
@@ -306,15 +306,25 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       });
     }
   };
+
+  const _onClose = () => {
+    if (steps > 0) {
+      setSteps(0);
+      setVisit([]);
+      setFormState({owner_id: formState?.owner_id, ci: formState?.ci});
+      return;
+    }
+    onClose();
+  };
+
   return (
     <ModalFull
       open={open}
-      onClose={onClose}
+      onClose={_onClose}
       title={steps > 0 ? 'Registrar sin qr' : 'Visitante sin qr'}
       buttonText={
         steps > 0 ? 'Notificar al residente' : steps <= 0 ? 'Buscar' : ''
       }
-      // buttonCancel="Cancelar"
       onSave={onSave}>
       <>
         {visit.length > 0 && (
@@ -371,20 +381,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
           />
         )}
         {steps > 0 && (
-          // <SelectTransport
-          //   typeSearch={typeSearch}
-          //   setTypeSearch={setTypeSearch}
-          //   formState={formState}
-          //   errors={errors}
-          //   onCheckCI={onExistTaxi}
-          //   disabledFields={formState?.disbledTaxi}
-          //   handleChangeInput={handleChangeInput}
-          //   tabs={[
-          //     {value: 'P', text: 'A pie'},
-          //     {value: 'V', text: 'En vehículo'},
-          //     {value: 'T', text: 'En taxi'},
-          //   ]}
-          // />
           <>
             <TabsButtons
               tabs={[
