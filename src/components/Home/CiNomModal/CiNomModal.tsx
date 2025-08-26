@@ -13,7 +13,7 @@ import {getFullName} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
-import {IconAlert, IconX} from '../../../icons/IconLibrary';
+import {IconAlert, IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import {TouchableOpacity} from 'react-native';
@@ -380,14 +380,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             errors={errors}
           />
         )}
-        {steps > 0 && (
-          <TextArea
-            label="Observaciones de Entrada"
-            name="obs_in"
-            value={formState?.obs_in}
-            onChange={(e: any) => handleChangeInput('obs_in', e)}
-          />
-        )}
+
         {steps > 0 && (
           <>
             <TabsButtons
@@ -419,7 +412,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                     fontSize: 16,
                     fontWeight: 'bold',
                     marginBottom: 4,
-                    color: cssVar.cWhiteV2,
+                    color: cssVar.cWhiteV1,
                     fontFamily: FONTS.medium,
                   }}>
                   Datos del conductor:
@@ -441,6 +434,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                   handleChangeInput={handleChangeInput}
                   disabled={formState?.disbledTaxi}
                   prefijo={'_taxi'}
+                  inputGrid={true}
                 />
                 <Input
                   label="Placa"
@@ -462,7 +456,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 fontSize: 16,
                 fontFamily: FONTS.medium,
                 marginBottom: 4,
-                color: cssVar.cWhiteV2,
+                color: cssVar.cWhiteV1,
               }}>
               {formState.acompanantes?.length > 1
                 ? 'Acompañantes:'
@@ -480,17 +474,29 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
           <TouchableOpacity
             style={{
               alignSelf: 'flex-start',
-              marginVertical: 4,
+              marginBottom: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
             }}
             onPress={() => setAddCompanion(true)}>
+            <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
             <Text
               style={{
-                color: cssVar.cWhite,
+                color: cssVar.cAccent,
                 textDecorationLine: 'underline',
               }}>
               Agregar acompañante
             </Text>
           </TouchableOpacity>
+        )}
+        {steps > 0 && (
+          <TextArea
+            label="Observaciones de entrada"
+            name="obs_in"
+            value={formState?.obs_in}
+            onChange={(e: any) => handleChangeInput('obs_in', e)}
+          />
         )}
       </>
 
