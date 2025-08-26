@@ -214,6 +214,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   };
 
   const onSave = async () => {
+    if (formState?.ci_taxi == formState?.ci) {
+      return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
+    }
     if (hasErrors(validate())) {
       return;
     }
@@ -221,6 +224,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       getVisits();
       return;
     }
+
     const url = '/accesses';
     let method = 'POST';
 
@@ -276,6 +280,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   }, [typeSearch]);
 
   const onExistTaxi = async () => {
+    if (formState?.ci_taxi == formState?.ci) {
+      return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
+    }
     const {data: exist} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -283,6 +290,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       fullType: 'L',
       ci_visit: formState?.ci_taxi,
     });
+    setErrors({errors, ci_taxi: ''});
     if (exist?.data) {
       setFormState({
         ...formState,
