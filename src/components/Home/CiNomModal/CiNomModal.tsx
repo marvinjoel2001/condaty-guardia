@@ -34,7 +34,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState(0);
-  const [openAlert, setOpenAlert] = useState(false);
+  // const [openAlert, setOpenAlert] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
   const [addCompanion, setAddCompanion] = useState(false);
 
@@ -109,7 +109,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     setVisit(visitData?.data);
     if (visitData?.data.length === 0) {
       setSteps(2);
-      setOpenAlert(true);
+      // setOpenAlert(true);
 
       return;
     } else {
@@ -491,15 +491,16 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         )}
         {steps > 0 && (
           <TextArea
-            label="Observaciones de entrada"
+            label="Observaciones"
             name="obs_in"
+            placeholder="Ej: El visitante está ingresando con 2 mascotas"
             value={formState?.obs_in}
             onChange={(e: any) => handleChangeInput('obs_in', e)}
           />
         )}
       </>
 
-      {openAlert && (
+      {/* {openAlert && (
         <Modal
           open={openAlert}
           onClose={onClose}
@@ -513,7 +514,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             <Text style={styles.modalAlertText}>¡Visita no registrada!</Text>
           </View>
         </Modal>
-      )}
+      )} */}
       {addCompanion && (
         <AccompaniedAdd
           open={addCompanion}
