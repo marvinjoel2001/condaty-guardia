@@ -14,7 +14,11 @@ function App() {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <AxiosProvider interceptors={axiosInterceptors}>
-        <StatusBar animated={true} backgroundColor={cssVar.cBlack} />
+        <StatusBar
+          animated={true}
+          backgroundColor={cssVar.cBlack}
+          barStyle={'light-content'}
+        />
         <NavigationContainer>
           <AuthProvider>
             <ActiveNotificationDB />
