@@ -258,7 +258,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             style={{
               borderRadius: 20,
               padding: 4,
-              elevation: 2,
             }}
             onPress={() => handleDeleteAcompanante(item.ci)}
           />
@@ -329,19 +328,12 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     <ModalFull
       open={open}
       onClose={_onClose}
-      title={steps > 0 ? 'Registrar sin qr' : 'Visitante sin qr'}
+      title={'Visitante sin QR'}
       buttonText={
         steps > 0 ? 'Notificar al residente' : steps <= 0 ? 'Buscar' : ''
       }
       onSave={onSave}>
       <>
-        {visit.length > 0 && (
-          <ItemList
-            title={getFullName(visit[0])}
-            subtitle={`CI: ${visit[0]?.ci}`}
-            left={<Avatar name={getFullName(visit[0])} />}
-          />
-        )}
         <Select
           filter
           label="¿A quién visita?"
@@ -359,6 +351,13 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             paddingTop: cssVar.spM,
           }}
         />
+        {visit.length > 0 && (
+          <ItemList
+            title={getFullName(visit[0])}
+            subtitle={`CI: ${visit[0]?.ci}`}
+            left={<Avatar name={getFullName(visit[0])} />}
+          />
+        )}
         {visit.length === 0 && steps === 0 && (
           <Input
             label="Carnet de identidad"
@@ -412,7 +411,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                     fontSize: 16,
                     fontWeight: 'bold',
                     marginBottom: 4,
-                    color: cssVar.cWhiteV1,
+                    color: cssVar.cWhite,
                     fontFamily: FONTS.medium,
                   }}>
                   Datos del conductor:
@@ -456,7 +455,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 fontSize: 16,
                 fontFamily: FONTS.medium,
                 marginBottom: 4,
-                color: cssVar.cWhiteV1,
+                color: cssVar.cWhite,
               }}>
               {formState.acompanantes?.length > 1
                 ? 'Acompañantes:'
