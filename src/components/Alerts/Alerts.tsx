@@ -193,7 +193,7 @@ const Alerts = () => {
       <Layout title="Alertas" refresh={() => reload()}>
         <TabsButtons
           tabs={[
-            {value: 'T', text: 'Todo'},
+            {value: 'T', text: 'Todas'},
             {value: 'NA', text: 'Nivel alto'},
             {value: 'NM', text: 'Nivel medio'},
             {value: 'NB', text: 'Nivel bajo'},
