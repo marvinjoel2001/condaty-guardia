@@ -396,6 +396,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 label="Placa"
                 type="text"
                 name="plate"
+                autoCapitalize={'characters'}
                 error={errors}
                 required={typeSearch == 'V'}
                 value={formState['plate']}
@@ -437,6 +438,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 />
                 <Input
                   label="Placa"
+                  autoCapitalize={'characters'}
                   type="text"
                   name="plate"
                   error={errors}
