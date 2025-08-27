@@ -193,7 +193,7 @@ const Select = ({
               {filter && (
                 <TextInput
                   style={styles.search}
-                  placeholderTextColor={cssVar.cWhiteV2}
+                  placeholderTextColor={cssVar.cWhiteV1}
                   value={search}
                   onChangeText={onChangeSearch}
                   placeholder={`Buscar ${placeholder || label}...`}
