@@ -9,6 +9,7 @@ import {
   IconToastSuccess,
   IconToastWarning,
   IconToastWarning2,
+  IconAlert,
 
 } from '../../../../src/icons/IconLibrary';
 import {cssVar, FONTS} from '../../../styles/themes';
@@ -70,8 +71,8 @@ const Toast = ({toast, showToast}: ToastProps) => {
         return {
           iconName: IconToastSuccess,
           iconColor: cssVar.cWhite,
-          iconBackgroundColor: '#2A8A46',
-          toastBackgroundColor: '#34A853',
+          iconBackgroundColor: cssVar.cSuccess || '#2A8A46',
+          toastBackgroundColor: cssVar.cSuccess || '#2A8A46',
           textColor: cssVar.cWhite,
           defaultTitle: '¡Excelente!',
         };
@@ -79,7 +80,7 @@ const Toast = ({toast, showToast}: ToastProps) => {
         return {
           iconName:  IconX,
           iconColor: cssVar.cWhite,
-          iconBackgroundColor: '#C12A2A',
+          iconBackgroundColor: cssVar.cError  || '#E53935',
           toastBackgroundColor: cssVar.cError || '#E53935',
           textColor: cssVar.cWhite,
           defaultTitle: 'Error',
@@ -88,7 +89,7 @@ const Toast = ({toast, showToast}: ToastProps) => {
         return {
           iconName: IconToastWarning,
           iconColor: cssVar.cWhite,
-          iconBackgroundColor: '#D4A017',
+          iconBackgroundColor: cssVar.cWarning || '#D4A017',
           toastBackgroundColor: cssVar.cWarning || '#FFB300',
           textColor: cssVar.cWhite,
           defaultTitle: 'Advertencia',
