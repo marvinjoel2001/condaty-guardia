@@ -107,13 +107,13 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
       <View style={styles.mainCard}>
         {details?.level == 4 ? (
           <>
-            <View >
+            <View>
               <Text style={styles.sectionTitle}>Tipo de emergencia</Text>
               {renderAlertPanic()}
             </View>
             <View style={styles.divider} />
             <View style={styles.informantContainer}>
-              <Text style={styles.sectionTitle}>Informantes</Text>
+              <Text style={styles.sectionTitle}>Informante</Text>
               <ItemList
                 title={getFullName(details?.owner)}
                 subtitle={
@@ -136,21 +136,42 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
             </View>
 
             <KeyValue
-              keys="Fecha del reporte:"
+              keys="Fecha del reporte"
               value={
-                <Text style={{fontSize: 14,
-                  color: cssVar.cWhite,
-                  fontFamily: FONTS.medium,
-                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: cssVar.cWhite,
+                    fontFamily: FONTS.medium,
+                  }}>
                   {formatToDayDDMMYYYYHHMM(details?.created_at, true)}
-                </Text>}
+                </Text>
+              }
+            />
+            <KeyValue
+              keys="Nivel de alerta"
+              value={
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: statusColor[details?.level]?.color,
+                    fontFamily: FONTS.medium,
+                  }}>
+                  {'Nivel ' + levelAlerts[details?.level]}
+                </Text>
+              }
             />
             <View style={styles.divider} />
 
             {!details?.date_at ? (
               <View style={styles.pendingContainer}>
-                <View style={{ padding: 8 }}>
-                  <Icon name={IconClock} size={40} color={cssVar.cError} viewBox="0 0 32 32"/>
+                <View style={{padding: 8}}>
+                  <Icon
+                    name={IconClock}
+                    size={40}
+                    color={cssVar.cError}
+                    viewBox="0 0 32 32"
+                  />
                 </View>
                 <Text style={styles.pendingText}>Pendiente de atención</Text>
               </View>
@@ -190,11 +211,30 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                     />
                   }
                 />
+
+                <KeyValue
+                  keys="Fecha de atención"
+                  value={
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: cssVar.cWhite,
+                        fontFamily: FONTS.medium,
+                      }}>
+                      {getDateTimeStrMes(
+                        details?.adm_attend?.updated_at ||
+                          details?.gua_attend?.updated_at ||
+                          details?.date_at,
+                        true,
+                      )}
+                    </Text>
+                  }
+                />
               </View>
             )}
           </>
         ) : (
-          <>
+          <View>
             <View style={styles.detailsContainer}>
               <Text style={styles.sectionTitle}>Descripción</Text>
               <Text style={styles.text}>{details?.descrip}</Text>
@@ -220,10 +260,12 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 style={{fontSize: 14}}
                 keys="Fecha del reporte:"
                 value={
-                  <Text style={{fontSize: 14,
-                    color: cssVar.cWhite,
-                    fontFamily: FONTS.medium,
-                  }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: cssVar.cWhite,
+                      fontFamily: FONTS.medium,
+                    }}>
                     {formatToDayDDMMYYYYHHMM(details?.created_at, true)}
                   </Text>
                 }
@@ -254,7 +296,8 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                     )}
                     subtitle={
                       details?.gua_attend
-                        ? 'Guardia -' + getDateTimeStrMes(details?.date_at, true)
+                        ? 'Guardia -' +
+                          getDateTimeStrMes(details?.date_at, true)
                         : 'Administrador -' +
                           getDateTimeStrMes(details?.date_at, true)
                     }
@@ -284,7 +327,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 </View>
               )}
             </View>
-          </>
+          </View>
         )}
       </View>
     );
@@ -367,6 +410,7 @@ const styles = StyleSheet.create({
   },
   attendedContainer: {
     marginTop: cssVar.spS,
+    gap: cssVar.spS,
   },
   alertLevelContainer: {
     marginBottom: cssVar.spS,

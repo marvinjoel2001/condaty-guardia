@@ -27,7 +27,7 @@ interface ToastProps {
   showToast: (param: string | null) => void;
 }
 
-export const TIME_TOAST = 100000;
+export const TIME_TOAST = 300;
 
 const Toast = ({toast, showToast}: ToastProps) => {
   const translateY = useRef(new Animated.Value(-200)).current;
