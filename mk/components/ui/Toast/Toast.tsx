@@ -10,6 +10,7 @@ import {
   IconToastWarning,
   IconToastWarning2,
   IconAlert,
+  IconToastError,
 
 } from '../../../../src/icons/IconLibrary';
 import {cssVar, FONTS} from '../../../styles/themes';
@@ -78,7 +79,7 @@ const Toast = ({toast, showToast}: ToastProps) => {
         };
       case 'error':
         return {
-          iconName:  IconX,
+          iconName:  IconToastError,
           iconColor: cssVar.cWhite,
           iconBackgroundColor: cssVar.cError  || '#E53935',
           toastBackgroundColor: cssVar.cError || '#E53935',
