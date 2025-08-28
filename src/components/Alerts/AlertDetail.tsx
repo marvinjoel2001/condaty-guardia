@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import useApi from '../../../mk/hooks/useApi';
-import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
+import Modal from '../../../mk/components/ui/Modal/Modal';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
-import {ActivityIndicator, StyleSheet, Text, View, ScrollView} from 'react-native';
+import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import {formatToDayDDMMYYYYHHMM, getDateTimeAgo, getDateTimeStrMes} from '../../../mk/utils/dates';
 import Button from '../../../mk/components/forms/Button/Button';
@@ -104,39 +104,120 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     }
 
     return (
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.mainCard}>
-          {details?.level == 4 ? (
-            <>
-              <View >
-                <Text style={styles.sectionTitle}>Tipo de emergencia</Text>
-                {renderAlertPanic()}
+      <View style={styles.mainCard}>
+        {details?.level == 4 ? (
+          <>
+            <View >
+              <Text style={styles.sectionTitle}>Tipo de emergencia</Text>
+              {renderAlertPanic()}
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.informantContainer}>
+              <Text style={styles.sectionTitle}>Informantes</Text>
+              <ItemList
+                title={getFullName(details?.owner)}
+                subtitle={
+                  details?.owner?.dpto?.[0]?.nro +
+                  ', ' +
+                  details?.owner?.dpto?.[0]?.description
+                }
+                left={
+                  <Avatar
+                    src={getUrlImages(
+                      '/OWNER-' +
+                        details?.owner?.id +
+                        '.webp?d=' +
+                        details?.updated_at,
+                    )}
+                    name={getFullName(details?.owner)}
+                  />
+                }
+              />
+            </View>
+
+            <KeyValue
+              keys="Fecha del reporte:"
+              value={
+                <Text style={{fontSize: 14,
+                  color: cssVar.cWhite,
+                  fontFamily: FONTS.medium,
+                }}>
+                  {formatToDayDDMMYYYYHHMM(details?.created_at, true)}
+                </Text>}
+            />
+            <View style={styles.divider} />
+
+            {!details?.date_at ? (
+              <View style={styles.pendingContainer}>
+                <View style={{ padding: 8 }}>
+                  <Icon name={IconClock} size={40} color={cssVar.cError} viewBox="0 0 32 32"/>
+                </View>
+                <Text style={styles.pendingText}>Pendiente de atención</Text>
               </View>
-              <View style={styles.divider} />
-              <View style={styles.informantContainer}>
-                <Text style={styles.sectionTitle}>Informante</Text>
+            ) : (
+              <View style={styles.attendedContainer}>
+                <Text style={styles.sectionTitle}>Atendida por</Text>
                 <ItemList
-                  title={getFullName(details?.owner)}
+                  title={getFullName(
+                    details?.gua_attend || details?.adm_attend,
+                  )}
                   subtitle={
-                    details?.owner?.dpto?.[0]?.nro +
-                    ', ' +
-                    details?.owner?.dpto?.[0]?.description
+                    details?.gua_attend
+                      ? 'Guardia -' + getDateTimeStrMes(details?.date_at, true)
+                      : 'Administrador -' +
+                        getDateTimeStrMes(details?.date_at, true)
                   }
                   left={
                     <Avatar
-                      src={getUrlImages(
-                        '/OWNER-' +
-                          details?.owner?.id +
-                          '.webp?d=' +
-                          details?.updated_at,
+                      src={
+                        details?.gua_attend
+                          ? getUrlImages(
+                              '/GUARD-' +
+                                details?.gua_attend?.id +
+                                '.webp?d=' +
+                                details?.updated_at,
+                            )
+                          : getUrlImages(
+                              '/ADM-' +
+                                details?.adm_attend?.id +
+                                '.webp?d=' +
+                                details?.updated_at,
+                            )
+                      }
+                      name={getFullName(
+                        details?.gua_attend || details?.adm_attend,
                       )}
-                      name={getFullName(details?.owner)}
                     />
                   }
                 />
               </View>
-              
+            )}
+          </>
+        ) : (
+          <>
+            <View style={styles.detailsContainer}>
+              <Text style={styles.sectionTitle}>Descripción</Text>
+              <Text style={styles.text}>{details?.descrip}</Text>
+              <View style={styles.divider} />
+              <Text style={styles.sectionTitle}>Informante</Text>
+              <ItemList
+                title={getFullName(details?.guardia)}
+                subtitle={'Guardia'}
+                left={
+                  <Avatar
+                    src={getUrlImages(
+                      '/GUARD-' +
+                        details?.guardia?.id +
+                        '.webp?d=' +
+                        details?.updated_at,
+                    )}
+                    name={getFullName(details?.guardia)}
+                  />
+                }
+              />
+
               <KeyValue
+                style={{fontSize: 14}}
                 keys="Fecha del reporte:"
                 value={
                   <Text style={{fontSize: 14,
@@ -144,19 +225,27 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                     fontFamily: FONTS.medium,
                   }}>
                     {formatToDayDDMMYYYYHHMM(details?.created_at, true)}
-                  </Text>}
+                  </Text>
+                }
               />
-              <View style={styles.divider} />
-              
-            
-              {!details?.date_at ? (
-                <View style={styles.pendingContainer}>
-                  <View style={{ padding: 8 }}>
-                    <Icon name={IconClock} size={40} color={cssVar.cError} viewBox="0 0 32 32"/>
-                  </View>
-                  <Text style={styles.pendingText}>Pendiente de atención</Text>
-                </View>
-              ) : (
+              {details?.level !== 4 && (
+                <KeyValue
+                  style={{fontSize: 14}}
+                  keys="Nivel de alerta:"
+                  value={
+                    <Text
+                      style={{
+                        color: statusColor[details?.level]?.color,
+                        fontSize: 14,
+                        fontFamily: FONTS.medium,
+                      }}>
+                      {levelAlerts[details?.level]}
+                    </Text>
+                  }
+                />
+              )}
+
+              {details?.date_at && (
                 <View style={styles.attendedContainer}>
                   <Text style={styles.sectionTitle}>Atendida por</Text>
                   <ItemList
@@ -165,7 +254,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                     )}
                     subtitle={
                       details?.gua_attend
-                        ? 'Guardia -' + getDateTimeStrMes(details?.date_at, true)                                                                                                                                                                                                                                                                                                                                                
+                        ? 'Guardia -' + getDateTimeStrMes(details?.date_at, true)
                         : 'Administrador -' +
                           getDateTimeStrMes(details?.date_at, true)
                     }
@@ -194,131 +283,29 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                   />
                 </View>
               )}
-            </>
-          ) : (
-            <>
-              <View style={styles.detailsContainer}>
-                <Text style={styles.sectionTitle}>Descripción</Text>
-                <Text style={styles.text}>{details?.descrip}</Text>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Informante</Text>
-                <ItemList
-                  title={getFullName(details?.guardia)}
-                  subtitle={
-                    'Guardia' 
-                  
-                     
-                    
-                  }
-                  left={
-                    <Avatar
-                      src={getUrlImages(
-                        '/GUARD-' +
-                          details?.guardia?.id +
-                          '.webp?d=' +
-                          details?.updated_at,
-                      )}
-                      name={getFullName(details?.guardia)}
-                    />
-                  }
-                />
-                
-                <KeyValue
-                  style={{fontSize: 14}}
-                  keys="Fecha del reporte:"
-                  value={
-                    <Text style={{fontSize: 14,
-                      color: cssVar.cWhite,
-                      fontFamily: FONTS.medium,
-                    }}>
-                      {formatToDayDDMMYYYYHHMM(details?.created_at, true)}
-                    </Text>
-                  }
-                />
-                {details?.level !== 4 && (
-                  <KeyValue
-                    style={{fontSize: 14}}
-                    keys="Nivel de alerta:"
-                    value={
-                      <Text
-                        style={{
-                          color: statusColor[details?.level]?.color,
-                          fontSize: 14,
-                          fontFamily: FONTS.medium,
-                        }}>
-                        {levelAlerts[details?.level]}
-                      </Text>
-                    }
-                  />
-                )}
-                
-                {details?.date_at && (
-                  <View style={styles.attendedContainer}>
-                    <Text style={styles.sectionTitle}>Atendida por</Text>
-                    <ItemList
-                      title={getFullName(
-                        details?.gua_attend || details?.adm_attend,
-                      )}
-                      subtitle={
-                        details?.gua_attend
-                          ? 'Guardia -' + getDateTimeStrMes(details?.date_at, true)
-                          : 'Administrador -' +
-                            getDateTimeStrMes(details?.date_at, true)
-                      }
-                      left={
-                        <Avatar
-                          src={
-                            details?.gua_attend
-                              ? getUrlImages(
-                                  '/GUARD-' +
-                                    details?.gua_attend?.id +
-                                    '.webp?d=' +
-                                    details?.updated_at,
-                                )
-                              : getUrlImages(
-                                  '/ADM-' +
-                                    details?.adm_attend?.id +
-                                    '.webp?d=' +
-                                    details?.updated_at,
-                                )
-                          }
-                          name={getFullName(
-                            details?.gua_attend || details?.adm_attend,
-                          )}
-                        />
-                      }
-                    />
-                  </View>
-                )}
-              </View>
-            </>
-          )}
-        </View>
-      </ScrollView>
+            </View>
+          </>
+        )}
+      </View>
     );
   };
 
   return (
-    <ModalFull
+    <Modal
       title="Detalle de alerta"
       open={open}
       onClose={_onClose}
       buttonText={!details?.date_at && details?.level == 4 ? "Atender" : ""}
       onSave={onSaveAttend}>
       {renderContent()}
-    </ModalFull>
+    </Modal>
   );
 };
 
 export default AlertDetail;
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: cssVar.spXxl,
-  },
   mainCard: {
-    flex: 1,
     backgroundColor: cssVar.cBlackV2,
     padding: cssVar.spM,
     borderRadius: cssVar.bRadiusL,

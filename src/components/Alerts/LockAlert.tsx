@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import {Text, View} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
@@ -14,6 +14,7 @@ import {
   IconTheft,
 } from '../../icons/IconLibrary';
 import {getUrlImages} from '../../../mk/utils/strings';
+import useApi from '../../../mk/hooks/useApi';
 
 const typeAlerts: any = {
   E: {
@@ -38,7 +39,9 @@ const typeAlerts: any = {
   },
 };
 
-const LockAlert = ({open, onClose, data}: any) => {
+const LockAlert = ({ open, onClose, data }: any) => {
+  const { execute } = useApi();
+
   if (!data) {
     return null;
   }
@@ -67,13 +70,25 @@ const LockAlert = ({open, onClose, data}: any) => {
       };
     }
   }, [open]);
+  const _onClose = () => {
+    onClose();
+  };
+
+  const onSaveAttend = async () => {
+    const {data: response} = await execute('/attend', 'POST', {
+      id: data?.id,
+    });
+    if (response?.success == true) {
+      _onClose();
+    }
+  };
   return (
     <Modal
       title="Alerta de emergencia"
       open={open}
       onClose={onClose}
-      buttonText="Cerrar"
-      onSave={onClose}
+      buttonText="Atender"
+      onSave={onSaveAttend}
       containerStyles={{
         borderWidth: 1,
         borderColor: cssVar.cError,

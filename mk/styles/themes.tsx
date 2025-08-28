@@ -101,6 +101,9 @@ export const cssVar = {
   cCompl8: '#DE6A60',
   cCompl9: '#5AB0E9',
 
+
+  cToastFill: '#4E4E4E',
+
   //sizes
   sXxl: 24,
   sXl: 20,
