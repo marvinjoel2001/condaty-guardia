@@ -74,9 +74,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         name:
           getFullName(owner) +
           ' - ' +
-          owner?.dpto[0]?.nro +
+          (owner?.dpto?.[0]?.nro || owner?.dpto_nro) +
           ' - ' +
-          owner?.dpto[0]?.type?.name,
+          (owner?.dpto?.[0]?.type?.name || owner?.type_name),
       }));
       setDataOwners(newOwners);
     }
@@ -394,9 +394,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             {typeSearch == 'V' && (
               <Input
                 label="Placa"
+                autoCapitalize="characters"
                 type="text"
                 name="plate"
-                autoCapitalize={'characters'}
                 error={errors}
                 required={typeSearch == 'V'}
                 value={formState['plate']}
@@ -438,7 +438,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 />
                 <Input
                   label="Placa"
-                  autoCapitalize={'characters'}
+                  autoCapitalize="characters"
                   type="text"
                   name="plate"
                   error={errors}
