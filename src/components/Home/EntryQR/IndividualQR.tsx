@@ -278,7 +278,7 @@ const IndividualQR = ({
               <Input
                 label="Placa del vehículo"
                 type="text"
-                name="plate" // Vehículo usa 'plate'
+                name="plate"
                 error={errors}
                 required={tab === 'V'}
                 value={formState?.plate || ''}
@@ -313,10 +313,10 @@ const IndividualQR = ({
                 <Input
                   label="Placa del taxi"
                   type="text"
-                  name="plate" // Taxi usa 'plate' como en la versión antigua
-                  error={errors} // Error para 'plate'
+                  name="plate"
+                  error={errors}
                   required={tab === 'T'}
-                  value={formState?.plate || ''} // Valor de 'plate'
+                  value={formState?.plate || ''}
                   onChange={(value: string) =>
                     handleChange('plate', value.toUpperCase())
                   }
