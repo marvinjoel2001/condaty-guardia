@@ -118,8 +118,8 @@ export const typeAlerts = {
 export const ALERT_LEVEL_OPTIONS = Object.entries(ALERT_LEVEL_LABELS)
   .filter(([key]) => key !== '4') // Excluir pánico del selector
   .map(([value, label]) => ({
-    value: parseInt(value),
-    label: label
+    id: parseInt(value),
+    name: label
   }));
 
 // Tabs para el componente Alerts (se genera automáticamente)
