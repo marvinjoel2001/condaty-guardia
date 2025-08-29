@@ -74,9 +74,6 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
         error={errors}
         required
         name="level"
-        style={{
-          paddingTop: cssVar.spM,
-        }}
         options={[
           {id: 1, name: 'Bajo - Solo guardias'},
           {id: 2, name: 'Medio - Solo administradores y guardias'},

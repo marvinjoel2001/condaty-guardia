@@ -57,27 +57,25 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       onClose={onClose}
       buttonText="Enviar reporte"
       buttonCancel="">
-      <View style={{marginTop: 12}}>
-        <TextArea
-          type="textArea"
-          label="Escribir reporte..."
-          name="descrip"
-          // placeholder="Escribir reporte..."
-          error={errors}
-          maxLength={250}
-          required={false}
-          value={formState?.descrip}
-          onChange={value => handleInputChange('descrip', value)}
-        />
+      <TextArea
+        type="textArea"
+        label="Escribir reporte..."
+        name="descrip"
+        // placeholder="Escribir reporte..."
+        error={errors}
+        maxLength={250}
+        required={false}
+        value={formState?.descrip}
+        onChange={value => handleInputChange('descrip', value)}
+      />
 
-        <UploadImage
-          style={{marginTop: 0}}
-          setFormState={setFormState}
-          formState={formState}
-          label="Adjuntar imagen"
-          name="avatar"
-        />
-      </View>
+      <UploadImage
+        style={{marginTop: 0}}
+        setFormState={setFormState}
+        formState={formState}
+        label="Adjuntar imagen"
+        name="avatar"
+      />
     </ModalFull>
   );
 };

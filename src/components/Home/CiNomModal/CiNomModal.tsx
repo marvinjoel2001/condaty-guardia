@@ -347,9 +347,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
           optionLabel="name"
           height={300}
           search={true}
-          style={{
-            paddingTop: cssVar.spM,
-          }}
         />
         {visit.length > 0 && (
           <ItemList

@@ -215,11 +215,8 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
 
   const onSaveAccess = async () => {
     if (!data) return;
-    console.log('formState antes de validar:', formState);
     const validationErrors = validate();
     if (hasErrors(validationErrors)) {
-      showToast('Errores: ' + JSON.stringify(validationErrors), 'error');
-      console.log('Errores de validación:', validationErrors);
       return;
     }
 
@@ -252,13 +249,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       };
     }
 
-    const {data: In} = await execute(
-      '/accesses/enterqr',
-      'POST',
-      params,
-      false,
-      3,
-    );
+    const {data: In} = await execute('/accesses/enterqr', 'POST', params);
     if (In?.success) {
       if (reload) reload();
       showToast('Registrado con éxito', 'success');
@@ -367,11 +358,11 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       buttonText={
         (!openSelected && data?.type === 'G') || data?.status === 'X'
           ? data?.type == 'O'
-            ? 'Dejar Ingresar'
+            ? 'Dejar ingresar'
             : ''
           : isCurrentlyInside
-          ? 'Registrar Salida'
-          : 'Dejar Ingresar'
+          ? 'Registrar salida'
+          : 'Dejar ingresar'
       }>
       {renderContent()}
     </ModalFull>
