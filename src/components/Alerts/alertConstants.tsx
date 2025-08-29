@@ -8,7 +8,7 @@ import {
 
 // CONSTANTES PRINCIPALES - CAMBIAR AQUÍ PARA AFECTAR TODO
 export const ALERT_LEVEL_LABELS = {
-  1: 'bajo',
+  1: 'bajisimo',
   2: 'medio',
   3: 'alto',
   4: 'pánico'

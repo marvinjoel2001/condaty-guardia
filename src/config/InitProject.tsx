@@ -35,7 +35,9 @@ const InitProject = () => {
     //   showToast('¡Bienvenido a casa!', 'warning');
     // }
     if (data?.event === 'alerts') {
-      showToast(`¡Se creo una alerta nivel ${info.level}!`, 'warning');
+      if (info.user_id !== useAuth().user?.id) {
+        showToast(`¡Se creo una alerta nivel ${info.level}!`, 'warning');
+      }
     }
     // if (data?.event === 'in-visitG') {
     //   // QR grupal
