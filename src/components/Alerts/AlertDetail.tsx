@@ -6,19 +6,22 @@ import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import {formatToDayDDMMYYYYHHMM, getDateTimeAgo, getDateTimeStrMes} from '../../../mk/utils/dates';
 import Button from '../../../mk/components/forms/Button/Button';
-import {levelAlerts, statusColor, statusColorPanic} from './Alerts';
 import KeyValue from '../../../mk/components/ui/KeyValue';
 import LineDetail from '../Home/Accesses/shares/LineDetail';
 import {
-  IconAlert,
-  IconAmbulance,
-  IconFlame,
-  IconTheft,
   IconClock,
 } from '../../icons/IconLibrary';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
+import {
+  ALERT_LEVEL_COLORS,
+  ALERT_LEVELS,
+  EMERGENCY_TYPES,
+  levelAlerts,
+  statusColor,
+  statusColorPanic
+} from './alertConstants';
 
 type PropsType = {
   id: any;
@@ -48,38 +51,23 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     setDetails({});
   };
   const renderAlertPanic = () => {
-    let icon: any;
+    const emergencyType = EMERGENCY_TYPES[details?.type as keyof typeof EMERGENCY_TYPES];
 
-    switch (details?.type) {
-      case 'F':
-        icon = IconFlame;
-        break;
-      case 'E':
-        icon = IconAmbulance;
-        break;
-      case 'T':
-        icon = IconTheft;
-        break;
-      case 'O':
-        icon = IconAlert;
-        break;
-      default:
-    }
     return (
       <View
         style={{
           ...styles.alertPanic,
-          backgroundColor: statusColorPanic[details?.type]?.background,
-          borderColor: statusColorPanic[details?.type]?.border,
+          backgroundColor: emergencyType?.background,
+          borderColor: emergencyType?.border,
         }}>
-        <Icon name={icon} color={cssVar.cWhite} />
+        <Icon name={emergencyType?.icon} color={cssVar.cWhite} />
         <Text
           style={{
             ...styles.text,
             color: cssVar.cWhite,
             marginTop: 8,
           }}>
-          {details?.descrip}
+          {emergencyType?.name || details?.descrip}
         </Text>
       </View>
     );
@@ -154,10 +142,10 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 <Text
                   style={{
                     fontSize: 14,
-                    color: statusColor[details?.level]?.color,
+                    color: ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.color,
                     fontFamily: FONTS.medium,
                   }}>
-                  {'Nivel ' + levelAlerts[details?.level]}
+                  {ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.label}
                 </Text>
               }
             />
@@ -277,11 +265,11 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                   value={
                     <Text
                       style={{
-                        color: statusColor[details?.level]?.color,
+                        color: ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.color,
                         fontSize: 14,
                         fontFamily: FONTS.medium,
                       }}>
-                      {levelAlerts[details?.level]}
+                      {ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.label}
                     </Text>
                   }
                 />

@@ -4,7 +4,7 @@ import useAuth from '../../mk/hooks/useAuth';
 import {useEvent} from '../../mk/hooks/useEvent';
 
 const InitProject = () => {
-  const {showToast, logout} = useAuth();
+  const {showToast, logout,user} = useAuth();
   const {dispatch} = useEvent('onReload');
   // para rcibir notificaciones
   const onNotif = useCallback((data: any) => {
@@ -35,7 +35,10 @@ const InitProject = () => {
     //   showToast('¡Bienvenido a casa!', 'warning');
     // }
     if (data?.event === 'alerts') {
-      showToast(`¡Se creo una alerta nivel ${info.level}!`, 'warning');
+      if (info.user_id !== user?.id) {
+        showToast(`¡Se creo una alerta nivel ${info.level}!`, 'warning');
+      }
+
     }
     // if (data?.event === 'in-visitG') {
     //   // QR grupal

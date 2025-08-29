@@ -6,38 +6,9 @@ import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import Sound from 'react-native-sound';
-import {
-  IconAccess,
-  IconAlert,
-  IconAmbulance,
-  IconFlame,
-  IconTheft,
-} from '../../icons/IconLibrary';
 import {getUrlImages} from '../../../mk/utils/strings';
 import useApi from '../../../mk/hooks/useApi';
-
-const typeAlerts: any = {
-  E: {
-    name: 'Emergencia Medica',
-    icon: IconAmbulance,
-    color: {background: cssVar.cHoverError, border: cssVar.cError},
-  },
-  F: {
-    name: 'Incendio',
-    icon: IconFlame,
-    color: {background: cssVar.cHoverWarning, border: cssVar.cWarning},
-  },
-  T: {
-    name: 'Robo',
-    icon: IconTheft,
-    color: {background: cssVar.cHoverInfo, border: cssVar.cInfo},
-  },
-  O: {
-    name: 'Otro',
-    icon: IconAlert,
-    color: {background: cssVar.cHoverInfo, border: cssVar.cInfo},
-  },
-};
+import {typeAlerts} from './alertConstants';
 
 const LockAlert = ({ open, onClose, data }: any) => {
   const { execute } = useApi();
@@ -125,16 +96,16 @@ const LockAlert = ({ open, onClose, data }: any) => {
       <View
         style={{
           width: 164,
-          backgroundColor: typeAlerts[data?.type]?.color?.background,
+          backgroundColor: data?.type && typeAlerts[data.type as keyof typeof typeAlerts]?.color?.background || 'transparent',
           borderWidth: 1,
-          borderColor: typeAlerts[data?.type]?.color?.border,
+          borderColor: data?.type && typeAlerts[data?.type as keyof typeof typeAlerts]?.color?.border,
           padding: 8,
           borderRadius: 8,
           alignSelf: 'center',
           marginTop: 12,
         }}>
         <Icon
-          name={typeAlerts[data?.type]?.icon}
+          name={data?.type && typeAlerts[data?.type as keyof typeof typeAlerts]?.icon}
           color={cssVar.cWhite}
           size={36}
         />
@@ -144,7 +115,7 @@ const LockAlert = ({ open, onClose, data }: any) => {
             fontSize: 12,
             fontFamily: FONTS.regular,
           }}>
-          {data?.name}
+          {typeAlerts[data?.type as keyof typeof typeAlerts]?.name}
         </Text>
       </View>
     </Modal>
