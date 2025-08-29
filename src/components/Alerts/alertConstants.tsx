@@ -8,10 +8,10 @@ import {
 
 // CONSTANTES PRINCIPALES - CAMBIAR AQUÍ PARA AFECTAR TODO
 export const ALERT_LEVEL_LABELS = {
-  1: 'bajisimo',
-  2: 'medio',
-  3: 'alto',
-  4: 'pánico'
+  1: 'Para guardias',
+  2: 'Para admins y guardias',
+  3: 'Para todo el condominio',
+  4: 'Emergencia',
 };
 
 export const EMERGENCY_TYPE_LABELS = {
@@ -125,8 +125,8 @@ export const ALERT_LEVEL_OPTIONS = Object.entries(ALERT_LEVEL_LABELS)
 // Tabs para el componente Alerts (se genera automáticamente)
 export const ALERT_TABS = [
   {value: 'T', text: 'Todas'},
-  {value: 'NA', text: `Nivel ${ALERT_LEVEL_LABELS[3]}`},
-  {value: 'NM', text: `Nivel ${ALERT_LEVEL_LABELS[2]}`},
-  {value: 'NB', text: `Nivel ${ALERT_LEVEL_LABELS[1]}`},
-  {value: 'P', text: `Nivel ${ALERT_LEVEL_LABELS[4]}`},
+  {value: 'NA', text: ` ${ALERT_LEVEL_LABELS[3]}`},
+  {value: 'NM', text: ` ${ALERT_LEVEL_LABELS[2]}`},
+  {value: 'NB', text: ` ${ALERT_LEVEL_LABELS[1]}`},
+  {value: 'P', text: ` ${ALERT_LEVEL_LABELS[4]}`},
 ];
