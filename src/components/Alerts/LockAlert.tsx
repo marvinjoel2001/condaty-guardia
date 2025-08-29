@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import {Text, View} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
@@ -49,7 +49,7 @@ const LockAlert = ({ open, onClose, data }: any) => {
     const {data: response} = await execute('/attend', 'POST', {
       id: data?.id,
     });
-    if (response?.success == true) {
+    if (response?.success) {
       _onClose();
     }
   };

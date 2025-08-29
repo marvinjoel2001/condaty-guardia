@@ -2,13 +2,13 @@ import React, {useEffect, useState} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
 import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {getDateTimeAgo, getDateTimeStrMes} from '../../../mk/utils/dates';
+import {getDateTimeAgo} from '../../../mk/utils/dates';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
@@ -16,12 +16,8 @@ import AlertDetail from './AlertDetail';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {
   ALERT_LEVEL_COLORS,
-  ALERT_LEVELS,
   ALERT_TABS,
   EMERGENCY_TYPES,
-  levelAlerts,
-  statusColor,
-  statusColorPanic
 } from './alertConstants';
 
 const Alerts = () => {
@@ -98,7 +94,6 @@ const Alerts = () => {
         onPress={() => {
           setOpenView({open: true, id: alerta.id});
         }}
-        // title={getFullName(alerta.guardia)}
         title={
           alerta.level === 4
             ? alerta.descrip

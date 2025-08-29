@@ -55,7 +55,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       level: formState.level,
       descrip: formState.descrip,
     });
-    if (alerts?.success == true) {
+    if (alerts?.success) {
       onClose();
       reload();
       showToast('Alerta Enviada', 'success');

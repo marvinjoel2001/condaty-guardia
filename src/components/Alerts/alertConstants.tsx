@@ -6,7 +6,7 @@ import {
   IconTheft,
 } from '../../icons/IconLibrary';
 
-// CONSTANTES PRINCIPALES - CAMBIAR AQUÍ PARA AFECTAR TODO
+// CONSTANTES PRINCIPALES - CAMBIAR AQUÍ PARA AFECTAR TODAS LAS ALERTAS
 export const ALERT_LEVEL_LABELS = {
   1: 'Para guardias',
   2: 'Para admins y guardias',
@@ -21,13 +21,12 @@ export const EMERGENCY_TYPE_LABELS = {
   O: 'Otro'
 };
 
-// Array para compatibilidad con código existente (se genera automáticamente)
+// Array para compatibilidad con código existente
 export const levelAlerts = ['', ...Object.values(ALERT_LEVEL_LABELS)];
 
-// Agregar esta constante que faltaba
 export const ALERT_LEVELS = ALERT_LEVEL_LABELS;
 
-// Colores por nivel de alerta (usa las etiquetas dinámicamente)
+// Colores por nivel de alerta
 export const ALERT_LEVEL_COLORS = {
   1: {
     color: cssVar.cSuccess,
@@ -54,7 +53,7 @@ export const ALERT_LEVEL_COLORS = {
 // Para compatibilidad con código existente
 export const statusColor = ALERT_LEVEL_COLORS;
 
-// Tipos de emergencia (usa las etiquetas dinámicamente)
+// Tipos de emergencia
 export const EMERGENCY_TYPES = {
   E: {
     name: EMERGENCY_TYPE_LABELS.E,
@@ -82,7 +81,6 @@ export const EMERGENCY_TYPES = {
   }
 };
 
-// Para compatibilidad con código existente
 export const statusColorPanic = {
   E: {border: EMERGENCY_TYPES.E.border, background: EMERGENCY_TYPES.E.background},
   F: {border: EMERGENCY_TYPES.F.border, background: EMERGENCY_TYPES.F.background},
@@ -90,7 +88,7 @@ export const statusColorPanic = {
   O: {border: EMERGENCY_TYPES.O.border, background: EMERGENCY_TYPES.O.background}
 };
 
-// Para LockAlert (formato diferente, usa las constantes principales)
+// Para LockAlert
 export const typeAlerts = {
   E: {
     name: EMERGENCY_TYPES.E.name,
@@ -114,15 +112,15 @@ export const typeAlerts = {
   }
 };
 
-// Opciones para el selector de nivel en AlertAdd (se genera automáticamente)
+// Opciones para el selector de nivel en AlertAdd
 export const ALERT_LEVEL_OPTIONS = Object.entries(ALERT_LEVEL_LABELS)
-  .filter(([key]) => key !== '4') // Excluir pánico del selector
+  .filter(([key]) => key !== '4')
   .map(([value, label]) => ({
     id: parseInt(value),
     name: label
   }));
 
-// Tabs para el componente Alerts (se genera automáticamente)
+// Tabs para el componente Alerts
 export const ALERT_TABS = [
   {value: 'T', text: 'Todas'},
   {value: 'NA', text: ` ${ALERT_LEVEL_LABELS[3]}`},

@@ -2,12 +2,10 @@ import React, {useEffect, useState} from 'react';
 import useApi from '../../../mk/hooks/useApi';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
-import {formatToDayDDMMYYYYHHMM, getDateTimeAgo, getDateTimeStrMes} from '../../../mk/utils/dates';
-import Button from '../../../mk/components/forms/Button/Button';
+import {formatToDayDDMMYYYYHHMM, getDateTimeStrMes} from '../../../mk/utils/dates';
 import KeyValue from '../../../mk/components/ui/KeyValue';
-import LineDetail from '../Home/Accesses/shares/LineDetail';
 import {
   IconClock,
 } from '../../icons/IconLibrary';
@@ -16,11 +14,7 @@ import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {
   ALERT_LEVEL_COLORS,
-  ALERT_LEVELS,
   EMERGENCY_TYPES,
-  levelAlerts,
-  statusColor,
-  statusColorPanic
 } from './alertConstants';
 
 type PropsType = {
@@ -77,7 +71,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     const {data} = await execute('/attend', 'POST', {
       id: details?.id,
     });
-    if (data?.success == true) {
+    if (data?.success) {
       _onClose();
     }
   };
