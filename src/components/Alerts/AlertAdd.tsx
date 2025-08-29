@@ -6,6 +6,7 @@ import useApi from '../../../mk/hooks/useApi';
 import useAuth from '../../../mk/hooks/useAuth';
 import {cssVar} from '../../../mk/styles/themes';
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
+import {ALERT_LEVEL_OPTIONS} from './alertConstants';
 
 type PropsType = {
   open: boolean;
@@ -63,27 +64,20 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
   };
   return (
     <ModalFull
+      title="Agregar alerta"
       open={open}
       onClose={onClose}
-      title="Crear Alerta"
-      onSave={onSaveAlerts}
-      buttonText="Crear alerta">
+      buttonText="Guardar"
+      onSave={onSaveAlerts}>
       <Select
-        label="Nivel de alerta"
-        // placeholder="Nivel de alerta"
-        error={errors}
-        required
         name="level"
-        style={{
-          paddingTop: cssVar.spM,
-        }}
-        options={[
-          {id: 1, name: 'Bajo - Solo guardias'},
-          {id: 2, name: 'Medio - Solo administradores y guardias'},
-          {id: 3, name: 'Alto - Residentes, administradores y guardias'},
-        ]}
+        required
+        label="Nivel de alerta"
+        placeholder="Selecciona el nivel"
         value={formState.level}
-        onChange={value => handleInputChange('level', value)}
+        onChange={(value) => handleInputChange('level', value)}
+        options={ALERT_LEVEL_OPTIONS}
+        error={errors.level}
       />
       <TextArea
         label="Descripción"

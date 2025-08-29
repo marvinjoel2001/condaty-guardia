@@ -13,27 +13,16 @@ import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
 import AlertDetail from './AlertDetail';
-import {
-  IconAlert,
-  IconAmbulance,
-  IconFlame,
-  IconTheft,
-} from '../../icons/IconLibrary';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-
-export const levelAlerts = ['', 'bajo', 'medio', 'alto', 'pánico'];
-export const statusColor: any = {
-  1: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
-  2: {color: cssVar.cWarning, background: cssVar.cHoverWarning},
-  3: {color: cssVar.cError, background: cssVar.cHoverError},
-  4: {color: cssVar.cError, background: cssVar.cHoverError},
-};
-export const statusColorPanic: any = {
-  E: {border: cssVar.cError, background: cssVar.cHoverError},
-  F: {border: cssVar.cWarning, background: cssVar.cHoverWarning},
-  T: {border: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
-  O: {border: cssVar.cCompl4, background: cssVar.cHoverCompl4},
-};
+import {
+  ALERT_LEVEL_COLORS,
+  ALERT_LEVELS,
+  ALERT_TABS,
+  EMERGENCY_TYPES,
+  levelAlerts,
+  statusColor,
+  statusColorPanic
+} from './alertConstants';
 
 const Alerts = () => {
   const [search, setSearch] = useState('');
@@ -52,57 +41,46 @@ const Alerts = () => {
   const onSearch = (search: string) => {
     setSearch(search);
   };
+
   const renderRight = (alerta: any) => {
+    const levelConfig = ALERT_LEVEL_COLORS[alerta?.level as keyof typeof ALERT_LEVEL_COLORS];
     return (
       <View
         style={{
-          backgroundColor: statusColor[alerta?.level]?.background,
+          backgroundColor: levelConfig?.background,
           paddingHorizontal: 8,
           paddingVertical: 2,
           borderRadius: 4,
         }}>
         <Text
           style={{
-            color: statusColor[alerta?.level]?.color,
+            color: levelConfig?.color,
             fontSize: 12,
             textAlign: 'center',
           }}>
-          {'Nivel ' + levelAlerts[alerta.level]}
+          {levelConfig?.label}
         </Text>
       </View>
     );
   };
-  const renderLeft = (alerta: any) => {
-    let icon: any;
 
-    switch (alerta.type) {
-      case 'F':
-        icon = IconFlame;
-        break;
-      case 'E':
-        icon = IconAmbulance;
-        break;
-      case 'T':
-        icon = IconTheft;
-        break;
-      case 'O':
-        icon = IconAlert;
-        break;
-      default:
-    }
+  const renderLeft = (alerta: any) => {
+    const emergencyType = EMERGENCY_TYPES[alerta.type as keyof typeof EMERGENCY_TYPES];
+
     return (
       <View
         style={{
-          backgroundColor: statusColorPanic[alerta?.type]?.background,
-          borderColor: statusColorPanic[alerta?.type]?.border,
+          backgroundColor: emergencyType?.background,
+          borderColor: emergencyType?.border,
           borderWidth: 1,
           padding: 8,
           borderRadius: '100%',
         }}>
-        <Icon name={icon} color={cssVar.cWhite} />
+        <Icon name={emergencyType?.icon} color={cssVar.cWhite} />
       </View>
     );
   };
+
   const alertList = (alerta: any) => {
     if (
       search != '' &&
@@ -162,7 +140,7 @@ const Alerts = () => {
               color: cssVar.cWhiteV1,
               fontSize: 14,
               fontFamily: FONTS.regular,
-             
+
             }}>
             {alerta.descrip}
           </Text>
@@ -192,13 +170,7 @@ const Alerts = () => {
     <>
       <Layout title="Alertas" refresh={() => reload()}>
         <TabsButtons
-          tabs={[
-            {value: 'T', text: 'Todas'},
-            {value: 'NA', text: 'Nivel alto'},
-            {value: 'NM', text: 'Nivel medio'},
-            {value: 'NB', text: 'Nivel bajo'},
-            {value: 'P', text: 'Nivel Pánico'},
-          ]}
+          tabs={ALERT_TABS}
           sel={typeSearch}
           setSel={setTypeSearch}
           style={{marginVertical:12}}
