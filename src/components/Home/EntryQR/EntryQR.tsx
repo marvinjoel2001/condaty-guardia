@@ -252,7 +252,10 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     const {data: In} = await execute('/accesses/enterqr', 'POST', params);
     if (In?.success) {
       if (reload) reload();
-      showToast('Registrado con éxito', 'success');
+      showToast(
+        'Visita registrada y notificación enviada con éxito',
+        'success',
+      );
       setFormState({});
       onClose();
     } else {
