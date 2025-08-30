@@ -237,9 +237,9 @@ const IndividualQR = ({
           />
         </Card>
         {!visit?.ci && data?.status !== 'X' && (
-          <View style={styles.formSection}>
+          <View style={{...styles.formSection, marginTop: cssVar.spM}}>
             <Input
-              label="Carnet del visitante*"
+              label="Carnet del visitante"
               name="ci"
               maxLength={10}
               keyboardType="numeric"
@@ -292,7 +292,7 @@ const IndividualQR = ({
               <>
                 <Text style={styles.subSectionTitle}>Datos del conductor</Text>
                 <Input
-                  label="Carnet de identidad (Taxista)"
+                  label="Carnet de identidad"
                   name="ci_taxi"
                   keyboardType="numeric"
                   maxLength={10}
