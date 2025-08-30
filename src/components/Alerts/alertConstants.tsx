@@ -9,7 +9,7 @@ import {
 // CONSTANTES PRINCIPALES - CAMBIAR AQUÍ PARA AFECTAR TODAS LAS ALERTAS
 export const ALERT_LEVEL_LABELS = {
   1: 'Para guardias',
-  2: 'Para admins y guardias',
+  2: 'Para administradores y guardias',
   3: 'Para todo el condominio',
   4: 'Emergencia',
 };
@@ -31,22 +31,22 @@ export const ALERT_LEVEL_COLORS = {
   1: {
     color: cssVar.cSuccess,
     background: cssVar.cHoverSuccess,
-    label: `Nivel ${ALERT_LEVEL_LABELS[1]}`
+    label: `${ALERT_LEVEL_LABELS[1]}`
   },
   2: {
     color: cssVar.cWarning,
     background: cssVar.cHoverWarning,
-    label: `Nivel ${ALERT_LEVEL_LABELS[2]}`
+    label: `${ALERT_LEVEL_LABELS[2]}`
   },
   3: {
     color: cssVar.cError,
     background: cssVar.cHoverError,
-    label: `Nivel ${ALERT_LEVEL_LABELS[3]}`
+    label: `${ALERT_LEVEL_LABELS[3]}`
   },
   4: {
     color: cssVar.cError,
     background: cssVar.cHoverError,
-    label: `Nivel ${ALERT_LEVEL_LABELS[4]}`
+    label: `${ALERT_LEVEL_LABELS[4]}`
   }
 };
 

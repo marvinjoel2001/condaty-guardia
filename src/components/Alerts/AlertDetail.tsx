@@ -166,9 +166,8 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                   )}
                   subtitle={
                     details?.gua_attend
-                      ? 'Guardia -' + getDateTimeStrMes(details?.date_at, true)
-                      : 'Administrador -' +
-                        getDateTimeStrMes(details?.date_at, true)
+                      ? details?.gua_attend?.phone + ' - Guardia'
+                      : details?.adm_attend?.phone + ' - Administrador'
                   }
                   left={
                     <Avatar
