@@ -8,6 +8,7 @@ import useAuth from '../../hooks/useAuth';
 import {isAndroid} from '../../utils/utils';
 import Footer from '../../../src/navigators/Footer/Footer';
 import LockAlert from '../../../src/components/Alerts/LockAlert';
+import AlertDetail from '../../../src/components/Alerts/AlertDetail';
 import {
   IconAmbulance,
   IconFlame,
@@ -58,12 +59,21 @@ const Layout = (props: PropsType) => {
   const route = useRoute();
   const scrollViewRef: any = useRef(null);
   const [openAlert, setOpenAlert]: any = useState({open: false, data: null});
+  const [openAlertDetail, setOpenAlertDetail]: any = useState({open: false, id: null});
   const shouldDisableScroll = route.name === 'QrIndividual';
+
   const onNotif = useCallback((data: any) => {
-    if (data?.event === 'alerts' && data?.payload?.level == 4) {
-      setOpenAlert({open: true, data: data?.payload});
+    if (data?.event === 'alerts') {
+      if (data?.payload?.level == 4) {
+        // Para alertas de pánico (nivel 4) usar LockAlert
+        setOpenAlert({open: true, data: data?.payload});
+      } else {
+        // Para otros niveles usar AlertDetail
+        setOpenAlertDetail({open: true, id: data?.payload?.id});
+      }
     }
   }, []);
+
   useEvent('onNotif', onNotif);
 
   const onRefresh = () => {
@@ -120,6 +130,10 @@ const Layout = (props: PropsType) => {
   const onCloseAlert = () => {
     setOpenAlert({open: false, data: null});
   };
+
+  const onCloseAlertDetail = () => {
+    setOpenAlertDetail({open: false, id: null});
+  };
   useEffect(() => {
     if (!user?.client_id) {
       setStore({...store, openClient: true});
@@ -131,7 +145,6 @@ const Layout = (props: PropsType) => {
         title={title}
         customTitle={customTitle}
         back={back}
-        
         style={styleHead}
         right={rigth}
         onBack={onBack}
@@ -186,6 +199,8 @@ const Layout = (props: PropsType) => {
       </View>
 
       {isRoute() && <Footer />}
+
+      {/* LockAlert para alertas de pánico (nivel 4) */}
       {openAlert.open && (
         <LockAlert
           open={openAlert.open}
@@ -193,6 +208,16 @@ const Layout = (props: PropsType) => {
           data={openAlert.data}
         />
       )}
+
+      {/* AlertDetail para otros niveles de alerta */}
+      {openAlertDetail.open && (
+        <AlertDetail
+          open={openAlertDetail.open}
+          onClose={onCloseAlertDetail}
+          id={openAlertDetail.id}
+        />
+      )}
+
       {store?.openClient && (
         <ChooseClient
           open={store?.openClient}
