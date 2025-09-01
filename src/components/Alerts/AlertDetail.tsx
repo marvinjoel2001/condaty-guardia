@@ -126,7 +126,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                     color: cssVar.cWhite,
                     fontFamily: FONTS.medium,
                   }}>
-                  {formatToDayDDMMYYYYHHMM(details?.created_at, true)}
+                  {formatToDayDDMMYYYYHHMM(details?.created_at)}
                 </Text>
               }
             />
@@ -247,7 +247,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                       color: cssVar.cWhite,
                       fontFamily: FONTS.medium,
                     }}>
-                    {formatToDayDDMMYYYYHHMM(details?.created_at, true)}
+                    {formatToDayDDMMYYYYHHMM(details?.created_at)}
                   </Text>
                 }
               />
