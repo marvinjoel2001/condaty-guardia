@@ -43,32 +43,32 @@ const Profile = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [imagePreview, setImagePreview] = useState(false);
   // imageData no se usa consistentemente, formState.avatar es el principal.
-  // const [imageData, setImageData] = useState(''); 
+  // const [imageData, setImageData] = useState('');
   const {user, getUser, showToast, logout}: any = useAuth();
   const [formState, setFormState]: any = useState({});
   const [type, setType] = useState({}); // Para el modal AccessEdit
   const [openModal, setOpenModal] = useState(false);
   const [errors, setErrors]: any = useState({});
   const {execute} = useApi();
-  
+
   // Estas definiciones son específicas de Guardias/Residentes, las mantenemos si son necesarias
   // const lDpto: any = {C: 'Casa', L: 'Lote', D: 'Departamento'}; // No parece usarse en Guardias
   const lCondo: any = {C: 'Condominio', E: 'Edificio', U: 'Urbanización'}; // Usado en modo vista
-  
+
   const client: any = user?.clients?.find((e: any) => e.id == user.client_id);
 
   useFocusEffect(
     React.useCallback(() => {
       // Carga inicial de datos del usuario al enfocar la pantalla
-      init(); 
+      init();
       if (!isEdit) {
         // Si no estamos en modo edición (ej. al volver de otra pantalla),
         // asegurarse que isEdit esté en false para mostrar el modo vista.
-        setIsEdit(false); 
+        setIsEdit(false);
       }
       // Si formState.avatar está vacío (ej. después de cancelar una selección previa sin guardar)
       // se resetea a null. Esto podría necesitar revisión si causa que una previsualización válida desaparezca.
-      if (!formState.avatar) { 
+      if (!formState.avatar) {
         setFormState((prevState: any) => ({
           ...prevState,
           avatar: null,
@@ -77,7 +77,7 @@ const Profile = () => {
       const onBackPress = () => {
         if (isEdit) {
           // Si estamos editando y se presiona atrás, salir del modo edición
-          setIsEdit(false); 
+          setIsEdit(false);
           return true; // Previene la acción por defecto (salir de la app/pantalla)
         }
         return false; // Permite la acción por defecto
@@ -116,14 +116,14 @@ const Profile = () => {
     if (!isEdit) { // Si no estamos editando (modo vista)
       setFormState({ // Usar directamente los datos de 'user'
         ...user,
-        avatar: user?.avatar || null, 
+        avatar: user?.avatar || null,
       });
     } else { // Si estamos editando
       // Al entrar en modo edición, popular formState desde 'user'.
       // Si ya había una previsualización de avatar en formState (base64), se intenta mantener.
       setFormState((prevState: any) => ({
         ...user, // Base son los datos del usuario
-        avatar: 
+        avatar:
           prevState?.avatar && typeof prevState.avatar === 'string' && prevState.avatar.startsWith('data:image')
           ? prevState.avatar // Mantener previsualización si existe
           : user?.avatar || null, // Sino, usar el avatar del servidor
@@ -135,7 +135,7 @@ const Profile = () => {
   const handleEdit = () => {
     // Al presionar "Editar", se carga formState con los datos actuales de 'user'
     // Esto asegura que empezamos a editar desde un estado limpio y conocido.
-    setFormState({...user, avatar: user?.avatar || null}); 
+    setFormState({...user, avatar: user?.avatar || null});
     setIsEdit(!isEdit); // Cambia el estado de edición
     setErrors({}); // Limpia errores previos
   };
@@ -210,7 +210,7 @@ const Profile = () => {
   const onOpenModal = (modalType: 'M' | 'P') => {
     setType(modalType); // 'M' para mail, 'P' para password
     // Resetear campos del formulario del modal
-    setFormState((prevState: any) => ({ 
+    setFormState((prevState: any) => ({
       ...prevState,
       newEmail: '',
       password: '',
@@ -236,7 +236,7 @@ const Profile = () => {
       onBack={() => {
         // Si está en modo edición, al presionar atrás, solo sale del modo edición.
         // Sino, navega hacia atrás (Home).
-        isEdit ? setIsEdit(false) : navigation.goBack(); 
+        isEdit ? setIsEdit(false) : navigation.goBack();
       }}
       title={'Mi perfil'}
       /* rigth={ // Icono de editar en la cabecera, solo visible si no está en modo edición
@@ -296,7 +296,7 @@ const Profile = () => {
 
       {isEdit ? (
         // ---------- MODO EDICIÓN ----------
-        <View style={{flex: 1}}> 
+        <View style={{flex: 1}}>
           <ScrollView
             style={{flex: 1}}
             contentContainerStyle={styles.editScrollContent}
@@ -357,7 +357,7 @@ const Profile = () => {
               <Text style={styles.infoText}>
                    Los datos bloqueados son delicados, solo pueden ser modificados con permiso de administración de Condaty.
               </Text>
-              
+
             </Form>
           </ScrollView>
           {/* Contenedor para los botones de acción, fijo abajo */}
@@ -367,7 +367,7 @@ const Profile = () => {
                 setIsEdit(false); // Salir del modo edición
                 setErrors({});
                 // Restaura formState a los valores originales del usuario
-                setFormState({...user, avatar: user?.avatar || null}); 
+                setFormState({...user, avatar: user?.avatar || null});
               }}
               style={{...styles.buttonBase, ...styles.cancelButton}}>
               <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
@@ -403,7 +403,7 @@ const Profile = () => {
             <Text style={styles.textValue}>
               {user?.address || 'No asignado'}
             </Text>
-            
+
             {user?.dpto && user?.dpto?.length > 0 && (
               <>
                 {/* <Text style={styles.label}>{lDpto[client?.type_dpto]}</Text> */}
@@ -500,11 +500,11 @@ const styles = StyleSheet.create({
   // Tarjeta contenedora de información en modo vista
   card: {
     borderRadius: 12,
-   
+
     paddingHorizontal: 12,
     backgroundColor: cssVar.cBlackV2, // Color de fondo de la tarjeta
-    paddingVertical: 12,
-    
+
+
   },
   // Etiqueta de un campo de información (ej. "Nombre completo")
   label: {

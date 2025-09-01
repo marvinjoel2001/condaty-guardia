@@ -64,6 +64,7 @@ const Layout = (props: PropsType) => {
 
   const onNotif = useCallback((data: any) => {
     if (data?.event === 'alerts') {
+      console.log('onNotif', data);
       if (data?.payload?.user_id == user?.id) {
         return;
       }
