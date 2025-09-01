@@ -64,6 +64,9 @@ const Layout = (props: PropsType) => {
 
   const onNotif = useCallback((data: any) => {
     if (data?.event === 'alerts') {
+      if (data?.payload?.user_id == user?.id) {
+        return;
+      }
       if (data?.payload?.level == 4) {
         // Para alertas de pánico (nivel 4) usar LockAlert
         setOpenAlert({open: true, data: data?.payload});
