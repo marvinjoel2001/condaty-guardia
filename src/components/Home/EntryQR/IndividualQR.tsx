@@ -199,7 +199,7 @@ const IndividualQR = ({
   if (!data) {
     return <Loading />;
   }
-
+  console.log(owner);
   return (
     <>
       <View>
@@ -210,9 +210,9 @@ const IndividualQR = ({
             subtitle={'Unidad: ' + getUnitInfo(owner)}
             left={
               <Avatar
-                src={
-                  owner?.url_avatar ? getUrlImages(owner.url_avatar) : undefined
-                }
+                src={getUrlImages(
+                  `/OWNER-${owner?.id}.webp?d=${owner?.updated_at}`,
+                )}
                 name={getFullName(owner)}
                 w={40}
                 h={40}
@@ -226,9 +226,9 @@ const IndividualQR = ({
             subtitle={'C.I. ' + (visit?.ci || '-/-')}
             left={
               <Avatar
-                src={
-                  visit?.url_avatar ? getUrlImages(visit.url_avatar) : undefined
-                }
+                src={getUrlImages(
+                  `/VISIT-${visit?.id}.webp?d=${visit?.updated_at}`,
+                )}
                 name={getFullName(visit)}
                 w={40}
                 h={40}
