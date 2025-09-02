@@ -325,7 +325,7 @@ const Profile = () => {
                     keyboardType="phone-pad"
                     name="phone"
                     required
-                    error={errors.phone}
+                    error={errors}
                     onChange={(value: any) => handleInputChange('phone', value)}
                   />
                 </View>
@@ -500,8 +500,9 @@ const styles = StyleSheet.create({
   // Tarjeta contenedora de información en modo vista
   card: {
     borderRadius: 12,
-
     paddingHorizontal: 12,
+    paddingVertical: 12,
+
     backgroundColor: cssVar.cBlackV2, // Color de fondo de la tarjeta
 
 
@@ -511,7 +512,7 @@ const styles = StyleSheet.create({
     color: cssVar.cWhiteV1, // Color más suave para la etiqueta
     fontFamily: FONTS.regular, // O FONTS.light si así está en Residentes
     fontSize: 12,
-    marginBottom: 2, // Pequeño espacio antes del valor
+     // Pequeño espacio antes del valor
   },
   // Valor de un campo de información
   textValue: {
@@ -524,7 +525,7 @@ const styles = StyleSheet.create({
   accessRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8, // Buen padding para touch
+
     // borderBottomWidth: 0.5, // El Br lo maneja o se puede poner aquí también
     // borderBottomColor: cssVar.cWhiteV2,
     gap: 12, // Espacio entre icono y texto
@@ -621,6 +622,10 @@ const styles = StyleSheet.create({
   // Contenedor para el botón de cerrar sesión
   logoutContainer: {
     alignItems: 'center',
+    position: 'absolute',
+    bottom: -140,
+    left: 0,
+    right: 0,
     paddingVertical: 30, // Espacio arriba y abajo
     marginTop: 10, // Espacio después de la última tarjeta
   },
