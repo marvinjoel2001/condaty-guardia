@@ -32,11 +32,7 @@ import AccessEdit from './AccessEdit'; // Asegúrate que esta ruta sea correcta
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 import AvatarPreview from './AvatarPreview'; // Asegúrate que esta ruta sea correcta
 import configApp from '../../config/config';
-
-// Componente separador simple, si no tienes Br definido globalmente
-const Br = () => (
-  <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 4}} />
-);
+import Br from './Br';
 
 const Profile = () => {
   const navigation: any = useNavigation();
@@ -386,24 +382,33 @@ const Profile = () => {
       ) : (
         <View>
           <View style={styles.card}>
-            <Text style={styles.label}>Nombre completo</Text>
-            <Text style={styles.textValue}>{getFullName(user)}</Text>
+            <View>
+              <Text style={styles.label}>Nombre completo</Text>
+              <Text style={styles.textValue}>{getFullName(user)}</Text>
+            </View>
             <Br />
+            <View>
             <Text style={styles.label}>Carnet de identidad</Text>
-            <Text style={styles.textValue}>{user?.ci || 'Sin registrar'}</Text>
+              <Text style={styles.textValue}>{user?.ci || 'Sin registrar'}</Text>
+            </View>
             <Br />
-            <Text style={styles.label}>Teléfono</Text>
-            <Text style={styles.textValue}>{user?.phone || 'Sin teléfono'}</Text>
+            <View>
+              <Text style={styles.label}>Teléfono</Text>
+              <Text style={styles.textValue}>{user?.phone || 'Sin teléfono'}</Text>
+            </View>
             <Br />
-            <Text style={styles.label}>{lCondo[client?.type]}</Text>
-            <Text style={styles.textValue}>{client?.name || 'No asignado'}</Text>
+            <View>
+              <Text style={styles.label}>{lCondo[client?.type]}</Text>
+              <Text style={styles.textValue}>{client?.name || 'No asignado'}</Text>
+            </View>
             <Br />
 
-            <Text style={styles.label}>Dirección</Text>
-            <Text style={styles.textValue}>
-              {user?.address || 'No asignado'}
-            </Text>
-
+            <View>
+              <Text style={styles.label}>Dirección</Text>
+              <Text style={styles.textValue}>
+                {user?.address || 'No asignado'}
+              </Text>
+            </View>
             {user?.dpto && user?.dpto?.length > 0 && (
               <>
                 {/* <Text style={styles.label}>{lDpto[client?.type_dpto]}</Text> */}
@@ -500,9 +505,8 @@ const styles = StyleSheet.create({
   // Tarjeta contenedora de información en modo vista
   card: {
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-
+    padding: 12,
+    gap: 8,
     backgroundColor: cssVar.cBlackV2, // Color de fondo de la tarjeta
 
 
@@ -519,7 +523,6 @@ const styles = StyleSheet.create({
     color: cssVar.cWhite,
     fontFamily: FONTS.regular, // O FONTS.semiBold si se quiere más énfasis
     fontSize: 15,
-    marginBottom: 2, // Espacio antes del siguiente separador o etiqueta
   },
   // Fila para opciones de acceso (email, contraseña)
   accessRow: {
@@ -536,7 +539,6 @@ const styles = StyleSheet.create({
     color: cssVar.cWhiteV1, // O cssVar.cWhiteV1 si es menos prominente
     fontFamily: FONTS.regular,
     fontSize: 14,
-    paddingVertical: 4,
   },
   // Contenedor del scroll en modo edición
   editScrollContent: {

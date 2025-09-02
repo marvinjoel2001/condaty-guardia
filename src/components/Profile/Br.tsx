@@ -10,7 +10,6 @@ export default Br;
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 1,
-    borderBottomColor: cssVar.cWhiteV2,
-    marginBottom: 5,
+    borderBottomColor: cssVar.cWhiteV1,
   },
 });
