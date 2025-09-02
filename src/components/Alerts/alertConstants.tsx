@@ -29,8 +29,8 @@ export const ALERT_LEVELS = ALERT_LEVEL_LABELS;
 // Colores por nivel de alerta
 export const ALERT_LEVEL_COLORS = {
   1: {
-    color: cssVar.cSuccess,
-    background: cssVar.cHoverSuccess,
+    color: cssVar.cInfo,
+    background: cssVar.cHoverCompl3,
     label: `${ALERT_LEVEL_LABELS[1]}`
   },
   2: {
@@ -77,7 +77,7 @@ export const EMERGENCY_TYPES = {
     name: EMERGENCY_TYPE_LABELS.O,
     icon: IconAlert,
     border: cssVar.cCompl4,
-    background: cssVar.cHoverCompl4
+    background: cssVar.cHoverCompl3
   }
 };
 

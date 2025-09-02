@@ -121,7 +121,7 @@ const Notifications = () => {
                 style={{
                   borderRadius: 50,
                 padding: 8,
-                backgroundColor: cssVar.cSuccess,
+                backgroundColor: cssVar.cInfo,
               }}
               color={cssVar.cWhite}
               name={IconAlertNotification}

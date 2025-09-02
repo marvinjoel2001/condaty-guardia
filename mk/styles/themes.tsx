@@ -61,7 +61,7 @@ export const cssVar = {
   cHoverOrange: '#F5822033',
   cHoverCompl1: '#FAFF7F33',
   cHoverCompl2: '#A2FAA333',
-  cHoverCompl3: '#B382D933',
+  cHoverCompl3: '#39ACEC33',
   cHoverCompl4: '#E1C15133',
   cHoverCompl5: '#F7B26733',
   cHoverCompl6: '#FF7F5133',
