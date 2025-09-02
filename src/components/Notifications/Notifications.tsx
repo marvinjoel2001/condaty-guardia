@@ -6,6 +6,7 @@ import Icon from '../../../mk/components/ui/Icon/Icon';
 import {cssVar} from '../../../mk/styles/themes';
 import {
   IconAlertNotification,
+  IconAmbulance,
   IconConfirmVisit,
   IconDelivery,
   IconOther,
@@ -77,17 +78,58 @@ const Notifications = () => {
       let image = '';
       let name = '';
       if (data.info?.act == 'alerts') {
-        return (
-          <Icon
-            style={{
-              borderRadius: 50,
-              padding: 8,
-              backgroundColor: cssVar.cWhite,
-            }}
-            color={cssVar.cError}
-            name={IconAlertNotification}
-          />
-        );
+        if(data.info?.level == 4){
+          return (
+            <Icon
+              style={{
+                borderRadius: 50,
+                padding: 8,
+                backgroundColor: cssVar.cError,
+              }}
+              color={cssVar.cWhite}
+              name={IconAmbulance}
+            />
+          );
+        }
+        if(data.info?.level == 3){
+          return (
+            <Icon
+              style={{
+                borderRadius: 50,
+                padding: 8,
+                backgroundColor: cssVar.cError,
+              }}
+              color={cssVar.cWhite}
+              name={IconAlertNotification}
+            />
+          );
+        }
+        if(data.info?.level == 2){
+          return (
+            <Icon
+              style={{
+                borderRadius: 50,
+                padding: 8,
+                backgroundColor: cssVar.cWarning,
+              }}
+              color={cssVar.cWhite}
+              name={IconAlertNotification}
+            />
+          );
+        }
+        if(data.info?.level == 1){
+          return (
+            <Icon
+              style={{
+                borderRadius: 50,
+                padding: 8,
+                backgroundColor: cssVar.cSuccess,
+              }}
+              color={cssVar.cWhite}
+              name={IconAlertNotification}
+            />
+          );
+        }
       }
       if (data.info?.act == 'in-pedido') {
         return (
