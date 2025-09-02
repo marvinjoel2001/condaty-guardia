@@ -78,24 +78,24 @@ const Notifications = () => {
       let image = '';
       let name = '';
       if (data.info?.act == 'alerts') {
-        if(data.info?.level == 4){
-          return (
-            <Icon
-              style={{
-                borderRadius: 50,
-                padding: 8,
-                backgroundColor: cssVar.cError,
-              }}
-              color={cssVar.cWhite}
-              name={IconAmbulance}
-            />
-          );
-        }
-        if(data.info?.level == 3){
-          return (
-            <Icon
-              style={{
-                borderRadius: 50,
+        switch (data.info?.level) {
+          default:
+            return(
+              <Icon 
+                style={{
+                  borderRadius: 50,
+                  padding: 8,
+                  backgroundColor: cssVar.cError,
+                }}
+                color={cssVar.cWhite}
+                name={IconAmbulance}
+              />
+            );
+          case 3:
+            return (
+              <Icon
+                style={{
+                  borderRadius: 50,
                 padding: 8,
                 backgroundColor: cssVar.cError,
               }}
@@ -103,12 +103,11 @@ const Notifications = () => {
               name={IconAlertNotification}
             />
           );
-        }
-        if(data.info?.level == 2){
-          return (
-            <Icon
-              style={{
-                borderRadius: 50,
+          case 2:
+            return (
+              <Icon
+                style={{
+                  borderRadius: 50,
                 padding: 8,
                 backgroundColor: cssVar.cWarning,
               }}
@@ -116,12 +115,11 @@ const Notifications = () => {
               name={IconAlertNotification}
             />
           );
-        }
-        if(data.info?.level == 1){
-          return (
-            <Icon
-              style={{
-                borderRadius: 50,
+          case 1:
+            return (
+              <Icon
+                style={{
+                  borderRadius: 50,
                 padding: 8,
                 backgroundColor: cssVar.cSuccess,
               }}
