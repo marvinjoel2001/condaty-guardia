@@ -19,7 +19,7 @@ interface TypeProps {
 
 const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
-  const [openSelected, setOpenSelected] = useState(false);
+  const [openSelected, setOpenSelected]: any = useState(false);
   const [errors, setErrors] = useState({});
   const [data, setData]: any = useState(null);
   const {execute} = useApi();
@@ -341,13 +341,21 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         return 'Detalle de QR';
     }
   };
-
-  const lastAccess =
-    data?.access && data.access.length > 0
-      ? data.access[data.access.length - 1]
-      : null;
-  const isCurrentlyInside =
-    lastAccess && lastAccess.in_at && !lastAccess.out_at;
+  console.log(data);
+  console.log(openSelected);
+  const isExit = () => {
+    if (data?.type == 'I') {
+      const lastAccess =
+        data?.access && data.access.length > 0
+          ? data.access[data.access.length - 1]
+          : null;
+      return lastAccess && lastAccess.in_at && !lastAccess.out_at;
+    }
+    if (data?.type == 'G') {
+      return data?.guests?.find((v: any) => v.id == openSelected?.id)?.access
+        ?.in_at;
+    }
+  };
 
   return (
     <ModalFull
@@ -355,7 +363,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       open={open}
       onClose={onClose}
       onSave={() => {
-        isCurrentlyInside ? onOut() : onSaveAccess();
+        isExit() ? onOut() : onSaveAccess();
       }}
       buttonCancel=""
       buttonText={
@@ -363,7 +371,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           ? data?.type == 'O'
             ? 'Dejar ingresar'
             : ''
-          : isCurrentlyInside
+          : isExit()
           ? 'Registrar salida'
           : 'Dejar ingresar'
       }>
