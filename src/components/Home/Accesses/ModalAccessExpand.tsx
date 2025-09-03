@@ -113,9 +113,9 @@ const ModalAccessExpand = ({
           title={getFullName(invitation?.owner)}
           subtitle={
             'Unidad: ' +
-            invitation?.owner?.dptos?.[0]?.nro +
+            invitation?.owner?.dpto?.[0]?.nro +
             ', ' +
-            invitation?.owner?.dptos?.[0]?.description
+            invitation?.owner?.dpto?.[0]?.description
           }
           left={
             <Avatar

@@ -179,9 +179,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             title={getFullName(data?.owner)}
             subtitle={
               'Unidad: ' +
-              data?.owner?.dptos?.[0]?.nro +
+              data?.owner?.dpto?.[0]?.nro +
               ', ' +
-              data?.owner?.dptos?.[0]?.description
+              data?.owner?.dpto?.[0]?.description
             }
             left={
               <Avatar
@@ -231,9 +231,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               title={getFullName(data?.owner)}
               subtitle={
                 'Unidad: ' +
-                data?.owner?.dptos?.[0]?.nro +
+                data?.owner?.dpto?.[0]?.nro +
                 ', ' +
-                data?.owner?.dptos?.[0]?.description
+                data?.owner?.dpto?.[0]?.description
               }
               left={
                 <Avatar
