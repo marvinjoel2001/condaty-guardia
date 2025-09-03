@@ -490,7 +490,6 @@ const GroupQR = ({
                       name={'obs_in'}
                       value={formState['obs_in']}
                       onChange={value => handleChange('obs_in', value)}
-                      style={styles.textAreaStyle}
                     />
                   ) : (
                     <TextArea
@@ -499,7 +498,6 @@ const GroupQR = ({
                       name="obs_out"
                       value={formState?.obs_out}
                       onChange={value => handleChange('obs_out', value)}
-                      style={styles.textAreaStyle}
                     />
                   ))}
               </View>
@@ -651,19 +649,7 @@ const styles = StyleSheet.create({
     color: cssVar.cAccent,
   },
   observationsOuterContainer: {
-    alignSelf: 'stretch',
-
-    borderRadius: 8, // rounded-lg
-
-    minHeight: 105, // h-[105px]
-  },
-
-  textAreaStyle: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: cssVar.cWhite, // Input text color should be light
-    textAlignVertical: 'top', // For Android
-    minHeight: 60, // Ensure text area has some height
+    marginTop: 12,
   },
 });
 
