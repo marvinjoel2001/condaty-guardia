@@ -3,13 +3,9 @@ import {Text, View, Animated, Easing, TouchableOpacity, StyleSheet} from 'react-
 import Icon from '../Icon/Icon';
 import {
   IconX,
-  IconSuccessToastNotCircle,
   IconInfoToast,
-  IconSuccessToast,
   IconToastSuccess,
   IconToastWarning,
-  IconToastWarning2,
-  IconAlert,
   IconToastError,
 
 } from '../../../../src/icons/IconLibrary';
