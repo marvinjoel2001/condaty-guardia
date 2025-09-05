@@ -94,6 +94,12 @@ const OwnerInvitationInfoDisplay = ({
         }
         left={
           <Avatar
+            src={getUrlImages(
+              '/OWNER-' +
+                invitationData?.owner?.id +
+                '.webp?d=' +
+                invitationData?.owner?.updated_at,
+            )}
             name={getFullName(invitationData.owner)}
             w={40}
             h={40}
@@ -314,34 +320,36 @@ const GroupQR = ({
           <Card>
             <OwnerInvitationInfoDisplay invitationData={data} />
             <Br />
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 12,
-                marginTop: 12,
-              }}
-              onPress={() => {
-                setOpenSelected(false);
-              }}>
-              {openSelected && (
-                <Icon name={IconArrowLeft} color={cssVar.cWhite} size={20} />
-              )}
-              <Text
+            <View style={{justifyContent: 'center'}}>
+              <TouchableOpacity
                 style={{
-                  color: cssVar.cWhite,
-                  fontWeight: '600',
-                  fontFamily: FONTS.medium,
-                  fontSize: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 12,
+                  marginTop: 12,
+                }}
+                onPress={() => {
+                  setOpenSelected(false);
                 }}>
-                {openSelected
-                  ? 'Invitados'
-                  : 'Cantidad de invitados ingresados: ' +
-                    ingresados() +
-                    '/' +
-                    data?.guests?.length}
-              </Text>
-            </TouchableOpacity>
+                {openSelected && (
+                  <Icon name={IconArrowLeft} color={cssVar.cWhite} size={20} />
+                )}
+                <Text
+                  style={{
+                    color: cssVar.cWhite,
+                    fontWeight: '600',
+                    fontFamily: FONTS.medium,
+                    fontSize: 16,
+                  }}>
+                  {openSelected
+                    ? 'Invitados'
+                    : 'Cantidad de invitados ingresados: ' +
+                      ingresados() +
+                      '/' +
+                      data?.guests?.length}
+                </Text>
+              </TouchableOpacity>
+            </View>
             {openSelected ? (
               <ItemList
                 title={getFullName(selectedVisit?.visit)}
