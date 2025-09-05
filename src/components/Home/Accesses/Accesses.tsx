@@ -191,23 +191,22 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
 
   const iconAccess = (item: any) => {
     const isOrder = item.type === 'P';
-    const orderIcons: Record<string, any> = {
-      Taxi: IconTaxi,
-      Mensajeria: IconOther,
-      Delivery: IconDelivery,
-      Otro: IconOther,
-    };
-
     if (isOrder) {
-      const iconName = orderIcons[item.other?.otherType?.name] || IconOther;
+      const icon =
+        item?.other?.other_type_id == 1
+          ? IconDelivery
+          : item?.other?.other_type_id == 2
+          ? IconTaxi
+          : IconOther;
       return (
         <Icon
           style={{
-            backgroundColor: cssVar.cWhite,
+            backgroundColor: cssVar.cWhiteV1,
             padding: 8,
             borderRadius: 50,
           }}
-          name={iconName}
+          name={icon}
+          color={cssVar.cPrimary}
           size={24}
         />
       );
@@ -229,14 +228,12 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     );
   };
   const iconOrder = (item: any) => {
-    const orderIcons: Record<string, any> = {
-      Taxi: IconTaxi,
-      Mensajeria: IconOther,
-      Delivery: IconDelivery,
-      Otro: IconOther,
-    };
-
-    const iconName = orderIcons[item?.other_type?.name] || IconOther;
+    const icon =
+      item?.other_type?.id == 1
+        ? IconDelivery
+        : item?.other_type?.id == 2
+        ? IconTaxi
+        : IconOther;
     return (
       <Icon
         style={{
@@ -244,7 +241,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
           padding: 10,
           borderRadius: 100,
         }}
-        name={iconName}
+        name={icon}
         size={24}
       />
     );

@@ -11,7 +11,14 @@ import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconCheck, IconCheckOff, IconExpand} from '../../../icons/IconLibrary';
+import {
+  IconCheck,
+  IconCheckOff,
+  IconDelivery,
+  IconExpand,
+  IconOther,
+  IconTaxi,
+} from '../../../icons/IconLibrary';
 import useAuth from '../../../../mk/hooks/useAuth';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
@@ -342,7 +349,28 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
     return getCheckVisit(data, isSelected, 'I');
   };
-
+  const getAvatarVisit = (item: any) => {
+    if (item?.type != 'P') {
+      return <Avatar name={getFullName(item.visit)} />;
+    } else {
+      const icon =
+        item?.other?.other_type_id == 1
+          ? IconDelivery
+          : item?.other?.other_type_id == 2
+          ? IconTaxi
+          : IconOther;
+      return (
+        <View
+          style={{
+            padding: 8,
+            backgroundColor: cssVar.cWhiteV1,
+            borderRadius: '50%',
+          }}>
+          <Icon name={icon} color={cssVar.cPrimary} />
+        </View>
+      );
+    }
+  };
   const detailVisit = (data: any) => {
     let visit = data.visit ? data.visit : data.owner;
 
@@ -366,7 +394,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               ? ' - Placa: ' + data?.plate
               : '')
           }
-          left={<Avatar name={getFullName(visit)} />}
+          left={getAvatarVisit(data)}
           right={rightDetailVisit(data, isSelected)}
         />
         {!data?.out_at && (

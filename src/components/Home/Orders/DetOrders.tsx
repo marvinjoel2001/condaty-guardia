@@ -15,7 +15,14 @@ import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import List from '../../../../mk/components/ui/List/List';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import { IconExpand, IconX, IconAdd, IconAccess, IconToastSuccess, IconAddMore } from '../../../icons/IconLibrary';
+import {
+  IconExpand,
+  IconX,
+  IconAdd,
+  IconAccess,
+  IconToastSuccess,
+  IconAddMore,
+} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
 import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
@@ -25,7 +32,7 @@ import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Br from '../../Profile/Br';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 
-const DetOrders = ({id, open, close, reload,handleChange}: any) => {
+const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [formState, setFormState]: any = useState({});
@@ -70,7 +77,7 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
     return mapping[status] || '';
   };
 
-    const onExistTaxi = async () => {
+  const onExistTaxi = async () => {
     if (!formState?.ci_taxi || formState.ci_taxi.length < 5) {
       setFormState((prevState: any) => ({
         ...prevState,
@@ -78,7 +85,7 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate, 
+        plate: prevState.tab === 'T' ? '' : prevState.plate,
         disbledTaxi: false,
       }));
       return;
@@ -91,14 +98,14 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
       ci_visit: formState?.ci_taxi,
     });
     if (existData?.data) {
-      setFormState((prevState: any) =>({
+      setFormState((prevState: any) => ({
         ...prevState,
         ci_taxi: existData.data.ci,
         name_taxi: existData.data.name,
         middle_name_taxi: existData.data.middle_name,
         last_name_taxi: existData.data.last_name,
         mother_last_name_taxi: existData.data.mother_last_name,
-        plate: existData.data.plate || '', 
+        plate: existData.data.plate || '',
         disbledTaxi: true,
       }));
     } else {
@@ -108,7 +115,7 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate, 
+        plate: prevState.tab === 'T' ? '' : prevState.plate,
         disbledTaxi: false,
       }));
     }
@@ -216,15 +223,10 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
     }
   };
 
-  // Renderizamos el detalle del pedido
-  console.log("Pedidos Data",data);
   const renderDetails = () => {
-    const status = getStatus();
     return (
       <Card>
-        <Text style={styles.labelAccess}>
-          Notificado Por
-        </Text>
+        <Text style={styles.labelAccess}>Notificado Por</Text>
         <ItemList
           title={getFullName(data?.owner)}
           // subtitle={'C.I.' + data?.owner?.ci}
@@ -263,15 +265,11 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
           // }
         />
         <KeyValue
-              keys="Fecha de notificación"
-              value={getDateTimeStrMes(data?.created_at, true)}
+          keys="Fecha de notificación"
+          value={getDateTimeStrMes(data?.created_at, true)}
         />
-        <KeyValue
-              keys="Descripión"
-              value={data?.descrip}
-        />
+        <KeyValue keys="Descripión" value={data?.descrip} />
         {/* {detailVisit(data)} */}
-
       </Card>
     );
   };
@@ -351,174 +349,168 @@ const DetOrders = ({id, open, close, reload,handleChange}: any) => {
     <ModalFull
       onClose={close}
       open={open}
-      title={'Pedido'+'/'+data?.other_type?.name}
+      title={'Pedido' + '/' + data?.other_type?.name}
       onSave={handleSave}
       buttonText={getButtonText()}>
-        {!data ? (
+      {!data ? (
         <Loading />
-        ) : (
-          <>
-            {renderDetails()}
-            <View style={{marginTop: 12}}>
-              {getStatus() === 'C' && (
-                <>
-                  <ItemList
-                    title={getFullName(data?.access?.visit)}
-                    subtitle={'C.I.' + data?.access?.visit?.ci}
-                    // subtitle2={
-                    //   data?.access?.plate
-                    //     ? 'Placa: ' + data?.access?.plate
-                    //     : 'Entrada a pie'
-                    // }
-                    left={<Avatar name={getFullName(data?.access?.visit)} />}>
-                    <ItemListDate
-                      inDate={data?.access?.in_at}
-                      outDate={data?.access?.out_at}
-                    />
-                  </ItemList>
-                </>
-              )}
-              {getStatus() === 'Y' && (
-                <>
-                  <Input
-                    label="Carnet del visitante"
-                    type="date"
-                    name="ci"
-                    required={true}
-                    maxLength={10}
-                    value={formState?.ci}
-                    error={errors}
-                    onChange={(value: any) => handleInputChange('ci', value)}
-                    onBlur={() => onExist()}
+      ) : (
+        <>
+          {renderDetails()}
+          <View style={{marginTop: 12}}>
+            {getStatus() === 'C' && (
+              <>
+                <ItemList
+                  title={getFullName(data?.access?.visit)}
+                  subtitle={'C.I.' + data?.access?.visit?.ci}
+                  left={<Avatar name={getFullName(data?.access?.visit)} />}>
+                  <ItemListDate
+                    inDate={data?.access?.in_at}
+                    outDate={data?.access?.out_at}
                   />
-                  <InputFullName
-                    formState={formState}
-                    errors={errors}
-                    handleChangeInput={handleInputChange}
-                    disabled={formState?.disbled}
-                    inputGrid={true}
-                  />
-                  {/* <TextArea
+                </ItemList>
+              </>
+            )}
+            {getStatus() === 'Y' && (
+              <>
+                <Input
+                  label="Carnet del visitante"
+                  type="date"
+                  name="ci"
+                  required={true}
+                  maxLength={10}
+                  value={formState?.ci}
+                  error={errors}
+                  onChange={(value: any) => handleInputChange('ci', value)}
+                  onBlur={() => onExist()}
+                />
+                <InputFullName
+                  formState={formState}
+                  errors={errors}
+                  handleChangeInput={handleInputChange}
+                  disabled={formState?.disbled}
+                  inputGrid={true}
+                />
+                {/* <TextArea
                     label="Observaciones"
                     name="obs_in"
                     value={formState?.obs_in || ''}
                     onChange={value => handleInputChange('obs_in', value)}
                     placeholder='Ej: El visitante está ingresando con 2 mascotas'
                   /> */}
-                  <TabsButtons
-                    tabs={[
-                      {value: 'P', text: 'A pie'},
-                      {value: 'V', text: 'En vehículo'},
-                      {value: 'T', text: 'En Taxi'},
-                    ]}
-                    sel={tab}
-                    setSel={setTab}
-                  />
+                <TabsButtons
+                  tabs={[
+                    {value: 'P', text: 'A pie'},
+                    {value: 'V', text: 'En vehículo'},
+                    {value: 'T', text: 'En Taxi'},
+                  ]}
+                  sel={tab}
+                  setSel={setTab}
+                />
 
-                  {tab === 'V' && (
+                {tab === 'V' && (
+                  <Input
+                    label="Placa"
+                    type="text"
+                    required
+                    name="plate"
+                    error={errors}
+                    // disabled={formState?.disbled}
+                    value={formState['plate']}
+                    onChange={(value: any) => handleInputChange('plate', value)}
+                  />
+                )}
+                {tab === 'T' && (
+                  <>
+                    <Text style={styles.subSectionTitle}>
+                      Datos del conductor del taxi:
+                    </Text>
                     <Input
-                      label="Placa"
-                      type="text"
-                      required
-                      name="plate"
+                      label="Carnet de identidad (Taxista)"
+                      name="ci_taxi"
+                      keyboardType="numeric"
+                      maxLength={10}
                       error={errors}
-                      // disabled={formState?.disbled}
-                      value={formState['plate']}
-                      onChange={(value: any) =>
-                        handleInputChange('plate', value)
+                      required
+                      value={formState?.ci_taxi || ''}
+                      onBlur={onExistTaxi}
+                      onChange={(value: string) =>
+                        handleChange('ci_taxi', value)
                       }
                     />
-                  )}
-                  {tab === 'T' && (
-                    <>
-                      <Text style={styles.subSectionTitle}> 
-                        Datos del conductor del taxi:
-                      </Text>
-                      <Input
-                        label="Carnet de identidad (Taxista)"
-                        name="ci_taxi"
-                        keyboardType="numeric"
-                        maxLength={10}
-                        error={errors}
-                        required
-                        value={formState?.ci_taxi || ''}
-                        onBlur={onExistTaxi}
-                        onChange={(value: string) => handleChange('ci_taxi', value)}
-                      
-                        
-                      />
-                      <InputFullName
-                        formState={formState}
-                        errors={errors}
-                        disabled={formState?.disbledTaxi}
-                        prefijo="_taxi"
-                        handleChangeInput={handleChange}
-                        inputGrid={true}
-                      />
-                      <Input
-                        label="Placa del taxi"
-                        type="text"
-                        name="plate" // Taxi usa 'plate' como en la versión antigua
-                        error={errors} // Error para 'plate'
-                        required={tab === 'T'}
-                        value={formState?.plate || ''} // Valor de 'plate'
-                        onChange={(value: string) => handleChange('plate', value.toUpperCase())}
-                        autoCapitalize="characters"
-                      />
-                    </>
-                  )}
-                  <TouchableOpacity
-                    style={{
-                      alignSelf: 'flex-start',
-                      marginVertical: 2,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingBottom:5
-                    }}
-                    
-                    onPress={() => setOpenAcom(true)}>
-                    <Icon
-                      style={{
-                        paddingVertical:10,
-                        borderRadius: 50,
-                        // color:cssVar.cSidebar
-                      }}
-                      color={cssVar.cAccent}
-                      name={IconAddMore}
-                      size={16}
+                    <InputFullName
+                      formState={formState}
+                      errors={errors}
+                      disabled={formState?.disbledTaxi}
+                      prefijo="_taxi"
+                      handleChangeInput={handleChange}
+                      inputGrid={true}
                     />
-                    <Text
-                      style={{
-                        color: cssVar.cAccent,
-                        textDecorationLine: 'underline',
-                      }}>
-                      Agregar acompañante
-                    </Text>
-                  </TouchableOpacity>
-                  {formState?.acompanantes?.length > 0 && (
-                    <>
-                      <List
-                        data={formState?.acompanantes}
-                        renderItem={acompanantesList}
-                      />
-                    </>
-                  )}
-                </>
-              )}
-              {getStatus() === 'Y' && (
-                <>
-                  <TextArea
-                    label="Observaciones"
-                    name="obs_out"
-                    value={formState?.obs_out || ''}
-                    onChange={e => handleInputChange('obs_out', e)}
-                    placeholder='Ej: El visitante está ingresando con 2 mascotas'
+                    <Input
+                      label="Placa del taxi"
+                      type="text"
+                      name="plate" // Taxi usa 'plate' como en la versión antigua
+                      error={errors} // Error para 'plate'
+                      required={tab === 'T'}
+                      value={formState?.plate || ''} // Valor de 'plate'
+                      onChange={(value: string) =>
+                        handleChange('plate', value.toUpperCase())
+                      }
+                      autoCapitalize="characters"
+                    />
+                  </>
+                )}
+                <TouchableOpacity
+                  style={{
+                    alignSelf: 'flex-start',
+                    marginVertical: 2,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingBottom: 5,
+                  }}
+                  onPress={() => setOpenAcom(true)}>
+                  <Icon
+                    style={{
+                      paddingVertical: 10,
+                      borderRadius: 50,
+                      // color:cssVar.cSidebar
+                    }}
+                    color={cssVar.cAccent}
+                    name={IconAddMore}
+                    size={16}
                   />
-                </>
-              )}
-            </View>
-          </>
-        )}
+                  <Text
+                    style={{
+                      color: cssVar.cAccent,
+                      textDecorationLine: 'underline',
+                    }}>
+                    Agregar acompañante
+                  </Text>
+                </TouchableOpacity>
+                {formState?.acompanantes?.length > 0 && (
+                  <>
+                    <List
+                      data={formState?.acompanantes}
+                      renderItem={acompanantesList}
+                    />
+                  </>
+                )}
+              </>
+            )}
+            {getStatus() === 'Y' && (
+              <>
+                <TextArea
+                  label="Observaciones"
+                  name="obs_out"
+                  value={formState?.obs_out || ''}
+                  onChange={e => handleInputChange('obs_out', e)}
+                  placeholder="Ej: El visitante está ingresando con 2 mascotas"
+                />
+              </>
+            )}
+          </View>
+        </>
+      )}
       <AccompaniedAdd
         open={openAcom}
         onClose={() => setOpenAcom(false)}
@@ -541,7 +533,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONTS.semiBold,
   },
-    subSectionTitle: { 
+  subSectionTitle: {
     fontSize: 16,
     fontFamily: FONTS.semiBold,
     color: cssVar.cWhiteV1 || '#D0D0D0',
