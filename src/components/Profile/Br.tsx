@@ -11,8 +11,7 @@ const Br = ({marginV = 8}: TypeProps) => {
 export default Br;
 const styles = StyleSheet.create({
   container: {
-    height: 0.5,
-    backgroundColor: cssVar.cWhiteV1,
-    width: '100%',
+    borderBottomWidth: 1,
+    borderBottomColor: cssVar.cWhiteV1,
   },
 });

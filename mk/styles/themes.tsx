@@ -61,9 +61,8 @@ export const cssVar = {
   cHoverOrange: '#F5822033',
   cHoverCompl1: '#FAFF7F33',
   cHoverCompl2: '#A2FAA333',
-  cHoverCompl3: '#B382D933',
-  cHoverCompl4: '#A9CCE333',
-  CHoverComp4: '#E1C151',
+  cHoverCompl3: '#39ACEC33',
+  cHoverCompl4: '#E1C15133',
   cHoverCompl5: '#F7B26733',
   cHoverCompl6: '#FF7F5133',
   cHoverCompl7: '#6CD16D33',
@@ -100,6 +99,9 @@ export const cssVar = {
   cCompl7: '#6CD16D',
   cCompl8: '#DE6A60',
   cCompl9: '#5AB0E9',
+
+
+  cToastFill: '#4E4E4E',
 
   //sizes
   sXxl: 24,
