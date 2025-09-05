@@ -249,7 +249,13 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       };
     }
 
-    const {data: In} = await execute('/accesses/enterqr', 'POST', params);
+    const {data: In} = await execute(
+      '/accesses/enterqr',
+      'POST',
+      params,
+      false,
+      3,
+    );
     if (In?.success) {
       if (reload) reload();
       showToast(
@@ -341,8 +347,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         return 'Detalle de QR';
     }
   };
-  console.log(data);
-  console.log(openSelected);
+
   const isExit = () => {
     if (data?.type == 'I') {
       const lastAccess =

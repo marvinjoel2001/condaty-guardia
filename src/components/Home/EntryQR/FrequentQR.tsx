@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity, View, StyleSheet, ScrollView} from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
@@ -14,6 +20,9 @@ import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
+import Card from '../../../../mk/components/ui/Card/Card';
+import KeyValue from '../../../../mk/components/ui/KeyValue';
+import Br from '../../Profile/Br';
 
 type PropsType = {
   setFormState: any;
@@ -22,16 +31,6 @@ type PropsType = {
   data: any;
   errors: any;
   setErrors: any;
-};
-
-const DetailRow = ({label, value}: {label: string; value: string | number | null | undefined}) => {
-  if (!value && value !== 0) return null;
-  return (
-    <View style={styles.detailRow}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
-    </View>
-  );
 };
 
 const FrequentQR = ({
@@ -46,15 +45,17 @@ const FrequentQR = ({
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
   const [editAcom, setEditAcom] = useState(null);
-  const meesageforUndefined = "Indefinido";
-  
+  const meesageforUndefined = 'Indefinido';
+
   const invitation = data;
   const visit = invitation?.visit;
   const owner = invitation?.owner;
   const access = invitation?.access;
 
-  const lastAccess = access && access.length > 0 ? access[access.length - 1] : null;
-  const isCurrentlyInside = lastAccess && lastAccess.in_at && !lastAccess.out_at;
+  const lastAccess =
+    access && access.length > 0 ? access[access.length - 1] : null;
+  const isCurrentlyInside =
+    lastAccess && lastAccess.in_at && !lastAccess.out_at;
 
   useEffect(() => {
     const currentVisit = data?.visit;
@@ -131,7 +132,7 @@ const FrequentQR = ({
       ci_visit: formState?.ci_taxi,
     });
     if (existData?.data) {
-      setFormState((prevState: any) =>({
+      setFormState((prevState: any) => ({
         ...prevState,
         ci_taxi: existData.data.ci,
         name_taxi: existData.data.name,
@@ -156,7 +157,9 @@ const FrequentQR = ({
 
   const onDelAcom = (acom: {ci: string}) => {
     const acomps = formState?.acompanantes || [];
-    const newAcomps = acomps.filter((item: {ci: string}) => item.ci !== acom.ci);
+    const newAcomps = acomps.filter(
+      (item: {ci: string}) => item.ci !== acom.ci,
+    );
     setFormState({...formState, acompanantes: newAcomps});
   };
 
@@ -178,9 +181,7 @@ const FrequentQR = ({
             color={cssVar.cError}
             size={20}
             style={{
-            
               padding: 4,
-           
             }}
             onPress={() => onDelAcom(acompanante)}
           />
@@ -196,7 +197,9 @@ const FrequentQR = ({
   const getUnitInfo = (ownerData: any) => {
     if (ownerData?.dpto && ownerData.dpto.length > 0) {
       const dpto = ownerData.dpto[0];
-      return dpto.nro ? `${dpto.nro}${dpto.description ? `, ${dpto.description}` : ''}` : 'No especificada';
+      return dpto.nro
+        ? `${dpto.nro}${dpto.description ? `, ${dpto.description}` : ''}`
+        : 'No especificada';
     }
     return 'No especificada';
   };
@@ -211,23 +214,23 @@ const FrequentQR = ({
     if (typeof weekdayValue !== 'number' || isNaN(weekdayValue)) {
       return '';
     }
-  
+
     const daysMap = [
-      { value: 1, label: 'Lun' },
-      { value: 2, label: 'Mar' },
-      { value: 4, label: 'Mié' },
-      { value: 8, label: 'Jue' },
-      { value: 16, label: 'Vie' },
-      { value: 32, label: 'Sáb' },
-      { value: 64, label: 'Dom' }
+      {value: 1, label: 'Lun'},
+      {value: 2, label: 'Mar'},
+      {value: 4, label: 'Mié'},
+      {value: 8, label: 'Jue'},
+      {value: 16, label: 'Vie'},
+      {value: 32, label: 'Sáb'},
+      {value: 64, label: 'Dom'},
     ];
-  
+
     const selectedDays = daysMap
       .filter(day => (weekdayValue & day.value) === day.value)
       .map(day => day.label);
-  
+
     return selectedDays.join(', ');
-  }
+  };
 
   if (!data) {
     return <Loading />;
@@ -235,37 +238,80 @@ const FrequentQR = ({
 
   return (
     <>
-      <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.contentContainer}>
-        
-        <View style={styles.summaryCard}>
-            <View style={styles.summarySection}>
-                <Text style={styles.summaryTitle}>Visita a</Text>
-                <View style={styles.personCard}>
-               
-                    <Avatar src={getUrlImages('/OWNER-' + owner?.id + '.webp?d=' + owner?.updated_at)} name={getFullName(owner)} w={40} h={40} />
-                    <View style={styles.personInfo}>
-                        <Text style={styles.personName}>{getFullName(owner)}</Text>
-                        <Text style={styles.personDetail}>Unidad: {getUnitInfo(owner)}</Text>
-                    </View>
-                </View>
-                <DetailRow label="Tipo de invitación" value={invitation.type === 'F' ? 'QR frecuente' : 'Otro'} />
-                <DetailRow label="Validez del QR" value={invitation.start_date && invitation.end_date ? `${formatSimpleDate(invitation.start_date)} - ${formatSimpleDate(invitation.end_date)}` : meesageforUndefined} />
-                <DetailRow label="Días de acceso" value={formatWeekdays(invitation.weekday)} />
-                <DetailRow label="Horario permitido" value={invitation.start_time && invitation.end_time ? `${invitation.start_time.substring(0,5)} - ${invitation.end_time.substring(0,5)}` : null} />
-                <DetailRow label="Cantidad de accesos" value={invitation.max_entries} />
-            </View>
+      <ScrollView style={styles.scrollViewContainer}>
+        <Card>
+          <Text style={styles.summaryTitle}>Visita a</Text>
+          <ItemList
+            style={{marginBottom: 12}}
+            title={getFullName(owner)}
+            subtitle={'Unidad: ' + getUnitInfo(owner)}
+            left={
+              <Avatar
+                src={getUrlImages(
+                  '/OWNER-' + owner?.id + '.webp?d=' + owner?.updated_at,
+                )}
+                name={getFullName(owner)}
+              />
+            }
+          />
 
-            <View style={styles.summarySection}>
-                <Text style={styles.summaryTitle}>Invitados</Text>
-                <View style={styles.personCard}>
-                    <Avatar src={visit?.url_avatar ? getUrlImages(visit.url_avatar) : undefined} name={getFullName(visit)} w={40} h={40} />
-                    <View style={styles.personInfo}>
-                        <Text style={styles.personName}>{getFullName(visit)}</Text>
-                        <Text style={styles.personDetail}>{visit?.ci ? `C.I. ${visit.ci}` : 'CI no registrado'}</Text>
-                    </View>
-                </View>
-            </View>
-        </View>
+          <KeyValue
+            keys="Tipo de invitación"
+            value={invitation.type === 'F' ? 'QR frecuente' : 'Otro'}
+          />
+          {invitation.start_date && (
+            <KeyValue
+              keys="Validez del QR"
+              value={
+                invitation.start_date && invitation.end_date
+                  ? `${formatSimpleDate(
+                      invitation.start_date,
+                    )} - ${formatSimpleDate(invitation.end_date)}`
+                  : meesageforUndefined
+              }
+            />
+          )}
+          {invitation.weekday && (
+            <KeyValue
+              keys="Días de acceso"
+              value={formatWeekdays(invitation.weekday)}
+            />
+          )}
+          {invitation.start_time && (
+            <KeyValue
+              keys="Horario permitido"
+              value={
+                invitation.start_time && invitation.end_time
+                  ? `${invitation.start_time.substring(
+                      0,
+                      5,
+                    )} - ${invitation.end_time.substring(0, 5)}`
+                  : null
+              }
+            />
+          )}
+          {invitation.max_entries && (
+            <KeyValue
+              keys="Cantidad de accesos"
+              value={invitation.max_entries}
+            />
+          )}
+          <Br />
+          <Text style={styles.summaryTitle}>Invitado</Text>
+          <ItemList
+            style={{marginTop: 12}}
+            title={getFullName(visit)}
+            subtitle={'C.I. ' + (visit.ci || '-/-')}
+            left={
+              <Avatar
+                src={getUrlImages(
+                  `/VISIT-${visit?.id}.png?d=${visit?.updated_at}`,
+                )}
+                name={getFullName(visit)}
+              />
+            }
+          />
+        </Card>
 
         {!visit?.ci && data?.status !== 'X' && (
           <>
@@ -287,28 +333,6 @@ const FrequentQR = ({
               inputGrid={true}
             />
           </>
-        )}
-
-        {data?.status !== 'X' && (
-          <View style={styles.textAreaContainer}>
-            {!isCurrentlyInside ? (
-              <TextArea
-                label="Observaciones de entrada"
-                placeholder="Ej: El visitante está ingresando con 1 mascota."
-                name="obs_in"
-                value={formState?.obs_in || ''}
-                onChange={(value: string) => handleChange('obs_in', value)}
-              />
-            ) : (
-              <TextArea
-                label="Observaciones de salida"
-                placeholder="Ej: El visitante está saliendo con 3 cajas"
-                name="obs_out"
-                value={formState?.obs_out || ''}
-                onChange={(value: string) => handleChange('obs_out', value)}
-              />
-            )}
-          </View>
         )}
 
         {!isCurrentlyInside && data?.status !== 'X' && (
@@ -333,13 +357,17 @@ const FrequentQR = ({
                 error={errors}
                 required={tab === 'V'}
                 value={formState?.plate || ''}
-                onChange={(value: string) => handleChange('plate', value.toUpperCase())}
+                onChange={(value: string) =>
+                  handleChange('plate', value.toUpperCase())
+                }
                 autoCapitalize="characters"
               />
             )}
             {tab === 'T' && (
               <View style={styles.taxiFormContainer}>
-                <Text style={styles.summaryTitle}>Datos del conductor del taxi</Text>
+                <Text style={{...styles.summaryTitle, marginBottom: 12}}>
+                  Datos del conductor del taxi
+                </Text>
                 <Input
                   label="Carnet de identidad (Taxista)"
                   name="ci_taxi"
@@ -366,7 +394,9 @@ const FrequentQR = ({
                   error={errors}
                   disabled={formState?.disbledTaxi}
                   value={formState?.middle_name_taxi || ''}
-                  onChange={(value: string) => handleChange('middle_name_taxi', value)}
+                  onChange={(value: string) =>
+                    handleChange('middle_name_taxi', value)
+                  }
                 />
                 <Input
                   label="Apellido paterno"
@@ -375,7 +405,9 @@ const FrequentQR = ({
                   required
                   disabled={formState?.disbledTaxi}
                   value={formState?.last_name_taxi || ''}
-                  onChange={(value: string) => handleChange('last_name_taxi', value)}
+                  onChange={(value: string) =>
+                    handleChange('last_name_taxi', value)
+                  }
                 />
                 <Input
                   label="Apellido materno"
@@ -383,7 +415,9 @@ const FrequentQR = ({
                   error={errors}
                   disabled={formState?.disbledTaxi}
                   value={formState?.mother_last_name_taxi || ''}
-                  onChange={(value: string) => handleChange('mother_last_name_taxi', value)}
+                  onChange={(value: string) =>
+                    handleChange('mother_last_name_taxi', value)
+                  }
                 />
                 <Input
                   label="Placa del taxi"
@@ -392,27 +426,53 @@ const FrequentQR = ({
                   error={errors}
                   required={tab === 'T'}
                   value={formState?.plate || ''}
-                  onChange={(value: string) => handleChange('plate', value.toUpperCase())}
+                  onChange={(value: string) =>
+                    handleChange('plate', value.toUpperCase())
+                  }
                   autoCapitalize="characters"
                 />
               </View>
             )}
-            
-            <TouchableOpacity style={styles.addCompanionButton} onPress={() => setOpenAcom(true)}>
+
+            <TouchableOpacity
+              style={styles.addCompanionButton}
+              onPress={() => setOpenAcom(true)}>
               <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
               <Text style={styles.addCompanionText}>Agregar acompañante</Text>
             </TouchableOpacity>
-          
+
             {(formState?.acompanantes?.length || 0) > 0 && (
               <View style={styles.taxiFormContainer}>
                 <Text style={styles.summaryTitle}>Acompañantes:</Text>
                 <List
-                  data={formState?.acompanantes} 
+                  data={formState?.acompanantes}
                   renderItem={acompanantesList}
                 />
               </View>
             )}
           </>
+        )}
+
+        {data?.status !== 'X' && (
+          <View style={styles.textAreaContainer}>
+            {!isCurrentlyInside ? (
+              <TextArea
+                label="Observaciones de entrada"
+                placeholder="Ej: El visitante está ingresando con 1 mascota."
+                name="obs_in"
+                value={formState?.obs_in || ''}
+                onChange={(value: string) => handleChange('obs_in', value)}
+              />
+            ) : (
+              <TextArea
+                label="Observaciones de salida"
+                placeholder="Ej: El visitante está saliendo con 3 cajas"
+                name="obs_out"
+                value={formState?.obs_out || ''}
+                onChange={(value: string) => handleChange('obs_out', value)}
+              />
+            )}
+          </View>
         )}
       </ScrollView>
 
@@ -431,13 +491,10 @@ const FrequentQR = ({
 };
 
 const styles = StyleSheet.create({
-  scrollViewContainer: { 
+  scrollViewContainer: {
     flex: 1,
   },
-  contentContainer: {
-    paddingVertical: 16,
-    gap: 16,
-  },
+
   summaryCard: {
     backgroundColor: cssVar.cBlackV2,
     padding: 12,
@@ -445,36 +502,14 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   summarySection: {
-    gap: 12,
+    // gap: 12,
   },
   summaryTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: cssVar.cWhite,
-    marginBottom: 12
   },
-  personCard: {
-    backgroundColor: cssVar.cBlackV3,
-    padding: 8,
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  personInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  personName: {
-    fontFamily: FONTS.medium,
-    fontSize: 14,
-    color: cssVar.cWhite,
-  },
-  personDetail: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: cssVar.cWhiteV1,
-  },
+
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -491,22 +526,21 @@ const styles = StyleSheet.create({
     color: cssVar.cWhite,
     textAlign: 'right',
   },
-  textAreaContainer: {},
-  taxiFormContainer: {
-    
+  textAreaContainer: {
+    marginTop: 12,
   },
+  taxiFormContainer: {},
   addCompanionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-   
   },
   addCompanionText: {
     color: cssVar.cAccent,
     textDecorationLine: 'underline',
     marginLeft: 4,
     fontSize: 12,
-  }
+  },
 });
 
 export default FrequentQR;
