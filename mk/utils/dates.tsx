@@ -45,10 +45,10 @@ export const esFormatoISO8601 = (cadena: string | null) => {
 export const convertirFechaUTCaLocal = (fechaUTCString: string | null) => {
   if (!fechaUTCString || fechaUTCString === '') return null;
   const fechaUTC = new Date(fechaUTCString);
-  const offsetUTC = fechaUTC.getTimezoneOffset();
-  const fechaLocal = new Date(fechaUTC.getTime() - offsetUTC * 60000);
 
-  if (offsetUTC === 0) fechaLocal.setHours(fechaLocal.getHours() + GMT);
+  // GMT = -4, así que restamos 4 horas (4 * 60 * 60 * 1000 milisegundos)
+  const fechaLocal = new Date(fechaUTC.getTime() + (GMT * 60 * 60 * 1000));
+
   return fechaLocal;
 };
 
@@ -331,7 +331,7 @@ export const getHour = (dateStr: string | null): string => {
 };
 export const formatToDayDDMMYYYYHHMM = (
   dateStr: string | null = '',
-  utc: boolean = true,
+  utc: boolean = false,
 ): string => {
   if (!dateStr || dateStr === '') return '';
 
@@ -339,11 +339,10 @@ export const formatToDayDDMMYYYYHHMM = (
 
   // 1. Obtener un objeto Date base
   if (esFormatoISO8601(dateStr) || utc) {
-    // Para cadenas ISO o marcadas como UTC, usamos convertirFechaUTCaLocal
-    // para intentar obtener un objeto Date que represente el tiempo local
-    const convertedDate = convertirFechaUTCaLocal(dateStr);
-    if (!convertedDate) return 'Fecha inválida';
-    dateForFormatting = convertedDate;
+    // Para fechas UTC, crear directamente con ajuste GMT-4
+    const fechaUTC = new Date(dateStr);
+    // Restar 4 horas directamente (GMT = -4)
+    dateForFormatting = new Date(fechaUTC.getTime() - (0 * 60 * 60 * 1000));
   } else {
     let tempDate = new Date(dateStr.replace(' ', 'T'));
     if (isNaN(tempDate.getTime())) {
