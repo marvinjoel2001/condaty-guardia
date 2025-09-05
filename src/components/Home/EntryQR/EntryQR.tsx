@@ -19,7 +19,7 @@ interface TypeProps {
 
 const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
-  const [openSelected, setOpenSelected] = useState(false);
+  const [openSelected, setOpenSelected]: any = useState(false);
   const [errors, setErrors] = useState({});
   const [data, setData]: any = useState(null);
   const {execute} = useApi();
@@ -215,11 +215,8 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
 
   const onSaveAccess = async () => {
     if (!data) return;
-    console.log('formState antes de validar:', formState);
     const validationErrors = validate();
     if (hasErrors(validationErrors)) {
-      showToast('Errores: ' + JSON.stringify(validationErrors), 'error');
-      console.log('Errores de validación:', validationErrors);
       return;
     }
 
@@ -252,16 +249,13 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       };
     }
 
-    const {data: In} = await execute(
-      '/accesses/enterqr',
-      'POST',
-      params,
-      false,
-      3,
-    );
+    const {data: In} = await execute('/accesses/enterqr', 'POST', params);
     if (In?.success) {
       if (reload) reload();
-      showToast('Registrado con éxito', 'success');
+      showToast(
+        'Visita registrada y notificación enviada con éxito',
+        'success',
+      );
       setFormState({});
       onClose();
     } else {
@@ -347,13 +341,21 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         return 'Detalle de QR';
     }
   };
-
-  const lastAccess =
-    data?.access && data.access.length > 0
-      ? data.access[data.access.length - 1]
-      : null;
-  const isCurrentlyInside =
-    lastAccess && lastAccess.in_at && !lastAccess.out_at;
+  console.log(data);
+  console.log(openSelected);
+  const isExit = () => {
+    if (data?.type == 'I') {
+      const lastAccess =
+        data?.access && data.access.length > 0
+          ? data.access[data.access.length - 1]
+          : null;
+      return lastAccess && lastAccess.in_at && !lastAccess.out_at;
+    }
+    if (data?.type == 'G') {
+      return data?.guests?.find((v: any) => v.id == openSelected?.id)?.access
+        ?.in_at;
+    }
+  };
 
   return (
     <ModalFull
@@ -361,17 +363,17 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       open={open}
       onClose={onClose}
       onSave={() => {
-        isCurrentlyInside ? onOut() : onSaveAccess();
+        isExit() ? onOut() : onSaveAccess();
       }}
       buttonCancel=""
       buttonText={
         (!openSelected && data?.type === 'G') || data?.status === 'X'
           ? data?.type == 'O'
-            ? 'Dejar Ingresar'
+            ? 'Dejar ingresar'
             : ''
-          : isCurrentlyInside
-          ? 'Registrar Salida'
-          : 'Dejar Ingresar'
+          : isExit()
+          ? 'Registrar salida'
+          : 'Dejar ingresar'
       }>
       {renderContent()}
     </ModalFull>

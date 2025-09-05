@@ -126,6 +126,7 @@ const ModalFull = ({
             ) : (
               <ScrollView
                 ref={scrollViewRef}
+                contentContainerStyle={{paddingBottom: 12}}
                 // automaticallyAdjustContentInsets
                 // automaticallyAdjustKeyboardInsets={true}
                 // automaticallyAdjustsScrollIndicatorInsets
@@ -224,7 +225,7 @@ const theme: ThemeType = {
   },
   body: {
     flexGrow: 1,
-    paddingHorizontal: cssVar.spM,
+    padding: cssVar.spM,
     color: cssVar.cWhiteV3,
     width: '100%',
   },

@@ -59,7 +59,7 @@ export const cssVar = {
   cHoverInfo: '#4285FA33',
   cHoverWarning: '#E9B01E33',
   cHoverOrange: '#F5822033',
-  cHoverCompl1: '#FAFF7F33',
+  cHoverCompl1: '#FAFAFA1A',
   cHoverCompl2: '#A2FAA333',
   cHoverCompl3: '#39ACEC33',
   cHoverCompl4: '#E1C15133',

@@ -1,12 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, TouchableOpacity, View, StyleSheet, Image} from 'react-native';
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Image,
+} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import List from '../../../../mk/components/ui/List/List';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconArrowLeft, IconX, IconAdd, IconSimpleAdd} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
+import {
+  IconArrowLeft,
+  IconX,
+  IconAdd,
+  IconSimpleAdd,
+} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
@@ -14,6 +26,8 @@ import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import {AccompaniedAdd} from './AccompaniedAdd';
 import useApi from '../../../../mk/hooks/useApi';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+import Card from '../../../../mk/components/ui/Card/Card';
+import KeyValue from '../../../../mk/components/ui/KeyValue';
 
 type PropsType = {
   setFormState: any;
@@ -26,8 +40,21 @@ type PropsType = {
   setErrors: any;
 };
 const Br = () => (
-  <View style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 8}} />
+  <View
+    style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 8}}
+  />
 );
+
+const colorStatus = {
+  C: {color: cssVar.cWhite, background: cssVar.cHoverCompl1},
+  I: {color: cssVar.cBlack, background: cssVar.cAccent},
+  O: {color: cssVar.cBlack, background: cssVar.cWarning},
+};
+const statusText = {
+  C: 'Completado',
+  I: 'Dejar ingresar',
+  O: 'Dejar salir',
+};
 
 const formatDateForInvitation = (dateString: string | undefined) => {
   if (!dateString) return '';
@@ -48,58 +75,45 @@ const formatDateForInvitation = (dateString: string | undefined) => {
   }
 };
 
-const OwnerInvitationInfoDisplay = ({ invitationData }: { invitationData: any }) => {
+const OwnerInvitationInfoDisplay = ({
+  invitationData,
+}: {
+  invitationData: any;
+}) => {
   if (!invitationData || !invitationData.owner) return null;
-
   return (
-    <View style={styles.ownerInfoMainContainer}>
-      <View style={styles.invitationDetailsSection}>
-        <View style={styles.invitationDetailsInnerWrapper}>
-          <View style={styles.invitationDetailsContent}>
-            <Text style={styles.sectionTitle}>Detalles de la invitaciónES</Text>
-            <View style={styles.detailsGroup}>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Nombre del evento</Text>
-                <Text style={styles.detailValueRight}>{invitationData.title}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Cantidad de invitados</Text>
-                <Text style={styles.detailValueRightNormal}>{invitationData.guests?.length || 0}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Fecha de invitación</Text>
-                <Text style={styles.detailValueRightNormal}>{formatDateForInvitation(invitationData.created_at)}</Text>
-              </View>
-              <Br />
-            </View>
-          </View>
+    <View>
+      <Text style={styles.sectionTitle}>Visita a:</Text>
+      <ItemList
+        title={getFullName(invitationData.owner)}
+        subtitle={
+          'Unidad: ' +
+          invitationData?.owner?.dpto?.[0]?.nro +
+          ', ' +
+          invitationData?.owner?.dpto?.[0]?.description
+        }
+        left={
+          <Avatar
+            name={getFullName(invitationData.owner)}
+            w={40}
+            h={40}
+            style={styles.avatarImage}
+          />
+        }
+      />
 
-          <View style={styles.visitToSection}>
-            <Text style={styles.sectionTitle}>Visita a:</Text>
-            <View style={styles.visitToContent}>
-              <Avatar name={getFullName(invitationData.owner)} w={40} h={40} style={styles.avatarImage} />
-              <View style={styles.visitToTextContainer}>
-                <Text style={styles.ownerNameValue}>{getFullName(invitationData.owner)}</Text>
-                <Text style={styles.ownerUnitValue}>
-                  Unidad: {invitationData.owner.dpto && invitationData.owner.dpto.length > 0 ? invitationData.owner.dpto[0].nro : 'N/A'}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      {/* <View style={styles.ownerCiSection}>
-        <Avatar name={getFullName(invitationData.owner)} w={40} h={40} style={styles.avatarImage} />
-        <View style={styles.ownerCiTextContainer}>
-          <Text style={styles.ownerNameValue}>{getFullName(invitationData.owner)}</Text>
-          <Text style={styles.ownerUnitValue}>C.I. {invitationData.owner.ci || 'N/A'}</Text>
-        </View>
-      </View> */}
+      <KeyValue keys="Nombre del evento" value={invitationData.title} />
+      <KeyValue
+        keys="Cantidad de invitados"
+        value={invitationData.guests?.length?.toString() || '0'}
+      />
+      <KeyValue
+        keys="Fecha de invitación"
+        value={formatDateForInvitation(invitationData.created_at)}
+      />
     </View>
   );
 };
-
 
 const GroupQR = ({
   setFormState,
@@ -116,6 +130,15 @@ const GroupQR = ({
   const [selectedVisit, setSelectedVisit]: any = useState(null);
   const [openAcom, setOpenAcom] = useState(false);
   const [editAcom, setEditAcom] = useState(null);
+  const getStatus = (item: any) => {
+    if (item?.access?.out_at) {
+      return 'C';
+    }
+    if (item?.access?.in_at) {
+      return 'O';
+    }
+    return 'I';
+  };
 
   const visitList = (item: any) => {
     return (
@@ -123,7 +146,6 @@ const GroupQR = ({
         onPress={() => {
           formState.acompanantes = [];
           setSelectedVisit(item);
-
           setFormState((prev: any) => ({
             ...prev,
             name: item.visit.name,
@@ -138,11 +160,11 @@ const GroupQR = ({
             plate: item.access?.plate || '',
           }));
           if (data?.status !== 'X' && !item.access?.out_at) {
-            setOpenSelected(true);
+            setOpenSelected(item);
             if (item.access?.type) {
-                setTab(item.access.type);
+              setTab(item.access.type);
             } else {
-                setTab('P');
+              setTab('P');
             }
           }
         }}
@@ -151,49 +173,21 @@ const GroupQR = ({
           item.visit?.ci ? 'C.I. ' + item.visit?.ci : 'C.I. (Sin registrar)'
         }
         right={
-          data?.status !== 'X' &&
-          (item.status !== 'A' ? (
-            item.access?.out_at ? (
-              <Text style={{color: cssVar.cAccent, fontSize: 10}}>
-                Completado
-              </Text>
-            ) : (
-              <View
-                style={{
-                  backgroundColor: cssVar.cWhiteV2,
-                  borderRadius: 100,
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                }}>
-                <Text
-                  style={{
-                    color: cssVar.cBlack,
-                    fontWeight: '500',
-                    fontSize: 8,
-                  }}>
-                  Dejar salir
-                </Text>
-              </View>
-            )
-          ) : (
-            <View
+          <View
+            style={{
+              backgroundColor: colorStatus[getStatus(item)].background,
+              borderRadius: 100,
+              padding: 8,
+            }}>
+            <Text
               style={{
-                backgroundColor: cssVar.cAccent,
-                borderRadius: 100,
-                alignItems: 'center',
-                paddingHorizontal: 8,
-                paddingVertical: 4,
+                color: colorStatus[getStatus(item)].color,
+                fontWeight: '500',
+                fontSize: 12,
               }}>
-              <Text
-                style={{
-                  color: cssVar.cBlack,
-                  fontWeight: '500',
-                  fontSize: 8,
-                }}>
-                Dejar ingresar
-              </Text>
-            </View>
-          ))
+              {statusText[getStatus(item)]}
+            </Text>
+          </View>
         }
         left={<Avatar name={getFullName(item.visit)} style={{}} />}
       />
@@ -205,7 +199,7 @@ const GroupQR = ({
     data?.guests?.map((invitado: any) => invitado?.access && ingreados++);
     return ingreados;
   };
-  
+
   useEffect(() => {
     setFormState((prevState: any) => ({
       ...prevState,
@@ -265,9 +259,7 @@ const GroupQR = ({
             color={cssVar.cError}
             size={20}
             style={{
-            
               padding: 4,
-     
             }}
             onPress={() => onDelAcom(acompanante)}
           />
@@ -318,50 +310,39 @@ const GroupQR = ({
       {!data ? (
         <Loading />
       ) : (
-        <View >
-          <OwnerInvitationInfoDisplay invitationData={data} />
-          {!openSelected ? (
-            <>
+        <View>
+          <Card>
+            <OwnerInvitationInfoDisplay invitationData={data} />
+            <Br />
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 12,
+                marginTop: 12,
+              }}
+              onPress={() => {
+                setOpenSelected(false);
+              }}>
+              {openSelected && (
+                <Icon name={IconArrowLeft} color={cssVar.cWhite} size={20} />
+              )}
               <Text
                 style={{
-                  fontFamily: FONTS.medium,
                   color: cssVar.cWhite,
-                  marginTop: 10,
-                  marginBottom: 5,
+                  fontWeight: '600',
+                  fontFamily: FONTS.medium,
+                  fontSize: 16,
                 }}>
-                Cantidad de invitados ingresados: {ingresados()} /
-                {data?.guests?.length}
+                {openSelected
+                  ? 'Invitados'
+                  : 'Cantidad de invitados ingresados: ' +
+                    ingresados() +
+                    '/' +
+                    data?.guests?.length}
               </Text>
-              <ScrollView style={{height: 480}}>
-                <List
-                  data={data?.guests}
-                  renderItem={visitList}
-                />
-              </ScrollView>
-            </>
-          ) : (
-            <ScrollView style={styles.selectedGuestScrollView}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-              
-                  alignItems: 'center',
-                  marginBottom: 12, marginTop:12,
-                }}
-                onPress={() => {
-                  setOpenSelected(false);
-                }}>
-                <Icon name={IconArrowLeft} color={cssVar.cWhite} size={20}/>
-                <Text
-                  style={{
-                    color: cssVar.cWhite,
-                    fontWeight: '600',
-                    fontFamily: FONTS.medium,
-                    fontSize: 16,
-                  }}>
-                  Volver a los invitados
-                </Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
+            {openSelected ? (
               <ItemList
                 title={getFullName(selectedVisit?.visit)}
                 subtitle={
@@ -370,8 +351,15 @@ const GroupQR = ({
                     : 'C.I. (Sin registrar)'
                 }
                 left={<Avatar name={getFullName(selectedVisit?.visit)} />}
-                
               />
+            ) : (
+              <ScrollView>
+                <List data={data?.guests} renderItem={visitList} />
+              </ScrollView>
+            )}
+          </Card>
+          {openSelected && (
+            <ScrollView>
               {!selectedVisit?.visit?.ci && (
                 <>
                   <Input
@@ -394,85 +382,85 @@ const GroupQR = ({
                 </>
               )}
 
-                <View style={styles.transportButtonsContainer}>
-                    <TabsButtons
-                        tabs={[
-                            {value: 'P', text: 'A pie'},
-                            {value: 'V', text: 'En vehículo'},
-                            {value: 'T', text: 'En taxi'},
-                        ]}
-                        sel={tab}
-                        setSel={setTab}
+              <TabsButtons
+                tabs={[
+                  {value: 'P', text: 'A pie'},
+                  {value: 'V', text: 'En vehículo'},
+                  {value: 'T', text: 'En taxi'},
+                ]}
+                sel={tab}
+                setSel={setTab}
+              />
+
+              {tab == 'V' &&
+                !selectedVisit?.access?.in_at &&
+                data?.status !== 'X' && (
+                  <Input
+                    label="Placa"
+                    type="text"
+                    name="plate"
+                    error={errors}
+                    required={tab == 'V'}
+                    value={formState['plate']}
+                    onChange={(value: any) => {
+                      handleChange('plate', value);
+                    }}
+                  />
+                )}
+              {tab == 'T' &&
+                !selectedVisit?.access?.in_at &&
+                data?.status !== 'X' && (
+                  <>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        marginVertical: 8,
+                        color: cssVar.cWhite,
+                        fontFamily: FONTS.medium,
+                      }}>
+                      Datos del conductor:
+                    </Text>
+                    <Input
+                      label="Carnet de identidad"
+                      type="text"
+                      name="ci_taxi"
+                      required
+                      maxLength={10}
+                      keyboardType="number-pad"
+                      error={errors}
+                      value={formState['ci_taxi']}
+                      onBlur={() => onExistTaxi()}
+                      onChange={(value: any) => handleChange('ci_taxi', value)}
                     />
-                </View>
-
-
-                {tab == 'V' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
+                    <InputFullName
+                      formState={formState}
+                      errors={errors}
+                      handleChangeInput={handleChange}
+                      disabled={formState?.disbledTaxi}
+                      prefijo={'_taxi'}
+                      inputGrid={true}
+                    />
                     <Input
                       label="Placa"
                       type="text"
                       name="plate"
                       error={errors}
-                      required={tab == 'V'}
+                      required={tab == 'T'}
                       value={formState['plate']}
-                      onChange={(value: any) => {
-                        handleChange('plate', value);
-                      }}
-                    
+                      onChange={(value: any) => handleChange('plate', value)}
                     />
-                  )}
-                  {tab == 'T' && !selectedVisit?.access?.in_at && data?.status !== 'X' && (
-                    <>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontWeight: 'bold',
-                          marginVertical: 8,
-                          color: cssVar.cWhite,
-                          fontFamily: FONTS.medium,
-                        }}>
-                        Datos del conductor:
-                      </Text>
-                      <Input
-                        label="Carnet de identidad"
-                        type="text"
-                        name="ci_taxi"
-                        required
-                        maxLength={10}
-                        keyboardType="number-pad"
-                        error={errors}
-                        value={formState['ci_taxi']}
-                        onBlur={() => onExistTaxi()}
-                        onChange={(value: any) =>
-                          handleChange('ci_taxi', value)
-                        }
-                      />
-                      <InputFullName
-                        formState={formState}
-                        errors={errors}
-                        handleChangeInput={handleChange}
-                        disabled={formState?.disbledTaxi}
-                        prefijo={'_taxi'}
-                        inputGrid={true}
-                      />
-                      <Input
-                        label="Placa"
-                        type="text"
-                        name="plate"
-                        error={errors}
-                        required={tab == 'T'}
-                        value={formState['plate']}
-                        onChange={(value: any) => handleChange('plate', value)}
-                      />
-                    </>
-                  )}
-              
+                  </>
+                )}
+
               {!selectedVisit?.access?.in_at && data?.status !== 'X' && (
                 <TouchableOpacity
-                    style={styles.addCompanionLinkContainer}
-                    onPress={() => setOpenAcom(true)}>
-                    <Icon name={IconSimpleAdd} size={13} color={cssVar.cAccent} />
-                    <Text style={styles.addCompanionLinkText}>Agregar acompañante</Text>
+                  style={styles.addCompanionLinkContainer}
+                  onPress={() => setOpenAcom(true)}>
+                  <Icon name={IconSimpleAdd} size={13} color={cssVar.cAccent} />
+                  <Text style={styles.addCompanionLinkText}>
+                    Agregar acompañante
+                  </Text>
                 </TouchableOpacity>
               )}
 
@@ -494,35 +482,25 @@ const GroupQR = ({
                 </>
               )}
               <View style={styles.observationsOuterContainer}>
-                  {data?.status != 'X' &&
-                    (!selectedVisit?.access?.in_at ? (
-                      <View style={styles.observationsInnerContainer}>
-                       
-                        <TextArea
-                            label='Observaciones de entrada'
-                            placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
-                            name={'obs_in'}
-                            value={formState['obs_in']}
-                            onChange={value => handleChange('obs_in', value)}
-                            style={styles.textAreaStyle}
-                            
-                        />
-                      </View>
-                    ) : (
-                      <View style={styles.observationsInnerContainer}>
-                        <Text style={styles.observationsLabel}>Observaciones de Salida</Text>
-                        <TextArea
-                            placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
-                            name="obs_out"
-                            value={formState?.obs_out}
-                            onChange={value => handleChange('obs_out', value)}
-                            style={styles.textAreaStyle}
-                            
-                        />
-                      </View>
-                    ))}
+                {data?.status != 'X' &&
+                  (!selectedVisit?.access?.in_at ? (
+                    <TextArea
+                      label="Observaciones de entrada"
+                      placeholder="Ej: El visitante está ingresando con 1 mascota y 2 bicicletas."
+                      name={'obs_in'}
+                      value={formState['obs_in']}
+                      onChange={value => handleChange('obs_in', value)}
+                    />
+                  ) : (
+                    <TextArea
+                      label="Observaciones de salida"
+                      placeholder="Ej: El visitante está saliendo con 3 cajas de embalaje"
+                      name="obs_out"
+                      value={formState?.obs_out}
+                      onChange={value => handleChange('obs_out', value)}
+                    />
+                  ))}
               </View>
-
             </ScrollView>
           )}
         </View>
@@ -542,27 +520,6 @@ const GroupQR = ({
 };
 
 const styles = StyleSheet.create({
-  ownerInfoMainContainer: {
-    width: '100%', // Changed from 388px to be responsive within its parent
-    flexDirection: 'column',
-
-  },
-  invitationDetailsSection: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 12, // gap-4
-    alignSelf: 'stretch',
-    backgroundColor: '#333536',
-    padding: 12, // p-3
-    borderRadius: 12, // rounded-xl
-    marginTop: 12,
-  },
-  invitationDetailsInnerWrapper: {
-    flexDirection: 'column',
-    // alignItems: 'flex-end', // Original HTML had this, but content seems left-aligned
-    gap: 12, // gap-4
-    alignSelf: 'stretch',
-  },
   invitationDetailsContent: {
     flexDirection: 'column',
     gap: 12, // gap-3
@@ -603,8 +560,6 @@ const styles = StyleSheet.create({
   },
   visitToSection: {
     flexDirection: 'column',
-    gap: 12, // gap-3
-    alignSelf: 'stretch',
   },
   visitToContent: {
     flexDirection: 'row',
@@ -648,16 +603,6 @@ const styles = StyleSheet.create({
     gap: 2, // gap-0.5
     flexGrow: 1,
   },
-  selectedGuestScrollView: {
-    marginTop: 10,
-  },
-  transportButtonsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    marginVertical: 12,
-
-  },
   transportButtonBase: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -671,7 +616,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#246950',
   },
-  transportButtonActiveGeneral: { // For Vehiculo and Taxi when active (using accent color)
+  transportButtonActiveGeneral: {
+    // For Vehiculo and Taxi when active (using accent color)
     backgroundColor: cssVar.cAccent, // Or #00af90 if strictly following 'A pie' active style
     borderWidth: 0.5,
     borderColor: cssVar.cAccent, // Or #246950
@@ -694,8 +640,6 @@ const styles = StyleSheet.create({
   addCompanionLinkContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-
-
   },
   addCompanionLinkText: {
     fontFamily: FONTS.regular,
@@ -705,33 +649,7 @@ const styles = StyleSheet.create({
     color: cssVar.cAccent,
   },
   observationsOuterContainer: {
-    alignSelf: 'stretch',
-
-  
-  
-    borderRadius: 8, // rounded-lg
-
-    minHeight: 105, // h-[105px]
-  },
-  observationsInnerContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignSelf: 'stretch',
-    flex: 1,
-  },
-  observationsLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 10,
-    color: '#a7a7a7',
-    marginBottom: 4,
-  },
-  textAreaStyle: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: cssVar.cWhite, // Input text color should be light
-    textAlignVertical: 'top', // For Android
-    minHeight: 60, // Ensure text area has some height
-  
+    marginTop: 12,
   },
 });
 
