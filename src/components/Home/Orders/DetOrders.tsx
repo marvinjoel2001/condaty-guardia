@@ -195,25 +195,19 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         return;
       }
       // Acción: Dejar entrar
-      const {data: result, error} = await execute(
-        '/accesses',
-        'POST',
-        {
-          begin_at: formState?.begin_at || getUTCNow(),
-          pedido_id: data?.id,
-          type: 'P',
-          plate: formState?.plate,
-          name: formState?.name,
-          middle_name: formState?.middle_name,
-          last_name: formState?.last_name,
-          mother_last_name: formState?.mother_last_name,
-          ci: formState?.ci,
-          obs_in: formState?.obs_in,
-          acompanantes: formState?.acompanantes,
-        },
-        false,
-        3,
-      );
+      const {data: result, error} = await execute('/accesses', 'POST', {
+        begin_at: formState?.begin_at || getUTCNow(),
+        pedido_id: data?.id,
+        type: 'P',
+        plate: formState?.plate,
+        name: formState?.name,
+        middle_name: formState?.middle_name,
+        last_name: formState?.last_name,
+        mother_last_name: formState?.mother_last_name,
+        ci: formState?.ci,
+        obs_in: formState?.obs_in,
+        acompanantes: formState?.acompanantes,
+      });
       if (result?.success) {
         if (reload) reload();
         close();
@@ -402,7 +396,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                   tabs={[
                     {value: 'P', text: 'A pie'},
                     {value: 'V', text: 'En vehículo'},
-                    {value: 'T', text: 'En Taxi'},
+                    // {value: 'T', text: 'En Taxi'},
                   ]}
                   sel={tab}
                   setSel={setTab}
