@@ -88,7 +88,12 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
 
     const filterByType = (items: any[], type: string) => {
       if (type === 'I') {
-        return items?.filter(item => !item?.in_at && !item?.out_at);
+        return items?.filter(item => {
+          if (item?.other_type && item?.access?.in_at) {
+            return null;
+          }
+          return !item?.in_at && !item?.out_at;
+        });
       } else if (type === 'S') {
         return items?.filter(item => item?.in_at);
       }
