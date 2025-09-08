@@ -195,8 +195,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const iconAccess = (item: any) => {
-    const isOrder = item.type === 'P';
-    if (isOrder) {
+    if (item.type === 'P') {
       const icon =
         item?.other?.other_type_id == 1
           ? IconDelivery
@@ -211,6 +210,20 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             borderRadius: 50,
           }}
           name={icon}
+          color={cssVar.cPrimary}
+          size={24}
+        />
+      );
+    }
+    if (item?.taxi == 'C') {
+      return (
+        <Icon
+          style={{
+            backgroundColor: cssVar.cWhiteV1,
+            padding: 8,
+            borderRadius: 50,
+          }}
+          name={IconTaxi}
           color={cssVar.cPrimary}
           size={24}
         />
@@ -260,6 +273,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const renderItemAccess = (item: any) => {
+    console.log(item);
     const status = getStatus(item);
     const hasColoredBorder = status === 'N' || status === 'A';
     if (
