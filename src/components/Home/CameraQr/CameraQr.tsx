@@ -55,10 +55,9 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
 
     const codes = _codes[0].value;
     const data = (codes + '||').split('|');
-    console.log(data);
     if (data[0] === 'condaty' && data[1] === 'qr') {
       const time: any = data[3].substring(data[3].length - 10);
-      console.log('codes02', time);
+
       if (time * 1 > 2024 + 10 + 27 + 9 + 27) {
         // if (isValidTimeTemp(time) == false) {
         //   isActive = true;

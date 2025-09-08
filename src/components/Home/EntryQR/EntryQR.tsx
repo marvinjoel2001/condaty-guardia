@@ -125,16 +125,10 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   }, [data]);
 
   const onOut = async () => {
-    const {data: In} = await execute(
-      '/accesses/exit',
-      'POST',
-      {
-        id: formState.access_id,
-        obs_out: formState.obs_out,
-      },
-      false,
-      3,
-    );
+    const {data: In} = await execute('/accesses/exit', 'POST', {
+      id: formState.access_id,
+      obs_out: formState.obs_out,
+    });
     if (In?.success) {
       if (reload) reload();
       onClose();
