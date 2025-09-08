@@ -273,7 +273,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const renderItemAccess = (item: any) => {
-    console.log(item);
     const status = getStatus(item);
     const hasColoredBorder = status === 'N' || status === 'A';
     if (

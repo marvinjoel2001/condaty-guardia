@@ -107,7 +107,9 @@ const OwnerInvitationInfoDisplay = ({
           />
         }
       />
-
+      {invitationData?.status == 'X' && (
+        <KeyValue keys="Estado" value="Anulado" colorValue={cssVar.cError} />
+      )}
       <KeyValue keys="Nombre del evento" value={invitationData.title} />
       <KeyValue
         keys="Cantidad de invitados"
@@ -179,21 +181,23 @@ const GroupQR = ({
           item.visit?.ci ? 'C.I. ' + item.visit?.ci : 'C.I. (Sin registrar)'
         }
         right={
-          <View
-            style={{
-              backgroundColor: colorStatus[getStatus(item)].background,
-              borderRadius: 100,
-              padding: 8,
-            }}>
-            <Text
+          data?.status !== 'X' && (
+            <View
               style={{
-                color: colorStatus[getStatus(item)].color,
-                fontWeight: '500',
-                fontSize: 12,
+                backgroundColor: colorStatus[getStatus(item)].background,
+                borderRadius: 100,
+                padding: 8,
               }}>
-              {statusText[getStatus(item)]}
-            </Text>
-          </View>
+              <Text
+                style={{
+                  color: colorStatus[getStatus(item)].color,
+                  fontWeight: '500',
+                  fontSize: 12,
+                }}>
+                {statusText[getStatus(item)]}
+              </Text>
+            </View>
+          )
         }
         left={<Avatar name={getFullName(item.visit)} style={{}} />}
       />
