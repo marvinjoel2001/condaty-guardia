@@ -47,7 +47,7 @@ export const convertirFechaUTCaLocal = (fechaUTCString: string | null) => {
   const fechaUTC = new Date(fechaUTCString);
 
   // GMT = -4, así que restamos 4 horas (4 * 60 * 60 * 1000 milisegundos)
-  const fechaLocal = new Date(fechaUTC.getTime() + (GMT * 60 * 60 * 1000));
+  const fechaLocal = new Date(fechaUTC.getTime() + GMT * 60 * 60 * 1000);
 
   return fechaLocal;
 };
@@ -166,29 +166,53 @@ export const formatDateToDDMMYY = (dateString: string): string => {
 //   return `${date[2]} de ${MONTHS[parseInt(date[1])]}${year}`;
 // };
 
+// export const getDateStrMes = (
+//   dateStr: string,
+//   utc: boolean = false,
+// ): string => {
+//   if (!dateStr || dateStr === '') return '';
+
+//   if (esFormatoISO8601(dateStr) || utc) {
+//     const fechaLocal: any = convertirFechaUTCaLocal(dateStr);
+//     dateStr = fechaLocal.toISOString().slice(0, 19).replace('T', ' ');
+//   }
+
+//   dateStr = dateStr.replace('T', ' ').replace('/', '-');
+//   const datetime = dateStr.split(' ');
+//   const date = datetime[0].split('-');
+
+//   if (date.length < 3) return '';
+
+//   const day = date[2].padStart(2, '0');
+//   const month = date[1].padStart(2, '0');
+//   const year = date[0];
+
+//   return `${day}/${month}/${year}`;
+// };
 export const getDateStrMes = (
   dateStr: string,
   utc: boolean = false,
 ): string => {
   if (!dateStr || dateStr === '') return '';
-
+  let fechaLocal: any;
   if (esFormatoISO8601(dateStr) || utc) {
-    const fechaLocal: any = convertirFechaUTCaLocal(dateStr);
-    dateStr = fechaLocal.toISOString().slice(0, 19).replace('T', ' ');
+    fechaLocal = convertirFechaUTCaLocal(dateStr);
+  } else {
+    fechaLocal = new Date(dateStr.replace(' ', 'T'));
   }
-
   dateStr = dateStr.replace('T', ' ').replace('/', '-');
   const datetime = dateStr.split(' ');
   const date = datetime[0].split('-');
 
   if (date.length < 3) return '';
-
+  const diaSemana = DAYS_SHORT[fechaLocal.getDay()];
   const day = date[2].padStart(2, '0');
   const month = date[1].padStart(2, '0');
   const year = date[0];
 
-  return `${day}/${month}/${year}`;
+  return `${diaSemana}, ${day}/${month}/${year}`;
 };
+
 export const getDateStrMesAnio = (
   dateStr: string | null = '',
   utc: boolean = false,
@@ -342,7 +366,7 @@ export const formatToDayDDMMYYYYHHMM = (
     // Para fechas UTC, crear directamente con ajuste GMT-4
     const fechaUTC = new Date(dateStr);
     // Restar 4 horas directamente (GMT = -4)
-    dateForFormatting = new Date(fechaUTC.getTime() - (0 * 60 * 60 * 1000));
+    dateForFormatting = new Date(fechaUTC.getTime() - 0 * 60 * 60 * 1000);
   } else {
     let tempDate = new Date(dateStr.replace(' ', 'T'));
     if (isNaN(tempDate.getTime())) {
