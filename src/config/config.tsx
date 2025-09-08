@@ -31,10 +31,9 @@ const configApp = {
   APP_INSTANTDB_APP_ID_DEMO: 'd3a70e0a-21ae-449f-b153-37a05b6ec300',
   APP_DEBUG: 0,
 };
-
 // configApp.API_URL = configApp.API_URL_PROD;
-configApp.API_URL = configApp.API_URL_DEV;
-// configApp.API_URL = configApp.API_URL_TEST;
+// configApp.API_URL = configApp.API_URL_DEV;
+configApp.API_URL = configApp.API_URL_TEST;
 // configApp.API_URL = configApp.API_URL_DEMO;
 
 if (process.env.NODE_ENV == 'development') {
