@@ -9,9 +9,11 @@ import Sound from 'react-native-sound';
 import {getUrlImages} from '../../../mk/utils/strings';
 import useApi from '../../../mk/hooks/useApi';
 import {typeAlerts} from './alertConstants';
+import useAuth from '../../../mk/hooks/useAuth';
 
 const LockAlert = ({ open, onClose, data }: any) => {
   const { execute } = useApi();
+  const {showToast} = useAuth();
 
   if (!data) {
     return null;
@@ -51,6 +53,9 @@ const LockAlert = ({ open, onClose, data }: any) => {
     });
     if (response?.success) {
       _onClose();
+    }else{
+      showToast(response?.message, 'error');
+      _onClose();
     }
   };
   return (
@@ -64,7 +69,7 @@ const LockAlert = ({ open, onClose, data }: any) => {
         borderWidth: 1,
         borderColor: cssVar.cError,
       }}
-      iconClose={false}>
+      iconClose={true}>
       <Text
         style={{
           color: cssVar.cWhiteV1,
