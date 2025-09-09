@@ -27,6 +27,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
   const [codeQr, setCodeQr]: any = useState('');
   const device: any = useCameraDevice('back');
   const [isPermissionRequested, setIsPermissionRequested] = useState(false);
+  const {showToast} = useAuth();
 
   useEffect(() => {
     const checkPermission = async () => {
@@ -79,6 +80,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
     } else {
       isActive = true;
       console.log('Codigo no Reconocido!!!', 'error');
+      showToast('Codigo no Reconocido!!!', 'error');
 
       // onMsg(
       //   '¡QR no válido!',
