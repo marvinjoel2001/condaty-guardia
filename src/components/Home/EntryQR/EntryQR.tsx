@@ -11,7 +11,7 @@ import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import {Text, View} from 'react-native';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconX} from '../../../icons/IconLibrary';
+import {IconAlert, IconX} from '../../../icons/IconLibrary';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 
 interface TypeProps {
@@ -27,7 +27,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [errors, setErrors] = useState({});
   const [data, setData]: any = useState(null);
   const {execute} = useApi();
-  const {showToast} = useAuth();
+  const {showToast, waiting} = useAuth();
   const [msgErrorQr, setMsgErrorQr] = useState('');
   const typeFromQr = code[2];
   const codeId: any = code[3];
@@ -334,6 +334,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   };
 
   const getModalTitle = () => {
+    if (waiting > 0) return 'Cargando...';
     if (!data) return 'Error de invitación';
     switch (data.type) {
       case 'I':
@@ -366,7 +367,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const RenderErrorMsg = () => {
     return (
       <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
-        <Icon name={IconX} size={60} color={cssVar.cError} />
+        <Icon name={IconAlert} size={80} color={cssVar.cWarning} />
         <Text
           style={{
             color: cssVar.cWhite,
