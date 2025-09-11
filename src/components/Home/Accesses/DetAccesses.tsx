@@ -24,6 +24,8 @@ import Loading from '../../../../mk/components/ui/Loading/Loading';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import ModalAccessExpand from './ModalAccessExpand';
 import Br from '../../Profile/Br';
+import Button from '../../../../mk/components/forms/Button/Button';
+import Modal from '../../../../mk/components/ui/Modal/Modal';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -34,11 +36,12 @@ const typeInvitation: any = {
   F: 'QR Frecuente',
 };
 const DetAccesses = ({id, open, close, reload}: any) => {
-  const {showToast} = useAuth();
+  const {showToast, waiting} = useAuth();
   const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
+  const [openEnterSinQR, setOpenEnterSinQR]: any = useState(false);
   const [openDet, setOpenDet]: any = useState({
     open: false,
     id: null,
@@ -417,6 +420,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={getDateTimeStrMes(data?.in_at) || '-/-'}
               />
             )}
+            {data?.confirm == 'G' && (
+              <KeyValue keys="Tipo de aprobación" value={'Por el guardia'} />
+            )}
             {getStatus() === 'S' || getStatus() === 'Y' ? (
               <KeyValue
                 keys={'Notificado por'}
@@ -507,6 +513,22 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       );
     return null;
   };
+  const onSaveSinQr = async () => {
+    const {data: dataSave} = await execute(
+      '/accesses/confirm-enter-guard',
+      'POST',
+      {
+        id: data.id,
+        obs_in: formState?.obs_in,
+      },
+      false,
+      3,
+    );
+    if (dataSave?.success) {
+      if (reload) reload();
+      close();
+    }
+  };
 
   return (
     <ModalFull
@@ -514,7 +536,18 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       open={open}
       title={status != 'I' ? 'Visitante sin QR' : 'Detalle del ingreso'}
       onSave={handleSave}
-      buttonText={getButtonText()}>
+      buttonText={getButtonText()}
+      buttonExtra={
+        status == 'S' &&
+        !data?.in_at &&
+        waiting <= 0 && (
+          <Button
+            style={{backgroundColor: cssVar.cError, borderColor: cssVar.cError}}
+            onPress={() => setOpenEnterSinQR(true)}>
+            Dejar ingresar
+          </Button>
+        )
+      }>
       {!data ? (
         <Loading />
       ) : (
@@ -533,6 +566,25 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             setOpenDet({open: false, id: null, type: '', invitation: null})
           }
         />
+      )}
+      {openEnterSinQR && (
+        <Modal
+          title="Dejar ingresar"
+          open={openEnterSinQR}
+          onClose={() => setOpenEnterSinQR(false)}
+          buttonText="Confirmar"
+          onSave={onSaveSinQr}>
+          <Text style={{color: cssVar.cWhite, marginBottom: 12}}>
+            ¿Estas seguro de dejar ingresar al visitante?
+          </Text>
+          <TextArea
+            label="Observaciones"
+            name="obs_in"
+            required
+            value={formState?.obs_in}
+            onChange={(e: any) => handleInputChange('obs_in', e)}
+          />
+        </Modal>
       )}
     </ModalFull>
   );
