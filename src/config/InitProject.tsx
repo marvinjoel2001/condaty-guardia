@@ -36,7 +36,7 @@ const InitProject = () => {
     // }
     if (data?.event === 'alerts') {
       if (info.user_id !== user?.id) {
-        showToast(`¡Se creo una alerta nivel ${info.level}!`, 'warning');
+        showToast(`¡Hay una nueva alerta!`, 'warning');
       }
 
     }
