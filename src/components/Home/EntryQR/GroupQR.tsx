@@ -28,6 +28,7 @@ import useApi from '../../../../mk/hooks/useApi';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
+import {getDateStrMes} from '../../../../mk/utils/dates';
 
 type PropsType = {
   setFormState: any;
@@ -56,24 +57,24 @@ const statusText = {
   O: 'Dejar salir',
 };
 
-const formatDateForInvitation = (dateString: string | undefined) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Fecha inválida';
+// const formatDateForInvitation = (dateString: string | undefined) => {
+//   if (!dateString) return '';
+//   try {
+//     const date = new Date(dateString);
+//     if (isNaN(date.getTime())) return 'Fecha inválida';
 
-    const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    const dayOfWeek = days[date.getUTCDay()];
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const year = date.getUTCFullYear();
-    const hours = String(date.getUTCHours()).padStart(2, '0');
-    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-    return `${dayOfWeek}, ${day}/${month}/${year} - ${hours}:${minutes}`;
-  } catch (e) {
-    return 'Fecha inválida';
-  }
-};
+//     const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+//     const dayOfWeek = days[date.getUTCDay()];
+//     const day = String(date.getUTCDate()).padStart(2, '0');
+//     const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+//     const year = date.getUTCFullYear();
+//     const hours = String(date.getUTCHours()).padStart(2, '0');
+//     const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+//     return `${dayOfWeek}, ${day}/${month}/${year} - ${hours}:${minutes}`;
+//   } catch (e) {
+//     return 'Fecha inválida';
+//   }
+// };
 
 const OwnerInvitationInfoDisplay = ({
   invitationData,
@@ -107,7 +108,9 @@ const OwnerInvitationInfoDisplay = ({
           />
         }
       />
-
+      {invitationData?.status == 'X' && (
+        <KeyValue keys="Estado" value="Anulado" colorValue={cssVar.cError} />
+      )}
       <KeyValue keys="Nombre del evento" value={invitationData.title} />
       <KeyValue
         keys="Cantidad de invitados"
@@ -115,7 +118,7 @@ const OwnerInvitationInfoDisplay = ({
       />
       <KeyValue
         keys="Fecha de invitación"
-        value={formatDateForInvitation(invitationData.created_at)}
+        value={getDateStrMes(invitationData.created_at)}
       />
     </View>
   );
@@ -179,21 +182,23 @@ const GroupQR = ({
           item.visit?.ci ? 'C.I. ' + item.visit?.ci : 'C.I. (Sin registrar)'
         }
         right={
-          <View
-            style={{
-              backgroundColor: colorStatus[getStatus(item)].background,
-              borderRadius: 100,
-              padding: 8,
-            }}>
-            <Text
+          data?.status !== 'X' && (
+            <View
               style={{
-                color: colorStatus[getStatus(item)].color,
-                fontWeight: '500',
-                fontSize: 12,
+                backgroundColor: colorStatus[getStatus(item)].background,
+                borderRadius: 100,
+                padding: 8,
               }}>
-              {statusText[getStatus(item)]}
-            </Text>
-          </View>
+              <Text
+                style={{
+                  color: colorStatus[getStatus(item)].color,
+                  fontWeight: '500',
+                  fontSize: 12,
+                }}>
+                {statusText[getStatus(item)]}
+              </Text>
+            </View>
+          )
         }
         left={<Avatar name={getFullName(item.visit)} style={{}} />}
       />

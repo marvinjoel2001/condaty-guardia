@@ -62,7 +62,7 @@ const KeyQR = ({formState, setFormState, handleChange, data}: PropsType) => {
   useEffect(() => {
     _onDetail({...data});
   }, [data]);
-
+  console.log(data);
   return (
     <View style={{marginTop: 20, gap: 20}}>
       {!data?.invitation || Object.keys(data?.invitation).length === 0 ? (

@@ -9,6 +9,10 @@ import useAuth from '../../../../mk/hooks/useAuth';
 import {getUTCNow} from '../../../../mk/utils/dates';
 import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+import {Text, View} from 'react-native';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
+import {IconAlert, IconX} from '../../../icons/IconLibrary';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
 
 interface TypeProps {
   code: string;
@@ -23,8 +27,8 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [errors, setErrors] = useState({});
   const [data, setData]: any = useState(null);
   const {execute} = useApi();
-  const {showToast} = useAuth();
-
+  const {showToast, waiting} = useAuth();
+  const [msgErrorQr, setMsgErrorQr] = useState('');
   const typeFromQr = code[2];
   const codeId: any = code[3];
 
@@ -56,8 +60,9 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           status,
         });
       } else if (QR?.success && (!QR.data || QR.data.length === 0)) {
-        showToast('Llave QR no encontrada o no válida.', 'error');
-        onClose();
+        // showToast('Llave QR no encontrada o no válida.', 'error');
+        setMsgErrorQr('Llave QR no encontrada o no válida.');
+        // onClose();
       } else {
         showToast(QR?.message || 'Error al consultar la llave QR.', 'error');
         onClose();
@@ -80,8 +85,9 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       if (invitation?.success && invitation.data?.[0]) {
         setData(invitation.data[0]);
       } else {
-        showToast(invitation?.message || 'Invitación no encontrada.', 'error');
-        onClose();
+        // showToast(invitation?.message || 'Invitación no encontrada.', 'error');
+        setMsgErrorQr(invitation?.message || 'Invitación no encontrada.');
+        // onClose();
       }
     };
 
@@ -93,8 +99,9 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       } else if (['I', 'G', 'F'].includes(typeFromQr)) {
         getInvitation();
       } else {
-        showToast('Tipo de QR no reconocido.', 'error');
-        onClose();
+        // showToast('Tipo de QR no reconocido.', 'error');
+        setMsgErrorQr('Tipo de QR no reconocido.');
+        // onClose();
       }
     }
   }, [code, open]);
@@ -125,16 +132,10 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   }, [data]);
 
   const onOut = async () => {
-    const {data: In} = await execute(
-      '/accesses/exit',
-      'POST',
-      {
-        id: formState.access_id,
-        obs_out: formState.obs_out,
-      },
-      false,
-      3,
-    );
+    const {data: In} = await execute('/accesses/exit', 'POST', {
+      id: formState.access_id,
+      obs_out: formState.obs_out,
+    });
     if (In?.success) {
       if (reload) reload();
       onClose();
@@ -333,7 +334,8 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   };
 
   const getModalTitle = () => {
-    if (!data) return 'Cargando...';
+    if (waiting > 0) return 'Cargando...';
+    if (!data) return 'Error de invitación';
     switch (data.type) {
       case 'I':
         return 'QR Individual';
@@ -362,6 +364,22 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     }
   };
 
+  const RenderErrorMsg = () => {
+    return (
+      <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
+        <Icon name={IconAlert} size={80} color={cssVar.cWarning} />
+        <Text
+          style={{
+            color: cssVar.cWhite,
+            fontSize: 16,
+            fontFamily: FONTS.semiBold,
+          }}>
+          {msgErrorQr}
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <ModalFull
       title={getModalTitle()}
@@ -371,6 +389,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         isExit() ? onOut() : onSaveAccess();
       }}
       buttonCancel=""
+      scrollViewHide={msgErrorQr ? true : false}
       buttonText={
         (!openSelected && data?.type === 'G') || data?.status === 'X'
           ? data?.type == 'O'
@@ -378,9 +397,11 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
             : ''
           : isExit()
           ? 'Registrar salida'
+          : msgErrorQr
+          ? ''
           : 'Dejar ingresar'
       }>
-      {renderContent()}
+      {msgErrorQr ? <RenderErrorMsg /> : renderContent()}
     </ModalFull>
   );
 };
