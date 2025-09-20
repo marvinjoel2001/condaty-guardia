@@ -469,6 +469,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 item.invitation?.title && (
                   <DetailRow label="Evento" value={item.invitation.title} />
                 )}
+              {item.confirm == 'G' && (
+                <DetailRow
+                  label="Tipo de aprobación"
+                  value={'Por el guardia'}
+                />
+              )}
               <DetailRow
                 label="Fecha y hora de ingreso"
                 value={getDateTimeStrMes(item.in_at)}

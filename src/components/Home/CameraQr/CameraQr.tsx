@@ -80,7 +80,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
     } else {
       isActive = true;
       console.log('Codigo no Reconocido!!!', 'error');
-      showToast('Codigo no Reconocido!!!', 'error');
+      showToast('QR inválido', 'error');
 
       // onMsg(
       //   '¡QR no válido!',
