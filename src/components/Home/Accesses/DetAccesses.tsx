@@ -308,13 +308,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       return (
         <Icon
           name={IconExpand}
-          onPress={() =>
-            setOpenDet({
-              open: true,
-              id: visit?.id,
-              type: type,
-            })
-          }
+          // onPress={() =>
+          //   setOpenDet({
+          //     open: true,
+          //     id: visit?.id,
+          //     type: type,
+          //   })
+          // }
           color={cssVar.cWhiteV1}
         />
       );
@@ -342,13 +342,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         <Icon
           name={IconExpand}
           color={cssVar.cWhiteV1}
-          onPress={() =>
-            setOpenDet({
-              open: true,
-              id: data?.id,
-              type: 'V',
-            })
-          }
+          // onPress={() =>
+          //   setOpenDet({
+          //     open: true,
+          //     id: data?.id,
+          //     type: 'V',
+          //   })
+          // }
         />
       );
     }
@@ -395,6 +395,14 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         <ItemList
           key={data?.visit?.id}
           title={getFullName(visit)}
+          onPress={() => {
+            if (data?.out_at)
+              setOpenDet({
+                open: true,
+                id: data?.id,
+                type: 'V',
+              });
+          }}
           style={{marginBottom: 12}}
           subtitle={
             'C.I: ' +
@@ -453,6 +461,14 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             {acompData.map((item: any) => (
               <ItemList
                 key={item?.id}
+                onPress={() => {
+                  if (getStatus(item) == 'C')
+                    setOpenDet({
+                      open: true,
+                      id: data?.id,
+                      type: 'V',
+                    });
+                }}
                 title={getFullName(item?.visit)}
                 subtitle={'C.I:' + item?.visit?.ci}
                 left={<Avatar name={getFullName(item?.visit)} />}
@@ -472,6 +488,14 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             {taxi.map((item: any) => (
               <ItemList
                 key={item?.id}
+                onPress={() => {
+                  if (getStatus(item) == 'C')
+                    setOpenDet({
+                      open: true,
+                      id: data?.id,
+                      type: 'V',
+                    });
+                }}
                 title={getFullName(item?.visit)}
                 subtitle={
                   'C.I:' + item?.visit?.ci + ' - ' + 'Placa: ' + item?.plate
@@ -521,8 +545,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         id: data.id,
         obs_in: formState?.obs_in,
       },
-      false,
-      3,
     );
     if (dataSave?.success) {
       if (reload) reload();
