@@ -428,9 +428,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 value={getDateTimeStrMes(data?.in_at) || '-/-'}
               />
             )}
-            {data?.confirm == 'G' && (
-              <KeyValue keys="Tipo de aprobación" value={'Por el guardia'} />
-            )}
+
             {getStatus() === 'S' || getStatus() === 'Y' ? (
               <KeyValue
                 keys={'Notificado por'}
@@ -449,6 +447,36 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               <KeyValue
                 keys="Observación de ingreso"
                 value={data?.obs_in || '-/-'}
+              />
+            )}
+            {data?.confirm_at && (
+              <KeyValue
+                keys="Tipo de aprobación"
+                value={
+                  <View
+                    style={{
+                      backgroundColor:
+                        data?.confirm == 'G'
+                          ? '#F37F3D33'
+                          : cssVar.cHoverSuccess,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 999,
+                    }}>
+                    <Text
+                      style={{
+                        color:
+                          data?.confirm == 'G'
+                            ? cssVar.cAlertMedio
+                            : cssVar.cSuccess,
+                        fontSize: 12,
+                      }}>
+                      {data?.confirm == 'G'
+                        ? 'Por el guardia'
+                        : 'Por el residente'}
+                    </Text>
+                  </View>
+                }
               />
             )}
           </>

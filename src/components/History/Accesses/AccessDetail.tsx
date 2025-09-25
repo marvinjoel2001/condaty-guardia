@@ -28,7 +28,7 @@ const DetailRow = ({
   valueStyle,
 }: {
   label: string;
-  value: string | undefined | null;
+  value: any;
   valueStyle?: object;
 }) => {
   let displayValue = value;
@@ -38,7 +38,11 @@ const DetailRow = ({
   return (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
+      {typeof displayValue === 'string' ? (
+        <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
+      ) : (
+        value
+      )}
     </View>
   );
 };
@@ -469,12 +473,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 item.invitation?.title && (
                   <DetailRow label="Evento" value={item.invitation.title} />
                 )}
-              {item.confirm == 'G' && (
-                <DetailRow
-                  label="Tipo de aprobación"
-                  value={'Por el guardia'}
-                />
-              )}
+
               <DetailRow
                 label="Fecha y hora de ingreso"
                 value={getDateTimeStrMes(item.in_at)}
@@ -526,6 +525,35 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 label="Observación de solicitud"
                 value={item.obs_guard}
               />
+              {item?.confirm_at && (
+                <DetailRow
+                  label="Tipo de aprobación"
+                  value={
+                    <View
+                      style={{
+                        backgroundColor:
+                          item?.confirm == 'G'
+                            ? '#F37F3D33'
+                            : cssVar.cHoverSuccess,
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 999,
+                      }}>
+                      <Text
+                        style={{
+                          color:
+                            item?.confirm == 'G'
+                              ? cssVar.cAlertMedio
+                              : cssVar.cSuccess,
+                        }}>
+                        {item?.confirm == 'G'
+                          ? 'Por el guardia'
+                          : 'Por el residente'}
+                      </Text>
+                    </View>
+                  }
+                />
+              )}
             </View>
           </View>
 
