@@ -83,7 +83,6 @@ const Home = () => {
       page: 1,
       fullType,
       searchBy: searchParam || '',
-      // section: endpoint === '/others' ? 'HOME' : '',
     });
     setLoaded(false);
     setData(data?.data || []);

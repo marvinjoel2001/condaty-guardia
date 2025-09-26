@@ -45,9 +45,9 @@ const NoResults = ({text, icon}: any) => (
 );
 
 const subtitleAccess = (item: any) => {
-  if (item.type === 'O') {
-    return 'USO LLAVE VIRTUAL QR';
-  }
+  // if (item.type === 'O') {
+  //   return 'USO LLAVE VIRTUAL QR';
+  // }
   let prefix = 'Visitó a: ';
   if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {
     prefix = 'Recogió a: ';
@@ -70,11 +70,12 @@ const subtitleAccess = (item: any) => {
   return <Text>{prefix + getFullName(item.owner)}</Text>;
 };
 const titleAccess = (item: any) => {
-  return item.type === 'O' ? (
-    <Text>{getFullName(item.owner)}</Text>
-  ) : (
-    <Text>{getFullName(item.visit)}</Text>
-  );
+  // return item.type === 'O' ? (
+  //   <Text>{getFullName(item.owner)}</Text>
+  // ) : (
+  //   <Text>{getFullName(item.visit)}</Text>
+  // );
+  return <Text>{getFullName(item?.visit || item?.owner)}</Text>;
 };
 
 const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
@@ -127,7 +128,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
         return 'N';
       }
     }
-    if (item?.type !== 'O' && item?.in_at && !item?.out_at) {
+    if (item?.in_at && !item?.out_at) {
       return 'S';
     }
     return '';
@@ -138,8 +139,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       <Text
         style={{
           fontSize: 10,
-          color: statusColor[getStatus(item)].color,
-          backgroundColor: statusColor[getStatus(item)].background,
+          color: statusColor[getStatus(item)]?.color,
+          backgroundColor: statusColor[getStatus(item)]?.background,
           padding: 4,
           borderRadius: 4,
           fontFamily: FONTS.regular,
@@ -231,17 +232,15 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     }
 
     const avatarSrc = getUrlImages(
-      item.type === 'O'
-        ? `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`
-        : `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`,
+      item.visit
+        ? `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`
+        : `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`,
     );
 
     return (
       <Avatar
         src={avatarSrc}
-        name={
-          item.type === 'O' ? getFullName(item.owner) : getFullName(item.visit)
-        }
+        name={getFullName(item.visit) || getFullName(item.owner)}
       />
     );
   };

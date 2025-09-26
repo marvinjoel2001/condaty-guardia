@@ -60,9 +60,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           status,
         });
       } else if (QR?.success && (!QR.data || QR.data.length === 0)) {
-        // showToast('Llave QR no encontrada o no válida.', 'error');
         setMsgErrorQr('Llave QR no encontrada o no válida.');
-        // onClose();
       } else {
         showToast(QR?.message || 'Error al consultar la llave QR.', 'error');
         onClose();
@@ -85,9 +83,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       if (invitation?.success && invitation.data?.[0]) {
         setData(invitation.data[0]);
       } else {
-        // showToast(invitation?.message || 'Invitación no encontrada.', 'error');
         setMsgErrorQr(invitation?.message || 'Invitación no encontrada.');
-        // onClose();
       }
     };
 
@@ -99,9 +95,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       } else if (['I', 'G', 'F'].includes(typeFromQr)) {
         getInvitation();
       } else {
-        // showToast('Tipo de QR no reconocido.', 'error');
         setMsgErrorQr('Tipo de QR no reconocido.');
-        // onClose();
       }
     }
   }, [code, open]);
@@ -227,6 +221,15 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         type: data.type,
         owner_id: data?.invitation?.id,
         begin_at: formState?.begin_at || getUTCNow(),
+        acompanantes: formState?.acompanantes || [],
+        obs_in: formState?.obs_in,
+        plate: formState?.plate,
+        ci_taxi: formState?.ci_taxi,
+        name_taxi: formState?.name_taxi,
+        middle_name_taxi: formState?.middle_name_taxi,
+        last_name_taxi: formState?.last_name_taxi,
+        mother_last_name_taxi: formState?.mother_last_name_taxi,
+        visit_id: formState?.visit_id,
       };
     } else if (['I', 'G', 'F'].includes(data.type)) {
       params = {
@@ -326,6 +329,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
             formState={formState}
             handleChange={handleChange}
             data={data}
+            errors={errors}
           />
         );
       default:
@@ -380,6 +384,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     );
   };
 
+  console.log(errors);
   return (
     <ModalFull
       title={getModalTitle()}

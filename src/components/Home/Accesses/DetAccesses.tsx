@@ -50,10 +50,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   });
   const getData = async () => {
     try {
-      const {data} = await execute('/accesses', 'GET', {
-        fullType: 'DET',
-        searchBy: id,
-      });
+      const {data} = await execute(
+        '/accesses',
+        'GET',
+        {
+          fullType: 'DET',
+          searchBy: id,
+        },
+        false,
+        3,
+      );
 
       if (data.success && data.data.length > 0) {
         const accessData = data.data[0];
@@ -74,7 +80,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       showToast('Error al obtener los datos', 'error');
     }
   };
-
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
 
@@ -176,6 +181,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
 
   const labelAccess = () => {
+    if (data?.type === 'O') {
+      return 'Llave virtual';
+    }
     if (status === 'I') {
       return 'Visitó a';
     }
@@ -389,31 +397,35 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
     return (
       <View>
-        <Text style={styles.labelAccess}>
-          {status !== 'I' ? 'Visitante' : 'Detalle del visitante'}
-        </Text>
-        <ItemList
-          key={data?.visit?.id}
-          title={getFullName(visit)}
-          onPress={() => {
-            if (data?.out_at)
-              setOpenDet({
-                open: true,
-                id: data?.id,
-                type: 'V',
-              });
-          }}
-          style={{marginBottom: 12}}
-          subtitle={
-            'C.I: ' +
-            visit?.ci +
-            (data?.plate && taxi?.length === 0
-              ? ' - Placa: ' + data?.plate
-              : '')
-          }
-          left={getAvatarVisit(data)}
-          right={rightDetailVisit(data, isSelected)}
-        />
+        {data?.type !== 'O' && (
+          <>
+            <Text style={styles.labelAccess}>
+              {status !== 'I' ? 'Visitante' : 'Detalle del visitante'}
+            </Text>
+            <ItemList
+              key={data?.visit?.id}
+              title={getFullName(visit)}
+              onPress={() => {
+                if (data?.out_at)
+                  setOpenDet({
+                    open: true,
+                    id: data?.id,
+                    type: 'V',
+                  });
+              }}
+              style={{marginBottom: 12}}
+              subtitle={
+                'C.I: ' +
+                visit?.ci +
+                (data?.plate && taxi?.length === 0
+                  ? ' - Placa: ' + data?.plate
+                  : '')
+              }
+              left={getAvatarVisit(data)}
+              right={rightDetailVisit(data, isSelected)}
+            />
+          </>
+        )}
         {!data?.out_at && (
           <>
             {data?.confirm != 'N' && (
@@ -484,7 +496,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
         {acompData?.length > 0 && (
           <>
-            <Br />
+            {data?.type !== 'O' && <Br />}
             <Text style={styles.labelAccess}>Acompañantes</Text>
             {acompData.map((item: any) => (
               <ItemList

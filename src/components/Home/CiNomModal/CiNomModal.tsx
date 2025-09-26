@@ -235,6 +235,15 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         ...params,
         owner_id: dataOwner?.invitation?.id,
         type: 'O',
+        acompanantes: formState?.acompanantes || [],
+        obs_in: formState?.obs_in,
+        plate: formState?.plate,
+        ci_taxi: formState?.ci_taxi,
+        name_taxi: formState?.name_taxi,
+        middle_name_taxi: formState?.middle_name_taxi,
+        last_name_taxi: formState?.last_name_taxi,
+        mother_last_name_taxi: formState?.mother_last_name_taxi,
+        visit_id: formState?.visit_id,
       };
     } else {
       params = {
@@ -359,6 +368,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             formState={formState}
             setFormState={setFormState}
             handleChange={handleChangeInput}
+            errors={errors}
           />
         ) : (
           <>
