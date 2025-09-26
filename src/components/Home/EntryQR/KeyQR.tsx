@@ -25,6 +25,8 @@ type PropsType = {
   handleChange: Function;
   data: any;
   errors: any;
+  setTab?: any;
+  tab?: any;
 };
 const KeyQR = ({
   formState,
@@ -32,11 +34,13 @@ const KeyQR = ({
   handleChange,
   data,
   errors,
+  setTab,
+  tab,
 }: PropsType) => {
   const [details, setDetails] = useState<TypeDetails>({
     data: [],
   });
-  const [tab, setTab] = useState('P');
+  // const [tab, setTab] = useState('P');
   const {execute} = useApi();
   const [openAcom, setOpenAcom] = useState(false);
 
@@ -159,8 +163,6 @@ const KeyQR = ({
       />
     );
   };
-  console.log(formState);
-  console.log(errors);
   return (
     <View style={{marginTop: 20}}>
       {!data?.invitation || Object.keys(data?.invitation).length === 0 ? (

@@ -123,7 +123,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       // });
     }
   };
-
+  console.log(typeSearch);
   const validate = () => {
     let errors: any = {};
     errors = checkRules({
@@ -132,37 +132,39 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       key: 'ci',
       errors,
     });
-    if (steps == 1) {
-      errors = checkRules({
-        value: formState.owner_id,
-        rules: ['required'],
-        key: 'owner_id',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.name,
-        rules: ['required', 'alpha'],
-        key: 'name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.middle_name,
-        rules: ['alpha'],
-        key: 'middle_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.last_name,
-        rules: ['required', 'alpha'],
-        key: 'last_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.mother_last_name,
-        rules: ['alpha'],
-        key: 'mother_last_name',
-        errors,
-      });
+    if (steps <= 1) {
+      if (steps == 1) {
+        errors = checkRules({
+          value: formState.owner_id,
+          rules: ['required'],
+          key: 'owner_id',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.name,
+          rules: ['required', 'alpha'],
+          key: 'name',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.middle_name,
+          rules: ['alpha'],
+          key: 'middle_name',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.last_name,
+          rules: ['required', 'alpha'],
+          key: 'last_name',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.mother_last_name,
+          rules: ['alpha'],
+          key: 'mother_last_name',
+          errors,
+        });
+      }
 
       if (typeSearch == 'V' || typeSearch == 'T') {
         errors = checkRules({
@@ -369,6 +371,8 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             setFormState={setFormState}
             handleChange={handleChangeInput}
             errors={errors}
+            setTab={setTypeSearch}
+            tab={typeSearch}
           />
         ) : (
           <>
