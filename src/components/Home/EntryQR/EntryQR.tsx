@@ -27,6 +27,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   const [errors, setErrors] = useState({});
   const [data, setData]: any = useState(null);
   const {execute} = useApi();
+  const [tab, setTab] = useState('P');
   const {showToast, waiting} = useAuth();
   const [msgErrorQr, setMsgErrorQr] = useState('');
   const typeFromQr = code[2];
@@ -330,6 +331,8 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
             handleChange={handleChange}
             data={data}
             errors={errors}
+            tab={tab}
+            setTab={setTab}
           />
         );
       default:
@@ -383,8 +386,6 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       </View>
     );
   };
-
-  console.log(errors);
   return (
     <ModalFull
       title={getModalTitle()}
