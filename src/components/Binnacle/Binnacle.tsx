@@ -1,30 +1,68 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import DataSearch from '../../../mk/components/ui/DataSearch';
-import List from '../../../mk/components/ui/List/List';
+import ListFlat from '../../../mk/components/ui/List/ListFlat';
 import useApi from '../../../mk/hooks/useApi';
-import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {getFullName, getUrlImages} from '../../../mk/utils/strings';
-import {Text, View} from 'react-native';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
-import {cssVar} from '../../../mk/styles/themes';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import BinnacleAdd from './BinnacleAdd';
 import BinnacleDetail from './BinnacleDetail';
-import {getDateStrMes, getDateTimeStrMes} from '../../../mk/utils/dates';
+import { getDateTimeStrMes} from '../../../mk/utils/dates';
 
 const Binnacle = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState({open: false, item: null});
   const [search, setSearch] = useState('');
-  const {data, reload, loaded} = useApi(
+  const [params, setParams] = useState({
+    fullType: 'L',
+    perPage: 20,
+    page: 1,
+  });
+  const [allData, setAllData] = useState<any[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const {data, reload, loaded, execute} = useApi(
     '/guardnews',
     'GET',
-    {
-      fullType: 'L',
-    },
+    params,
     3,
   );
+
+
+  useEffect(() => {
+    if (data && loaded) {
+      if (params.perPage === 20) {
+        setAllData(data.data || []);
+        setTotalItems(data.message?.total || 0);
+      } else {
+        // Carga de páginas adicionales (cuando perPage > 20)
+        setAllData(prevData => [...prevData, ...(data.data || [])]);
+      }
+    }
+  }, [data, loaded, params.perPage]);
+
+  const onPagination = () => {
+    if (allData.length >= totalItems) {
+      console.log('No more data to load');
+      return;
+    }
+
+    console.log('🚀 Loading next page...');
+    setParams(prevParams => ({
+      ...prevParams,
+      perPage: prevParams.perPage + 20,
+    }));
+  };
+
+  const handleReload = () => {
+    setParams({
+      fullType: 'L',
+      perPage: 20,
+      page: 1,
+    });
+    setAllData([]);
+    setTotalItems(0);
+  };
 
   const novedadList = (novedad: any) => {
     if (
@@ -35,57 +73,43 @@ const Binnacle = () => {
     return (
       <ItemList
         onPress={() => setOpenView({open: true, item: novedad})}
-        // title={getFullName(novedad?.guardia)}
         title={novedad.descrip}
         subtitle={getDateTimeStrMes(novedad?.created_at)}
-        // left={
-        //   <Avatar
-        //     src={getUrlImages(
-        //       '/GUARD-' +
-        //         novedad?.guard_id +
-        //         '.webp?d=' +
-        //         novedad?.guardia?.updated_at,
-        //     )}
-        //     name={getFullName(novedad?.guardia)}
-        //   />
-        // }
       />
-      //    <View style={{paddingTop: 8}}>
-      //     <Text style={{color: cssVar.cWhite}}>Descripción</Text>
-      //     <Text
-      //       numberOfLines={1}
-      //       ellipsizeMode="tail"
-      //       style={{
-      //         color: cssVar.cWhiteV1,
-      //         fontSize: 10,
-      //         fontWeight: '400',
-      //       }}>
-      //       {novedad.descrip}
-      //     </Text>
-      //   </View>
-      //  </ItemList>
     );
   };
 
   const onSearch = (search: string) => {
     setSearch(search);
   };
+
   return (
     <>
-      <Layout title="Bitácora">
+      <Layout title="Bitácora" scroll={false} style={{paddingHorizontal: 0}}>
         <DataSearch
           setSearch={onSearch}
           name="Bitácora"
-          style={{marginVertical: 8}}
+          style={{marginVertical: 6}}
           value={search}
         />
-        <List data={data?.data} renderItem={novedadList} refreshing={!loaded} />
+        <ListFlat
+          data={allData}
+          renderItem={novedadList}
+          skeletonType="survey"
+          refreshing={!loaded && params.perPage === 20}
+          emptyLabel="No hay datos en la bitácora"
+          onRefresh={handleReload}
+          loading={!loaded && params.perPage > 20}
+          onPagination={onPagination}
+          total={totalItems}
+
+        />
 
         {openAdd && (
           <BinnacleAdd
             open={openAdd}
             onClose={() => setOpenAdd(false)}
-            reload={reload}
+            reload={handleReload}
           />
         )}
         {openView.open && (
