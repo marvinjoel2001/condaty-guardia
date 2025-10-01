@@ -11,7 +11,7 @@ import { getDateTimeStrMes} from '../../../mk/utils/dates';
 
 const Binnacle = () => {
   const [openAdd, setOpenAdd] = useState(false);
-  const [openView, setOpenView] = useState({open: false, item: null});
+  const [openView, setOpenView] = useState({open: false, id: null});
   const [search, setSearch] = useState('');
   const [params, setParams] = useState({
     fullType: 'L',
@@ -72,7 +72,7 @@ const Binnacle = () => {
       return null;
     return (
       <ItemList
-        onPress={() => setOpenView({open: true, item: novedad})}
+        onPress={() => setOpenView({open: true, id: novedad.id})}
         title={novedad.descrip}
         subtitle={getDateTimeStrMes(novedad?.created_at)}
       />
@@ -102,7 +102,7 @@ const Binnacle = () => {
           loading={!loaded && params.perPage > 20}
           onPagination={onPagination}
           total={totalItems}
-
+          style={{paddingTop: 8}}
         />
 
         {openAdd && (
@@ -115,8 +115,8 @@ const Binnacle = () => {
         {openView.open && (
           <BinnacleDetail
             open={openView.open}
-            onClose={() => setOpenView({open: false, item: null})}
-            item={openView?.item}
+            onClose={() => setOpenView({open: false, id: null})}
+            id={openView?.id}
           />
         )}
       </Layout>
