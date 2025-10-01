@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import {getUrlImages} from '../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
 import Card from '../../../mk/components/ui/Card/Card';
 import useApi from '../../../mk/hooks/useApi';
+import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Br from '../Profile/Br';
 
 type PropsType = {
@@ -25,7 +26,6 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
       searchBy: id,
     });
     if (data?.success) {
-      console.log(data);
       setDetails(data?.data[0]);
     }
   };
@@ -42,9 +42,8 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
     setImageError(false);
   };
 
-
   const renderImageSection = () => {
-    // Si no tiene imagen, mostrar mensaje
+
     if (details?.has_image === 0) {
       return (
         <View style={styles.noImageContainer}>
@@ -53,40 +52,30 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
       );
     }
 
-    // Si hubo error cargando la imagen, mostrar mensaje de error
+
     if (imageError) {
       return (
-        <Text
-          style={{
-            color: cssVar.cWhiteV1,
-            textAlign: 'center',
-            marginVertical: 16,
-            fontSize: 14,
-          }}>
-          Sin Imagen
-        </Text>
+        <View style={styles.noImageContainer}>
+          <Text style={styles.noImageText}>No se encontró la imagen</Text>
+        </View>
       );
     }
 
-    // Si tiene imagen y no hay error, mostrar la imagen
+
     return (
       <>
         <Text style={styles.text}>Imagen del reporte</Text>
-        <View style={styles.containerImage}>
-          <Image
-            source={{
-              uri: getUrlImages(
-                `/GNEW-${details?.id}.webp?d=${details?.updated_at}`,
-              ),
-            }}
-            resizeMode="cover"
-            style={{
-              flex: 1,
-              borderRadius: 8,
-              justifyContent: 'center',
-              width: '100%',
-            }}
-            onError={() => setImageError(true)}
+        <View style={styles.imageContainer}>
+          <Avatar
+            src={getUrlImages(
+              `/GNEW-${details?.id}.webp?d=${details?.updated_at}`,
+            )}
+            name="Imagen del reporte"
+            w={750}
+            h={180}
+            circle={false}
+            error={() => setImageError(true)}
+            style={styles.avatarImage}
           />
         </View>
       </>
@@ -138,14 +127,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 12,
   },
-  containerImage: {
-    flex: 1,
-    justifyContent: 'center',
+  imageContainer: {
     marginTop: 16,
-    borderRadius: 10,
+    borderRadius: 8,
+    backgroundColor: cssVar.cWhiteV2,
     height: 180,
     width: '100%',
-    backgroundColor: cssVar.cWhiteV2,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
   },
   loadingContainer: {
     flex: 1,
