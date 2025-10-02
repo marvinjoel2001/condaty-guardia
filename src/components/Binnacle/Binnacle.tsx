@@ -15,7 +15,7 @@ const Binnacle = () => {
   const [search, setSearch] = useState('');
   const [params, setParams] = useState({
     fullType: 'L',
-    perPage: 20,
+    perPage: -1,
     page: 1,
   });
   const [allData, setAllData] = useState<any[]>([]);
@@ -57,7 +57,7 @@ const Binnacle = () => {
   const handleReload = () => {
     setParams({
       fullType: 'L',
-      perPage: 20,
+      perPage: -1,
       page: 1,
     });
     setAllData([]);
@@ -85,7 +85,7 @@ const Binnacle = () => {
 
   return (
     <>
-      <Layout title="Bitácora" scroll={false} style={{paddingHorizontal: 0}}>
+      <Layout title="Bitácora" scroll={false} style={{paddingHorizontal: 12}}>
         <DataSearch
           setSearch={onSearch}
           name="Bitácora"
@@ -96,10 +96,10 @@ const Binnacle = () => {
           data={allData}
           renderItem={novedadList}
           skeletonType="survey"
-          refreshing={!loaded && params.perPage === 20}
+          refreshing={!loaded && params.perPage === -1}
           emptyLabel="No hay datos en la bitácora"
           onRefresh={handleReload}
-          loading={!loaded && params.perPage > 20}
+          loading={!loaded && params.perPage > -1}
           onPagination={onPagination}
           total={totalItems}
           style={{paddingTop: 8}}
