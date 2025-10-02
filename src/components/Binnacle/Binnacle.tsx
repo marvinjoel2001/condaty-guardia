@@ -27,7 +27,6 @@ const Binnacle = () => {
     loaded,
   } = useApi('/guardnews', 'GET', params, 3);
 
-  // Cargar cada vez que cambian los parámetros (evita acumulaciones y duplicados)
   useEffect(() => {
     reloadBinnacle(params);
   }, [params]);
@@ -43,12 +42,12 @@ const Binnacle = () => {
 
     setParams(prev => ({
       ...prev,
-      perPage: prev.perPage + 20, // solo incrementa perPage y recarga via useEffect
+      perPage: prev.perPage + 20,
     }));
   };
 
   const handleReload = () => {
-    setParams(paramsInitial); // useEffect recargará automáticamente
+    setParams(paramsInitial); 
   };
 
   const novedadList = (novedad: any) => {
