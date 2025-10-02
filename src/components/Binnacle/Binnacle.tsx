@@ -10,58 +10,45 @@ import BinnacleDetail from './BinnacleDetail';
 import { getDateTimeStrMes} from '../../../mk/utils/dates';
 
 const Binnacle = () => {
-  const [openAdd, setOpenAdd] = useState(false);
-  const [openView, setOpenView] = useState({open: false, id: null});
-  const [search, setSearch] = useState('');
-  const [params, setParams] = useState({
+  const paramsInitial = {
     fullType: 'L',
     perPage: 20,
     page: 1,
-  });
-  const [allData, setAllData] = useState<any[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
+  };
 
-  const {data, reload, loaded, execute} = useApi(
-    '/guardnews',
-    'GET',
-    params,
-    3,
-  );
+  const [openAdd, setOpenAdd] = useState(false);
+  const [openView, setOpenView] = useState({open: false, id: null});
+  const [search, setSearch] = useState('');
+  const [params, setParams] = useState(paramsInitial);
 
+  const {
+    data: binnacleData,
+    reload: reloadBinnacle,
+    loaded,
+  } = useApi('/guardnews', 'GET', params, 3);
 
+  // Cargar cada vez que cambian los parámetros (evita acumulaciones y duplicados)
   useEffect(() => {
-    if (data && loaded) {
-      if (params.perPage === 20) {
-        setAllData(data.data || []);
-        setTotalItems(data.message?.total || 0);
-      } else {
-        // Carga de páginas adicionales (cuando perPage > 20)
-        setAllData(prevData => [...prevData, ...(data.data || [])]);
-      }
-    }
-  }, [data, loaded, params.perPage]);
+    reloadBinnacle(params);
+  }, [params]);
 
   const onPagination = () => {
-    if (allData.length >= totalItems) {
-      console.log('No more data to load');
+    const total = binnacleData?.message?.total || 0;
+    const currentLength = binnacleData?.data?.length || 0;
+    const maxPage = Math.ceil(total / params.perPage);
+
+    if (currentLength >= total || params.page >= maxPage || !loaded) {
       return;
     }
 
-    console.log('🚀 Loading next page...');
-    setParams(prevParams => ({
-      ...prevParams,
-      perPage: prevParams.perPage + 20,
+    setParams(prev => ({
+      ...prev,
+      perPage: prev.perPage + 20, // solo incrementa perPage y recarga via useEffect
     }));
   };
 
   const handleReload = () => {
-    setParams({
-      fullType: 'L',
-      perPage: 20,
-      page: 1,
-    });
-    setAllData([]);
-    setTotalItems(0);
+    setParams(paramsInitial); // useEffect recargará automáticamente
   };
 
   const novedadList = (novedad: any) => {
@@ -89,11 +76,15 @@ const Binnacle = () => {
         <DataSearch
           setSearch={onSearch}
           name="Bitácora"
-          style={{marginVertical: 6}}
+          style={{
+            marginTop: 12,
+            marginHorizontal: 12,
+            marginBottom: 4,
+          }}
           value={search}
         />
         <ListFlat
-          data={allData}
+          data={binnacleData?.data}
           renderItem={novedadList}
           skeletonType="survey"
           refreshing={!loaded && params.perPage === 20}
@@ -101,8 +92,8 @@ const Binnacle = () => {
           onRefresh={handleReload}
           loading={!loaded && params.perPage > 20}
           onPagination={onPagination}
-          total={totalItems}
-          style={{paddingTop: 8}}
+          total={binnacleData?.message?.total || 0}
+
         />
 
         {openAdd && (

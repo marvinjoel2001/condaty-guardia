@@ -105,7 +105,7 @@ const ListFlat = (props: PropsType) => {
         testID="ListFlatlist"
         nativeID="ListFlatlist"
         data={data}
-        contentContainerStyle={[style, {paddingBottom: 60}]}
+        contentContainerStyle={[style, {paddingBottom: 24, paddingHorizontal: 12}]}
         keyExtractor={(item, idx) => `news-index-${idx}`}
         renderItem={({item, index}) => (
           <Fragment key={index}>
