@@ -6,6 +6,7 @@ import Button from '../../../mk/components/forms/Button/Button';
 import {getUrlImages} from '../../../mk/utils/strings';
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
+import useAuth from '../../../mk/hooks/useAuth';
 
 interface Props {
   open: boolean;
@@ -15,6 +16,7 @@ interface Props {
 
 const DocumentDetail = ({open, onClose, item}: Props) => {
   const [downloading, setDownloading] = useState(false);
+  const {showToast} = useAuth();
 
   const downloadAndOpen = async (document: any) => {
     try {
@@ -54,15 +56,20 @@ const DocumentDetail = ({open, onClose, item}: Props) => {
           showAppsSuggestions: true,
         });
       } else {
-        Alert.alert(
-          'Error',
+        // Alert.alert(
+        //   'Error',
+        //   'No se pudo descargar el documento. Código: ' +
+        //     downloadResult.statusCode,
+        // );
+        showToast(
           'No se pudo descargar el documento. Código: ' +
             downloadResult.statusCode,
+          'error',
         );
       }
     } catch (error: any) {
-      console.error('Error descargando/abriendo archivo: ', error);
-
+      //   console.error('Error descargando/abriendo archivo: ', error);
+      showToast('Ocurrió un error al abrir el documento.', 'error');
       let errorMessage = 'Ocurrió un error al abrir el documento.';
 
       if (error.message?.includes('No app')) {
@@ -70,7 +77,7 @@ const DocumentDetail = ({open, onClose, item}: Props) => {
           'No hay una aplicación instalada para abrir este tipo de archivo.';
       }
 
-      Alert.alert('Error', errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setDownloading(false);
     }
