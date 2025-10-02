@@ -29,10 +29,23 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       return;
     }
 
-    const {data: novedad} = await execute('/guardnews', 'POST', {
+    const hasImage =
+      typeof formState?.avatar === 'string' &&
+      formState.avatar.trim() !== '' &&
+      formState.avatar !== 'undefined';
+
+    const payload: any = {
       descrip: formState.descrip,
-      imageNew: {file: encodeURIComponent(formState.avatar), ext: 'webp'},
-    });
+    };
+
+    if (hasImage) {
+      payload.imageNew = {
+        file: encodeURIComponent(formState.avatar),
+        ext: 'webp',
+      };
+    }
+
+    const {data: novedad} = await execute('/guardnews', 'POST', payload);
     if (novedad?.success) {
       onClose();
       reload();
@@ -55,7 +68,6 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
         type="textArea"
         label="Escribir reporte..."
         name="descrip"
-        // placeholder="Escribir reporte..."
         error={errors}
         maxLength={250}
         required={false}
