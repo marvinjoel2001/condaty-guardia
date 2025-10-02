@@ -12,7 +12,7 @@ import { getDateTimeStrMes} from '../../../mk/utils/dates';
 const Binnacle = () => {
   const paramsInitial = {
     fullType: 'L',
-    perPage: 20,
+    perPage: -1,
     page: 1,
   };
 
@@ -71,7 +71,7 @@ const Binnacle = () => {
 
   return (
     <>
-      <Layout title="Bitácora" scroll={false} style={{paddingHorizontal: 12}}>
+      <Layout title="Bitácora" scroll={false} style={{paddingHorizontal: 0}}>
         <DataSearch
           setSearch={onSearch}
           name="Bitácora"
@@ -89,7 +89,7 @@ const Binnacle = () => {
           refreshing={!loaded && params.perPage === -1}
           emptyLabel="No hay datos en la bitácora"
           onRefresh={handleReload}
-          loading={!loaded && params.perPage > -1}
+          loading={!loaded && params.perPage >= -1}
           onPagination={onPagination}
           total={binnacleData?.message?.total || 0}
 
