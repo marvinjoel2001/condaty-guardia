@@ -47,7 +47,7 @@ const Documents = () => {
   const DocumentList = (document: any) => {
     const fileType = getFileType(document.ext.toLowerCase());
     const iconName = FILE_TYPE_ICONS[fileType] || IconPDF;
-    console.log('iconName: ', fileType);
+
     return (
       <ItemList
         title={document?.name}
