@@ -2,6 +2,7 @@ import {ColorValue, TouchableOpacity, View} from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import {TypeStyles} from '../../../styles/themes';
 import React from 'react';
+
 export interface IconType {
   style?: TypeStyles;
   size?: number;
