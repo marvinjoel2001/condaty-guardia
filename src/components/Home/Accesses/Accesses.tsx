@@ -70,11 +70,7 @@ const subtitleAccess = (item: any) => {
   return <Text>{prefix + getFullName(item.owner)}</Text>;
 };
 const titleAccess = (item: any) => {
-  // return item.type === 'O' ? (
-  //   <Text>{getFullName(item.owner)}</Text>
-  // ) : (
-  //   <Text>{getFullName(item.visit)}</Text>
-  // );
+
   return <Text>{getFullName(item?.visit || item?.owner)}</Text>;
 };
 
@@ -274,12 +270,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const renderItemAccess = (item: any) => {
     const status = getStatus(item);
     const hasColoredBorder = status === 'N' || status === 'A';
-    if (
-      search &&
-      !removeAccents(getFullName(item.visit))?.includes(removeAccents(search))
-    ) {
-      return null;
-    }
+   
     return (
       <ItemList
         key={item.id}
@@ -300,15 +291,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const renderItemOrder = (item: any) => {
-    if (
-      search &&
-      !removeAccents(getFullName(item?.owner))?.includes(
-        removeAccents(search),
-      ) &&
-      !removeAccents(item?.other_type?.name)?.includes(removeAccents(search))
-    ) {
-      return null;
-    }
     return (
       <ItemList
         key={item?.id}
@@ -326,20 +308,20 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const filterBySearch = (items: any[], searchTerm: string) => {
-    if (!searchTerm) return items;
+  if (!searchTerm) return items;
 
-    return items?.filter(item => {
-      const name = item.visit
-        ? getFullName(item.visit)
-        : getFullName(item.owner);
-      const otherTypeName = item?.other_type?.name || '';
+  return items?.filter(item => {
+    const visitName = item?.visit ? getFullName(item.visit) : '';
+    const ownerName = item?.owner ? getFullName(item.owner) : '';
+    const otherTypeName = item?.other_type?.name || '';
 
-      return (
-        removeAccents(name)?.includes(removeAccents(searchTerm)) ||
-        removeAccents(otherTypeName)?.includes(removeAccents(searchTerm))
-      );
-    });
-  };
+    return (
+      removeAccents(visitName)?.includes(removeAccents(searchTerm)) ||
+      removeAccents(ownerName)?.includes(removeAccents(searchTerm)) ||
+      removeAccents(otherTypeName)?.includes(removeAccents(searchTerm))
+    );
+  });
+};
 
   const filteredAccesses = useMemo(
     () => filterBySearch(dataAccesses || [], search),
