@@ -31,7 +31,7 @@ const statusText: any = {
   S: 'Dejar salir',
 };
 const statusColor: any = {
-  E: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
+  E: {color: cssVar.cWarning, background: cssVar.cHoverWarning},
   A: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
   N: {color: cssVar.cError, background: cssVar.cHoverError},
   S: {color: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
