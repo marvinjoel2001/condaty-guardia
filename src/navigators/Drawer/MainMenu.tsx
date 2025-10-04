@@ -105,6 +105,7 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
           <ItemMenu
             screen="Binnacle"
             text="Bitácora"
+            color={cssVar.cWhiteV1}
             icon={IconBitacora}
             activeItem={activeItem}
           />
