@@ -1,14 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
-import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {
+  getDateStrMes,
+  getDateTimeStrMes,
+  parseWeekDays,
+} from '../../../../mk/utils/dates';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import useApi from '../../../../mk/hooks/useApi';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import { IconArrowDown, IconArrowUp } from '../../../icons/IconLibrary';
+import {IconExpand} from '../../../icons/IconLibrary';
+import Modal from '../../../../mk/components/ui/Modal/Modal';
+import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 
 type Props = {
   open: boolean;
@@ -16,7 +22,15 @@ type Props = {
   id: string | null;
 };
 
-const DetailRow = ({label, value, valueStyle}: {label: string; value: string | undefined | null; valueStyle?: object}) => {
+const DetailRow = ({
+  label,
+  value,
+  valueStyle,
+}: {
+  label: string;
+  value: any;
+  valueStyle?: object;
+}) => {
   let displayValue = value;
   if (value === undefined || value === null || value === '') {
     displayValue = '-/-';
@@ -24,52 +38,58 @@ const DetailRow = ({label, value, valueStyle}: {label: string; value: string | u
   return (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
+      {typeof displayValue === 'string' ? (
+        <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
+      ) : (
+        value
+      )}
     </View>
   );
 };
 
-interface CompanionItemProps {
-  companionAccess: any;
-  isFrequentOrGroup?: boolean;
+interface ModalPersonData {
+  person: any;
+  typeLabel: string;
+  accessInAt?: string | null;
+  accessOutAt?: string | null;
+  accessObsIn?: string | null;
+  accessObsOut?: string | null;
+  plate?: string | null;
+  statusText?: string;
+  statusColor?: string;
 }
 
-const CompanionItem = ({ companionAccess, isFrequentOrGroup }: CompanionItemProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const visit = companionAccess.visit;
+interface CompanionItemProps {
+  companionAccess: any;
+  onPress: () => void;
+}
 
-  if (!visit) return null;
-
-  const companionFullName = getFullName(visit) || 'N/A';
-  const companionCi = visit.ci ? `C.I. ${visit.ci}` : 'CI no disponible';
+const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
+  const person = companionAccess.visit || companionAccess;
+  const companionFullName = getFullName(person) || 'N/A';
+  const companionCi = person.ci ? `C.I. ${person.ci}` : 'CI no disponible';
 
   return (
-    <View style={styles.companionCard}>
-      <TouchableOpacity style={styles.companionHeader} onPress={() => setIsExpanded(!isExpanded)} activeOpacity={0.7}>
+    <ItemList
+      title={companionFullName}
+      subtitle={companionCi}
+      left={
         <Avatar
           name={companionFullName}
-          src={visit.url_avatar ? getUrlImages(visit.url_avatar) : undefined}
+          src={person.url_avatar ? getUrlImages(person.url_avatar) : undefined}
           w={40}
           h={40}
-          style={!visit.url_avatar && isFrequentOrGroup ? { backgroundColor: cssVar.cCompl2 } : {}}
-          fontSize={cssVar.sM}
         />
-        <View style={styles.companionInfo}>
-          <Text style={styles.companionName}>{companionFullName}</Text>
-          <Text style={styles.companionCi}>{companionCi}</Text>
-        </View>
-        <Icon name={isExpanded ? IconArrowUp : IconArrowDown} size={20} color={cssVar.cWhiteV1} />
-      </TouchableOpacity>
-
-      {isExpanded && (
-        <View style={styles.companionDetails}>
-          <DetailRow label="Hora y fecha de ingreso" value={getDateTimeStrMes(companionAccess.in_at)} />
-          <DetailRow label="Hora y fecha de salida" value={getDateTimeStrMes(companionAccess.out_at)} />
-          <DetailRow label="Observación de ingreso" value={companionAccess.obs_in} />
-          <DetailRow label="Observación de salida" value={companionAccess.obs_out} />
-        </View>
-      )}
-    </View>
+      }
+      right={
+        <Icon
+          name={IconExpand}
+          size={cssVar.sXl}
+          color={cssVar.cWhiteV1}
+          onPress={onPress}
+        />
+      }
+    />
   );
 };
 
@@ -77,56 +97,121 @@ const AccessDetail = ({open, onClose, id}: Props) => {
   const [accessData, setAccessData] = useState<any>(null);
   const {execute} = useApi();
 
-  useEffect(() => {
-    const getAccess = async () => {
-      // No se establece accessData a null aquí intencionalmente al inicio de getAccess,
-      // se limpiará solo si el 'id' cambia (ver abajo) o si la petición falla.
-      // Esto replica el comportamiento del "antiguo componente".
-      try {
-        const {data: apiResponse} = await execute('/accesses', 'GET', {
-          fullType: 'DET',
-          section: 'ACT',
-          searchBy: id, // 'id' aquí es el de las props/clausura del useEffect
-        });
-        // Solo actualizar si el modal está abierto y el 'id' para el que se hizo la petición
-        // sigue siendo el 'id' actual de las props. Esto evita condiciones de carrera.
-        if (open && id === id) { // Esta comprobación id === id es redundante aquí, se simplifica
-            setAccessData(apiResponse.data?.[0] || null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch access details:", error);
-        if (open && id === id) { // Simplificado, id es constante dentro de este scope de getAccess
-            setAccessData(null);
-        }
-      }
-    };
+  const [modalPersonData, setModalPersonData] =
+    useState<ModalPersonData | null>(null);
+  const [isPersonDetailModalVisible, setIsPersonDetailModalVisible] =
+    useState(false);
 
+  const getAccess = async () => {
+    try {
+      const {data: apiResponse} = await execute('/accesses', 'GET', {
+        fullType: 'DET',
+        section: 'ACT',
+        searchBy: id,
+      });
+      if (apiResponse?.success) {
+        setAccessData(apiResponse.data?.[0] || null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch access details:', error);
+
+      setAccessData(null);
+    }
+  };
+  useEffect(() => {
     if (id && open) {
-      // Cuando 'id' cambia (y está abierto), o cuando se abre el modal con un 'id',
-      // limpiamos 'accessData' para mostrar el estado de carga y luego obtenemos los datos.
       setAccessData(null);
       getAccess();
     } else if (!id && open) {
-      // Si el modal está abierto pero no hay 'id', limpiar datos.
       setAccessData(null);
     }
-    // La dependencia es solo 'id' y 'open'.
-    // 'execute' se usa, pero no se lista como dependencia para replicar el "antiguo componente".
-    // ADVERTENCIA: Si `execute` no es una referencia estable y su lógica interna depende
-    // de algo que cambia, esto podría usar una versión obsoleta de `execute`.
-    // La forma "correcta" moderna sería incluir `execute` y asegurarse de que `useApi` lo memoiza.
-    // Pero para replicar el "antiguo", lo omitimos de las dependencias.
   }, [id, open]);
 
-
-  // Efecto adicional para limpiar los datos cuando el modal se cierra,
-  // independientemente del estado de 'id'.
   useEffect(() => {
     if (!open) {
       setAccessData(null);
+      setIsPersonDetailModalVisible(false);
+      setModalPersonData(null);
     }
   }, [open]);
 
+  const getStatusForCompanionOrResident = (personData: any) => {
+    if (personData.out_at) return {text: 'Completado', color: cssVar.cSuccess};
+    if (personData.in_at) return {text: 'Por salir', color: cssVar.cSuccess};
+    return {text: 'Pendiente', color: cssVar.cWhite};
+  };
+
+  const getStatusForTaxiDriver = (mainAccessItem: any) => {
+    let text = 'Denegado';
+    let color = cssVar.cError;
+
+    if (mainAccessItem.out_at) {
+      text = 'Completado';
+      color = cssVar.cSuccess;
+    } else if (!mainAccessItem.confirm_at && mainAccessItem.status !== 'X') {
+      text = 'Por confirmar';
+      color = cssVar.cWarning;
+    } else if (mainAccessItem.in_at) {
+      text = 'Por salir';
+      color = cssVar.cSuccess;
+    } else if (mainAccessItem.confirm === 'Y') {
+      text = 'Por ingresar';
+      color = cssVar.cSuccess;
+    } else if (mainAccessItem.status === 'X') {
+      text = 'Anulado';
+      color = cssVar.cError;
+    }
+
+    return {text, color};
+  };
+
+  const handleOpenPersonDetailModal = (
+    personData: any,
+    typeLabel: 'Acompañante' | 'Taxista' | 'Residente',
+    mainAccessItem: any,
+  ) => {
+    let dataForModal: ModalPersonData;
+
+    const personToShow =
+      typeLabel === 'Acompañante' ? personData.visit || personData : personData;
+
+    if (typeLabel === 'Acompañante' || typeLabel === 'Residente') {
+      const {text, color} = getStatusForCompanionOrResident(personData);
+
+      dataForModal = {
+        person: personToShow,
+        typeLabel,
+        accessInAt: personData.in_at,
+        accessOutAt: personData.out_at,
+        accessObsIn: personData.obs_in,
+        accessObsOut: personData.obs_out,
+        statusText: text,
+        statusColor: color,
+      };
+    } else {
+      const {text, color} = getStatusForTaxiDriver(mainAccessItem);
+
+      dataForModal = {
+        person: personToShow.visit,
+        typeLabel: 'Taxista',
+        accessInAt: personToShow.in_at,
+        accessOutAt: personToShow.out_at,
+        accessObsIn: personToShow.obs_in,
+        accessObsOut: personToShow.obs_out,
+        plate: personToShow.plate,
+        statusText: text,
+        statusColor: color,
+      };
+    }
+
+    setModalPersonData(dataForModal);
+    setIsPersonDetailModalVisible(true);
+  };
+
+  const handleClosePersonDetailModal = () => {
+    setIsPersonDetailModalVisible(false);
+    setModalPersonData(null);
+  };
 
   const renderContent = () => {
     if (!accessData) {
@@ -134,285 +219,772 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     }
 
     const item = accessData;
-    const mainUser = item.visit || item.owner;
-    const mainUserFullName = getFullName(mainUser) || 'N/A';
-    const mainUserCi = mainUser?.ci;
-    const mainUserPlate = item.plate && !item.taxi ? item.plate : null;
+    const resident = item.owner;
+    const mainVisitor = item.visit;
+    const driverAccess = item.accesses?.find((acc: any) => acc.taxi === 'C');
+    const driver = driverAccess ? driverAccess.visit : null;
+    const companions =
+      item.accesses?.filter((acc: any) => acc.taxi !== 'C') || [];
+
+    const mainUserFullName = getFullName(mainVisitor) || 'N/A';
+    const mainUserCi = mainVisitor?.ci;
 
     let statusText = '';
     let statusColor = cssVar.cWhite;
-    let tipoAccesoText = '';
 
-    if (item.type === 'O') {
-      tipoAccesoText = 'QR Llave Virtual';
-      statusText = getDateTimeStrMes(item.in_at) ? 'Ingresó' : 'Pendiente';
-    } else {
-      statusText = item.out_at
-        ? 'Completado'
-        : !item.confirm_at && item.status !== 'X'
-        ? 'Por confirmar'
-        : item.in_at
-        ? 'Por Salir'
-        : item.confirm === 'Y'
-        ? 'Por Entrar'
-        : item.status === 'X'
-        ? 'Anulado'
-        : 'Denegado';
+    statusText = item.out_at
+      ? 'Completado'
+      : !item.confirm_at && item.status !== 'X'
+      ? 'Por confirmar'
+      : item.in_at
+      ? 'Dentro del condominio'
+      : item.confirm === 'Y'
+      ? 'Por ingresar'
+      : item.status === 'X'
+      ? 'Anulado'
+      : 'Denegado';
 
-      if (statusText === 'Completado' || statusText === 'Por Salir' || statusText === 'Por Entrar') statusColor = cssVar.cSuccess;
-      if (statusText === 'Anulado' || statusText === 'Denegado') statusColor = cssVar.cError;
-      if (statusText === 'Por confirmar') statusColor = cssVar.cWarning;
+    if (
+      statusText === 'Completado' ||
+      statusText === 'Dentro del condominio' ||
+      statusText === 'Por ingresar'
+    )
+      statusColor = cssVar.cSuccess;
+    if (statusText === 'Anulado' || statusText === 'Denegado')
+      statusColor = cssVar.cError;
+    if (statusText === 'Por confirmar') statusColor = cssVar.cWarning;
 
-      switch (item.type) {
-        case 'P':
-          tipoAccesoText = `Pedido - ${item.other?.other_type?.name || 'General'}`;
-          break;
-        case 'I':
-          tipoAccesoText = 'QR Individual';
-          break;
-        case 'C':
-          tipoAccesoText = 'Sin QR';
-          break;
-        case 'G':
-          tipoAccesoText = 'QR Grupal';
-          break;
-        case 'F':
-          tipoAccesoText = 'QR Frecuente';
-          break;
-        default:
-          tipoAccesoText = 'Desconocido';
-      }
+    let tipoAccesoText = 'Desconocido';
+    switch (item.type) {
+      case 'P':
+        tipoAccesoText = `Pedido - ${
+          item.other?.other_type?.name || 'General'
+        }`;
+        break;
+      case 'I':
+        tipoAccesoText = 'QR Individual';
+        break;
+      case 'C':
+        tipoAccesoText = 'Sin QR';
+        break;
+      case 'G':
+        tipoAccesoText = 'QR Grupal';
+        break;
+      case 'F':
+        tipoAccesoText = 'QR Frecuente';
+        break;
+      case 'O':
+        tipoAccesoText = 'QR Llave Virtual';
+        break;
     }
-    
-    const isFrequentOrGroup = item.type === 'G' || item.type === 'F';
+
+    if (item.type === 'F') {
+      return (
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.mainCard}>
+            <Text style={styles.sectionTitleNoBorder}>
+              Resumen de la visita
+            </Text>
+            <ItemList
+              title={mainUserFullName}
+              subtitle={
+                (mainUserCi ? `C.I. ${mainUserCi}` : '') +
+                (mainUserCi && item.plate ? ' • ' : '') +
+                (item.plate ? `Placa: ${item.plate}` : '')
+              }
+              left={
+                <Avatar
+                  name={mainUserFullName}
+                  src={
+                    mainVisitor?.url_avatar
+                      ? getUrlImages(mainVisitor.url_avatar)
+                      : undefined
+                  }
+                  w={40}
+                  h={40}
+                />
+              }
+            />
+            <View style={styles.detailsGroup}>
+              <DetailRow label="Tipo de visita" value={tipoAccesoText} />
+              <DetailRow
+                label="Estado"
+                value={statusText}
+                valueStyle={{color: statusColor, fontFamily: FONTS.semiBold}}
+              />
+              <DetailRow
+                label="Fecha y hora de ingreso"
+                value={getDateTimeStrMes(item.in_at)}
+              />
+              <DetailRow
+                label="Fecha y hora de salida"
+                value={getDateTimeStrMes(item.out_at)}
+              />
+              <DetailRow
+                label="Guardia de ingreso"
+                value={getFullName(item.guardia)}
+              />
+              <DetailRow
+                label="Guardia de salida"
+                value={getFullName(item.out_guard)}
+              />
+              <DetailRow label="Observación de ingreso" value={item.obs_in} />
+              <DetailRow label="Observación de salida" value={item.obs_out} />
+              {companions && companions.length > 0 && (
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>
+                    Acompañante{companions.length > 1 ? 's' : ''}
+                  </Text>
+                  {companions.map((companionAccess: any, index: number) => (
+                    <View
+                      key={`companion-wrapper-${companionAccess.id || index}`}
+                      style={
+                        index > 0 ? styles.additionalCompanionWrapper : null
+                      }>
+                      <CompanionItem
+                        companionAccess={companionAccess}
+                        onPress={() =>
+                          handleOpenPersonDetailModal(
+                            companionAccess,
+                            'Acompañante',
+                            item,
+                          )
+                        }
+                      />
+                    </View>
+                  ))}
+                </View>
+              )}
+              {driver && (
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>Taxista</Text>
+                  <ItemList
+                    title={getFullName(driver)}
+                    subtitle={
+                      (driver.ci ? `C.I. ${driver.ci}` : '') +
+                      (driver.ci && driverAccess.plate ? ' • ' : '') +
+                      (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')
+                    }
+                    left={
+                      <Avatar
+                        name={getFullName(driver)}
+                        src={getUrlImages(
+                          '/VISIT-' +
+                            driver?.id +
+                            '.webp?d=' +
+                            driver?.updated_at,
+                        )}
+                        w={40}
+                        h={40}
+                      />
+                    }
+                    right={
+                      <Icon
+                        name={IconExpand}
+                        size={cssVar.sXl}
+                        color={cssVar.cWhiteV1}
+                        onPress={() =>
+                          handleOpenPersonDetailModal(
+                            driverAccess,
+                            'Taxista',
+                            item,
+                          )
+                        }
+                      />
+                    }
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+          <View style={styles.mainCardR}>
+            <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+            <ItemList
+              title={getFullName(resident)}
+              subtitle2={
+                'Unidad:' +
+                resident?.dpto?.[0]?.nro +
+                ', ' +
+                resident?.dpto?.[0]?.description
+              }
+              left={
+                <Avatar
+                  name={getFullName(resident)}
+                  src={getUrlImages(
+                    '/OWNER-' +
+                      resident?.id +
+                      '.webp?d=' +
+                      resident?.updated_at,
+                  )}
+                  w={40}
+                  h={40}
+                />
+              }
+              right={
+                <Icon
+                  name={IconExpand}
+                  size={cssVar.sXl}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    handleOpenPersonDetailModal(resident, 'Residente', item)
+                  }
+                />
+              }
+            />
+          </View>
+        </ScrollView>
+      );
+    }
 
     return (
-      <ScrollView >
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Detalle del acceso</Text>
-          <View style={styles.mainVisitorInfoContainer}>
-            <Avatar
-              name={mainUserFullName}
-              src={mainUser?.url_avatar ? getUrlImages(mainUser.url_avatar) : undefined}
-              w={60}
-              h={60}
-              style={!mainUser?.url_avatar && isFrequentOrGroup ? {backgroundColor: cssVar.cCompl2} : {}}
-              fontSize={!mainUser?.url_avatar && isFrequentOrGroup ? cssVar.sL : cssVar.sM}
-
-            />
-            <Text style={styles.mainVisitorName}>{mainUserFullName}</Text>
-            <Text style={styles.mainVisitorSubText}>
-              {(mainUserCi ? `C.I. ${mainUserCi}` : '') +
-               (mainUserCi && mainUserPlate ? ' - ' : '') +
-               (mainUserPlate ? `Placa: ${mainUserPlate}` : '') || 'Datos no disponibles'}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.mainCard}>
+          <View style={styles.sectionContainer}>
+            <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>
+              Resumen de la visita
             </Text>
-          </View>
+            {mainVisitor ? (
+              <ItemList
+                title={mainUserFullName}
+                subtitle={mainUserCi ? `C.I. ${mainUserCi}` : ''}
+                left={
+                  <Avatar
+                    name={mainUserFullName}
+                    src={getUrlImages(
+                      '/VISIT-' +
+                        mainVisitor?.id +
+                        '.webp?d=' +
+                        mainVisitor?.updated_at,
+                    )}
+                    w={40}
+                    h={40}
+                  />
+                }
+              />
+            ) : null}
+            <View style={styles.detailsGroup}>
+              <DetailRow label="Tipo de visita" value={tipoAccesoText} />
+              <DetailRow
+                label="Estado"
+                value={statusText}
+                valueStyle={{color: statusColor, fontFamily: FONTS.semiBold}}
+              />
+              {(item.type === 'G' || item.type === 'I') &&
+                item.invitation?.title && (
+                  <DetailRow label="Evento" value={item.invitation.title} />
+                )}
 
-          <DetailRow label="Tipo de acceso" value={tipoAccesoText} />
-          <DetailRow label="Estado" value={statusText} valueStyle={{color: statusColor}} />
-          
-          { (item.type === 'G' || item.type === 'I' || item.type === 'F') && item.invitation?.title && (
-            <DetailRow label="Evento" value={item.invitation.title} />
-          )}
-          
-          <DetailRow 
-              label={isFrequentOrGroup ? "Hora y fecha de ingreso" : "Fecha y hora de ingreso"}
-              value={getDateTimeStrMes(item.in_at)} 
-          />
-          <DetailRow 
-              label={isFrequentOrGroup ? "Hora y fecha de salida" : "Fecha y hora de salida"}
-              value={getDateTimeStrMes(item.out_at)} 
-          />
-
-          {item.type === 'O' && (
-            <>
-              <DetailRow label="Residente" value={getFullName(item.owner)} />
-              <DetailRow label="Guardia de entrada" value={getFullName(item.guardia)} />
-            </>
-          )}
-
-          {item.type !== 'O' && (
-            <>
-              {item.type === 'P' && <DetailRow label="Conductor" value={getFullName(item.visit)} />}
-              <DetailRow label={item.out_at ? "Visitó a" : "Visita a"} value={getFullName(item.owner)} />
-
-              {(item.type === 'I' || item.type === 'G' || item.type === 'F') && item.invitation?.date_event && (
-                <DetailRow label="Fecha de invitación" value={getDateStrMes(item.invitation.date_event)} />
+              <DetailRow
+                label="Fecha y hora de ingreso"
+                value={getDateTimeStrMes(item.in_at)}
+              />
+              <DetailRow
+                label="Fecha y hora de salida"
+                value={getDateTimeStrMes(item.out_at)}
+              />
+              <DetailRow
+                label="Guardia de ingreso"
+                value={getFullName(item.guardia)}
+              />
+              <DetailRow
+                label="Guardia de salida"
+                value={getFullName(item.out_guard)}
+              />
+              <DetailRow label="Observación de ingreso" value={item.obs_in} />
+              <DetailRow label="Observación de salida" value={item.obs_out} />
+              {!(item.type === 'I' || item.type === 'G') && (
+                <DetailRow
+                  label={item.out_at ? 'Visitó a' : 'Visita a'}
+                  value={getFullName(resident)}
+                />
               )}
-              {(item.type === 'I' || item.type === 'G' || item.type === 'F') && item.invitation?.obs && (
-                <DetailRow label="Descripción (Invitación)" value={item.invitation.obs} />
-              )}
-
+              {(item.type === 'I' || item.type === 'G') &&
+                item.invitation?.date_event && (
+                  <DetailRow
+                    label="Fecha de invitación"
+                    value={getDateStrMes(item.invitation.date_event)}
+                  />
+                )}
+              {(item.type === 'I' || item.type === 'G') &&
+                item.invitation?.obs && (
+                  <DetailRow
+                    label="Descripción (Invitación)"
+                    value={item.invitation.obs}
+                  />
+                )}
               {statusText === 'Denegado' && (
                 <>
-                  <DetailRow label="Fecha de denegación" value={getDateTimeStrMes(item.confirm_at)} />
+                  <DetailRow
+                    label="Fecha de denegación"
+                    value={getDateTimeStrMes(item.confirm_at)}
+                  />
                   <DetailRow label="Motivo" value={item.obs_confirm} />
                 </>
               )}
-              
-              <DetailRow label="Guardia de entrada" value={getFullName(item.guardia)} />
-              {item.out_guard && item.guardia?.id !== item.out_guard?.id && (
-                <DetailRow label="Guardia de salida" value={getFullName(item.out_guard)} />
-              )}
-               {item.out_guard && item.guardia?.id === item.out_guard?.id && item.out_at && (
-                <DetailRow label="Guardia de salida" value={getFullName(item.out_guard)} />
-              )}
-
-              <DetailRow label="Observación de solicitud" value={item.obs_guard} />
-              <DetailRow label="Observación de ingreso" value={item.obs_in} />
-              <DetailRow label="Observación de salida" value={item.obs_out} />
-            </>
-          )}
-
-          {item.accesses && item.accesses.length > 0 && (
-            <>
-              <View style={styles.separator} />
-              <Text style={styles.companionsGeneralTitle}>Acompañantes</Text>
-              {item.accesses.map((companionAccess: any, index: number) => (
-                <CompanionItem
-                  key={`companion-${companionAccess.id || index}`}
-                  companionAccess={companionAccess}
-                  isFrequentOrGroup={isFrequentOrGroup}
+              <DetailRow
+                label="Observación de solicitud"
+                value={item.obs_guard}
+              />
+              {item?.confirm_at && (
+                <DetailRow
+                  label="Tipo de aprobación"
+                  value={
+                    <View
+                      style={{
+                        backgroundColor:
+                          item?.confirm == 'G'
+                            ? '#F37F3D33'
+                            : cssVar.cHoverSuccess,
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 999,
+                      }}>
+                      <Text
+                        style={{
+                          color:
+                            item?.confirm == 'G'
+                              ? cssVar.cAlertMedio
+                              : cssVar.cSuccess,
+                        }}>
+                        {item?.confirm == 'G'
+                          ? 'Por el guardia'
+                          : 'Por el residente'}
+                      </Text>
+                    </View>
+                  }
                 />
+              )}
+            </View>
+          </View>
+
+          {companions && companions.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>
+                Acompañante{companions.length > 1 ? 's' : ''}
+              </Text>
+              {companions.map((companionAccess: any, index: number) => (
+                <View
+                  key={`companion-wrapper-${companionAccess.id || index}`}
+                  style={index > 0 ? styles.additionalCompanionWrapper : null}>
+                  <CompanionItem
+                    companionAccess={companionAccess}
+                    onPress={() =>
+                      handleOpenPersonDetailModal(
+                        companionAccess,
+                        'Acompañante',
+                        item,
+                      )
+                    }
+                  />
+                </View>
               ))}
-            </>
+            </View>
           )}
+          {driver && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Taxista</Text>
+              <ItemList
+                title={getFullName(driver)}
+                subtitle={
+                  (driver.ci ? `C.I. ${driver.ci}` : '') +
+                  (driver.ci && driverAccess.plate ? ' • ' : '') +
+                  (driverAccess.plate ? `Placa: ${driverAccess.plate}` : '')
+                }
+                left={
+                  <Avatar
+                    name={getFullName(driver)}
+                    src={getUrlImages(
+                      '/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at,
+                    )}
+                    w={40}
+                    h={40}
+                  />
+                }
+                right={
+                  <Icon
+                    name={IconExpand}
+                    size={cssVar.sXl}
+                    color={cssVar.cWhiteV1}
+                    onPress={() =>
+                      handleOpenPersonDetailModal(driverAccess, 'Taxista', item)
+                    }
+                  />
+                }
+              />
+            </View>
+          )}
+        </View>
+        <View style={styles.mainCardR}>
+          <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+          <ItemList
+            title={getFullName(resident)}
+            subtitle={
+              'Unidad:' +
+              resident?.dpto?.[0]?.nro +
+              ', ' +
+              resident?.dpto?.[0]?.description
+            }
+            left={
+              <Avatar
+                name={getFullName(resident)}
+                src={getUrlImages(
+                  '/OWNER-' + resident?.id + '.webp?d=' + resident?.updated_at,
+                )}
+                w={40}
+                h={40}
+              />
+            }
+            right={
+              (item.type === 'I' || item.type === 'G' || item.type === 'F') && (
+                <Icon
+                  name={IconExpand}
+                  size={cssVar.sXl}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    handleOpenPersonDetailModal(resident, 'Residente', item)
+                  }
+                />
+              )
+            }
+          />
         </View>
       </ScrollView>
     );
   };
 
+  const renderBody = () => {
+    if (!open) return null;
+    if (id) return renderContent();
+
+    return (
+      <View style={styles.noDataContainer}>
+        <Text style={styles.noDataText}>ID no proporcionado.</Text>
+      </View>
+    );
+  };
   return (
-    <ModalFull title={'Detalle de acceso'} open={open} onClose={onClose}>
-      {(open && id) ? renderContent() : (open && !id ? <View style={styles.noDataContainer}><Text style={styles.noDataText}>ID no proporcionado.</Text></View> : null) }
+    <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose}>
+      {renderBody()}
+      {isPersonDetailModalVisible && modalPersonData && (
+        <Modal
+          title={
+            modalPersonData.typeLabel === 'Residente'
+              ? 'Detalle de invitación'
+              : `Detalle del ${modalPersonData.typeLabel}`
+          }
+          open={isPersonDetailModalVisible}
+          onClose={handleClosePersonDetailModal}>
+          <ScrollView
+            contentContainerStyle={styles.personDetailModalInnerContent}>
+            <View style={styles.personDetailModalCardContent}>
+              {modalPersonData.typeLabel === 'Residente' && accessData ? (
+                <>
+                  <ItemList
+                    style={{marginBottom: 12}}
+                    title={getFullName(modalPersonData.person)}
+                    subtitle={
+                      'Unidad:' +
+                      modalPersonData.person?.dpto?.[0]?.nro +
+                      ', ' +
+                      modalPersonData.person?.dpto?.[0]?.description
+                    }
+                    left={
+                      <Avatar
+                        name={getFullName(modalPersonData.person)}
+                        src={getUrlImages(
+                          '/OWNER-' +
+                            modalPersonData.person?.id +
+                            '.webp?d=' +
+                            modalPersonData.person?.updated_at,
+                        )}
+                        w={40}
+                        h={40}
+                      />
+                    }
+                  />
+                  <View style={styles.detailsGroup}>
+                    {accessData.type === 'I' && (
+                      <>
+                        <DetailRow
+                          label="Tipo de invitación"
+                          value={
+                            accessData.invitation?.type_name || 'QR Individual'
+                          }
+                        />
+                        <DetailRow
+                          label="Fecha de invitación"
+                          value={getDateStrMes(
+                            accessData.invitation?.date_event,
+                          )}
+                        />
+                        <DetailRow
+                          label="Descripción"
+                          value={accessData.invitation?.obs}
+                        />
+                      </>
+                    )}
+                    {accessData.type === 'G' && (
+                      <>
+                        <DetailRow
+                          label="Tipo de invitación"
+                          value={
+                            accessData.invitation?.type_name || 'QR Grupal'
+                          }
+                        />
+                        <DetailRow
+                          label="Evento"
+                          value={accessData.invitation?.title}
+                        />
+                        <DetailRow
+                          label="Cantidad de invitados"
+                          value={accessData.invitation?.max_companions?.toString()}
+                        />
+                        <DetailRow
+                          label="Descripción"
+                          value={accessData.invitation?.obs}
+                        />
+                      </>
+                    )}
+                    {accessData.type === 'F' && (
+                      <>
+                        <DetailRow
+                          label="Tipo de invitación"
+                          value={
+                            accessData.invitation?.type_name || 'QR Frecuente'
+                          }
+                        />
+                        <DetailRow
+                          label="Periodo de validez"
+                          value={
+                            accessData.invitation?.start_date &&
+                            accessData.invitation?.end_date
+                              ? `${getDateStrMes(
+                                  accessData.invitation?.start_date,
+                                )} a ${getDateStrMes(
+                                  accessData.invitation?.end_date,
+                                )}`
+                              : undefined
+                          }
+                        />
+                        <DetailRow
+                          label="Indicaciones"
+                          value={accessData.invitation?.obs}
+                        />
+                        <View
+                          style={{
+                            height: 0.5,
+                            backgroundColor: cssVar.cWhiteV1,
+                          }}
+                        />
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            color: cssVar.cWhite,
+                            fontFamily: FONTS.semiBold,
+                            marginBottom: 12,
+                          }}>
+                          Configuración avanzada
+                        </Text>
+                        <DetailRow
+                          label="Días de acceso"
+                          value={
+                            accessData.invitation?.weekday
+                              ? parseWeekDays(
+                                  accessData.invitation?.weekday,
+                                ).join(', ')
+                              : undefined
+                          }
+                        />
+                        <DetailRow
+                          label="Horario permitido"
+                          value={
+                            accessData.invitation?.start_time &&
+                            accessData.invitation?.end_time
+                              ? `${accessData.invitation?.start_time.slice(
+                                  0,
+                                  5,
+                                )} - ${accessData.invitation?.end_time.slice(
+                                  0,
+                                  5,
+                                )}`
+                              : undefined
+                          }
+                        />
+                        <DetailRow
+                          label="Cantidad de accesos"
+                          value={accessData.invitation?.max_entries?.toString()}
+                        />
+                      </>
+                    )}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <ItemList
+                    style={{marginBottom: 12}}
+                    title={getFullName(modalPersonData.person)}
+                    subtitle={
+                      (modalPersonData.person?.ci
+                        ? `C.I. ${modalPersonData.person.ci}`
+                        : '') +
+                      (modalPersonData.typeLabel === 'Taxista' &&
+                      modalPersonData.person?.ci &&
+                      modalPersonData.plate
+                        ? ' • '
+                        : '') +
+                      (modalPersonData.typeLabel === 'Taxista' &&
+                      modalPersonData.plate
+                        ? `Placa: ${modalPersonData.plate}`
+                        : '')
+                    }
+                    left={
+                      <Avatar
+                        name={getFullName(modalPersonData.person)}
+                        src={getUrlImages(
+                          '/OWNER-' +
+                            modalPersonData.person?.id +
+                            '.webp?d=' +
+                            modalPersonData.person?.updated_at,
+                        )}
+                        w={40}
+                        h={40}
+                      />
+                    }
+                  />
+                  <View style={styles.detailsGroup}>
+                    <DetailRow
+                      label="Estado"
+                      value={modalPersonData.statusText}
+                      valueStyle={{
+                        color: modalPersonData.statusColor,
+                        fontFamily: FONTS.semiBold,
+                      }}
+                    />
+                    <DetailRow
+                      label="Fecha y hora de ingreso"
+                      value={getDateTimeStrMes(modalPersonData.accessInAt)}
+                    />
+                    <DetailRow
+                      label="Fecha y hora de salida"
+                      value={getDateTimeStrMes(modalPersonData.accessOutAt)}
+                    />
+                    <DetailRow
+                      label="Guardia de ingreso"
+                      value={getFullName(accessData?.guardia)}
+                    />
+                    <DetailRow
+                      label="Guardia de salida"
+                      value={getFullName(accessData?.out_guard)}
+                    />
+                    <DetailRow
+                      label="Observación de ingreso"
+                      value={modalPersonData.accessObsIn}
+                    />
+                    <DetailRow
+                      label="Observación de salida"
+                      value={modalPersonData.accessObsOut}
+                    />
+                  </View>
+                </>
+              )}
+            </View>
+          </ScrollView>
+        </Modal>
+      )}
     </ModalFull>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingVertical: cssVar.spL,
-    paddingHorizontal: cssVar.spM,
-    alignItems: 'center',
+  scrollContainer: {
     flexGrow: 1,
+    paddingTop: 12,
+    gap: 16,
   },
-  card: {
+  mainCard: {
     backgroundColor: cssVar.cBlackV2,
-    padding: cssVar.spM,
-    paddingHorizontal: cssVar.spL,
-    borderRadius: cssVar.bRadius,
-    marginTop: cssVar.spM,
-    maxWidth: '100%',
-    alignSelf: 'center',
-    
+    padding: 12,
+    borderRadius: 12,
+    gap: 16,
   },
-  cardTitle: {
+  mainCardR: {
+    backgroundColor: cssVar.cBlackV2,
+    padding: 12,
+    borderRadius: 12,
+    gap: 16,
+    marginBottom: 12,
+  },
+  sectionContainer: {
+    gap: 12,
+  },
+  sectionTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: cssVar.sL,
     color: cssVar.cWhite,
-    marginBottom: cssVar.spM,
+    borderTopWidth: 0.5,
+    borderTopColor: cssVar.cWhiteV1,
+    paddingTop: 12,
+    marginTop: 4,
   },
-  mainVisitorInfoContainer: {
+  sectionTitleNoBorder: {
+    fontFamily: FONTS.semiBold,
+    fontSize: cssVar.sL,
+    color: cssVar.cWhite,
+    borderTopWidth: 0,
+    paddingTop: 0,
+    marginTop: 0,
+  },
+  personBlock: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: cssVar.spXs,
-    alignSelf: 'stretch',
-    marginBottom: cssVar.spM,
+    backgroundColor: cssVar.cBlackV3,
+    padding: 8,
+    borderRadius: 8,
+    gap: 8,
+    marginBottom: 12,
   },
-  mainVisitorName: {
+  personInfoContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: 2,
+    marginTop: 12,
+  },
+  personName: {
     fontFamily: FONTS.medium,
     fontSize: cssVar.sM,
-    textAlign: 'center',
     color: cssVar.cWhite,
-    marginTop: cssVar.spXs,
   },
-   mainVisitorNameSm: {
-    fontFamily: FONTS.medium,
-    fontSize: cssVar.sS,
-    textAlign: 'center',
-    color: cssVar.cWhite,
-    marginTop: cssVar.spXs,
-  },
-  mainVisitorSubText: {
+  personSubDetail: {
     fontFamily: FONTS.regular,
-    fontSize: cssVar.sS,
-    textAlign: 'center',
+    fontSize: cssVar.sM,
     color: cssVar.cWhiteV1,
   },
-  mainVisitorSubTextSm: {
-    fontFamily: FONTS.regular,
-    fontSize: cssVar.sXs,
-    textAlign: 'center',
-    color: cssVar.cWhiteV1,
+  detailsGroup: {
+    flexDirection: 'column',
+    gap: 12,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    alignSelf: 'stretch',
-    paddingVertical: cssVar.spS / 1.5,
-    borderBottomWidth: 0.5,
-    borderBottomColor: cssVar.cBlackV3,
   },
   detailLabel: {
     fontFamily: FONTS.regular,
     fontSize: cssVar.sM,
     color: cssVar.cWhiteV1,
-    flexBasis: '45%',
-    marginRight: cssVar.spS,
+    flex: 1,
+    marginRight: 8,
   },
   detailValue: {
     fontFamily: FONTS.medium,
     fontSize: cssVar.sM,
     color: cssVar.cWhite,
     textAlign: 'right',
-    flexBasis: '55%',
+    flex: 1.5,
   },
-  separator: {
-    height: 1,
-    backgroundColor: cssVar.cWhiteV1,
-    alignSelf: 'stretch',
-    marginVertical: cssVar.spM,
-  },
-  companionsGeneralTitle: {
-    fontFamily: FONTS.semiBold,
-    fontSize: cssVar.sL,
-    color: cssVar.cWhite,
-    marginBottom: cssVar.spS,
-    marginTop: cssVar.spS,
-  },
-  companionCard: {
-    backgroundColor: cssVar.cBlackV3,
-    borderRadius: cssVar.bRadiusS,
-    marginBottom: cssVar.spS,
-    paddingHorizontal: cssVar.spS,
-    paddingVertical: cssVar.spS,
-    borderWidth: 1,
-    borderColor: cssVar.cBlackV1,
-  },
-  companionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  companionInfo: {
-    flex: 1,
-    marginLeft: cssVar.spM,
-  },
-  companionName: {
-    fontFamily: FONTS.medium,
-    fontSize: cssVar.sM,
-    color: cssVar.cWhite,
-  },
-  companionCi: {
-    fontFamily: FONTS.regular,
-    fontSize: cssVar.sS,
-    color: cssVar.cWhiteV1,
-  },
-  companionDetails: {
-    marginTop: cssVar.spM,
-    paddingHorizontal: cssVar.spS,
-    paddingTop: cssVar.spS,
-    borderTopWidth: 0.5,
-    borderTopColor: cssVar.cBlackV1,
+  additionalCompanionWrapper: {
+    marginTop: 12,
   },
   noDataContainer: {
     flex: 1,
@@ -424,7 +996,11 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     fontSize: cssVar.sM,
     color: cssVar.cWhiteV1,
-  }
+  },
+  personDetailModalInnerContent: {
+    paddingVertical: cssVar.spS,
+  },
+  personDetailModalCardContent: {},
 });
 
 export default AccessDetail;

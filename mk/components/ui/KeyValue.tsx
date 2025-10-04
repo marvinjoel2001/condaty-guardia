@@ -13,7 +13,7 @@ const KeyValue = ({keys, value, colorValue, style}: PropsType) => {
   return (
     <View style={{...theme.container, ...style}}>
       <Text style={theme.key}>{keys}</Text>
-      {typeof value === 'string' ? (
+      {typeof value === 'string' || typeof value === 'number' ? (
         <Text style={{...theme.value, color: colorValue || cssVar.cWhite}}>
           {value}
         </Text>
@@ -26,7 +26,6 @@ const KeyValue = ({keys, value, colorValue, style}: PropsType) => {
 const theme: ThemeType = {
   container: {
     flexDirection: 'row',
-    gap: 8,
     marginBottom: 12,
   },
   key: {

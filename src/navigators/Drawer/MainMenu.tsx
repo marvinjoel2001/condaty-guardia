@@ -88,6 +88,13 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             activeItem={activeItem}
           />
           <ItemMenu
+            screen="History"
+            text="Historial"
+            icon={IconHistorial}
+            activeItem={activeItem}
+            reverse
+          />
+          <ItemMenu
             screen="Alerts"
             text="Alertas"
             icon={IconAlertNotification}
@@ -106,13 +113,6 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
             screen="Notifications"
             text="Notificaciones"
             icon={IconNotification}
-            activeItem={activeItem}
-            reverse
-          />
-          <ItemMenu
-            screen="History"
-            text="Historial"
-            icon={IconHistorial}
             activeItem={activeItem}
             reverse
           />

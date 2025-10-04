@@ -27,6 +27,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
   const [codeQr, setCodeQr]: any = useState('');
   const device: any = useCameraDevice('back');
   const [isPermissionRequested, setIsPermissionRequested] = useState(false);
+  const {showToast} = useAuth();
 
   useEffect(() => {
     const checkPermission = async () => {
@@ -56,8 +57,8 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
     const codes = _codes[0].value;
     const data = (codes + '||').split('|');
     if (data[0] === 'condaty' && data[1] === 'qr') {
-      const time: any = data[3].substring(data[3].length - 12);
-      console.log('codes02', time);
+      const time: any = data[3].substring(data[3].length - 10);
+
       if (time * 1 > 2024 + 10 + 27 + 9 + 27) {
         // if (isValidTimeTemp(time) == false) {
         //   isActive = true;
@@ -71,7 +72,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
         //   data[3] = '';
         //   setId(null);
         // }
-        data[3] = data[3].slice(0, -12);
+        data[3] = data[3].slice(0, -10);
       }
       console.log('codes03', data[3]);
       await setCode(data);
@@ -79,6 +80,7 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
     } else {
       isActive = true;
       console.log('Codigo no Reconocido!!!', 'error');
+      showToast('QR inválido', 'error');
 
       // onMsg(
       //   '¡QR no válido!',

@@ -19,8 +19,10 @@ interface PropsType {
   style?: TypeStyles;
   widthMain?: any;
   check?: boolean | null;
+  truncateSubtitle?: boolean;
   onPressTitle?: () => void;
   onLongPress?: () => void;
+  variant?: 'V1' | 'V2';
 }
 
 export const ItemList = (props: PropsType) => {
@@ -28,6 +30,7 @@ export const ItemList = (props: PropsType) => {
     title,
     subtitle,
     subtitle2,
+    truncateSubtitle = false,
     right,
     left,
     children,
@@ -36,6 +39,7 @@ export const ItemList = (props: PropsType) => {
     onPressTitle,
     onLongPress,
     widthMain,
+    variant,
     check = null,
   } = props;
 
@@ -45,20 +49,21 @@ export const ItemList = (props: PropsType) => {
       onLongPress={onLongPress ? () => onLongPress() : undefined}>
       <View
         style={{
-          ...theme.itemList,
-          // paddingHorizontal: 0,
-          // borderRadius: 0,
-          // marginBottom: 0,
+          ...(variant == 'V1'
+            ? theme.ItemListV1
+            : variant == 'V2'
+            ? theme.ItemListV2
+            : theme.itemList),
           ...style,
         }}>
         <View style={theme.container}>
           {left && <View style={theme.left}>{left}</View>}
           <View
             style={{
-              width: widthMain || 150,
-              flexGrow: 1,
+              // width: widthMain || 150,
+              flex: 1,
               overflow: 'hidden',
-              flexWrap: 'nowrap',
+              // flexWrap: 'nowrap',
             }}>
             <Text
               onPress={onPressTitle}
@@ -67,7 +72,22 @@ export const ItemList = (props: PropsType) => {
               style={theme.title}>
               {title}
             </Text>
-            {subtitle && <Text style={theme.subtitle}>{subtitle}</Text>}
+            {/* {subtitle && (
+              <Text
+                ellipsizeMode={truncateSubtitle ? 'tail' : undefined}
+                numberOfLines={truncateSubtitle ? 1 : undefined}
+                style={theme.subtitle}>
+                {subtitle}
+              </Text>
+            )} */}
+            {subtitle && (
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={theme.subtitle}>
+                {subtitle}
+              </Text>
+            )}
             {subtitle2 && <Text style={theme.subtitle2}>{subtitle2}</Text>}
           </View>
           <View
@@ -89,13 +109,13 @@ export const ItemList = (props: PropsType) => {
         </View>
         {children && <View style={{}}>{children}</View>}
         {date && (
-          <View style={theme.date}>
+          <>
             {typeof date == 'string' ? (
               <Text style={theme.date}>{date}</Text>
             ) : (
-              <Text>{date}</Text>
+              date
             )}
-          </View>
+          </>
         )}
       </View>
     </TouchableOpacity>
@@ -105,9 +125,22 @@ export const ItemList = (props: PropsType) => {
 const theme: ThemeType = {
   itemList: {
     backgroundColor: cssVar.cWhiteV2,
-    padding: 12,
-    borderRadius: 12,
+    padding: 8,
+    borderRadius: 8,
     marginVertical: 4,
+    // marginBottom: 8,
+  },
+  ItemListV1: {
+    backgroundColor: 'transparent',
+    padding: 0,
+    borderRadius: 0,
+    marginVertical: 4,
+  },
+  ItemListV2: {
+    borderWidth: 0.5,
+    padding: 8,
+    borderRadius: 12,
+    borderColor: cssVar.cWhiteV1,
   },
   container: {
     overflow: 'hidden',
@@ -133,6 +166,7 @@ const theme: ThemeType = {
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
     textAlign: 'left',
+    marginTop: 2,
   },
   subtitle2: {
     color: cssVar.cWhiteV1,

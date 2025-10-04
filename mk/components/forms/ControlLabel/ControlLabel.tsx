@@ -1,4 +1,4 @@
-import {View, Text, KeyboardTypeOptions} from 'react-native';
+import {View, Text, KeyboardTypeOptions, SafeAreaView} from 'react-native';
 import {FONTS, ThemeType, TypeStyles, cssVar} from '../../../styles/themes';
 import React from 'react';
 
@@ -56,15 +56,19 @@ const ControlLabel = ({
     ...(!isFocus && iconLeft && !value ? {paddingLeft: cssVar.spM} : {}),
     ...(!isFocus && iconRight && !value ? {paddingRight: cssVar.spM} : {}),
     ...(isFocus || value || placeholder
-      ? {...theme.focus, left: iconLeft ? 24 : 8}
+      ? {
+          ...theme.focus,
+          left: iconLeft ? 24 : 8,
+          color:
+            !isFocus && (placeholder || value)
+              ? cssVar.cWhiteV1
+              : cssVar.cAccent,
+        }
       : {}),
     ...(error?.[name] ? {color: cssVar.cError} : {}),
     ...(disabled ? theme.disabled : {}),
   };
-  const _label =
-    label +
-    ' ' +
-    (required ? '*' : required === false || disabled ? '' : '(opcional)');
+  const _label = label + (required ? ' *' : '');
   return (
     <View style={theme.container}>
       {iconLeft && <View style={theme.iconLeft}>{iconLeft}</View>}
@@ -81,10 +85,6 @@ const ControlLabel = ({
             <Text
               style={{
                 ...theme.textLength,
-                color:
-                  maxLength <= (value + '').length
-                    ? cssVar.cError
-                    : cssVar.cBlack,
               }}>
               {(value + '').length} / {maxLength}
             </Text>
@@ -117,7 +117,7 @@ const theme: ThemeType = {
     fontSize: cssVar.sXs,
     fontFamily: FONTS.regular,
     position: 'absolute',
-    color: cssVar.cWhiteV1,
+    color: cssVar.cAccent,
     zIndex: 1,
     left: 12,
     // transform: [{translateY: 10}],
@@ -126,7 +126,6 @@ const theme: ThemeType = {
   },
   error: {
     marginHorizontal: cssVar.spS,
-
     fontSize: cssVar.sXs,
     color: cssVar.cError,
     fontFamily: FONTS.medium,
@@ -136,9 +135,11 @@ const theme: ThemeType = {
     fontFamily: FONTS.regular,
     textAlign: 'right',
     marginBottom: cssVar.spS,
+    color: cssVar.cWhite,
   },
   viewBottom: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     width: '100%',
   },
   iconLeft: {

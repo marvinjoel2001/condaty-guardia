@@ -1,39 +1,67 @@
 // DetAccesses.tsx
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import LineDetail from './shares/LineDetail';
 import useApi from '../../../../mk/hooks/useApi';
-import {getAccessType} from '../../../../mk/utils/utils';
-import {getDateStrMes} from '../../../../mk/utils/dates';
-import {getFullName} from '../../../../mk/utils/strings';
-import List from '../../../../mk/components/ui/List/List';
+import {getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import ItemListDate from './shares/ItemListDate';
-import {IconCheck, IconCheckOff} from '../../../icons/IconLibrary';
+import {
+  IconCheck,
+  IconCheckOff,
+  IconDelivery,
+  IconExpand,
+  IconOther,
+  IconTaxi,
+} from '../../../icons/IconLibrary';
 import useAuth from '../../../../mk/hooks/useAuth';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+import KeyValue from '../../../../mk/components/ui/KeyValue';
+import ModalAccessExpand from './ModalAccessExpand';
+import Br from '../../Profile/Br';
+import Button from '../../../../mk/components/forms/Button/Button';
+import Modal from '../../../../mk/components/ui/Modal/Modal';
 
+const typeInvitation: any = {
+  I: 'QR Individual',
+  G: 'QR Grupal',
+  C: 'Sin QR',
+  O: 'Llave virtual',
+  P: 'Pedido',
+  F: 'QR Frecuente',
+};
 const DetAccesses = ({id, open, close, reload}: any) => {
-  const {showToast} = useAuth();
-  const {execute, waiting} = useApi();
+  const {showToast, waiting} = useAuth();
+  const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
-  const [formState, setFormState]: any = useState({}); // estado para obs_in / obs_out
-  const getData = async (id: number) => {
+  const [formState, setFormState]: any = useState({});
+  const [openEnterSinQR, setOpenEnterSinQR]: any = useState(false);
+  const [openDet, setOpenDet]: any = useState({
+    open: false,
+    id: null,
+    type: '',
+    invitation: null,
+  });
+  const getData = async () => {
     try {
-      const {data} = await execute('/accesses', 'GET', {
-        fullType: 'DET',
-        searchBy: id,
-      });
+      const {data} = await execute(
+        '/accesses',
+        'GET',
+        {
+          fullType: 'DET',
+          searchBy: id,
+        },
+        false,
+        3,
+      );
 
       if (data.success && data.data.length > 0) {
-        // If there's a linked access_id, use that instead of the current data
         const accessData = data.data[0];
         if (accessData.access_id) {
           const {data: linkedData} = await execute('/accesses', 'GET', {
@@ -49,216 +77,263 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         }
       }
     } catch (error) {
-      console.error('Error fetching access data:', error);
+      showToast('Error al obtener los datos', 'error');
     }
   };
-
-  useEffect(() => {
-    if (id) {
-      getData(id);
-    }
-  }, [id]);
-  // console.log(data,'data dataaaa')
-  const handleSave = async () => {
-    const status = getStatus();
-    if (status === 'C') {
-      // Si está completado, significa que todos han salido
-      close();
-      return;
-    }
-    //  console.log('status desde save',acompanSelect)
-    if (status === 'I') {
-      if (Object.values(acompanSelect).every(value => !value)) {
-        console.log(
-          'Debe seleccionar al menos un acompañante para dejar salir',
-        );
-        showToast(
-          'Debe seleccionar al menos un acompañante para dejar salir',
-          'error',
-        );
-        return;
-      }
-      // const ids = acompanSelect.map((item: any) => item.id);
-      const ids = Object.keys(acompanSelect)
-        .filter(id => acompanSelect[id])
-        .map(id => Number(id));
-
-      // console.log(ids,'idsss')
-      const {data: result, error} = await execute(
-        '/accesses/exit',
-        'POST',
-        {
-          ids,
-          obs_out: formState?.obs_out || '',
-        },
-        false,
-        3,
-      );
-      if (result?.success) {
-        reload();
-        close();
-        showToast('El visitante salió', 'success');
-      } else {
-        console.log('Error en dejar salir:', error);
-        showToast('Error al dejar salir', 'error');
-      }
-    } else {
-      const {data: result, error} = await execute('/accesses/enter', 'POST', {
-        id: data?.id,
-        obs_in: formState?.obs_in || '',
-      });
-      if (result?.success) {
-        reload();
-        close();
-      } else {
-        console.log('Error en dejar entrar:', error);
-      }
-    }
-  };
-
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
-    //status
-    // S=Solicitud de confirmacion
-    // Y = solicitud confirmada
-    // N = Solicitid rechazada
-    // I=Ingreso falta que salga
-    // C=completado
+
     if (!_data?.in_at && !_data?.out_at && !_data?.confirm_at) return 'S';
     if (!_data?.in_at && !_data?.out_at && _data.confirm) return _data.confirm;
     if (_data?.in_at && !_data?.out_at) return 'I';
 
-    // Verificar si el visitante principal y todos los acompañantes han salido
     if (_data?.out_at) {
-      // Si no hay acompañantes, está completado
       if (!_data?.accesses || _data.accesses.length === 0) return 'C';
-
-      // Verificar que todos los acompañantes hayan salido
       const todosHanSalido = _data.accesses.every((acomp: any) => acomp.out_at);
       return todosHanSalido ? 'C' : 'I';
     }
+    if (_data?.confirm === 'N') return 'N';
     return '';
   };
+
   const status = getStatus();
+  useEffect(() => {
+    if (id) {
+      getData();
+    }
+  }, [id]);
 
-  let accessType = getAccessType(data);
+  const saveEntry = async () => {
+    const {data: result} = await execute(
+      '/accesses/enter',
+      'POST',
+      {
+        id: data?.id,
+        obs_in: formState?.obs_in || '',
+      },
+      false,
+      3,
+    );
+    if (result?.success) {
+      if (reload) reload();
+      close();
+    } else {
+      showToast('Error al dejar entrar', 'error');
+    }
+  };
 
-  // Actualiza formState para las observaciones
+  const saveExit = async () => {
+    let ids = [];
+
+    if (
+      Object.values(acompanSelect).every(value => !value) &&
+      data?.accesses?.length > 0
+    ) {
+      showToast('Debe seleccionar para dejar salir', 'error');
+      return;
+    }
+
+    if (data?.accesses?.length > 0) {
+      ids = Object.keys(acompanSelect)
+        .filter(id => acompanSelect[id])
+        .map(id => Number(id));
+    } else {
+      ids.push(data?.id);
+    }
+
+    const {data: result} = await execute('/accesses/exit', 'POST', {
+      ids,
+      obs_out: formState?.obs_out || '',
+    });
+    if (result?.success) {
+      if (reload) reload();
+      close();
+      showToast('El visitante salió', 'success');
+    } else {
+      showToast('Error al dejar salir', 'error');
+    }
+  };
+  const handleSave = async () => {
+    if (status === 'C' || status === 'N') {
+      close();
+      return;
+    }
+    if (status === 'I') {
+      saveExit();
+    } else {
+      saveEntry();
+    }
+  };
+
   const handleInputChange = (name: string, value: string) => {
     setFormState({...formState, [name]: value});
   };
-  console.log(getStatus(), 'status');
+
   const getButtonText = () => {
-    const status = getStatus();
     const buttonTexts: Record<string, string> = {
       I: 'Dejar salir',
-      Y: 'Dejar entrar',
+      Y: 'Dejar ingresar',
       S: '',
       C: '',
+      N: 'Cerrar',
     };
     return buttonTexts[status] || '';
   };
-  const getStatusText = () => {
-    const status = getStatus();
-    const statusTexts: Record<string, string> = {
-      I: 'Por salir',
-      Y: 'Por ingresar',
-      S: 'Esperando confirmación',
-      C: 'Completado',
-    };
-    return statusTexts[status] || '';
-  };
 
-  const statusText = getStatusText();
+  const labelAccess = () => {
+    if (data?.type === 'O') {
+      return 'Llave virtual';
+    }
+    if (status === 'I') {
+      return 'Visitó a';
+    }
+    if (status === 'N') {
+      return 'Residente';
+    }
+
+    return 'Visita a';
+  };
 
   const cardDetail = () => {
-    const status = getStatus();
-    return (
-      <>
-        <LineDetail label="Estado:" value={statusText || 'Completado'} />
-        <LineDetail label="Tipo:" value={accessType} />
-        {(data?.type === 'I' || data?.type === 'G') && data?.invitation && (
-          <>
-            {data?.type === 'G' && data?.invitation?.title && (
-              <LineDetail label="Evento:" value={data?.invitation?.title} />
-            )}
-            <LineDetail
-              label="Fecha de invitación:"
-              value={getDateStrMes(data?.invitation?.date_event)}
-            />
-            {data?.invitation?.obs && (
-              <LineDetail label="Descripción:" value={data?.invitation?.obs} />
-            )}
-          </>
-        )}
-        {data?.type === 'P' && (
-          <LineDetail label="Conductor:" value={getFullName(data?.visit)} />
-        )}
-        {data?.plate && !data?.taxi && (
-          <LineDetail label="Placa:" value={data?.plate} />
-        )}
-        <LineDetail
-          label={data?.in_at && data?.out_at ? 'Visitó a:' : 'Visita a:'}
-          value={getFullName(data?.owner)}
-        />
-        {status === 'Denegado' && (
-          <>
-            <LineDetail
-              label="Fecha de denegación:"
-              value={getDateStrMes(data?.confirm_at)}
-            />
-            <LineDetail label="Motivo:" value={data?.obs_confirm} />
-          </>
-        )}
-        {data?.out_at ? (
-          <>
-            <LineDetail
-              label="Guardia de entrada:"
-              value={getFullName(data?.guardia)}
-            />
-            {data?.out_guard && data?.guardia?.id !== data?.out_guard?.id && (
-              <LineDetail
-                label="Guardia de salida:"
-                value={getFullName(data?.out_guard)}
+    if (status != 'I') {
+      return (
+        <Card>
+          <Text style={styles.labelAccess}>{labelAccess()}</Text>
+          <ItemList
+            title={getFullName(data?.owner)}
+            subtitle={
+              'Unidad: ' +
+              data?.owner?.dpto?.[0]?.nro +
+              ', ' +
+              data?.owner?.dpto?.[0]?.description
+            }
+            left={
+              <Avatar
+                name={getFullName(data?.owner)}
+                src={getUrlImages(
+                  '/OWNER-' +
+                    data?.owner?.id +
+                    '.webp?d=' +
+                    data?.owner?.updated_at,
+                )}
               />
-            )}
-            {data?.obs_guard && (
-              <LineDetail label="Obs. de solicitud:" value={data?.obs_guard} />
-            )}
-            {data?.obs_in && (
-              <LineDetail label="Obs. de entrada:" value={data?.obs_in} />
-            )}
-            {data?.obs_out && (
-              <LineDetail label="Obs. de salida:" value={data?.obs_out} />
-            )}
-          </>
-        ) : (
-          <>
-            {data?.obs_in ? (
-              <LineDetail label="Obs. de entrada:" value={data?.obs_in} />
-            ) : data?.obs_out ? (
-              <LineDetail label="Obs. de salida:" value={data?.obs_out} />
-            ) : null}
-          </>
-        )}
-      </>
-    );
+            }
+            right={
+              data?.type !== 'C' ? (
+                <Icon
+                  name={IconExpand}
+                  color={cssVar.cWhiteV1}
+                  onPress={() =>
+                    setOpenDet({
+                      open: true,
+                      id: data?.invitation_id,
+                      invitation: {...data?.invitation, owner: data?.owner},
+                      type: 'I',
+                    })
+                  }
+                />
+              ) : null
+            }
+          />
+          {data?.confirm == 'N' && data?.obs_confirm && (
+            <KeyValue
+              style={{marginTop: 12}}
+              keys="Motivo del rechazo"
+              value={data?.obs_confirm}
+            />
+          )}
+          <Br />
+          <View>{detailVisit(data)}</View>
+        </Card>
+      );
+    } else {
+      return (
+        <>
+          <Card>
+            <Text style={styles.labelAccess}>{labelAccess()}</Text>
+            <ItemList
+              title={getFullName(data?.owner)}
+              subtitle={
+                'Unidad: ' +
+                data?.owner?.dpto?.[0]?.nro +
+                ', ' +
+                data?.owner?.dpto?.[0]?.description
+              }
+              left={
+                <Avatar
+                  name={getFullName(data?.owner)}
+                  src={getUrlImages(
+                    '/OWNER-' +
+                      data?.owner?.id +
+                      '.webp?d=' +
+                      data?.owner?.updated_at,
+                  )}
+                />
+              }
+              right={
+                data?.type !== 'C' ? (
+                  <Icon
+                    name={IconExpand}
+                    color={cssVar.cWhiteV1}
+                    onPress={() =>
+                      setOpenDet({
+                        open: true,
+                        id: data?.invitation_id,
+                        invitation: {...data?.invitation, owner: data?.owner},
+                        type: 'I',
+                      })
+                    }
+                  />
+                ) : null
+              }
+            />
+          </Card>
+          {data?.accesses?.length > 0 && (
+            <Text
+              style={{
+                color: cssVar.cWhite,
+                fontSize: 16,
+                fontFamily: FONTS.medium,
+              }}>
+              Selecciona al visitante que esté por salir
+            </Text>
+          )}
+          <Card>
+            <View>{detailVisit(data)}</View>
+          </Card>
+        </>
+      );
+    }
   };
 
-  const getCheckVisit = (visit: any, isSelected: boolean) => {
+  const getCheckVisit = (
+    visit: any,
+    isSelected: boolean,
+    type: 'A' | 'T' | 'I',
+  ) => {
     const status = getStatus(visit);
-
-    if (status == 'S')
-      return <Text style={{color: cssVar.cWhite}}>Sin confirmar</Text>;
-    if (status == 'N')
-      return <Text style={{color: cssVar.cError}}>No Autorizado</Text>;
-    if (status == 'C') return null;
+    if (status == 'C') {
+      return (
+        <Icon
+          name={IconExpand}
+          // onPress={() =>
+          //   setOpenDet({
+          //     open: true,
+          //     id: visit?.id,
+          //     type: type,
+          //   })
+          // }
+          color={cssVar.cWhiteV1}
+        />
+      );
+    }
+    if (status == 'S' || status == 'N') return null;
 
     return (
       <Icon
         name={isSelected ? IconCheck : IconCheckOff}
-        color={isSelected ? cssVar.cSuccess : 'transparent'}
-        fillStroke={isSelected ? undefined : 'white'}
+        color={isSelected ? cssVar.cAccent : 'transparent'}
+        fillStroke={isSelected ? 'transparent' : cssVar.cWhiteV1}
         onPress={() =>
           setAcompSelect({
             ...acompanSelect,
@@ -269,33 +344,213 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     );
   };
 
+  const rightDetailVisit = (data: any, isSelected: any) => {
+    if (data?.out_at) {
+      return (
+        <Icon
+          name={IconExpand}
+          color={cssVar.cWhiteV1}
+          // onPress={() =>
+          //   setOpenDet({
+          //     open: true,
+          //     id: data?.id,
+          //     type: 'V',
+          //   })
+          // }
+        />
+      );
+    }
+    if (data?.accesses?.length == 0 || !data?.in_at) {
+      return;
+    }
+
+    return getCheckVisit(data, isSelected, 'I');
+  };
+  const getAvatarVisit = (item: any) => {
+    if (item?.type != 'P') {
+      return <Avatar name={getFullName(item.visit)} />;
+    } else {
+      const icon =
+        item?.other?.other_type_id == 1
+          ? IconDelivery
+          : item?.other?.other_type_id == 2
+          ? IconTaxi
+          : IconOther;
+      return (
+        <View
+          style={{
+            padding: 8,
+            backgroundColor: cssVar.cWhiteV1,
+            borderRadius: '50%',
+          }}>
+          <Icon name={icon} color={cssVar.cPrimary} />
+        </View>
+      );
+    }
+  };
   const detailVisit = (data: any) => {
     let visit = data.visit ? data.visit : data.owner;
 
     const isSelected = acompanSelect[data?.id || '0'];
-    return (
-      <ItemList
-        key={data?.visit?.id}
-        title={getFullName(visit)}
-        subtitle={'C.I. ' + visit?.ci}
-        left={<Avatar name={getFullName(visit)} />}
-        right={
-          data?.out_at || status === 'Y'
-            ? null
-            : getCheckVisit(data, isSelected)
-        }
-        date={<ItemListDate inDate={data?.in_at} outDate={data?.out_at} />}
-      />
-    );
-  };
+    const acompData = data?.accesses.filter((item: any) => item.taxi != 'C');
+    const taxi = data?.accesses.filter((item: any) => item.taxi == 'C');
 
-  const detailCompanions = () => {
-    if (data?.accesses?.length == 0) return null;
     return (
-      <>
-        <Text style={styles.labelAccess}>Acompañantes</Text>
-        <List data={data?.accesses} renderItem={detailVisit} />
-      </>
+      <View>
+        {data?.type !== 'O' && (
+          <>
+            <Text style={styles.labelAccess}>
+              {status !== 'I' ? 'Visitante' : 'Detalle del visitante'}
+            </Text>
+            <ItemList
+              key={data?.visit?.id}
+              title={getFullName(visit)}
+              onPress={() => {
+                if (data?.out_at)
+                  setOpenDet({
+                    open: true,
+                    id: data?.id,
+                    type: 'V',
+                  });
+              }}
+              style={{marginBottom: 12}}
+              subtitle={
+                'C.I: ' +
+                visit?.ci +
+                (data?.plate && taxi?.length === 0
+                  ? ' - Placa: ' + data?.plate
+                  : '')
+              }
+              left={getAvatarVisit(data)}
+              right={rightDetailVisit(data, isSelected)}
+            />
+          </>
+        )}
+        {!data?.out_at && (
+          <>
+            {data?.confirm != 'N' && (
+              <KeyValue
+                keys="Tipo de visita"
+                value={typeInvitation[data?.type] || '-/-'}
+              />
+            )}
+            {data?.in_at && (
+              <KeyValue
+                keys="Fecha y hora de ingreso"
+                value={getDateTimeStrMes(data?.in_at) || '-/-'}
+              />
+            )}
+
+            {getStatus() === 'S' || getStatus() === 'Y' ? (
+              <KeyValue
+                keys={'Notificado por'}
+                value={getFullName(data?.guardia)}
+              />
+            ) : (
+              data?.guardia &&
+              data?.confirm != 'N' && (
+                <KeyValue
+                  keys={'Guardia de ingreso'}
+                  value={getFullName(data?.guardia)}
+                />
+              )
+            )}
+            {data?.in_at && (
+              <KeyValue
+                keys="Observación de ingreso"
+                value={data?.obs_in || '-/-'}
+              />
+            )}
+            {data?.confirm_at && (
+              <KeyValue
+                keys="Tipo de aprobación"
+                value={
+                  <View
+                    style={{
+                      backgroundColor:
+                        data?.confirm == 'G'
+                          ? '#F37F3D33'
+                          : cssVar.cHoverSuccess,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 999,
+                    }}>
+                    <Text
+                      style={{
+                        color:
+                          data?.confirm == 'G'
+                            ? cssVar.cAlertMedio
+                            : cssVar.cSuccess,
+                        fontSize: 12,
+                      }}>
+                      {data?.confirm == 'G'
+                        ? 'Por el guardia'
+                        : 'Por el residente'}
+                    </Text>
+                  </View>
+                }
+              />
+            )}
+          </>
+        )}
+
+        {acompData?.length > 0 && (
+          <>
+            {data?.type !== 'O' && <Br />}
+            <Text style={styles.labelAccess}>Acompañantes</Text>
+            {acompData.map((item: any) => (
+              <ItemList
+                key={item?.id}
+                onPress={() => {
+                  if (getStatus(item) == 'C')
+                    setOpenDet({
+                      open: true,
+                      id: data?.id,
+                      type: 'V',
+                    });
+                }}
+                title={getFullName(item?.visit)}
+                subtitle={'C.I:' + item?.visit?.ci}
+                left={<Avatar name={getFullName(item?.visit)} />}
+                right={
+                  status === 'Y'
+                    ? null
+                    : getCheckVisit(item, acompanSelect[item?.id || '0'], 'A')
+                }
+              />
+            ))}
+          </>
+        )}
+        {taxi?.length > 0 && (
+          <>
+            <Br />
+            <Text style={styles.labelAccess}>Taxista</Text>
+            {taxi.map((item: any) => (
+              <ItemList
+                key={item?.id}
+                onPress={() => {
+                  if (getStatus(item) == 'C')
+                    setOpenDet({
+                      open: true,
+                      id: data?.id,
+                      type: 'V',
+                    });
+                }}
+                title={getFullName(item?.visit)}
+                subtitle={
+                  'C.I:' + item?.visit?.ci + ' - ' + 'Placa: ' + item?.plate
+                }
+                left={<Avatar name={getFullName(item?.visit)} />}
+                right={
+                  status === 'Y'
+                    ? null
+                    : getCheckVisit(item, acompanSelect[item?.id || '0'], 'T')
+                }
+              />
+            ))}
+          </>
+        )}
+      </View>
     );
   };
 
@@ -304,16 +559,17 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (status == 'Y')
       return (
         <TextArea
-          label="Observaciones de Entrada"
+          label="Observaciones de entrada"
           name="obs_in"
           value={formState?.obs_in}
           onChange={(e: any) => handleInputChange('obs_in', e)}
+          placeholder="Ej: El visitante está ingresando con 2 mascotas"
         />
       );
     if (status == 'I')
       return (
         <TextArea
-          label="Observaciones de Salida"
+          label="Observaciones de salida"
           name="obs_out"
           value={formState?.obs_out}
           onChange={(e: any) => handleInputChange('obs_out', e)}
@@ -321,45 +577,82 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       );
     return null;
   };
-
-  const typeLabels: Record<'O' | 'P' | 'I' | 'G', string> = {
-    O: 'Residente',
-    P: 'Repartidor',
-    I: 'Visitante individual',
-    G: 'Visitante grupal',
+  const onSaveSinQr = async () => {
+    const {data: dataSave} = await execute(
+      '/accesses/confirm-enter-guard',
+      'POST',
+      {
+        id: data.id,
+        obs_in: formState?.obs_in,
+      },
+    );
+    if (dataSave?.success) {
+      if (reload) reload();
+      close();
+    }
   };
 
-  const type = typeLabels[data?.type as 'O' | 'P' | 'I' | 'G'] || '';
-
-  // let type =
   return (
     <ModalFull
       onClose={() => close()}
       open={open}
-      title={'Detalle'}
+      title={status != 'I' ? 'Visitante sin QR' : 'Detalle del ingreso'}
       onSave={handleSave}
-      // buttonCancel={getStatus() === 'C' ? '' : 'cancelar'}
-      buttonText={getButtonText()}>
+      buttonText={getButtonText()}
+      buttonExtra={
+        status == 'S' &&
+        !data?.in_at &&
+        waiting <= 0 && (
+          <Button
+            style={{backgroundColor: cssVar.cError, borderColor: cssVar.cError}}
+            onPress={() => setOpenEnterSinQR(true)}>
+            Dejar ingresar
+          </Button>
+        )
+      }>
       {!data ? (
         <Loading />
       ) : (
-        <Card>
+        <>
           {cardDetail()}
-          {/* visita */}
-          <Text style={styles.labelAccess}>{type}</Text>
-          {detailVisit(data)}
-          {/* Lista de acompañantes */}
-          {detailCompanions()}
-          {/* Mostrar textarea según la acción (botón) */}
           {getObs()}
-        </Card>
+        </>
+      )}
+      {openDet.open && (
+        <ModalAccessExpand
+          open={openDet.open}
+          type={openDet.type}
+          invitation={openDet.invitation}
+          id={openDet.id}
+          onClose={() =>
+            setOpenDet({open: false, id: null, type: '', invitation: null})
+          }
+        />
+      )}
+      {openEnterSinQR && (
+        <Modal
+          title="Dejar ingresar"
+          open={openEnterSinQR}
+          onClose={() => setOpenEnterSinQR(false)}
+          buttonText="Confirmar"
+          onSave={onSaveSinQr}>
+          <Text style={{color: cssVar.cWhite, marginBottom: 12}}>
+            ¿Estas seguro de dejar ingresar al visitante?
+          </Text>
+          <TextArea
+            label="Observaciones"
+            name="obs_in"
+            required
+            value={formState?.obs_in}
+            onChange={(e: any) => handleInputChange('obs_in', e)}
+          />
+        </Modal>
       )}
     </ModalFull>
   );
 };
 
 const styles = StyleSheet.create({
-  // Definiciones básicas
   label: {
     color: cssVar.cWhiteV1,
     fontSize: 12,
@@ -367,7 +660,9 @@ const styles = StyleSheet.create({
   },
   labelAccess: {
     color: cssVar.cWhite,
-    marginVertical: 10,
+    marginBottom: 12,
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
   },
 });
 

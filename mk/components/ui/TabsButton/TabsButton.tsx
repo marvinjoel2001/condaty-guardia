@@ -1,7 +1,5 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
-
-import {useContext} from 'react';
 import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
 
 interface Tab {
@@ -15,9 +13,16 @@ interface TabsButtonsProps {
   tabs: Tab[];
   setSel: (value: string) => void;
   style?: TypeStyles;
+  grow?: boolean;
 }
 
-const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
+const TabsButtons = ({
+  sel,
+  tabs,
+  setSel,
+  style = {},
+  grow = true,
+}: TabsButtonsProps) => {
   return (
     <View
       style={{
@@ -31,25 +36,27 @@ const TabsButtons = ({sel, tabs, setSel, style = {}}: TabsButtonsProps) => {
         contentContainerStyle={{
           flexDirection: 'row',
           gap: 8,
-          flexGrow: tabs.length <= 4 ? 1 : 0,
+          flexGrow: grow ? 1 : 0,
         }}>
         {tabs.map(tab => (
           <TouchableOpacity
             key={tab.value}
             onPress={() => setSel(tab.value)}
             style={{
-              flex: tabs.length <= 4 ? 1 : 0,
+              flex: grow ? 1 : 0,
             }}>
             <View
               style={{
                 borderRadius: 8,
-                paddingHorizontal: 18,
-                paddingVertical: 8,
+                // paddingHorizontal: 18,
+                padding: 8,
                 backgroundColor: cssVar.cHoverBlackV2,
+                borderWidth: 0.5,
+                borderColor: cssVar.cWhiteV1,
                 ...(sel === tab.value
                   ? {
                       backgroundColor: cssVar.cHoverSuccess,
-                      borderWidth: 1,
+
                       borderColor: cssVar.cSidebar,
                     }
                   : {}),

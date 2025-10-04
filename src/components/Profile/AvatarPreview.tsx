@@ -1,10 +1,8 @@
-import {BlurView} from '@react-native-community/blur';
+
 import {useEffect, useRef} from 'react';
-import {Animated, Easing, Modal, StyleSheet, Text, View} from 'react-native';
+import {Animated, Easing, Modal, StyleSheet, View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getUrlImages} from '../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../mk/styles/themes';
-import Button from '../../../mk/components/forms/Button/Button';
 import React from 'react';
 
 interface PropsType {
@@ -57,7 +55,6 @@ const AvatarPreview = ({
   const _onClose = () => {
     onClose();
   };
-  // console.log(getUrlImages(`/${prefijo}-${id}.webp?d=${updated_at}`));
 
   return (
     <>
@@ -65,11 +62,6 @@ const AvatarPreview = ({
         <Modal animationType="fade" transparent={true} visible={open}>
           <View
             style={{backgroundColor: 'rgba(0, 0, 0, 0.8)', ...styles.absolute}}>
-            {/* <BlurView
-            style={styles.absolute}
-            blurType="dark"
-            blurAmount={8}
-            reducedTransparencyFallbackColor="white"> */}
             <Animated.View
               onTouchEnd={closeImage}
               style={[styles.animatedContainer]}>
@@ -78,11 +70,9 @@ const AvatarPreview = ({
                 w={w || 240}
                 h={h || 240}
                 name={name}
-                // sizeIconVerify={58}
                 fontSize={48}
               />
             </Animated.View>
-            {/* </BlurView> */}
           </View>
         </Modal>
       )}

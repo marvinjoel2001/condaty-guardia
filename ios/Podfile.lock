@@ -8,7 +8,7 @@ PODS:
   - hermes-engine (0.77.1):
     - hermes-engine/Pre-built (= 0.77.1)
   - hermes-engine/Pre-built (0.77.1)
-  - NWWebSocket (0.5.4)
+  - NWWebSocket (0.5.7)
   - OneSignalXCFramework (5.2.9):
     - OneSignalXCFramework/OneSignalComplete (= 5.2.9)
   - OneSignalXCFramework/OneSignal (5.2.9):
@@ -58,8 +58,8 @@ PODS:
   - pusher-websocket-react-native (1.3.1):
     - PusherSwift (~> 10.1.5)
     - React
-  - PusherSwift (10.1.5):
-    - NWWebSocket (~> 0.5.4)
+  - PusherSwift (10.1.6):
+    - NWWebSocket (~> 0.5.7)
     - TweetNacl (~> 1.0.0)
   - RCT-Folly (2024.11.18.00):
     - boost
@@ -2277,10 +2277,10 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: eb93e2f488219332457c3c4eafd2738ddc7e80b8
   hermes-engine: ccc24d29d650ea725d582a9a53d57cd417fbdb53
-  NWWebSocket: 040d22f23438cc09aaeabf537beff67699c3c76d
+  NWWebSocket: b4741420f1976e1dff4da3edad00c401e4f1d769
   OneSignalXCFramework: f5b2a3c4f130e4c910ead7bb25bed7455e976fbf
   pusher-websocket-react-native: e40c49a1e4ec96d4157375aebcf44943f0f8f62f
-  PusherSwift: cad631bad86cfff4b8458dce1310a7774e469b1f
+  PusherSwift: fa3d5f6587c20ad5790de87a5c9b150367b5f0f5
   RCT-Folly: 36fe2295e44b10d831836cc0d1daec5f8abcf809
   RCTDeprecation: 664055db806cce35c3c1b43c84414dd66e117ae6
   RCTRequired: dc9a83fa1012054f94430d210337ca3a1afe6fc0

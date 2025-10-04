@@ -45,18 +45,24 @@ const useNotifInstandDB = (channels: {channel: string}[] = []): NotifType => {
     notif: {
       $: {
         where: {
-          or: [
-            {channel: channelGral},
-            {channel: channelGral + user?.client_id},
-            {channel: chiam},
-            {channel: channelGral + user?.client_id + '-guards'},
-            {channel: channelGral + user?.client_id + '-alerts-1'},
-            {channel: channelGral + user?.client_id + '-alerts-2'},
-            {channel: channelGral + user?.client_id + '-alerts-3'},
-            ...channels,
+          and: [
+            {client_id: user?.client_id},
+            {
+              or: [
+                {channel: channelGral},
+                {channel: channelGral + user?.client_id},
+                {channel: chiam},
+                {channel: channelGral + user?.client_id + '-guards'},
+                {channel: channelGral + user?.client_id + '-alerts-1'},
+                {channel: channelGral + user?.client_id + '-alerts-2'},
+                {channel: channelGral + user?.client_id + '-alerts-3'},
+                ...channels,
+              ],
+            },
           ],
+          // created_at: { $gte: new Date(last).toISOString() },
         },
-        limit: 2,
+        limit: 1,
         order: {
           serverCreatedAt: 'desc',
         },

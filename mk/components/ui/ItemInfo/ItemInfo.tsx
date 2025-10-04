@@ -202,7 +202,7 @@ const theme: ThemeType = {
     width: '50%',
     textAlign: 'right',
     paddingRight: cssVar.spXs,
-    color: cssVar.cWhiteV2,
+    color: cssVar.cWhiteV1,
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
   },

@@ -33,7 +33,7 @@ export const cssVar = {
   cWhite: '#FAFAFA',
   cWhiteV1: '#A7A7A7',
   cWhiteV2: '#414141',
-  cWhiteV3: '#FFFFFF0D',
+  cWhiteV3: '#818181',
   cBlack: '#212121',
   cBlackV1: '#292929',
   cBlackV2: '#333536',
@@ -48,19 +48,21 @@ export const cssVar = {
   cOrange: '#F58220',
 
   cSidebar: '#246950',
+  cFillSidebar: '#1F2D27',
 
   cHover: '#FFFFFF0D',
   cHoverBlack: '#212121CC',
   cHoverBlackV2: '#33353633',
+  cHovetablepdf: '#7979791A',
   cHoverSuccess: '#00AF9033',
   cHoverError: '#E4605533',
   cHoverInfo: '#4285FA33',
   cHoverWarning: '#E9B01E33',
   cHoverOrange: '#F5822033',
-  cHoverCompl1: '#FAFF7F33',
+  cHoverCompl1: '#FAFAFA1A',
   cHoverCompl2: '#A2FAA333',
-  cHoverCompl3: '#B382D933',
-  cHoverCompl4: '#A9CCE333',
+  cHoverCompl3: '#39ACEC33',
+  cHoverCompl4: '#E1C15133',
   cHoverCompl5: '#F7B26733',
   cHoverCompl6: '#FF7F5133',
   cHoverCompl7: '#6CD16D33',
@@ -98,6 +100,9 @@ export const cssVar = {
   cCompl8: '#DE6A60',
   cCompl9: '#5AB0E9',
 
+
+  cToastFill: '#4E4E4E',
+
   //sizes
   sXxl: 24,
   sXl: 20,
@@ -127,6 +132,9 @@ export const cssVar = {
   //responsives
   responsiveTablet: 768,
   responsiveMobile: 480,
+
+  cHoverSecondary: '#21212133',
+  cHoverAccent: '#00E38C33',
 };
 
 export const screenHeight = Dimensions.get('window').height;

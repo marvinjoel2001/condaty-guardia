@@ -216,6 +216,8 @@ export const getAccessType = (data: any) => {
     return 'Sin QR';
   } else if (data?.type === 'G') {
     return 'QR Grupal';
+  } else if (data?.type === 'F') {
+    return 'QR Frecuente';
   } else {
     return 'QR Llave Virtual';
   }

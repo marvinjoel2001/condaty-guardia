@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
-import {cssVar} from '../../../styles/themes';
+import {cssVar, TypeStyles} from '../../../styles/themes';
 import Icon from '../../ui/Icon/Icon';
 import {IconGallery, IconX} from '../../../../src/icons/IconLibrary';
 import {uploadImage} from '../../../utils/uploadFile';
@@ -10,9 +10,16 @@ interface PropsType {
   setFormState: any;
   label: string;
   name: string;
+  style?: TypeStyles;
 }
 
-const UploadImage = ({formState, setFormState, label, name}: PropsType) => {
+const UploadImage = ({
+  formState,
+  setFormState,
+  label,
+  name,
+  style,
+}: PropsType) => {
   const {showToast} = useAuth();
   return (
     <View
@@ -25,6 +32,7 @@ const UploadImage = ({formState, setFormState, label, name}: PropsType) => {
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 16,
+        ...style,
       }}>
       {formState?.[name] ? (
         <>

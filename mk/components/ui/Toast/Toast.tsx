@@ -3,9 +3,10 @@ import {Text, View, Animated, Easing, TouchableOpacity, StyleSheet} from 'react-
 import Icon from '../Icon/Icon';
 import {
   IconX,
-  IconSuccessToastNotCircle,
   IconInfoToast,
-  IconSuccessToast,
+  IconToastSuccess,
+  IconToastWarning,
+  IconToastError,
 
 } from '../../../../src/icons/IconLibrary';
 import {cssVar, FONTS} from '../../../styles/themes';
@@ -23,7 +24,7 @@ interface ToastProps {
   showToast: (param: string | null) => void;
 }
 
-export const TIME_TOAST = 3000;
+export const TIME_TOAST = 5000;
 
 const Toast = ({toast, showToast}: ToastProps) => {
   const translateY = useRef(new Animated.Value(-200)).current;
@@ -43,9 +44,9 @@ const Toast = ({toast, showToast}: ToastProps) => {
 
   useEffect(() => {
     if (toast?.msg) {
-      translateY.setValue(-200); 
-      Animated.spring(translateY, { 
-        toValue: 0, 
+      translateY.setValue(-200);
+      Animated.spring(translateY, {
+        toValue: 0,
         useNativeDriver: true,
         friction: 7,
         tension: 60,
@@ -65,36 +66,36 @@ const Toast = ({toast, showToast}: ToastProps) => {
     switch (toast?.type) {
       case 'success':
         return {
-          iconName: IconSuccessToastNotCircle,
+          iconName: IconToastSuccess,
           iconColor: cssVar.cWhite,
-          iconBackgroundColor: '#2A8A46', 
-          toastBackgroundColor: '#34A853', 
+          iconBackgroundColor: cssVar.cSuccess || '#2A8A46',
+          toastBackgroundColor: cssVar.cSuccess || '#2A8A46',
           textColor: cssVar.cWhite,
           defaultTitle: '¡Excelente!',
         };
       case 'error':
         return {
-          iconName:  IconX, 
+          iconName:  IconToastError,
           iconColor: cssVar.cWhite,
-          iconBackgroundColor: '#C12A2A', 
+          iconBackgroundColor: cssVar.cError  || '#E53935',
           toastBackgroundColor: cssVar.cError || '#E53935',
           textColor: cssVar.cWhite,
           defaultTitle: 'Error',
         };
       case 'warning':
         return {
-          iconName:IconInfoToast, 
-          iconColor: cssVar.cBlack, 
-          iconBackgroundColor: '#D4A017', 
+          iconName: IconToastWarning,
+          iconColor: cssVar.cWhite,
+          iconBackgroundColor: cssVar.cWarning || '#D4A017',
           toastBackgroundColor: cssVar.cWarning || '#FFB300',
-          textColor: cssVar.cBlack, 
+          textColor: cssVar.cWhite,
           defaultTitle: 'Advertencia',
         };
       case 'info':
         return {
           iconName: IconInfoToast,
           iconColor: cssVar.cWhite,
-          iconBackgroundColor: '#1A73E8', 
+          iconBackgroundColor: cssVar.cInfo || '#4285FA',
           toastBackgroundColor: cssVar.cInfo || '#2196F3',
           textColor: cssVar.cWhite,
           defaultTitle: 'Información',
@@ -103,8 +104,8 @@ const Toast = ({toast, showToast}: ToastProps) => {
         return {
           iconName: IconInfoToast,
           iconColor: cssVar.cWhite,
-          iconBackgroundColor: cssVar.cWhiteV1 || '#5F6368', 
-          toastBackgroundColor: cssVar.cWhiteV1 || '#9E9E9E', 
+          iconBackgroundColor: cssVar.cWhiteV1 || '#5F6368',
+          toastBackgroundColor: cssVar.cWhiteV1 || '#9E9E9E',
           textColor: cssVar.cWhite,
           defaultTitle: 'Mensaje',
         };
@@ -121,21 +122,20 @@ const Toast = ({toast, showToast}: ToastProps) => {
   return (
     <View style={styles.outerContainer}>
       <Animated.View style={{transform: [{translateY}]}}>
-        
-        {/* ÍCONO FLOTANTE SEPARADO - FUERA DEL TOAST */}
-        <View style={[styles.iconOuterCircle, {backgroundColor: theme.iconBackgroundColor}]}>
-          <Icon name={theme.iconName} color={theme.iconColor} size={22} />
-        </View>
+        {/* CONTENEDOR DEL TOAST CON ÍCONO INTERNO */}
+        <View style={[styles.toastBaseContainer, {backgroundColor: cssVar.cToastFill}]}>
+          {/* ÍCONO DENTRO DEL TOAST */}
+          <View style={[styles.iconInnerCircle, {backgroundColor: theme.iconBackgroundColor}]}>
+            <Icon name={theme.iconName} color={theme.iconColor} size={24} />
+          </View>
 
-        {/* CONTENEDOR DEL TOAST */}
-        <View style={[styles.toastBaseContainer, {backgroundColor: theme.toastBackgroundColor}]}>
           <View style={styles.textContentWrapper}>
             <Text style={[styles.titleText, {color: theme.textColor}]}>{currentTitle}</Text>
             <Text style={[styles.messageText, {color: theme.textColor}]}>{toast.msg}</Text>
           </View>
 
           <TouchableOpacity onPress={_close} style={styles.closeButtonWrapper}>
-            <Icon name={IconX} size={14} color={theme.textColor} />
+            <Icon name={IconX} size={24} color={theme.textColor} />
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -148,51 +148,45 @@ export default Toast;
 const styles = StyleSheet.create({
   outerContainer: {
     position: 'absolute',
-    top: 55, 
+    top: 0,
     left: 0,
     right: 0,
     alignItems: 'center',
     zIndex: 1000,
-    paddingHorizontal: 20, 
-  },
-  // ÍCONO SEPARADO - POSICIÓN ABSOLUTA DESDE EL CONTENEDOR PADRE
-  iconOuterCircle: {
-    width: 48, 
-    height: 48,
-    borderRadius: 24, 
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    left: 20,     // Posición desde el borde izquierdo del contenedor
-    top: -10,     // Posición hacia arriba
-    zIndex: 10,   // Asegurar que esté por encima del toast
-    // Sombra pronunciada para efecto flotante
-    elevation: 15,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 8},
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    // Borde blanco grueso para separación visual
-    borderWidth: 8,
-    borderColor: cssVar.cBlack, 
+    paddingHorizontal: 20,
   },
   toastBaseContainer: {
-    width: '100%', 
-    maxWidth: 340, 
+    width: '100%',
+    maxWidth: 340,
     minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 12, 
-    paddingLeft: 90,   // Espacio grande para que no se superponga con el ícono
+    borderRadius: 12,
+    paddingLeft: 16,
     paddingRight: 16,
     paddingVertical: 12,
-    marginTop: 20,     // CLAVE: Margen superior para separar del ícono
+    marginTop: 50,
     // Sombra sutil para el toast
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 3,
+  },
+  // ÍCONO AHORA DENTRO DEL TOAST
+  iconInnerCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    // Sombra para el ícono
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   textContentWrapper: {
     flex: 1,
@@ -210,11 +204,11 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   closeButtonWrapper: {
-    width: 30, 
-    height: 30,
+    width: 48,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
-    padding: 4, 
+    padding: 4,
   },
 });

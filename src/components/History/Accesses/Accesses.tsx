@@ -6,36 +6,49 @@ import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
-import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import {openLink} from '../../../../mk/utils/utils';
-import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDownload} from '../../../icons/IconLibrary';
-import {cssVar} from '../../../../mk/styles/themes';
 
 type Props = {
   data: any;
   loaded: boolean;
 };
 const Accesses = ({data, loaded}: Props) => {
-  const {execute} = useApi();
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
+
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
+  const getAccessSubtitle = (item: any): string => {
+    const groupTitle = item.invitation?.title || item.access?.invitation?.title;
+
+    switch (item.type) {
+      case 'O':
+        return 'Llave QR';
+      case 'C':
+        return 'Sin QR';
+      case 'I':
+        return 'QR Individual';
+      case 'G':
+        return 'QR Grupal' + (groupTitle ? ' - ' + groupTitle : '');
+      case 'F':
+        return 'QR Frecuente';
+      case 'P':
+        return 'Pedido';
+      default:
+        return '';
+    }
+  };
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
-    const subTitle =
-      item.type == 'O' ? 'Llave QR' :
-      item.type == 'C' ? 'Sin QR' : 
-      item.type == 'I' ? 'QR Individual' : 
-      item.type == 'G' ? 'QR Grupal' : 
-      item.type == 'F' ? 'QR Frecuente' : 
-      item.type == 'P' ? 'Pedido'  : '';
 
     if (search && search !== '') {
       if (
-        user.name?.toLowerCase()?.includes(search?.toLowerCase()) === false &&
-        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) ===
-          false
+        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
+        false
       ) {
         return null;
       }
@@ -50,7 +63,7 @@ const Accesses = ({data, loaded}: Props) => {
         }}
         key={item?.id}
         title={getFullName(user)}
-        subtitle={subTitle}
+        subtitle={getAccessSubtitle(item)}
         left={
           <Avatar
             name={getFullName(user)}
@@ -71,21 +84,8 @@ const Accesses = ({data, loaded}: Props) => {
     setSearch(value);
   };
 
-  const onExport = async () => {
-    const {data: file} = await execute('/accesses', 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType: 'L',
-      section: 'ACT',
-      _export: 'pdf',
-    });
-    if (file?.success == true) {
-      openLink(getUrlImages('/' + file?.data.path));
-    }
-  };
-
   return (
-    <View >
+    <View>
       <View
         style={{
           flexDirection: 'row',
@@ -99,12 +99,6 @@ const Accesses = ({data, loaded}: Props) => {
           value={search}
           style={{flex: 1}}
         />
-       {/*  <Icon
-          name={IconDownload}
-          onPress={onExport}
-          fillStroke={cssVar.cWhiteV2}
-          color={'transparent'}
-        /> */}
       </View>
       <List
         data={data}

@@ -1,5 +1,5 @@
 import {Text, TouchableOpacity} from 'react-native';
-import {IconSimpleAdd} from '../../../../src/icons/IconLibrary';
+import {IconAddAlert, IconSimpleAdd} from '../../../../src/icons/IconLibrary';
 import Icon from '../Icon/Icon';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
 import React from 'react';
@@ -14,7 +14,7 @@ type PropsType = {
 };
 
 const IconFloat = ({
-  icon = IconSimpleAdd,
+  icon = IconAddAlert,
   text = '',
   onPress,
   style = {},
@@ -63,7 +63,7 @@ const theme: ThemeType = {
     right: 12,
     backgroundColor: cssVar.cAccent,
     padding: cssVar.spM,
-    borderRadius: cssVar.bRadiusS,
+    borderRadius: 100,
     alignSelf: 'center',
     zIndex: 100,
   },

@@ -6,6 +6,8 @@ import useApi from '../../../mk/hooks/useApi';
 import useAuth from '../../../mk/hooks/useAuth';
 import {cssVar} from '../../../mk/styles/themes';
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
+import {ALERT_LEVEL_OPTIONS} from './alertConstants';
+import {View} from 'react-native';
 
 type PropsType = {
   open: boolean;
@@ -18,6 +20,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
   const [errors, setErrors]: any = useState({});
   const {showToast} = useAuth();
   const {execute} = useApi();
+
   const handleInputChange = (name: string, value: any) => {
     const v = value?.target?.value ? value.target.value : value;
     setFormState({
@@ -25,6 +28,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       [name]: v,
     });
   };
+
   const validate = () => {
     let errors: any = {};
     errors = checkRules({
@@ -51,7 +55,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       level: formState.level,
       descrip: formState.descrip,
     });
-    if (alerts?.success == true) {
+    if (alerts?.success) {
       onClose();
       reload();
       showToast('Alerta Enviada', 'success');
@@ -61,39 +65,36 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
       showToast(errorMessage, 'error');
     }
   };
+
   return (
     <ModalFull
+      title="Agregar alerta"
       open={open}
       onClose={onClose}
-      title="Crear Alerta"
-      onSave={onSaveAlerts}
-      buttonText="Crear alerta">
-      <Select
-        label="Nivel de alerta"
-        // placeholder="Nivel de alerta"
-        error={errors}
-        required
-        name="level"
-        style={{
-          paddingTop: cssVar.spM,
-        }}
-        options={[
-          {id: 1, name: 'Bajo - Solo guardias'},
-          {id: 2, name: 'Medio - Solo administradores y guardias'},
-          {id: 3, name: 'Alto - Residentes, administradores y guardias'},
-        ]}
-        value={formState.level}
-        onChange={value => handleInputChange('level', value)}
-      />
-      <TextArea
-        label="Descripción"
-        // placeholder="Ej. Se ha detectado un incendio en el edificio 1 piso 2."
-        name="descrip"
-        required
-        error={errors}
-        value={formState.descrip}
-        onChange={value => handleInputChange('descrip', value)}
-      />
+      buttonText="Guardar"
+      onSave={onSaveAlerts}>
+      <View style={{gap: cssVar.spM, marginTop: cssVar.spM}}>
+        <Select
+          name="level"
+          required
+          label="Nivel de alerta"
+          placeholder="Selecciona el nivel"
+          value={formState.level}
+          onChange={(value) => handleInputChange('level', value)}
+          options={ALERT_LEVEL_OPTIONS}
+          optionValue="id"
+          optionLabel="name"
+          error={errors.level}
+        />
+        <TextArea
+          label="Descripción"
+          name="descrip"
+          required
+          error={errors}
+          value={formState.descrip}
+          onChange={value => handleInputChange('descrip', value)}
+        />
+      </View>
     </ModalFull>
   );
 };

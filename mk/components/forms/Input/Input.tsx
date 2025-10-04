@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {TextInput} from 'react-native';
+import {Platform, StyleSheetProperties, TextInput} from 'react-native';
 import ControlLabel, {PropsTypeInputBase} from '../ControlLabel/ControlLabel';
 import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
 import React from 'react';
@@ -64,7 +64,7 @@ const Input = (props: PropsType) => {
         value={props.value}
         returnKeyType={props.search}
         placeholder={isFocused ? '' : props.placeholder || ''}
-        placeholderTextColor={cssVar.cWhiteV1}
+        placeholderTextColor={cssVar.cWhiteV3}
         editable={!props.disabled && !props.readOnly}
         secureTextEntry={props.password || false}
         autoFocus={props.autoFocus || false}
@@ -96,6 +96,6 @@ const theme: ThemeType = {
     // paddingVertical: cssVar.spL,
   },
   errorInput: {borderColor: cssVar.cError},
-  disabledInput: {opacity: 0.6, color: cssVar.cWhiteV3},
+  disabled: {color: cssVar.cWhiteV1},
   focusInput: {borderColor: cssVar.cAccent},
 };

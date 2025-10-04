@@ -16,7 +16,7 @@ type PropsType = {
 };
 
 const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
-  const [errors, setErrors]: any = useState();
+  const [errors, setErrors]: any = useState({});
   const [formState, setFormState]: any = useState();
   const {showToast} = useAuth();
   const {execute} = useApi();
@@ -57,24 +57,25 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       onClose={onClose}
       buttonText="Enviar reporte"
       buttonCancel="">
-      <View style={{marginTop: 12}}>
-        <TextArea
-          label="Descripción"
-          name="descrip"
-          placeholder="Escribir reporte..."
-          error={errors}
-          maxLength={250}
-          required={true}
-          value={formState?.descrip}
-          onChange={value => handleInputChange('descrip', value)}
-        />
-        <UploadImage
-          setFormState={setFormState}
-          formState={formState}
-          label="Adjuntar imagen"
-          name="avatar"
-        />
-      </View>
+      <TextArea
+        type="textArea"
+        label="Escribir reporte..."
+        name="descrip"
+        // placeholder="Escribir reporte..."
+        error={errors}
+        maxLength={250}
+        required={false}
+        value={formState?.descrip}
+        onChange={value => handleInputChange('descrip', value)}
+      />
+
+      <UploadImage
+        style={{marginTop: 0}}
+        setFormState={setFormState}
+        formState={formState}
+        label="Adjuntar imagen"
+        name="avatar"
+      />
     </ModalFull>
   );
 };

@@ -47,6 +47,7 @@ const InputNameCi = ({
         errors={errors}
         handleChangeInput={handleChangeInput}
         disabled={disabledName}
+        inputGrid={true}
         prefijo={prefix}
       />
     </View>

@@ -9,9 +9,6 @@ import DateAccess from '../DateAccess/DateAccess';
 import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 import {openLink} from '../../../../mk/utils/utils';
-import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDownload} from '../../../icons/IconLibrary';
-import {cssVar} from '../../../../mk/styles/themes';
 
 type Props = {
   data: any;
@@ -23,20 +20,34 @@ const QR = ({data, loaded}: Props) => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
 
+  const removeAccents = (str: string) => {
+    return str
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+      ?.toLowerCase();
+  };
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
+    const groupTitle = item.invitation?.title || item.access?.invitation?.title;
     const subTitle =
-      item.type == 'O' ? 'Llave QR' :
-      item.type == 'C' ? 'Sin QR' : 
-      item.type == 'I' ? 'QR Individual' : 
-      item.type == 'G' ? 'QR Grupal' : 
-      item.type == 'F' ? 'QR Frecuente' : 
-      item.type == 'P' ? 'Pedido'  : '';
+      item.type == 'O'
+        ? 'Llave QR'
+        : item.type == 'C'
+        ? 'Sin QR'
+        : item.type == 'I'
+        ? 'QR Individual'
+        : item.type == 'G'
+        ? 'QR Grupal' + (groupTitle ? ' - ' + groupTitle : '')
+        : item.type == 'F'
+        ? 'QR Frecuente'
+        : item.type == 'P'
+        ? 'Pedido'
+        : '';
 
     if (search && search !== '') {
       if (
-        user.name?.toLowerCase()?.includes(search?.toLowerCase()) === false &&
-        user?.last_name?.toLowerCase()?.includes(search?.toLowerCase()) === false
+        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
+        false
       ) {
         return null;
       }
@@ -125,4 +136,4 @@ const QR = ({data, loaded}: Props) => {
   );
 };
 
-export default QR; 
+export default QR;

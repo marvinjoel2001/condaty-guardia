@@ -9,12 +9,6 @@ import {
   View,
   Modal,
 } from 'react-native';
-import Animated, {
-  Easing,
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
 import {
   IconArrowDown,
   IconArrowUp,
@@ -76,9 +70,6 @@ const Select = ({
   const [selectedNames, setSelectedNames] = useState('');
   const [_options, setOptions] = useState<{[key: string]: any} | any[]>([]);
   const [search, setSearch] = useState('');
-
-  const opacity = useSharedValue(0);
-
   const selectRef = useRef(null);
 
   const onChangeSearch = (value: string) => {
@@ -141,25 +132,6 @@ const Select = ({
     }
   }, [value]);
 
-  useEffect(() => {
-    if (openOptions) {
-      opacity.value = withTiming(1, {
-        duration: 300,
-        easing: Easing.out(Easing.exp),
-      });
-    } else {
-      opacity.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.exp),
-      });
-    }
-  }, [openOptions]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{scale: opacity.value}],
-  }));
-
   if (!options) return null;
 
   return (
@@ -216,16 +188,12 @@ const Select = ({
           <TouchableOpacity
             style={styles.overlay}
             onPress={() => setOpenOptions(false)}>
-            <Animated.View
-              style={[
-                styles.modalContent,
-                animatedStyle,
-                {maxHeight: filter ? 280 : 140},
-              ]}>
+            <View
+              style={[styles.modalContent, {maxHeight: filter ? 280 : 140}]}>
               {filter && (
                 <TextInput
                   style={styles.search}
-                  placeholderTextColor={cssVar.cWhiteV2}
+                  placeholderTextColor={cssVar.cWhiteV1}
                   value={search}
                   onChangeText={onChangeSearch}
                   placeholder={`Buscar ${placeholder || label}...`}
@@ -286,6 +254,7 @@ const Select = ({
                   : Object.keys(_options).map((key: string) => (
                       <TouchableOpacity
                         key={key}
+                        delayPressIn={0}
                         onPress={() =>
                           handleSelectClickElement(
                             _options[key][optionValue] || _options[key].label,
@@ -297,7 +266,7 @@ const Select = ({
                       </TouchableOpacity>
                     ))}
               </ScrollView>
-            </Animated.View>
+            </View>
           </TouchableOpacity>
         </Modal>
       )}

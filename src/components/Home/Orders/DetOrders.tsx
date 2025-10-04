@@ -3,8 +3,8 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import useApi from '../../../../mk/hooks/useApi';
-import {getUTCNow} from '../../../../mk/utils/dates';
-import {getFullName} from '../../../../mk/utils/strings';
+import {getDateTimeStrMes, getUTCNow} from '../../../../mk/utils/dates';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import LineDetail from '../Accesses/shares/LineDetail';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
@@ -15,13 +15,24 @@ import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import List from '../../../../mk/components/ui/List/List';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import {IconX} from '../../../icons/IconLibrary';
+import {
+  IconExpand,
+  IconX,
+  IconAdd,
+  IconAccess,
+  IconToastSuccess,
+  IconAddMore,
+} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
 import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 import ItemListDate from '../Accesses/shares/ItemListDate';
+import Card from '../../../../mk/components/ui/Card/Card';
+import KeyValue from '../../../../mk/components/ui/KeyValue';
+import Br from '../../Profile/Br';
+import Loading from '../../../../mk/components/ui/Loading/Loading';
 
-const DetOrders = ({id, open, close, reload}: any) => {
+const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [formState, setFormState]: any = useState({});
@@ -59,13 +70,56 @@ const DetOrders = ({id, open, close, reload}: any) => {
     const status = getStatus();
     const mapping: Record<string, string> = {
       I: 'Dejar salir',
-      Y: 'Dejar entrar',
+      Y: 'Registrar ingreso',
       // S: 'Esperando confirmación',
       C: '',
     };
     return mapping[status] || '';
   };
 
+  const onExistTaxi = async () => {
+    if (!formState?.ci_taxi || formState.ci_taxi.length < 5) {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: prevState.tab === 'T' ? '' : prevState.plate,
+        disbledTaxi: false,
+      }));
+      return;
+    }
+    const {data: existData} = await execute('/visits', 'GET', {
+      perPage: 1,
+      page: 1,
+      exist: '1',
+      fullType: 'L',
+      ci_visit: formState?.ci_taxi,
+    });
+    if (existData?.data) {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        ci_taxi: existData.data.ci,
+        name_taxi: existData.data.name,
+        middle_name_taxi: existData.data.middle_name,
+        last_name_taxi: existData.data.last_name,
+        mother_last_name_taxi: existData.data.mother_last_name,
+        plate: existData.data.plate || '',
+        disbledTaxi: true,
+      }));
+    } else {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: prevState.tab === 'T' ? '' : prevState.plate,
+        disbledTaxi: false,
+      }));
+    }
+  };
   const handleInputChange = (name: string, value: string) => {
     setFormState({...formState, [name]: value});
   };
@@ -141,25 +195,19 @@ const DetOrders = ({id, open, close, reload}: any) => {
         return;
       }
       // Acción: Dejar entrar
-      const {data: result, error} = await execute(
-        '/accesses',
-        'POST',
-        {
-          begin_at: formState?.begin_at || getUTCNow(),
-          pedido_id: data?.id,
-          type: 'P',
-          plate: formState?.plate,
-          name: formState?.name,
-          middle_name: formState?.middle_name,
-          last_name: formState?.last_name,
-          mother_last_name: formState?.mother_last_name,
-          ci: formState?.ci,
-          obs_in: formState?.obs_in,
-          acompanantes: formState?.acompanantes,
-        },
-        false,
-        3,
-      );
+      const {data: result, error} = await execute('/accesses', 'POST', {
+        begin_at: formState?.begin_at || getUTCNow(),
+        pedido_id: data?.id,
+        type: 'P',
+        plate: formState?.plate,
+        name: formState?.name,
+        middle_name: formState?.middle_name,
+        last_name: formState?.last_name,
+        mother_last_name: formState?.mother_last_name,
+        ci: formState?.ci,
+        obs_in: formState?.obs_in,
+        acompanantes: formState?.acompanantes,
+      });
       if (result?.success) {
         if (reload) reload();
         close();
@@ -169,48 +217,54 @@ const DetOrders = ({id, open, close, reload}: any) => {
     }
   };
 
-  // Renderizamos el detalle del pedido
-  console.log(data);
   const renderDetails = () => {
-    const status = getStatus();
     return (
-      <>
-        <LineDetail label="Estado:" value={getAccessStatus(data)} />
-        <LineDetail
-          label="Tipo de pedido:"
-          value={'Pedido-' + (data?.other_type?.name || '')}
+      <Card>
+        <Text style={styles.labelAccess}>Notificado Por</Text>
+        <ItemList
+          title={getFullName(data?.owner)}
+          // subtitle={'C.I.' + data?.owner?.ci}
+          subtitle={
+            'Unidad: ' +
+            data?.owner?.dpto?.[0]?.nro +
+            ', ' +
+            data?.owner?.dpto?.[0]?.description
+          }
+          left={
+            <Avatar
+              name={getFullName(data?.owner)}
+              src={getUrlImages(
+                '/OWNER-' +
+                  data?.owner?.id +
+                  '.webp?d=' +
+                  data?.owner?.updated_at,
+              )}
+            />
+          }
+          // right={
+          //   data?.type !== 'C' ? (
+          //     <Icon
+          //       name={IconExpand}
+          //       color={cssVar.cWhiteV1}
+          //       onPress={() =>
+          //         setOpenDet({
+          //           open: true,
+          //           id: data?.invitation_id,
+          //           invitation: {...data?.invitation, owner: data?.owner},
+          //           type: 'I',
+          //         })
+          //       }
+          //     />
+          //   ) : null
+          // }
         />
-        {/* Si es un pedido de Taxi, por ejemplo, podrías mostrar el nombre del conductor */}
-        {data?.other?.otherType?.name === 'Taxi' && (
-          <LineDetail label="Conductor:" value={getFullName(data?.visit)} />
-        )}
-        {data?.plate && <LineDetail label="Placa:" value={data?.plate} />}
-        <LineDetail label="Entregó a:" value={getFullName(data?.owner)} />
-        {status === 'C' && data?.obs_confirm && (
-          <>
-            <LineDetail label="Observación:" value={data?.obs_confirm} />
-          </>
-        )}
-        {data?.access?.plate && (
-          <LineDetail label="Placa:" value={data?.access?.plate} />
-        )}
-        {data?.descrip && (
-          <LineDetail label="Descripción:" value={data?.descrip} />
-        )}
-
-        {data?.access?.guardia && (
-          <LineDetail
-            label={data?.access?.out_guard ? 'Guardia de entrada:' : 'Guardia:'}
-            value={getFullName(data?.access?.guardia)}
-          />
-        )}
-        {data?.access?.out_guard && (
-          <LineDetail
-            label="Guardia de salida:"
-            value={getFullName(data?.access?.out_guard)}
-          />
-        )}
-      </>
+        <KeyValue
+          keys="Fecha de notificación"
+          value={getDateTimeStrMes(data?.created_at, true)}
+        />
+        <KeyValue keys="Descripión" value={data?.descrip} />
+        {/* {detailVisit(data)} */}
+      </Card>
     );
   };
 
@@ -289,140 +343,168 @@ const DetOrders = ({id, open, close, reload}: any) => {
     <ModalFull
       onClose={close}
       open={open}
-      title={'Detalle de Pedido'}
+      title={'Pedido' + '/' + data?.other_type?.name}
       onSave={handleSave}
       buttonText={getButtonText()}>
-      <View style={{marginVertical: 12}}>
-        {!data ? (
-          <Text style={{color: cssVar.cWhiteV2}}>Cargando...</Text>
-        ) : (
-          <>
-            {renderDetails()}
-            <View style={{marginTop: 12}}>
-              {getStatus() === 'C' && (
-                <>
-                  <ItemList
-                    title={getFullName(data?.access?.visit)}
-                    subtitle={'C.I.' + data?.access?.visit?.ci}
-                    // subtitle2={
-                    //   data?.access?.plate
-                    //     ? 'Placa: ' + data?.access?.plate
-                    //     : 'Entrada a pie'
-                    // }
-                    left={<Avatar name={getFullName(data?.access?.visit)} />}>
-                    <ItemListDate
-                      inDate={data?.access?.in_at}
-                      outDate={data?.access?.out_at}
-                    />
-                  </ItemList>
-                </>
-              )}
-              {getStatus() === 'Y' && (
-                <>
-                  <Input
-                    label="Carnet de identidad"
-                    type="date"
-                    name="ci"
-                    required={true}
-                    maxLength={10}
-                    value={formState?.ci}
-                    error={errors}
-                    onChange={(value: any) => handleInputChange('ci', value)}
-                    onBlur={() => onExist()}
+      {!data ? (
+        <Loading />
+      ) : (
+        <>
+          {renderDetails()}
+          <View style={{marginTop: 12}}>
+            {getStatus() === 'C' && (
+              <>
+                <ItemList
+                  title={getFullName(data?.access?.visit)}
+                  subtitle={'C.I.' + data?.access?.visit?.ci}
+                  left={<Avatar name={getFullName(data?.access?.visit)} />}>
+                  <ItemListDate
+                    inDate={data?.access?.in_at}
+                    outDate={data?.access?.out_at}
                   />
-                  <InputFullName
-                    formState={formState}
-                    errors={errors}
-                    handleChangeInput={handleInputChange}
-                    disabled={formState?.disbled}
-                  />
-
-                  <TextArea
-                    label="Observaciones de Entrada"
+                </ItemList>
+              </>
+            )}
+            {getStatus() === 'Y' && (
+              <>
+                <Input
+                  label="Carnet del visitante"
+                  type="date"
+                  name="ci"
+                  required={true}
+                  maxLength={10}
+                  value={formState?.ci}
+                  error={errors}
+                  onChange={(value: any) => handleInputChange('ci', value)}
+                  onBlur={() => onExist()}
+                />
+                <InputFullName
+                  formState={formState}
+                  errors={errors}
+                  handleChangeInput={handleInputChange}
+                  disabled={formState?.disbled}
+                  inputGrid={true}
+                />
+                {/* <TextArea
+                    label="Observaciones"
                     name="obs_in"
                     value={formState?.obs_in || ''}
                     onChange={value => handleInputChange('obs_in', value)}
-                  />
-                  <TabsButtons
-                    tabs={[
-                      {value: 'P', text: 'A pie'},
-                      {value: 'V', text: 'En vehículo'},
-                    ]}
-                    sel={tab}
-                    setSel={setTab}
-                  />
+                    placeholder='Ej: El visitante está ingresando con 2 mascotas'
+                  /> */}
+                <TabsButtons
+                  tabs={[
+                    {value: 'P', text: 'A pie'},
+                    {value: 'V', text: 'En vehículo'},
+                    // {value: 'T', text: 'En Taxi'},
+                  ]}
+                  sel={tab}
+                  setSel={setTab}
+                />
 
-                  {tab === 'V' && (
+                {tab === 'V' && (
+                  <Input
+                    label="Placa"
+                    type="text"
+                    required
+                    name="plate"
+                    error={errors}
+                    // disabled={formState?.disbled}
+                    value={formState['plate']}
+                    onChange={(value: any) => handleInputChange('plate', value)}
+                  />
+                )}
+                {tab === 'T' && (
+                  <>
+                    <Text style={styles.subSectionTitle}>
+                      Datos del conductor del taxi:
+                    </Text>
                     <Input
-                      label="Placa"
-                      type="text"
-                      required
-                      name="plate"
+                      label="Carnet de identidad (Taxista)"
+                      name="ci_taxi"
+                      keyboardType="numeric"
+                      maxLength={10}
                       error={errors}
-                      // disabled={formState?.disbled}
-                      value={formState['plate']}
-                      onChange={(value: any) =>
-                        handleInputChange('plate', value)
+                      required
+                      value={formState?.ci_taxi || ''}
+                      onBlur={onExistTaxi}
+                      onChange={(value: string) =>
+                        handleChange('ci_taxi', value)
                       }
                     />
-                  )}
-                  <TouchableOpacity
+                    <InputFullName
+                      formState={formState}
+                      errors={errors}
+                      disabled={formState?.disbledTaxi}
+                      prefijo="_taxi"
+                      handleChangeInput={handleChange}
+                      inputGrid={true}
+                    />
+                    <Input
+                      label="Placa del taxi"
+                      type="text"
+                      name="plate" // Taxi usa 'plate' como en la versión antigua
+                      error={errors} // Error para 'plate'
+                      required={tab === 'T'}
+                      value={formState?.plate || ''} // Valor de 'plate'
+                      onChange={(value: string) =>
+                        handleChange('plate', value.toUpperCase())
+                      }
+                      autoCapitalize="characters"
+                    />
+                  </>
+                )}
+                <TouchableOpacity
+                  style={{
+                    alignSelf: 'flex-start',
+                    marginVertical: 2,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingBottom: 5,
+                  }}
+                  onPress={() => setOpenAcom(true)}>
+                  <Icon
                     style={{
-                      alignSelf: 'flex-start',
-                      marginVertical: 4,
+                      paddingVertical: 10,
+                      borderRadius: 50,
+                      // color:cssVar.cSidebar
                     }}
-                    onPress={() => setOpenAcom(true)}>
-                    <Text
-                      style={{
-                        color: cssVar.cWhite,
-                        textDecorationLine: 'underline',
-                      }}>
-                      Agregar acompañante
-                    </Text>
-                  </TouchableOpacity>
-                  {formState?.acompanantes?.length > 0 && (
-                    <>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontFamily: FONTS.semiBold,
-                          marginVertical: 4,
-                          color: cssVar.cWhiteV2,
-                        }}>
-                        Acompañantes:
-                      </Text>
-                      <List
-                        data={formState?.acompanantes}
-                        renderItem={acompanantesList}
-                      />
-                    </>
-                  )}
-                </>
-              )}
-              {getStatus() === 'I' && (
-                <>
-                  <ItemList
-                    title={getFullName(data?.access?.visit)}
-                    subtitle={'C.I.' + data?.access?.visit?.ci}
-                    // subtitle2={
-                    //   data?.access?.plate
-                    //     ? 'Placa: ' + data?.access?.plate
-                    //     : 'Entrada a pie'
-                    // }
-                    left={<Avatar name={getFullName(data?.access?.visit)} />}
+                    color={cssVar.cAccent}
+                    name={IconAddMore}
+                    size={16}
                   />
-                  <TextArea
-                    label="Observaciones de Salida"
-                    name="obs_out"
-                    value={formState?.obs_out || ''}
-                    onChange={e => handleInputChange('obs_out', e)}
-                  />
-                </>
-              )}
-            </View>
-          </>
-        )}
-      </View>
+                  <Text
+                    style={{
+                      color: cssVar.cAccent,
+                      textDecorationLine: 'underline',
+                    }}>
+                    Agregar acompañante
+                  </Text>
+                </TouchableOpacity>
+                {formState?.acompanantes?.length > 0 && (
+                  <>
+                    <List
+                      data={formState?.acompanantes}
+                      renderItem={acompanantesList}
+                    />
+                  </>
+                )}
+              </>
+            )}
+            {getStatus() === 'Y' && (
+              <>
+                <TextArea
+                  label="Observaciones"
+                  name="obs_out"
+                  value={formState?.obs_out || ''}
+                  onChange={e => handleInputChange('obs_out', e)}
+                  placeholder="Ej: El visitante está ingresando con 2 mascotas"
+                />
+              </>
+            )}
+          </View>
+        </>
+      )}
       <AccompaniedAdd
         open={openAcom}
         onClose={() => setOpenAcom(false)}
@@ -434,7 +516,23 @@ const DetOrders = ({id, open, close, reload}: any) => {
 };
 
 const styles = StyleSheet.create({
-  // Puedes definir estilos propios para DetOrders
+  label: {
+    color: cssVar.cWhiteV1,
+    fontSize: 12,
+    fontFamily: FONTS.light,
+  },
+  labelAccess: {
+    color: cssVar.cWhite,
+    marginBottom: 12,
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+  },
+  subSectionTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+    color: cssVar.cWhiteV1 || '#D0D0D0',
+    marginBottom: 12,
+  },
 });
 
 export default DetOrders;

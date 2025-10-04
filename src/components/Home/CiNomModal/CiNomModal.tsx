@@ -3,7 +3,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
-import {checkRules} from '../../../../mk/utils/validate/Rules';
+import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Select from '../../../../mk/components/forms/Select/Select';
 import Input from '../../../../mk/components/forms/Input/Input';
@@ -12,8 +12,8 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getFullName} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
-import Modal from '../../../../mk/components/ui/Modal/Modal';
-import {IconAlert, IconX} from '../../../icons/IconLibrary';
+// import Modal from '../../../../mk/components/ui/Modal/Modal';
+import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import {TouchableOpacity} from 'react-native';
@@ -21,6 +21,7 @@ import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
 import {getUTCNow} from '../../../../mk/utils/dates';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
+import KeyQR from '../EntryQR/KeyQR';
 
 interface CiNomModalProps {
   open: boolean;
@@ -29,28 +30,21 @@ interface CiNomModalProps {
 }
 
 const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
-  const {user, showToast} = useAuth();
-  const [visit, setVisit]: any = useState([]);
+  const {showToast} = useAuth();
+  const [visit, setVisit]: any = useState(null);
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState(0);
-  const [openAlert, setOpenAlert] = useState(false);
+  // const [openAlert, setOpenAlert] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
   const [addCompanion, setAddCompanion] = useState(false);
+  const [dataOwner, setDataOwner]: any = useState(null);
 
   const handleDeleteAcompanante = (ci: any) => {
     const newAcompanante = formState.acompanantes.filter(
       (acomDelete: any) => acomDelete.ci !== ci,
     );
     setFormState((old: any) => ({...old, acompanantes: newAcompanante}));
-  };
-  const hasErrors = (errors: any) => {
-    for (const key in errors) {
-      if (errors[key]) {
-        return true;
-      }
-    }
-    return false;
   };
 
   const [dataOwners, setDataOwners] = useState([]);
@@ -59,19 +53,13 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     data: owners,
     loaded,
     execute,
-  } = useApi(
-    '/owners',
-    'GET',
-    {
-      perPage: -1,
-      sortBy: 'name',
-      orderBy: 'asc',
-      searchBy: '',
-      fullType: 'L',
-    },
-    3,
-    true,
-  );
+  } = useApi('/owners', 'GET', {
+    perPage: -1,
+    sortBy: 'name',
+    orderBy: 'asc',
+    searchBy: '',
+    fullType: 'L',
+  });
 
   useEffect(() => {
     if (owners?.data) {
@@ -80,9 +68,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         name:
           getFullName(owner) +
           ' - ' +
-          owner?.dpto[0]?.nro +
+          (owner?.dpto?.[0]?.nro || owner?.dpto_nro) +
           ' - ' +
-          owner?.dpto[0]?.type?.name,
+          (owner?.dpto?.[0]?.type?.name || owner?.type_name),
       }));
       setDataOwners(newOwners);
     }
@@ -95,13 +83,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     });
   };
 
-  const getVisits = async () => {
-    // if (hasErrors(validate())) {
-    //   return;
-    // }
-
+  const visitExist = async () => {
     const {data: visitData} = await execute(
-      '/visits',
+      '/visit-exist',
       'GET',
       {
         perPage: -1,
@@ -109,27 +93,37 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         fullType: 'L',
         searchBy: formState.ci,
       },
-      // 3
+      false,
+      3,
     );
-    setVisit(visitData?.data);
-    if (visitData?.data.length === 0) {
-      setSteps(2);
-      setOpenAlert(true);
-
-      return;
+    if (visitData?.success) {
+      if (visitData?.data?.owner_exist) {
+        setDataOwner({invitation: visitData?.data});
+      } else {
+        setVisit(visitData?.data);
+        setFormState({
+          ...formState,
+          name: visitData?.data?.name,
+          middle_name: visitData?.data?.middle_name,
+          last_name: visitData?.data?.last_name,
+          mother_last_name: visitData?.data?.mother_last_name,
+          ci: visitData?.data?.ci,
+        });
+        setSteps(2);
+      }
     } else {
       setSteps(1);
-      setFormState({
-        ...formState,
-        name: visitData?.data[0].name,
-        middle_name: visitData?.data[0].middle_name,
-        last_name: visitData?.data[0].last_name,
-        mother_last_name: visitData?.data[0].mother_last_name,
-        ci: visitData?.data[0].ci,
-      });
+      // setFormState({
+      //   ...formState,
+      //   name: visitData?.data?.name,
+      //   middle_name: visitData?.data?.middle_name,
+      //   last_name: visitData?.data?.last_name,
+      //   mother_last_name: visitData?.data?.mother_last_name,
+      //   ci: visitData?.data?.ci,
+      // });
     }
   };
-
+  console.log(typeSearch);
   const validate = () => {
     let errors: any = {};
     errors = checkRules({
@@ -138,37 +132,39 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       key: 'ci',
       errors,
     });
-    if (steps > 0) {
-      errors = checkRules({
-        value: formState.owner_id,
-        rules: ['required'],
-        key: 'owner_id',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.name,
-        rules: ['required', 'alpha'],
-        key: 'name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.middle_name,
-        rules: ['alpha'],
-        key: 'middle_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.last_name,
-        rules: ['required', 'alpha'],
-        key: 'last_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.mother_last_name,
-        rules: ['alpha'],
-        key: 'mother_last_name',
-        errors,
-      });
+    if (steps <= 1) {
+      if (steps == 1) {
+        errors = checkRules({
+          value: formState.owner_id,
+          rules: ['required'],
+          key: 'owner_id',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.name,
+          rules: ['required', 'alpha'],
+          key: 'name',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.middle_name,
+          rules: ['alpha'],
+          key: 'middle_name',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.last_name,
+          rules: ['required', 'alpha'],
+          key: 'last_name',
+          errors,
+        });
+        errors = checkRules({
+          value: formState.mother_last_name,
+          rules: ['alpha'],
+          key: 'mother_last_name',
+          errors,
+        });
+      }
 
       if (typeSearch == 'V' || typeSearch == 'T') {
         errors = checkRules({
@@ -219,33 +215,60 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   };
 
   const onSave = async () => {
+    if (formState?.ci_taxi == formState?.ci) {
+      return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
+    }
     if (hasErrors(validate())) {
       return;
     }
-    if (steps === 0) {
-      getVisits();
+    if (steps === 0 && !dataOwner) {
+      visitExist();
       return;
     }
-    const url = '/accesses';
-    let method = 'POST';
 
-    const {data, error: err} = await execute(url, method, {
-      ...formState,
+    const url = dataOwner ? '/accesses/enterqr' : '/accesses';
+    let method = 'POST';
+    let params: any = {
       begin_at: formState?.begin_at || getUTCNow(),
-    });
+    };
+
+    if (dataOwner) {
+      params = {
+        ...params,
+        owner_id: dataOwner?.invitation?.id,
+        type: 'O',
+        acompanantes: formState?.acompanantes || [],
+        obs_in: formState?.obs_in,
+        plate: formState?.plate,
+        ci_taxi: formState?.ci_taxi,
+        name_taxi: formState?.name_taxi,
+        middle_name_taxi: formState?.middle_name_taxi,
+        last_name_taxi: formState?.last_name_taxi,
+        mother_last_name_taxi: formState?.mother_last_name_taxi,
+        visit_id: formState?.visit_id,
+      };
+    } else {
+      params = {
+        ...params,
+        ...formState,
+      };
+    }
+
+    const {data, error: err} = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
       onClose();
-      // Removed reload call since reload is not defined in the component scope
       reload();
-      showToast('Notificación enviada', 'success');
+      showToast(
+        dataOwner ? 'Visita registrada' : 'Notificación enviada',
+        'success',
+      );
     } else {
       showToast(data?.message, 'error');
     }
   };
 
   const acompanantesList = (item: any) => {
-    // console.log(item,'item',formState.acompanantes,'formState.acompanantes')
     return (
       <ItemList
         title={getFullName(item)}
@@ -254,7 +277,12 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         right={
           <Icon
             name={IconX}
-            color={cssVar.cWhiteV2}
+            color={cssVar.cError}
+            size={20}
+            style={{
+              borderRadius: 20,
+              padding: 4,
+            }}
             onPress={() => handleDeleteAcompanante(item.ci)}
           />
         }
@@ -275,6 +303,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   }, [typeSearch]);
 
   const onExistTaxi = async () => {
+    if (formState?.ci_taxi == formState?.ci) {
+      return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
+    }
     const {data: exist} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -282,7 +313,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       fullType: 'L',
       ci_visit: formState?.ci_taxi,
     });
-    console.log(exist, 'exist');
+    setErrors({errors, ci_taxi: ''});
     if (exist?.data) {
       setFormState({
         ...formState,
@@ -306,191 +337,220 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       });
     }
   };
+
+  const _onClose = () => {
+    if (steps > 0) {
+      setSteps(0);
+      setVisit(null);
+      setFormState({owner_id: formState?.owner_id, ci: formState?.ci});
+      return;
+    }
+    onClose();
+  };
+
   return (
     <ModalFull
       open={open}
-      onClose={onClose}
-      title={steps > 0 ? 'Registrar sin qr' : 'Visitante sin qr'}
+      onClose={_onClose}
+      title={'Visitante sin QR'}
       buttonText={
-        steps > 0 ? 'Notificar al residente' : steps <= 0 ? 'Buscar' : ''
+        steps > 0
+          ? 'Notificar al residente'
+          : steps <= 0
+          ? dataOwner
+            ? 'Dejar ingresar'
+            : 'Buscar'
+          : ''
       }
-      // buttonCancel="Cancelar"
       onSave={onSave}>
       <>
-        {visit.length > 0 && (
-          <ItemList
-            title={getFullName(visit[0])}
-            subtitle={`CI: ${visit[0]?.ci}`}
-            left={<Avatar name={getFullName(visit[0])} />}
-          />
-        )}
-        <Select
-          filter
-          label="¿A quién visita?"
-          name="owner_id"
-          required={true}
-          options={dataOwners || []}
-          value={formState.owner_id || ''}
-          onChange={value => handleChangeInput('owner_id', value.target.value)}
-          optionValue="id"
-          error={errors}
-          optionLabel="name"
-          height={300}
-          search={true}
-          style={{
-            paddingTop: cssVar.spM,
-          }}
-        />
-        {visit.length === 0 && steps === 0 && (
-          <Input
-            label="Carnet de identidad"
-            type="date"
-            name="ci"
-            error={errors}
-            required={true}
-            value={formState['ci']}
-            maxLength={10}
-            onChange={(value: any) => handleChangeInput('ci', value)}
-          />
-        )}
-        {steps === 2 && (
-          <InputNameCi
-            formStateName={formState}
-            formStateCi={formState.ci}
-            disabledCi={steps === 2}
-            handleChangeInput={handleChangeInput}
+        {dataOwner ? (
+          <KeyQR
+            data={dataOwner}
+            formState={formState}
+            setFormState={setFormState}
+            handleChange={handleChangeInput}
             errors={errors}
+            setTab={setTypeSearch}
+            tab={typeSearch}
           />
-        )}
-        {steps > 0 && (
-          <TextArea
-            label="Observaciones de Entrada"
-            name="obs_in"
-            value={formState?.obs_in}
-            onChange={(e: any) => handleChangeInput('obs_in', e)}
-          />
-        )}
-        {steps > 0 && (
-          // <SelectTransport
-          //   typeSearch={typeSearch}
-          //   setTypeSearch={setTypeSearch}
-          //   formState={formState}
-          //   errors={errors}
-          //   onCheckCI={onExistTaxi}
-          //   disabledFields={formState?.disbledTaxi}
-          //   handleChangeInput={handleChangeInput}
-          //   tabs={[
-          //     {value: 'P', text: 'A pie'},
-          //     {value: 'V', text: 'En vehículo'},
-          //     {value: 'T', text: 'En taxi'},
-          //   ]}
-          // />
+        ) : (
           <>
-            <TabsButtons
-              tabs={[
-                {value: 'P', text: 'A pie'},
-                {value: 'V', text: 'En vehículo'},
-                {value: 'T', text: 'En taxi'},
-              ]}
-              sel={typeSearch}
-              setSel={setTypeSearch}
-            />
-            {typeSearch == 'V' && (
+            {!visit && steps === 0 && (
               <Input
-                label="Placa"
-                type="text"
-                name="plate"
+                label="Carnet de identidad"
+                type="date"
+                name="ci"
                 error={errors}
-                required={typeSearch == 'V'}
-                value={formState['plate']}
-                onChange={(value: any) => {
-                  handleChangeInput('plate', value);
-                }}
+                required={true}
+                value={formState['ci']}
+                maxLength={10}
+                onChange={(value: any) => handleChangeInput('ci', value)}
               />
             )}
-            {typeSearch == 'T' && (
+            <Select
+              filter
+              label="¿A quién visita?"
+              name="owner_id"
+              required={true}
+              options={dataOwners || []}
+              value={formState.owner_id || ''}
+              onChange={value =>
+                handleChangeInput('owner_id', value.target.value)
+              }
+              optionValue="id"
+              error={errors}
+              optionLabel="name"
+              height={300}
+              search={true}
+            />
+            {visit && (
+              <ItemList
+                title={getFullName(visit)}
+                subtitle={`CI: ${visit?.ci}`}
+                left={<Avatar name={getFullName(visit)} />}
+              />
+            )}
+
+            {steps === 1 && !visit && (
+              <InputNameCi
+                formStateName={formState}
+                formStateCi={formState.ci}
+                disabledCi={true}
+                handleChangeInput={handleChangeInput}
+                errors={errors}
+              />
+            )}
+
+            {steps > 0 && (
+              <>
+                <TabsButtons
+                  tabs={[
+                    {value: 'P', text: 'A pie'},
+                    {value: 'V', text: 'En vehículo'},
+                    {value: 'T', text: 'En taxi'},
+                  ]}
+                  sel={typeSearch}
+                  setSel={setTypeSearch}
+                />
+                {typeSearch == 'V' && (
+                  <Input
+                    label="Placa"
+                    autoCapitalize="characters"
+                    type="text"
+                    name="plate"
+                    error={errors}
+                    required={typeSearch == 'V'}
+                    value={formState['plate']}
+                    onChange={(value: any) => {
+                      handleChangeInput('plate', value);
+                    }}
+                  />
+                )}
+                {typeSearch == 'T' && (
+                  <>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        marginBottom: 4,
+                        color: cssVar.cWhite,
+                        fontFamily: FONTS.medium,
+                      }}>
+                      Datos del conductor:
+                    </Text>
+                    <Input
+                      label="Carnet de identidad"
+                      type="date"
+                      name="ci_taxi"
+                      required
+                      maxLength={10}
+                      error={errors}
+                      value={formState['ci_taxi']}
+                      onBlur={() => onExistTaxi()}
+                      onChange={(value: any) =>
+                        handleChangeInput('ci_taxi', value)
+                      }
+                    />
+                    <InputFullName
+                      formState={formState}
+                      errors={errors}
+                      handleChangeInput={handleChangeInput}
+                      disabled={formState?.disbledTaxi}
+                      prefijo={'_taxi'}
+                      inputGrid={true}
+                    />
+                    <Input
+                      label="Placa"
+                      autoCapitalize="characters"
+                      type="text"
+                      name="plate"
+                      error={errors}
+                      required={typeSearch == 'T'}
+                      value={formState['plate']}
+                      onChange={(value: any) =>
+                        handleChangeInput('plate', value)
+                      }
+                    />
+                  </>
+                )}
+              </>
+            )}
+            {formState.acompanantes?.length > 0 && (
               <>
                 <Text
                   style={{
                     fontSize: 16,
-                    fontWeight: 'bold',
-                    marginBottom: 4,
-                    color: cssVar.cWhiteV2,
                     fontFamily: FONTS.medium,
+                    marginBottom: 4,
+                    color: cssVar.cWhite,
                   }}>
-                  Datos del conductor:
+                  {formState.acompanantes?.length > 1
+                    ? 'Acompañantes:'
+                    : 'Acompañante:'}
                 </Text>
-                <Input
-                  label="Carnet de identidad"
-                  type="date"
-                  name="ci_taxi"
-                  required
-                  maxLength={10}
-                  error={errors}
-                  value={formState['ci_taxi']}
-                  onBlur={() => onExistTaxi()}
-                  onChange={(value: any) => handleChangeInput('ci_taxi', value)}
-                />
-                <InputFullName
-                  formState={formState}
-                  errors={errors}
-                  handleChangeInput={handleChangeInput}
-                  disabled={formState?.disbledTaxi}
-                  prefijo={'_taxi'}
-                />
-                <Input
-                  label="Placa"
-                  type="text"
-                  name="plate"
-                  error={errors}
-                  required={typeSearch == 'T'}
-                  value={formState['plate']}
-                  onChange={(value: any) => handleChangeInput('plate', value)}
+                <List
+                  data={formState.acompanantes}
+                  renderItem={acompanantesList}
+                  refreshing={!loaded}
                 />
               </>
             )}
-          </>
-        )}
-        {formState.acompanantes?.length > 0 && (
-          <>
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: FONTS.medium,
-                marginBottom: 4,
-                color: cssVar.cWhiteV2,
-              }}>
-              {formState.acompanantes?.length > 1
-                ? 'Acompañantes:'
-                : 'Acompañante:'}
-            </Text>
-            <List
-              data={formState.acompanantes}
-              renderItem={acompanantesList}
-              refreshing={!loaded}
-            />
-          </>
-        )}
 
-        {steps > 0 && (
-          <TouchableOpacity
-            style={{
-              alignSelf: 'flex-start',
-              marginVertical: 4,
-            }}
-            onPress={() => setAddCompanion(true)}>
-            <Text
-              style={{
-                color: cssVar.cWhite,
-                textDecorationLine: 'underline',
-              }}>
-              Agregar acompañante
-            </Text>
-          </TouchableOpacity>
+            {steps > 0 && (
+              <TouchableOpacity
+                style={{
+                  alignSelf: 'flex-start',
+                  marginBottom: 12,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                onPress={() => setAddCompanion(true)}>
+                <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+                <Text
+                  style={{
+                    color: cssVar.cAccent,
+                    textDecorationLine: 'underline',
+                  }}>
+                  Agregar acompañante
+                </Text>
+              </TouchableOpacity>
+            )}
+            {steps > 0 && (
+              <TextArea
+                label="Observaciones"
+                name="obs_in"
+                placeholder="Ej: El visitante está ingresando con 2 mascotas"
+                value={formState?.obs_in}
+                onChange={(e: any) => handleChangeInput('obs_in', e)}
+              />
+            )}
+          </>
         )}
       </>
 
-      {openAlert && (
+      {/* {openAlert && (
         <Modal
           open={openAlert}
           onClose={onClose}
@@ -504,7 +564,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             <Text style={styles.modalAlertText}>¡Visita no registrada!</Text>
           </View>
         </Modal>
-      )}
+      )} */}
       {addCompanion && (
         <AccompaniedAdd
           open={addCompanion}
