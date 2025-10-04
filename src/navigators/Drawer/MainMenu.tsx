@@ -12,7 +12,7 @@ import {
   IconLinkedin,
   IconLogout,
   IconNotification,
-  IconNovedades,
+  IconBitacora,
   IconTikTok,
   IconUser,
   IconYoutube,
@@ -105,8 +105,7 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
           <ItemMenu
             screen="Binnacle"
             text="Bitácora"
-            icon={IconNovedades}
-            reverse
+            icon={IconBitacora}
             activeItem={activeItem}
           />
           <ItemMenu
