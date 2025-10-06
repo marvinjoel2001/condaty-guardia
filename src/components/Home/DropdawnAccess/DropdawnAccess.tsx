@@ -90,21 +90,15 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
           }}>
           {openDrop ? (
             <Icon
-              style={{marginTop: 2}}
-              name={IconArrowDown}
-              color={cssVar.cWhite}
+              style={{marginTop: 2}} name={IconArrowDown} color={cssVar.cWhite}
             />
           ) : (
             <Icon
-              style={{marginTop: 2}}
-              name={IconArrowUp}
-              color={cssVar.cWhite}
+              style={{marginTop: 2}} name={IconArrowUp} color={cssVar.cWhite}
             />
           )}
         </View>
-        {/* <View onTouchEnd={toggleDropdown} style={styles.containerLine}>
-          <View style={styles.line}></View>
-        </View> */}
+
         {showButtons && (
           <>
             <Text style={{...styles.text, marginTop: 20}}>
@@ -116,16 +110,13 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
               }}
               style={styles.containerButtons}>
               <View onTouchEnd={onPressCiNom} style={styles.buttons}>
-                <Icon
-                  size={50}
-                  name={IconNoQr}
-                  color={'transparent'}
-                  fillStroke={cssVar.cWhite}
+                <Icon size={50} style={{marginBottom: 8, marginTop: 2}}
+                  name={IconNoQr} color={'transparent'} fillStroke={cssVar.cWhite}
                 />
                 <Text style={{color: cssVar.cWhite}}>Sin QR</Text>
               </View>
               <View onTouchEnd={onPressQr} style={styles.buttons}>
-                <Icon size={50} name={IconGenericQr} color={cssVar.cWhite} />
+                <Icon size={50} name={IconGenericQr} color={cssVar.cWhite} style={{marginBottom: 8}} />
                 <Text style={{color: cssVar.cWhite}}>Leer QR</Text>
               </View>
             </View>
@@ -146,23 +137,10 @@ const styles = StyleSheet.create({
     bottom: isIos() ? 68.5 : 72.5,
     borderTopRightRadius: cssVar.bRadius,
     borderTopLeftRadius: cssVar.bRadius,
-    // overflow: 'hidden',
     borderWidth: 0.5,
     borderBottomWidth: 0,
     borderTopColor: cssVar.cWhiteV1,
   },
-  // containerLine: {
-  //   alignItems: 'center',
-  //   width: '100%',
-  //   justifyContent: 'center',
-  //   height: 40,
-  // },
-  // line: {
-  //   backgroundColor: cssVar.cWhiteV1,
-  //   height: 6,
-  //   width: 54,
-  //   borderRadius: cssVar.bRadiusL,
-  // },
   text: {
     color: cssVar.cWhite,
     textAlign: 'center',
@@ -174,8 +152,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent:'center',
     gap:32
-    // justifyContent: 'space-around',
-    // overflow: 'hidden',
   },
   buttons: {
     backgroundColor: cssVar.cBlackV2,
@@ -183,7 +159,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: cssVar.spXxl,
     justifyContent: 'center',
     alignItems: 'center',
-    // overflow: 'hidden',
     borderRadius: cssVar.bRadius,
   },
 });
