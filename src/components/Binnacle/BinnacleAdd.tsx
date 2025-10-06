@@ -4,6 +4,7 @@ import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
 import useAuth from '../../../mk/hooks/useAuth';
 import useApi from '../../../mk/hooks/useApi';
 import UploadImage from '../../../mk/components/forms/UploadImage/UploadImage';
+import { View } from 'react-native';
 type PropsType = {
   open: boolean;
   onClose: () => void;
@@ -63,25 +64,30 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       onSave={onSaveNovedades}
       onClose={onClose}
       buttonText="Enviar reporte"
-      buttonCancel="">
-      <TextArea
-        type="textArea"
-        label="Escribir reporte..."
-        name="descrip"
-        error={errors}
-        maxLength={250}
-        required={false}
-        value={formState?.descrip}
-        onChange={value => handleInputChange('descrip', value)}
-      />
+      buttonCancel=""
+      scrollViewHide={true}
+    >
+      <View style={{flex: 1, padding: 12}}>
+        <TextArea
+          type="textArea"
+          label="Escribir reporte..."
+          name="descrip"
+          error={errors}
+          maxLength={5000}
+          required={false}
+          value={formState?.descrip}
+          onChange={value => handleInputChange('descrip', value)}
+          maxAutoHeightRatio={0.5}
+        />
 
-      <UploadImage
-        style={{marginTop: 0}}
-        setFormState={setFormState}
-        formState={formState}
-        label="Adjuntar imagen"
-        name="avatar"
-      />
+        <UploadImage
+          style={{flex: 1, marginTop: 12}}
+          setFormState={setFormState}
+          formState={formState}
+          label="Adjuntar imagen"
+          name="avatar"
+        />
+      </View>
     </ModalFull>
   );
 };
