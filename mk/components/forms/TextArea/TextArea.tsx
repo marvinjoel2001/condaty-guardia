@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {TextInput, Text, View} from 'react-native';
+import {TextInput, Text, View, Dimensions} from 'react-native';
 import ControlLabel, {PropsTypeInputBase} from '../ControlLabel/ControlLabel';
 import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
 
 interface PropsType extends PropsTypeInputBase {
   lines?: number;
   maxLength?: number;
+  maxAutoHeightRatio?: number; // 0..1 (ej. 0.5 = 50% de la pantalla)
+  maxAutoHeight?: number;      // alto máximo en px
 }
 
 export const TextArea = (props: PropsType) => {
@@ -13,7 +15,28 @@ export const TextArea = (props: PropsType) => {
   const [isFocused, setIsFocused] = useState(false);
   // const [textLength, setTextLength] = useState(value?.length || 0);
   const lineHeight = 20;
-  const lines = props?.lines || 4;
+  const lines = props?.lines || 15;
+
+  // Alto mínimo según líneas (solo texto)
+  const minHeightText = lineHeight * lines;
+
+  // Calcula padding vertical efectivo (theme + override de props.style)
+  const defaultPaddingTop = (theme.default?.paddingTop as number) ?? 0;
+  const defaultPaddingBottom = (theme.default?.paddingBottom as number) ?? 0;
+  const stylePaddingTop = (props.style?.paddingTop as number) ?? 0;
+  const stylePaddingBottom = (props.style?.paddingBottom as number) ?? 0;
+  const verticalPadding =
+    defaultPaddingTop + defaultPaddingBottom + stylePaddingTop + stylePaddingBottom;
+
+  // Umbral máximo de crecimiento
+  const windowHeight = Dimensions.get('window').height;
+  const maxAutoHeight =
+    props.maxAutoHeight ??
+    (props.maxAutoHeightRatio ? windowHeight * props.maxAutoHeightRatio : undefined);
+
+  // Alto dinámico y control de scroll
+  const [inputHeight, setInputHeight] = useState<number>(minHeightText + verticalPadding);
+  const [scrollEnabled, setScrollEnabled] = useState<boolean>(false);
 
   const styleInput = {
     ...theme.default,
@@ -23,7 +46,8 @@ export const TextArea = (props: PropsType) => {
       : {}),
     ...props.style,
     ...(props.disabled ? theme.disabledInput : {}),
-    height: lineHeight * lines,
+    // Altura dinámica con padding incluido
+    height: inputHeight,
   };
 
   const _onBlur = (e: any) => {
@@ -33,8 +57,31 @@ export const TextArea = (props: PropsType) => {
 
   const handleTextChange = (text: string) => {
     if (maxLength === undefined || text?.length <= maxLength) {
-      // setTextLength(text?.length);
       props.onChange?.(text);
+    }
+  };
+
+  const onContentSizeChange = (e: any) => {
+    const contentHeight = e?.nativeEvent?.contentSize?.height ?? minHeightText;
+
+    // Suma el padding vertical al contenido
+    let nextHeight = contentHeight + verticalPadding;
+
+    // Limita por umbral máximo si corresponde
+    if (maxAutoHeight !== undefined) {
+      nextHeight = Math.min(nextHeight, maxAutoHeight);
+    }
+
+    // Respeta un mínimo (texto + padding)
+    nextHeight = Math.max(nextHeight, minHeightText + verticalPadding);
+
+    setInputHeight(nextHeight);
+
+    // Habilita scroll solo cuando el contenido (sin padding) supera el umbral
+    if (maxAutoHeight !== undefined) {
+      setScrollEnabled(contentHeight + verticalPadding > maxAutoHeight);
+    } else {
+      setScrollEnabled(false);
     }
   };
 
@@ -66,7 +113,9 @@ export const TextArea = (props: PropsType) => {
         autoFocus={props.autoFocus}
         allowFontScaling={false}
         textAlignVertical="top"
-        maxLength={maxLength ?? undefined} // Permite texto ilimitado si no se define maxLength
+        maxLength={maxLength ?? undefined}
+        onContentSizeChange={onContentSizeChange}
+        scrollEnabled={scrollEnabled}
       />
       {/* {maxLength !== undefined && (
           <Text style={theme.counter}>
