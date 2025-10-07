@@ -1,19 +1,22 @@
-import React, {Fragment, useEffect, useRef} from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Text,
-  View,
-} from 'react-native';
-import {TypeStyles, cssVar} from '../../../styles/themes';
+import React, {Fragment, useRef} from 'react';
+import {FlatList, View} from 'react-native';
+import {TypeStyles} from '../../../styles/themes';
 import useAuth from '../../../hooks/useAuth';
-// import Loading from '../../../../src/components/Animations/Loading';
+import Skeleton from '../Skeleton/Skeleton';
+
+// Footer component extracted to top-level to satisfy lint rules
+const RenderFooterComponent = ({loading, skeletonType, mapSkeletonType}: any) => {
+  if (!loading) return null;
+  return (
+    <View style={{paddingVertical: 4}}>
+      <Skeleton type={mapSkeletonType(skeletonType)} />
+    </View>
+  );
+};
 
 interface PropsType {
   data: any;
   renderItem: (item: any, index?: number) => any;
-  children?: any;
   sepList?: (item: any) => any;
   keyExtractor?: (item: any) => any;
   onRefresh?: any;
@@ -21,7 +24,13 @@ interface PropsType {
   style?: TypeStyles;
   emptyLabel?: React.ReactNode; // Puede ser string, componente o elemento JSX
   typeLoading?: 'loading' | 'skeleton';
-  skeletonType?: 'media' | 'survey' | 'event';
+  skeletonType?:
+    | 'media'
+    | 'survey'
+    | 'event'
+    | 'access'
+    | 'list'
+    | 'detail';
   onPagination?: any;
   total?: number;
   loading?: boolean;
@@ -30,7 +39,6 @@ interface PropsType {
 const ListFlat = (props: PropsType) => {
   const {
     data,
-    children,
     renderItem,
     sepList,
     keyExtractor,
@@ -45,60 +53,49 @@ const ListFlat = (props: PropsType) => {
     loading = false,
   } = props;
 
-  const {setStore, store} = useAuth();
-  const refFlatList = useRef(null);
-
+  const {setStore} = useAuth();
   const scrollOffset = useRef(0);
-
   const handleScroll = ({nativeEvent}: any) => {
     scrollOffset.current = nativeEvent.contentOffset.y;
     setStore({onScroll: nativeEvent.contentOffset.y});
   };
 
-  // useEffect(() => {
-  //   setStore({onFlatRef: refFlatList});
-  // }, [refFlatList]);
+  const mapSkeletonType = (t: any) => {
+    switch (t) {
+      case 'survey':
+      case 'media':
+      case 'list':
+        return 'list';
+      case 'event':
+      case 'detail':
+        return 'detail';
+      case 'access':
+        return 'access';
+      default:
+        return 'list';
+    }
+  };
 
   if (refreshing) {
     return (
-      <View style={{paddingTop: 100}}>
-        {/* <Loading
-          type={typeLoading}
-          skeletonType={skeletonType}
-          title="Cargando..."
-        /> */}
-        <Text>Cargando..</Text>
+      <View style={{paddingTop: 4}}>
+        <Skeleton type={mapSkeletonType(skeletonType)} />
       </View>
     );
   }
-  // console.log(total, data.length, loading);
-  const RenderFooter = () => {
-    if (!loading) return null;
+
+  // If we're loading and there's no data yet, show the main skeleton (initial load)
+  if (loading && (!data || (Array.isArray(data) && data.length === 0))) {
     return (
-      // <ActivityIndicator
-      //   size="large"
-      //   color={cssVar.cPrimary}
-      //   style={{margin: 10}}
-      // />
-      <View>
-        {/* <Loading
-          type={typeLoading}
-          skeletonType={skeletonType}
-          title="Cargando..."
-        /> */}
-        <Text>Cargando...</Text>
+      <View style={{paddingTop: 4}}>
+        <Skeleton type={mapSkeletonType(skeletonType)} />
       </View>
     );
-  };
-  // const MemoizedRenderItem = React.memo(({item, index}: any) => (
-  //   <>
-  //     {sepList && sepList(item)}
-  //     {renderItem(item, index)}
-  //   </>
-  // ));
+  }
+
+  
 
   return (
-    <>
       <FlatList
         // ref={refFlatList}
         id="ListFlatlist"
@@ -106,32 +103,20 @@ const ListFlat = (props: PropsType) => {
         nativeID="ListFlatlist"
         data={data}
         contentContainerStyle={[style, {paddingBottom: 24, paddingHorizontal: 12}]}
-        keyExtractor={(item, idx) => `news-index-${idx}`}
+        keyExtractor={(item, idx) =>
+          keyExtractor ? keyExtractor(item) : `news-index-${idx}`
+        }
         renderItem={({item, index}) => (
           <Fragment key={index}>
-            {sepList && sepList(item)}
+            {sepList?.(item)}
             {renderItem(item, index)}
           </Fragment>
         )}
-        // renderItem={({item, index}) => (
-        //   <MemoizedRenderItem item={item} index={index} />
-        // )}
-        // refreshControl={
-        //   <RefreshControl
-        //     progressBackgroundColor={cssVar.cBlack}
-        //     colors={[cssVar.cAccent]}
-        //     refreshing={refreshing}
-        //     onRefresh={() => {
-        //       onRefresh();
-        //     }}
-        //     tintColor={cssVar.cAccent}
-        //   />
-        // }
+  // renderItem memoization removed for now
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        // contentContainerStyle={style}
-        // ListFooterComponent={children}
+  // children/list footer can be passed via props if needed
         initialNumToRender={5}
         // initialNumToRender={10}
         // windowSize={5}
@@ -144,7 +129,13 @@ const ListFlat = (props: PropsType) => {
         decelerationRate={0.5}
         onEndReached={onPagination} // Llamado al llegar al final
         onEndReachedThreshold={2} // Disparar cuando quede 50% del contenido
-        ListFooterComponent={<RenderFooter />} // Mostrar indicador de carga
+        ListFooterComponent={
+          <RenderFooterComponent
+            loading={loading}
+            skeletonType={skeletonType}
+            mapSkeletonType={mapSkeletonType}
+          />
+        } // Mostrar indicador de carga
         refreshing={refreshing}
         onRefresh={onRefresh} // Llamado al deslizar hacia abajo
         // removeClippedSubviews={false} // Asegura que los elementos no se desmonten fuera de pantalla
@@ -153,7 +144,6 @@ const ListFlat = (props: PropsType) => {
         legacyImplementation={true}
         updateCellsBatchingPeriod={50}
       />
-    </>
   );
 };
 
