@@ -10,6 +10,7 @@ import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
 import {IconUser} from '../../../../src/icons/IconLibrary';
 import Icon from '../Icon/Icon';
 import {cRandomcolors} from '../../../utils/randomColors';
+import ImageExpandableModal from '../ImageExpandableModal/ImageExpandableModal';
 
 interface AvatarProps {
   src?: string | null;
@@ -29,6 +30,7 @@ interface AvatarProps {
   circle?: boolean;
   borderColor?: string;
   borderWidth?: number;
+  expandable?: boolean;
 }
 
 const Avatar = ({
@@ -46,8 +48,10 @@ const Avatar = ({
   circle = true,
   borderColor = 'transparent',
   borderWidth = 0,
+  expandable = false,
 }: AvatarProps) => {
   const [imageError, setImageError] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     setImageError(false);
@@ -63,10 +67,18 @@ const Avatar = ({
 
   const backgroundColor = getBackgroundColor(name);
 
+  const handlePress = () => {
+    if (expandable && src && !imageError) {
+      setModalVisible(true);
+    } else if (onClick) {
+      onClick();
+    }
+  };
+
   const view = (
     <View style={{alignItems: 'center'}}>
       <TouchableOpacity
-        activeOpacity={onClick ? 0.2 : 1}
+        activeOpacity={(onClick || (expandable && src && !imageError)) ? 0.2 : 1}
         style={{
           ...theme.avatar,
           width: w,
@@ -77,7 +89,7 @@ const Avatar = ({
           borderRadius: circle ? w / 2 : cssVar.bRadiusS,
           ...style,
         }}
-        onPress={() => onClick && onClick()}>
+        onPress={handlePress}>
         {src && !imageError ? (
           <Image
             source={{uri: src}}
@@ -111,7 +123,18 @@ const Avatar = ({
     </View>
   );
 
-  return <View style={theme.container}>{view}</View>;
+  return (
+    <View style={theme.container}>
+      {view}
+      {expandable && src && !imageError && (
+        <ImageExpandableModal
+          visible={modalVisible}
+          imageUri={src}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
+    </View>
+  );
 };
 
 export default Avatar;

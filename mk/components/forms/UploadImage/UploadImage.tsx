@@ -1,16 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {cssVar, TypeStyles} from '../../../styles/themes';
 import Icon from '../../ui/Icon/Icon';
 import {IconGallery, IconX} from '../../../../src/icons/IconLibrary';
 import {uploadImage} from '../../../utils/uploadFile';
 import useAuth from '../../../hooks/useAuth';
+import ImageExpandableModal from '../../ui/ImageExpandableModal/ImageExpandableModal';
 interface PropsType {
   formState: any;
   setFormState: any;
   label: string;
   name: string;
   style?: TypeStyles;
+  expandable?: boolean;
 }
 
 const UploadImage = ({
@@ -19,8 +21,15 @@ const UploadImage = ({
   label,
   name,
   style,
+  expandable = true,
 }: PropsType) => {
   const {showToast} = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  const imageUri = formState?.[name] 
+    ? 'data:image/jpg;base64,' + formState?.[name]
+    : '';
+
   return (
     <View
       style={{
@@ -50,13 +59,18 @@ const UploadImage = ({
             }}>
             <Icon name={IconX} color={cssVar.cWhiteV1} size={16} />
           </TouchableOpacity>
-          <Image
-            source={{
-              uri: 'data:image/jpg;base64,' + formState?.[name],
-            }}
-            resizeMode="contain"
-            style={{width: '100%', height: '100%', borderRadius: 12}}
-          />
+          <TouchableOpacity
+            activeOpacity={expandable ? 0.7 : 1}
+            onPress={() => expandable && setModalVisible(true)}
+            style={{width: '100%', height: '100%'}}>
+            <Image
+              source={{
+                uri: imageUri,
+              }}
+              resizeMode="contain"
+              style={{width: '100%', height: '100%', borderRadius: 12}}
+            />
+          </TouchableOpacity>
         </>
       ) : (
         <>
@@ -75,6 +89,14 @@ const UploadImage = ({
             {label || 'Subir comprobante'}
           </Text>
         </>
+      )}
+      
+      {expandable && !!imageUri && (
+        <ImageExpandableModal
+          visible={modalVisible}
+          imageUri={imageUri}
+          onClose={() => setModalVisible(false)}
+        />
       )}
     </View>
   );

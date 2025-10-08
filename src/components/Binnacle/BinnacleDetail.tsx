@@ -67,6 +67,7 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
         <Text style={styles.text}>Imagen del reporte</Text>
         <View style={styles.imageContainer}>
           <Avatar
+            expandable={true}
             src={getUrlImages(
               `/GNEW-${details?.id}.webp?d=${details?.updated_at}`,
             )}
