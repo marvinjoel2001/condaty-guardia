@@ -9,10 +9,11 @@ import {StatusBar, Text} from 'react-native';
 import {cssVar} from './mk/styles/themes';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import ActiveNotificationDB from './mk/hooks/ActiveNotificationDB';
+import { navigationRef } from './src/navigators/navigationRef';
 
 function App() {
-  Text.defaultProps = Text.defaultProps || {};
-  Text.defaultProps.allowFontScaling = false;
+  (Text as any).defaultProps = (Text as any).defaultProps || {};
+  (Text as any).defaultProps.allowFontScaling = false;
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <AxiosProvider interceptors={axiosInterceptors}>
@@ -21,7 +22,7 @@ function App() {
           backgroundColor={cssVar.cBlack}
           barStyle={'light-content'}
         />
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <AuthProvider>
             <ActiveNotificationDB />
             <OneSignalContextProvider>
