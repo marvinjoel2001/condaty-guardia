@@ -1,29 +1,103 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {Image, StyleSheet, Text, View} from 'react-native';
-import {getDateTimeStrMes} from '../../../mk/utils/dates';
+import {StyleSheet, Text, View} from 'react-native';
 import {getUrlImages} from '../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
-import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Card from '../../../mk/components/ui/Card/Card';
+import useApi from '../../../mk/hooks/useApi';
+import Avatar from '../../../mk/components/ui/Avatar/Avatar';
+import Br from '../Profile/Br';
+
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  item: any;
+  id: any;
 };
 
-const BinnacleDetail = ({open, onClose, item}: PropsType) => {
-  // console.log(item,'ssss')
+const BinnacleDetail = ({open, onClose, id}: PropsType) => {
+  const [details, setDetails] = useState<any>({});
   const [imageError, setImageError] = useState(false);
-  const Br = () => {
+
+  const {execute, loaded} = useApi();
+
+  const getBinnacleDetail = async () => {
+    const {data} = await execute('/guardnews', 'GET', {
+      fullType: 'DET',
+      searchBy: id,
+    });
+    if (data?.success) {
+      setDetails(data?.data[0]);
+    }
+  };
+
+  useEffect(() => {
+    if (id && open) {
+      getBinnacleDetail();
+    }
+  }, [id, open]);
+
+  const _onClose = () => {
+    onClose();
+    setDetails({});
+    setImageError(false);
+  };
+
+  const renderImageSection = () => {
+
+    if (details?.has_image === 0) {
+      return (
+        <View style={styles.noImageContainer}>
+          <Text style={styles.noImageText}>Sin imagen</Text>
+        </View>
+      );
+    }
+
+
+    if (imageError) {
+      return (
+        <View style={styles.noImageContainer}>
+          <Text style={styles.noImageText}>No se encontró la imagen</Text>
+        </View>
+      );
+    }
+
+
     return (
-      <View
-        style={{
-          marginVertical: 16,
-          backgroundColor: cssVar.cWhiteV1,
-          height: 0.5,
-        }}
-      />
+      <>
+        <Text style={styles.text}>Imagen del reporte</Text>
+        <View style={styles.imageContainer}>
+          <Avatar
+            src={getUrlImages(
+              `/GNEW-${details?.id}.webp?d=${details?.updated_at}`,
+            )}
+            name="Imagen del reporte"
+            w={750}
+            h={180}
+            circle={false}
+            error={() => setImageError(true)}
+            style={styles.avatarImage}
+          />
+        </View>
+      </>
+    );
+  };
+
+  const renderContent = () => {
+    if (!loaded) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={{color: cssVar.cWhite}}>Cargando...</Text>
+        </View>
+      );
+    }
+
+    return (
+      <Card>
+        <Text style={styles.text}>Reporte</Text>
+        <Text style={{...styles.textV1}}>{details?.descrip}</Text>
+        <Br />
+        {renderImageSection()}
+      </Card>
     );
   };
 
@@ -31,46 +105,10 @@ const BinnacleDetail = ({open, onClose, item}: PropsType) => {
     <ModalFull
       open={open}
       title="Detalle de bitácora"
-      onClose={onClose}
+      onClose={_onClose}
       buttonCancel=""
       buttonText="">
-      <Card>
-        <Text style={styles.text}>Reporte</Text>
-        <Text style={{...styles.textV1}}>{item?.descrip}</Text>
-        <Br />
-        {imageError ? (
-          <Text
-            style={{
-              color: cssVar.cWhiteV1,
-              textAlign: 'center',
-              marginVertical: 16,
-              fontSize: 14,
-            }}>
-            No se encontró la imagen
-          </Text>
-        ) : (
-          <>
-            <Text style={styles.text}>Imagen del reporte</Text>
-            <View style={styles.containerImage}>
-              <Image
-                source={{
-                  uri: getUrlImages(
-                    `/GNEW-${item?.id}.webp?d=${item?.updated_at}`,
-                  ),
-                }}
-                resizeMode="contain"
-                style={{
-                  flex: 1,
-                  borderRadius: 8,
-                  justifyContent: 'center',
-                  width: '100%',
-                }}
-                onError={() => setImageError(true)}
-              />
-            </View>
-          </>
-        )}
-      </Card>
+      {renderContent()}
     </ModalFull>
   );
 };
@@ -89,13 +127,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 12,
   },
-  containerImage: {
-    flex: 1,
-    justifyContent: 'center',
+  imageContainer: {
     marginTop: 16,
-    borderRadius: 10,
+    borderRadius: 8,
+    backgroundColor: cssVar.cWhiteV2,
     height: 180,
     width: '100%',
-    backgroundColor: cssVar.cWhiteV2,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  noImageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    padding: 20,
+    backgroundColor: cssVar.cBlackV2,
+    borderRadius: 8,
+  },
+  noImageText: {
+    color: cssVar.cWhiteV1,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

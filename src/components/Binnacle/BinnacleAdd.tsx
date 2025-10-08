@@ -1,12 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState} from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
-import Icon from '../../../mk/components/ui/Icon/Icon';
-import {uploadImage} from '../../../mk/utils/uploadFile';
 import useAuth from '../../../mk/hooks/useAuth';
-import {IconScreenShot} from '../../icons/IconLibrary';
-import {cssVar} from '../../../mk/styles/themes';
 import useApi from '../../../mk/hooks/useApi';
 import UploadImage from '../../../mk/components/forms/UploadImage/UploadImage';
 type PropsType = {
@@ -34,17 +29,29 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       return;
     }
 
-    const {data: novedad, error: err} = await execute('/guardnews', 'POST', {
+    const hasImage =
+      typeof formState?.avatar === 'string' &&
+      formState.avatar.trim() !== '' &&
+      formState.avatar !== 'undefined';
+
+    const payload: any = {
       descrip: formState.descrip,
-      imageNew: {file: encodeURIComponent(formState.avatar), ext: 'webp'},
-    });
-    if (novedad?.success == true) {
+    };
+
+    if (hasImage) {
+      payload.imageNew = {
+        file: encodeURIComponent(formState.avatar),
+        ext: 'webp',
+      };
+    }
+
+    const {data: novedad} = await execute('/guardnews', 'POST', payload);
+    if (novedad?.success) {
       onClose();
       reload();
       setFormState({});
       showToast('Novedad agregada', 'success');
     } else {
-      // showToast(err, 'error');
       showToast('Ocurrió un error', 'error');
     }
   };
@@ -61,7 +68,6 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
         type="textArea"
         label="Escribir reporte..."
         name="descrip"
-        // placeholder="Escribir reporte..."
         error={errors}
         maxLength={250}
         required={false}
