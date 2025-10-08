@@ -2,6 +2,7 @@ import {OneSignal} from 'react-native-onesignal';
 import {useCallback, useEffect} from 'react';
 import useAuth from '../../mk/hooks/useAuth';
 import {useEvent} from '../../mk/hooks/useEvent';
+import { navigationRef } from '../navigators/navigationRef';
 
 const InitProject = () => {
   const {showToast, logout,user} = useAuth();
@@ -73,6 +74,16 @@ const InitProject = () => {
   useEffect(() => {
     OneSignal.Notifications.addEventListener('click', event => {
       console.log('OneSignal: notification clicked:', event);
+      const data: any = event.notification?.additionalData || null;
+
+      const params = {fromPush: true, pushData: data};
+      if (navigationRef.isReady()) {
+        navigationRef.navigate('Notifications', params);
+      } else {
+        setTimeout(() => {
+          navigationRef.navigate('Notifications', params);
+        }, 300);
+      }
       // const data: any = event.notification?.additionalData || null;
       // if (data) {
       //   switch (data.act) {
