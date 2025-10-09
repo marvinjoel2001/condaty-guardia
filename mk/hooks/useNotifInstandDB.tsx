@@ -36,7 +36,11 @@ const channelGral: string = configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX;
 const useNotifInstandDB = (channels: {channel: string}[] = []): NotifType => {
   const {user, showToast} = useAuth();
   const chiam =
-    channelGral + '-' + configApp.APP_AUTH_IAM.replace('/', '') + user?.id;
+    channelGral +
+    user?.client_id +
+    '-' +
+    configApp.APP_AUTH_IAM.replace('/', '') +
+    user?.id;
 
   const [lastNotif, setLastNotif] = useState<number | null>(null);
   const {dispatch} = useEvent('onNotif');
