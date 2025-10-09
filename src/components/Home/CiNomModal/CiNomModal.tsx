@@ -544,6 +544,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 placeholder="Ej: El visitante está ingresando con 2 mascotas"
                 value={formState?.obs_in}
                 onChange={(e: any) => handleChangeInput('obs_in', e)}
+                maxAutoHeightRatio={0.3}
               />
             )}
           </>
