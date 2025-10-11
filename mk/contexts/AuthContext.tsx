@@ -24,6 +24,7 @@ export interface AuthContextType {
   waiting: number;
   setWaiting: Function;
   splash: boolean;
+  setSplash: Function;
   store: any;
   storeRef: any;
   setStore: Function;
@@ -185,6 +186,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
     }
   };
   const login = async (credentials: any) => {
+    setSplash(true);
     setWaiting(1, 'login');
     setUser(false);
     const {data, error}: any = await execute(
@@ -210,8 +212,10 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
         // console.log('apiToken New Grabado', apiToken);
         await setUser({...data?.data?.user, token: data?.data?.token});
         setWaiting(-1, '-login');
+        setSplash(false);
         return {user: {...data?.data?.user, token: data?.data?.token}};
       } catch (error) {
+        setSplash(false);
         console.log('====================================');
         console.log('Error storage User login');
         console.log('====================================');
@@ -222,6 +226,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
       console.log('Not Logued', data, error);
       console.log('====================================');
       setWaiting(-1, '-loginError');
+      setSplash(false);
       return {user: false, errors: data?.errors || data?.message || error};
     }
   };
@@ -277,6 +282,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
         waiting,
         setWaiting: setWaiting,
         splash,
+        setSplash,
         store,
         storeRef,
         setStore: _setStore,

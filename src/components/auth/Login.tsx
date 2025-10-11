@@ -18,18 +18,16 @@ import useAuth from '../../../mk/hooks/useAuth';
 import {checkCI, checkPasswords} from '../../../mk/utils/validations';
 import Input from '../../../mk/components/forms/Input/Input';
 import ForgotPass from './ForgotPass';
-// import Splash from '../Splash/Splash';
 import React from 'react';
 import Splash from '../Splash/Splash';
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
-// import Loading from '../Animations/Loading';
 
 const Login = () => {
   const [formState, setFormState]: any = useState({});
   const [onRegister, setOnRegister] = useState(false);
   const [onForgotPass, setOnForgotPass] = useState(false);
   const [errors, setErrors] = useState({});
-  const {login, user, waiting} = useAuth();
+  const {login, user, waiting, splash, setSplash} = useAuth();
   const [showPassword, setShowPassword] = useState(true);
   const [load, setLoad] = useState(true);
 
@@ -39,28 +37,6 @@ const Login = () => {
       [name]: value,
     });
   };
-
-  // const validaciones = () => {
-  //   let errors = {};
-
-  //   const emailError = checkCI(formState.email);
-
-  //   if (emailError) {
-  //     errors = {...errors, email: emailError};
-  //   }
-
-  //   const passwordError = checkPasswords(formState.password);
-
-  //   if (passwordError) {
-  //     errors = {...errors, password: passwordError};
-  //   }
-
-  //   if (!formState.password) {
-  //     errors = {...errors, password: 'Campo requerido'};
-  //   }
-
-  //   return errors;
-  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -107,6 +83,7 @@ const Login = () => {
     }
     login(formState)
       .then((data: any) => {
+        setSplash(false);
         if (!(user || data?.user)) {
           if (data?.errors?.status == 500) {
             setErrors({
@@ -124,31 +101,24 @@ const Login = () => {
         return;
       })
       .catch((err: any) => {
+        setSplash(false);
         console.log('====================================');
         console.log('Error Login network', err, errors);
         console.log('====================================');
       });
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoad(false);
-    }, 3000);
-  }, []);
-
   const goTerminos = () => {
-    console.log('goTerminos');
     Linking.openURL('https://www.condaty.com/terminos');
   };
 
   const goPoliticas = () => {
-    console.log('goPoliticas');
     Linking.openURL('https://www.condaty.com/politicas');
   };
 
   return (
     <SafeAreaView style={theme.safeAreaView}>
-      {waiting > 0 && !user?.id ? (
+      {splash ? (
         <Splash />
       ) : (
         <Form behaviorAndroid="height" hideKeyboard={true}>
@@ -184,7 +154,6 @@ const Login = () => {
               password={showPassword}
               error={errors}
               value={formState['password']}
-              // keyboardType="numeric"
               onBlur={() => {
                 setErrors({
                   ...errors,
@@ -322,8 +291,7 @@ const theme: ThemeType = {
 
   container: {
     paddingHorizontal: 16,
-    backgroundColor: cssVar.cBlack,
-    // paddingVertical: 32,
+    backgroundColor: cssVar.cBlack
   },
   noAccountContainer: {
     flexDirection: 'row',
