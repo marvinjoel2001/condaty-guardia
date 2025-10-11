@@ -25,7 +25,7 @@ export const TextArea = (props: PropsType) => {
   const minHeight = (lines * lineHeight) + paddingVertical;
 
   const windowHeight = Dimensions.get('window').height;
-  const {maxAutoHeightRatio = 0.4} = props; // Default: 40%
+  const {maxAutoHeightRatio = 0.28} = props; // Default: 40%
   const maxHeight = props.maxAutoHeight || (windowHeight * maxAutoHeightRatio);
 
   const [height, setHeight] = useState(minHeight);

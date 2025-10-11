@@ -77,11 +77,13 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           required={false}
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}
-          maxAutoHeightRatio={0.5}
         />
 
         <UploadImage
-          style={{flex: 1, marginTop: 12}}
+          style={{
+            marginTop: 12,
+            ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
+          }}
           setFormState={setFormState}
           formState={formState}
           label="Adjuntar imagen"

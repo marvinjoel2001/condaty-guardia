@@ -21,7 +21,7 @@ const UploadImage = ({
   label,
   name,
   style,
-  expandable = true,
+  expandable = false,
 }: PropsType) => {
   const {showToast} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
