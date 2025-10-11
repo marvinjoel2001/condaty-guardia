@@ -77,6 +77,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           required={false}
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}
+          expandable={true}
         />
 
         <UploadImage

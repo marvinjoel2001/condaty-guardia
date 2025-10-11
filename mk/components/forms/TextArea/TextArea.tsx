@@ -8,10 +8,11 @@ interface PropsType extends PropsTypeInputBase {
   maxLength?: number;
   maxAutoHeightRatio?: number; // 0..1 (ej. 0.5 = 50% de la pantalla) - Default: 0.4 (40%)
   maxAutoHeight?: number;      // alto máximo en px
+  expandable?: boolean;        // Si es true, el textarea crece automáticamente - Default: false
 }
 
 export const TextArea = (props: PropsType) => {
-  const {value, maxLength} = props;
+  const {value, maxLength, expandable = false} = props;
   const [isFocused, setIsFocused] = useState(false);
   
   // Calcular altura mínima basada en líneas y tamaño de fuente
@@ -29,7 +30,7 @@ export const TextArea = (props: PropsType) => {
   const maxHeight = props.maxAutoHeight || (windowHeight * maxAutoHeightRatio);
 
   const [height, setHeight] = useState(minHeight);
-  const [scrollEnabled, setScrollEnabled] = useState(false);
+  const [scrollEnabled, setScrollEnabled] = useState(!expandable);
 
   const styleInput = useMemo(() => ({
     ...theme.default,
@@ -48,6 +49,11 @@ export const TextArea = (props: PropsType) => {
   }, [maxLength, props.onChange]);
 
   const onContentSizeChange = useCallback((e: any) => {
+    // Solo crece si expandable está en true
+    if (!expandable) {
+      return;
+    }
+
     const contentHeight = e.nativeEvent.contentSize.height;
     
     if (maxHeight) {
@@ -64,7 +70,7 @@ export const TextArea = (props: PropsType) => {
       setHeight(Math.max(minHeight, contentHeight));
       setScrollEnabled(false);
     }
-  }, [minHeight, maxHeight]);
+  }, [expandable, minHeight, maxHeight]);
 
   return (
     <ControlLabel
