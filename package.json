@@ -12,7 +12,9 @@
     "releaseapk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
     "apkandroid": "cd android && gradlew assembleRelease && cd ..",
     "apkdebug": "cd android && ./gradlew assembleDebug && cd ..",
-    "abbstore": "cd android && npx react-native build-android --mode=release && cd .."
+    "abbstore": "cd android && npx react-native build-android --mode=release && cd ..",
+    "demo": "node updateBuildInfo.js && rm -rf android/app/build/outputs/apk && cd android && ./gradlew clean && ./gradlew assembleDebug && cd ..",
+    "demo-release": "node updateBuildInfo.js && rm -rf android/app/build/outputs/apk && cd android && ./gradlew clean && ./gradlew assembleRelease && cd .."
   },
   "dependencies": {
     "@bam.tech/react-native-image-resizer": "^3.0.11",
