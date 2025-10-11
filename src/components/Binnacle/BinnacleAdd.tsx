@@ -60,7 +60,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   return (
     <ModalFull
       open={open}
-      title="Nueva bitácora"
+      title="Nuevo reporte"
       onSave={onSaveNovedades}
       onClose={onClose}
       buttonText="Enviar reporte"
