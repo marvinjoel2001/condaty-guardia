@@ -26,6 +26,8 @@ import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import {useNavigation} from '@react-navigation/native';
 import Icon from '../../../mk/components/ui/Icon/Icon';
+import configApp from '../../config/config';
+import buildInfo from '../../../buildInfo.json';
 
 const MainMenu = ({navigation}: DrawerContentComponentProps) => {
   const {logout, user, setStore, store} = useAuth();
@@ -179,6 +181,22 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
           }
         />
       </View>
+      {/* About App - Build Info */}
+      {(configApp.API_URL != configApp.API_URL_PROD) && (
+        <View style={theme.aboutContainer}>
+          <Text style={theme.aboutText}>
+            Versión {buildInfo.version} - Build #{buildInfo.buildNumber}
+          </Text>
+        <Text style={theme.aboutSubtext}>
+          {new Date(buildInfo.buildDate).toLocaleString('es-BO', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </Text>
+      </View>)}
     </View>
   );
 };
@@ -217,6 +235,23 @@ const theme: ThemeType = {
     textAlign: 'center',
     fontSize: cssVar.sS,
     marginBottom: cssVar.spXl,
+  },
+  aboutContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: cssVar.cBlackV2,
+    alignItems: 'center',
+  },
+  aboutText: {
+    color: cssVar.cWhiteV3,
+    fontSize: 12,
+    fontFamily: FONTS.medium,
+    marginBottom: 4,
+  },
+  aboutSubtext: {
+    color: cssVar.cWhiteV3,
+    fontSize: 10,
+    fontFamily: FONTS.regular,
   },
 };
 
