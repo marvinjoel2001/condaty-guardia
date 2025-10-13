@@ -329,12 +329,6 @@ const Notifications = () => {
   };
   return (
     <Layout title="Notificaciones" refresh={() => reload()} scroll={false}>
-      {/* <List
-        data={notifs?.data}
-        renderItem={NotifisList}
-        refreshing={!loaded}
-        skeletonType="list"
-      /> */}
       <ListFlat
         data={notifs?.data}
         renderItem={NotifisList}
