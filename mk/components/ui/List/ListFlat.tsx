@@ -1,150 +1,155 @@
-import React, {Fragment, useRef} from 'react';
-import {FlatList, View} from 'react-native';
-import {TypeStyles} from '../../../styles/themes';
+import React, {memo, useCallback, useRef} from 'react';
+import {FlatList, RefreshControl, View} from 'react-native';
+import {cssVar, TypeStyles} from '../../../styles/themes';
 import useAuth from '../../../hooks/useAuth';
-import Skeleton from '../Skeleton/Skeleton';
+import Skeleton, {PropsTypeSkeleton} from '../Skeleton/Skeleton';
 
-// Footer component extracted to top-level to satisfy lint rules
-const RenderFooterComponent = ({loading, skeletonType, mapSkeletonType}: any) => {
-  if (!loading) return null;
-  return (
-    <View style={{paddingVertical: 4}}>
-      <Skeleton type={mapSkeletonType(skeletonType)} />
-    </View>
-  );
-};
+// Memoiza el footer para evitar re-renders innecesarios
+const RenderFooterComponent = memo(
+  ({
+    loading,
+    skeletonType,
+  }: {
+    loading: boolean;
+    skeletonType: PropsTypeSkeleton['type'];
+  }) => {
+    if (!loading) return null;
+    return (
+      <View style={{paddingVertical: 4}}>
+        <Skeleton type={skeletonType} />
+      </View>
+    );
+  },
+);
+
+RenderFooterComponent.displayName = 'RenderFooterComponent';
 
 interface PropsType {
-  data: any;
+  data: any[];
   renderItem: (item: any, index?: number) => any;
   sepList?: (item: any) => any;
-  keyExtractor?: (item: any) => any;
-  onRefresh?: any;
+  keyExtractor?: (item: any, index: number) => string;
+  onRefresh?: () => void;
   refreshing?: boolean;
   style?: TypeStyles;
-  emptyLabel?: React.ReactNode; // Puede ser string, componente o elemento JSX
+  emptyLabel?: React.ReactNode;
   typeLoading?: 'loading' | 'skeleton';
-  skeletonType?:
-    | 'media'
-    | 'survey'
-    | 'event'
-    | 'access'
-    | 'list'
-    | 'detail';
-  onPagination?: any;
+  skeletonType?: PropsTypeSkeleton['type'];
+  onPagination?: () => void;
   total?: number;
   loading?: boolean;
 }
 
-const ListFlat = (props: PropsType) => {
+const ListFlat = memo((props: PropsType) => {
   const {
     data,
     renderItem,
     sepList,
     keyExtractor,
-    onRefresh = () => {},
+    onRefresh,
     refreshing = false,
     style,
-    emptyLabel = 'No hay datos', // valor por defecto
-    typeLoading = 'loading',
-    skeletonType = 'media',
-    onPagination = undefined,
-    total = undefined,
+    skeletonType = 'list',
+    onPagination,
     loading = false,
   } = props;
 
   const {setStore} = useAuth();
-  const scrollOffset = useRef(0);
-  const handleScroll = ({nativeEvent}: any) => {
-    scrollOffset.current = nativeEvent.contentOffset.y;
-    setStore({onScroll: nativeEvent.contentOffset.y});
-  };
+  const scrollOffsetRef = useRef(0);
 
-  const mapSkeletonType = (t: any) => {
-    switch (t) {
-      case 'survey':
-      case 'media':
-      case 'list':
-        return 'list';
-      case 'event':
-      case 'detail':
-        return 'detail';
-      case 'access':
-        return 'access';
-      default:
-        return 'list';
-    }
-  };
+  // Memoiza el handler de scroll
+  const handleScroll = useCallback(
+    ({nativeEvent}: any) => {
+      const offset = nativeEvent.contentOffset.y;
+      scrollOffsetRef.current = offset;
+      setStore({onScroll: offset});
+    },
+    [setStore],
+  );
 
-  if (refreshing) {
+  // Memoiza el keyExtractor
+  const getItemKey = useCallback(
+    (item: any, index: number) =>
+      keyExtractor ? keyExtractor(item, index) : `item-${index}`,
+    [keyExtractor],
+  );
+
+  // Memoiza el renderItem
+  const renderItemMemo = useCallback(
+    ({item, index}: {item: any; index: number}) => {
+      const separator = sepList?.(item);
+      const content = renderItem(item, index);
+
+      if (separator) {
+        return (
+          <>
+            {separator}
+            {content}
+          </>
+        );
+      }
+      return content;
+    },
+    [renderItem, sepList],
+  );
+
+  // Memoiza el RefreshControl
+  const refreshControl = useCallback(
+    () => (
+      <RefreshControl
+        progressBackgroundColor={cssVar.cBlack}
+        colors={[cssVar.cAccent]}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        tintColor={cssVar.cAccent}
+      />
+    ),
+    [refreshing, onRefresh],
+  );
+
+  // Estados de carga inicial
+  if (refreshing && (!data || data.length === 0)) {
     return (
       <View style={{paddingTop: 4}}>
-        <Skeleton type={mapSkeletonType(skeletonType)} />
+        <Skeleton type={skeletonType} />
       </View>
     );
   }
 
-  // If we're loading and there's no data yet, show the main skeleton (initial load)
-  if (loading && (!data || (Array.isArray(data) && data.length === 0))) {
+  if (loading && (!data || data.length === 0)) {
     return (
       <View style={{paddingTop: 4}}>
-        <Skeleton type={mapSkeletonType(skeletonType)} />
+        <Skeleton type={skeletonType} />
       </View>
     );
   }
-
-  
 
   return (
-      <FlatList
-        // ref={refFlatList}
-        id="ListFlatlist"
-        testID="ListFlatlist"
-        nativeID="ListFlatlist"
-        data={data}
-        contentContainerStyle={[style, {paddingBottom: 24, paddingHorizontal: 12}]}
-        keyExtractor={(item, idx) =>
-          keyExtractor ? keyExtractor(item) : `news-index-${idx}`
-        }
-        renderItem={({item, index}) => (
-          <Fragment key={index}>
-            {sepList?.(item)}
-            {renderItem(item, index)}
-          </Fragment>
-        )}
-  // renderItem memoization removed for now
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-  // children/list footer can be passed via props if needed
-        initialNumToRender={5}
-        // initialNumToRender={10}
-        // windowSize={5}
-        maxToRenderPerBatch={5}
-        windowSize={21} // Optimiza el tamaño de la ventana de renderizado
-        // maxToRenderPerBatch={20}
-        // snapToAlignment={undefined}
-        // snapToInterval={Dimensions.get("window").height}
-        // decelerationRate="normal"
-        decelerationRate={0.5}
-        onEndReached={onPagination} // Llamado al llegar al final
-        onEndReachedThreshold={2} // Disparar cuando quede 50% del contenido
-        ListFooterComponent={
-          <RenderFooterComponent
-            loading={loading}
-            skeletonType={skeletonType}
-            mapSkeletonType={mapSkeletonType}
-          />
-        } // Mostrar indicador de carga
-        refreshing={refreshing}
-        onRefresh={onRefresh} // Llamado al deslizar hacia abajo
-        // removeClippedSubviews={false} // Asegura que los elementos no se desmonten fuera de pantalla
-        // removeClippedSubviews={true}
-        // windowSize={20} // Tamaño de la ventana de renderizado
-        legacyImplementation={true}
-        updateCellsBatchingPeriod={50}
-      />
+    <FlatList
+      testID="ListFlatlist"
+      data={data}
+      contentContainerStyle={[style, {paddingBottom: 24}]}
+      keyExtractor={getItemKey}
+      renderItem={renderItemMemo}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+      initialNumToRender={10}
+      maxToRenderPerBatch={10}
+      windowSize={10}
+      removeClippedSubviews={true}
+      updateCellsBatchingPeriod={50}
+      onEndReached={onPagination}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        <RenderFooterComponent loading={loading} skeletonType={skeletonType} />
+      }
+      refreshControl={refreshControl()}
+      getItemLayout={undefined} // Añade esto si tus items tienen altura fija
+    />
   );
-};
+});
+
+ListFlat.displayName = 'ListFlat';
 
 export default ListFlat;

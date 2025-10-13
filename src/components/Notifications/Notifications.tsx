@@ -25,16 +25,17 @@ import {useFocusEffect, useRoute} from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';
 import DetAccesses from '../Home/Accesses/DetAccesses';
 import AlertDetail from '../Alerts/AlertDetail';
-
+import ListFlat from '../../../mk/components/ui/List/ListFlat';
+const paramsInitial = {
+  fullType: 'L',
+  perPage: 20,
+  page: 1,
+};
 const Notifications = () => {
   const [openDetail, setOpenDetail] = useState('');
   const [formState, setFormState]: any = useState({});
   const route = useRoute();
-  const [params, setParams]: any = useState({
-    perPage: -1,
-    page: 1,
-    fullType: 'L',
-  });
+  const [params, setParams] = useState(paramsInitial);
   const {
     data: notifs,
     loaded,
@@ -306,14 +307,38 @@ const Notifications = () => {
         left={left(data)}></ItemList>
     );
   };
+  const handleReload = () => {
+    setParams(paramsInitial);
+  };
+  useEffect(() => {
+    reload(params);
+  }, [params]);
+  const onPagination = () => {
+    const total = notifs?.message?.total || 0;
+    const currentLength = notifs?.data?.length || 0;
+    const maxPage = Math.ceil(total / params.perPage);
 
+    if (currentLength >= total || params.page >= maxPage || !loaded) {
+      return;
+    }
+
+    setParams(prev => ({
+      ...prev,
+      perPage: prev.perPage + 20,
+    }));
+  };
   return (
-    <Layout title="Notificaciones" refresh={() => reload()}>
-      <List
+    <Layout title="Notificaciones" refresh={() => reload()} scroll={false}>
+      <ListFlat
         data={notifs?.data}
         renderItem={NotifisList}
-        refreshing={!loaded}
-        skeletonType="list"
+        // skeletonType="list"
+        refreshing={!loaded && params.perPage === -1}
+        emptyLabel="No hay datos en la bitácora"
+        onRefresh={handleReload}
+        loading={!loaded && params.perPage > -1}
+        onPagination={onPagination}
+        total={notifs?.message?.total || 0}
       />
 
       {openDetail == 'Pedidos' && (

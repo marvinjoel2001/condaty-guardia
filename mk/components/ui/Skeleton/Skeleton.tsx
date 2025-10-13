@@ -1,9 +1,11 @@
 import React, {useEffect, useRef} from 'react';
 import {View, Animated, StyleSheet} from 'react-native';
 import {cssVar} from '../../../styles/themes';
-
-type Props = {
+export interface PropsTypeSkeleton {
   type: 'access' | 'list' | 'detail';
+}
+type Props = {
+  type: PropsTypeSkeleton['type'];
   style?: any;
 };
 
