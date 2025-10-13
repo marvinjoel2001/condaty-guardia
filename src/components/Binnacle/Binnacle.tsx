@@ -7,7 +7,7 @@ import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import BinnacleAdd from './BinnacleAdd';
 import BinnacleDetail from './BinnacleDetail';
-import { getDateTimeStrMes} from '../../../mk/utils/dates';
+import {getDateTimeStrMes} from '../../../mk/utils/dates';
 
 const Binnacle = () => {
   const paramsInitial = {
@@ -47,7 +47,7 @@ const Binnacle = () => {
   };
 
   const handleReload = () => {
-    setParams(paramsInitial); 
+    setParams(paramsInitial);
   };
 
   const novedadList = (novedad: any) => {
@@ -71,13 +71,13 @@ const Binnacle = () => {
 
   return (
     <>
-      <Layout title="Bitácora" scroll={false} style={{paddingHorizontal: 0}}>
+      <Layout title="Bitácora" scroll={false}>
         <DataSearch
           setSearch={onSearch}
           name="Bitácora"
           style={{
             marginTop: 12,
-            marginHorizontal: 12,
+
             marginBottom: 4,
           }}
           value={search}
@@ -85,14 +85,13 @@ const Binnacle = () => {
         <ListFlat
           data={binnacleData?.data}
           renderItem={novedadList}
-          skeletonType="survey"
+          // skeletonType="survey"
           refreshing={!loaded && params.perPage === -1}
           emptyLabel="No hay datos en la bitácora"
           onRefresh={handleReload}
           loading={!loaded && params.perPage > -1}
           onPagination={onPagination}
           total={binnacleData?.message?.total || 0}
-
         />
 
         {openAdd && (
