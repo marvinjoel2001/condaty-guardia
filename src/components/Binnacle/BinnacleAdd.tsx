@@ -68,6 +68,16 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       scrollViewHide={true}
     >
       <View style={{flex: 1, padding: 12}}>
+        <UploadImage
+          style={{
+            marginBottom: 12,
+            ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
+          }}
+          setFormState={setFormState}
+          formState={formState}
+          label="Adjuntar imagen"
+          name="avatar"
+        />
         <TextArea
           type="textArea"
           label="Escribir reporte..."
@@ -78,17 +88,6 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}
           expandable={true}
-        />
-
-        <UploadImage
-          style={{
-            marginTop: 12,
-            ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
-          }}
-          setFormState={setFormState}
-          formState={formState}
-          label="Adjuntar imagen"
-          name="avatar"
         />
       </View>
     </ModalFull>
