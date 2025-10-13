@@ -60,7 +60,7 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   return (
     <ModalFull
       open={open}
-      title="Nueva bitácora"
+      title="Nuevo reporte"
       onSave={onSaveNovedades}
       onClose={onClose}
       buttonText="Enviar reporte"
@@ -77,11 +77,14 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
           required={false}
           value={formState?.descrip}
           onChange={value => handleInputChange('descrip', value)}
-          maxAutoHeightRatio={0.5}
+          expandable={true}
         />
 
         <UploadImage
-          style={{flex: 1, marginTop: 12}}
+          style={{
+            marginTop: 12,
+            ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
+          }}
           setFormState={setFormState}
           formState={formState}
           label="Adjuntar imagen"

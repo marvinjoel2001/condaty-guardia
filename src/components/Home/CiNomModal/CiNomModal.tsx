@@ -545,6 +545,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 value={formState?.obs_in}
                 onChange={(e: any) => handleChangeInput('obs_in', e)}
                 maxAutoHeightRatio={0.3}
+                expandable={true}
               />
             )}
           </>
