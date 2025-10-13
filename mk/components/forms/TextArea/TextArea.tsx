@@ -1,5 +1,5 @@
 import React, {useState, useMemo, useCallback} from 'react';
-import {TextInput, Dimensions} from 'react-native';
+import {TextInput, Dimensions, Platform} from 'react-native';
 import ControlLabel, {PropsTypeInputBase} from '../ControlLabel/ControlLabel';
 import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
 
@@ -30,7 +30,8 @@ export const TextArea = (props: PropsType) => {
   const maxHeight = props.maxAutoHeight || (windowHeight * maxAutoHeightRatio);
 
   const [height, setHeight] = useState(minHeight);
-  const [scrollEnabled, setScrollEnabled] = useState(!expandable);
+  // En iOS, scrollEnabled debe ser true siempre para que funcione el scroll interno
+  const [scrollEnabled, setScrollEnabled] = useState(Platform.OS === 'ios' ? true : !expandable);
 
   const styleInput = useMemo(() => ({
     ...theme.default,
@@ -60,7 +61,10 @@ export const TextArea = (props: PropsType) => {
       // Con límite máximo
       if (contentHeight <= maxHeight) {
         setHeight(Math.max(minHeight, contentHeight));
-        setScrollEnabled(false);
+        // En iOS, mantener scrollEnabled siempre en true
+        if (Platform.OS !== 'ios') {
+          setScrollEnabled(false);
+        }
       } else {
         setHeight(maxHeight);
         setScrollEnabled(true);
@@ -68,7 +72,10 @@ export const TextArea = (props: PropsType) => {
     } else {
       // Sin límite, crece libremente
       setHeight(Math.max(minHeight, contentHeight));
-      setScrollEnabled(false);
+      // En iOS, mantener scrollEnabled siempre en true
+      if (Platform.OS !== 'ios') {
+        setScrollEnabled(false);
+      }
     }
   }, [expandable, minHeight, maxHeight]);
 
