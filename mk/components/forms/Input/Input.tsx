@@ -100,7 +100,10 @@ const Input = React.memo((props: PropsType) => {
     prevProps.disabled === nextProps.disabled &&
     prevProps.placeholder === nextProps.placeholder &&
     prevProps.maxLength === nextProps.maxLength &&
-    prevProps.keyboardType === nextProps.keyboardType
+    prevProps.keyboardType === nextProps.keyboardType &&
+    prevProps.password === nextProps.password &&
+    prevProps.iconLeft === nextProps.iconLeft &&
+    prevProps.iconRight === nextProps.iconRight
   );
 });
 
