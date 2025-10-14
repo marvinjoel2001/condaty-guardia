@@ -1,13 +1,5 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Login from '../components/auth/Login';
-import Home from '../components/Home/Home';
-import Profile from '../components/Profile/Profile';
-import Alerts from '../components/Alerts/Alerts';
-import Binnacle from '../components/Binnacle/Binnacle';
-import Notifications from '../components/Notifications/Notifications';
-import Documents from '../components/Documents/Documents';
-import History from '../components/History/History';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,25 +13,29 @@ const Navigate = () => {
           headerShown: false,
         }}
         name="Home"
-        component={Home}
+        // component={HomeScreen}
+        getComponent={() => require('../components/Home/Home').default}
       />
       <Stack.Screen
         name="Profile"
-        component={Profile}
+        // component={Profile}
+        getComponent={() => require('../components/Profile/Profile').default}
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="Alerts"
-        component={Alerts}
+        // component={Alerts}
+        getComponent={() => require('../components/Alerts/Alerts').default}
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="Login"
-        component={Login}
+        // component={Login}
+        getComponent={() => require('../components/auth/Login').default}
         options={{
           headerShown: false,
         }}
@@ -47,28 +43,36 @@ const Navigate = () => {
 
       <Stack.Screen
         name="Binnacle"
-        component={Binnacle}
+        // component={Binnacle}
+        getComponent={() => require('../components/Binnacle/Binnacle').default}
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="Notifications"
-        component={Notifications}
+        // component={Notifications}
+        getComponent={() =>
+          require('../components/Notifications/Notifications').default
+        }
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="Documents"
-        component={Documents}
+        // component={Documents}
+        getComponent={() =>
+          require('../components/Documents/Documents').default
+        }
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="History"
-        component={History}
+        // component={History}
+        getComponent={() => require('../components/History/History').default}
         options={{
           headerShown: false,
         }}
