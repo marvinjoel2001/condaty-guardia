@@ -31,12 +31,12 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(true);
   const [load, setLoad] = useState(true);
 
-  const handleInputChange = (name: string, value: string) => {
-    setFormState({
-      ...formState,
+  const handleInputChange = React.useCallback((name: string, value: string) => {
+    setFormState((prevState: any) => ({
+      ...prevState,
       [name]: value,
-    });
-  };
+    }));
+  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
