@@ -296,6 +296,7 @@ const FrequentQR = ({
               value={invitation.max_entries}
             />
           )}
+          <KeyValue keys="Descripción" value={data?.obs || '-/-'} />
           <Br />
           <Text style={styles.summaryTitle}>Invitado</Text>
           <ItemList

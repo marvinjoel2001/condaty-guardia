@@ -324,6 +324,7 @@ const GroupQR = ({
         <View>
           <Card>
             <OwnerInvitationInfoDisplay invitationData={data} />
+            <KeyValue keys="Descripción" value={data?.obs || '-/-'} />
             <Br />
             <View style={{justifyContent: 'center'}}>
               <TouchableOpacity

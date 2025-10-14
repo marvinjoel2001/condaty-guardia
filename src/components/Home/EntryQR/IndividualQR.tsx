@@ -22,6 +22,7 @@ import List from '../../../../mk/components/ui/List/List';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Br from '../../Profile/Br';
 import Card from '../../../../mk/components/ui/Card/Card';
+import KeyValue from '../../../../mk/components/ui/KeyValue';
 
 type PropsType = {
   setFormState: any;
@@ -48,7 +49,7 @@ const IndividualQR = ({
   const visit = data?.visit;
   const owner = data?.owner;
   const access = data?.access;
-
+  console.log(data);
   useEffect(() => {
     const currentVisit = data?.visit;
     const currentAccess = data?.access;
@@ -199,7 +200,6 @@ const IndividualQR = ({
   if (!data) {
     return <Loading />;
   }
-  console.log(owner);
   return (
     <>
       <View>
@@ -234,6 +234,11 @@ const IndividualQR = ({
                 h={40}
               />
             }
+          />
+          <KeyValue
+            style={{marginTop: cssVar.spM}}
+            keys="Descripción "
+            value={data?.obs || '-/-'}
           />
         </Card>
         {!visit?.ci && data?.status !== 'X' && (
