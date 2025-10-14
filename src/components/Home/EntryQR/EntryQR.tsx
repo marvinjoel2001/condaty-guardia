@@ -373,13 +373,20 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
 
   const RenderErrorMsg = () => {
     return (
-      <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
+      <View
+        style={{
+          alignItems: 'center',
+          flex: 1,
+          justifyContent: 'center',
+          paddingHorizontal: 16,
+        }}>
         <Icon name={IconAlert} size={80} color={cssVar.cWarning} />
         <Text
           style={{
             color: cssVar.cWhite,
             fontSize: 16,
             fontFamily: FONTS.semiBold,
+            textAlign: 'center',
           }}>
           {msgErrorQr}
         </Text>
