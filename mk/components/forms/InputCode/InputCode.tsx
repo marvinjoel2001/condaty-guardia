@@ -100,13 +100,13 @@ const style = StyleSheet.create({
     borderColor: 'red',
   },
   inputsContainer: {
-    paddingHorizontal: cssVar.spM,
+    paddingHorizontal: cssVar.spS,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: cssVar.spL,
-    marginBottom: cssVar.spM,
-    gap: cssVar.spL,
+    paddingVertical: cssVar.spS, // más compacto
+    marginBottom: cssVar.spS, // más compacto
+    gap: cssVar.spS, // dígitos más juntos
   },
   inputContainer: {
     borderColor: '#cccccc',
