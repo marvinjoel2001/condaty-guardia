@@ -30,11 +30,13 @@ const Splash = () => {
             color: cssVar.cWhite,
             fontFamily: FONTS.regular,
           }}>
-          Tecnología,
           <Text style={{fontFamily: FONTS.bold, color: cssVar.cWhite}}>
-            {' '}que une
+            Tecnología,
           </Text>
+            {' '}que une
+          <Text style={{fontFamily: FONTS.bold, color: cssVar.cWhite}}>
             {' '}vecinos
+          </Text>
         </Text>
       </View>
     </View>
