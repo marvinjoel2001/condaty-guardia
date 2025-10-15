@@ -167,7 +167,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     }
 
     // Validar vehículo/taxi (aplica para steps > 0)
-    if (steps > 0 && (typeSearch === 'V' || typeSearch === 'T')) {
+    if (steps >= 0 && (typeSearch === 'V' || typeSearch === 'T')) {
       errors = checkRules({
         value: formState.plate,
         rules: ['required', 'plate'],
@@ -212,19 +212,21 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     setErrors(errors);
     return errors;
   };
-
+  
   const onSave = async () => {
     if (formState?.ci_taxi == formState?.ci) {
       return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
     }
+    
     if (hasErrors(validate())) {
       return;
     }
+    
     if (steps === 0 && !dataOwner) {
       visitExist();
       return;
     }
-
+    
     const url = dataOwner ? '/accesses/enterqr' : '/accesses';
     let method = 'POST';
     let params: any = {
@@ -551,21 +553,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         )}
       </>
 
-      {/* {openAlert && (
-        <Modal
-          open={openAlert}
-          onClose={onClose}
-          iconClose={false}
-          onSave={() => setOpenAlert(false)}
-          buttonText="Registrar"
-          buttonCancel=""
-          headerStyles={{backgroundColor: 'transparent'}}>
-          <View style={styles.modalAlert}>
-            <Icon name={IconAlert} size={80} color={cssVar.cWarning} />
-            <Text style={styles.modalAlertText}>¡Visita no registrada!</Text>
-          </View>
-        </Modal>
-      )} */}
       {addCompanion && (
         <AccompaniedAdd
           open={addCompanion}
