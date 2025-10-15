@@ -19,7 +19,7 @@ type PropsType = {
 
 const AccessEdit = ({open, onClose, type}: PropsType) => {
   const [formState, setFormState]: any = useState({
-    pinned: 1,
+    pinned: 0,
   });
   const [showPassword, setShowPassword] = useState(true);
   const {execute} = useApi();
