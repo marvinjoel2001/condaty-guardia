@@ -322,19 +322,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   ) => {
     const status = getStatus(visit);
     if (status == 'C') {
-      return (
-        <Icon
-          name={IconExpand}
-          // onPress={() =>
-          //   setOpenDet({
-          //     open: true,
-          //     id: visit?.id,
-          //     type: type,
-          //   })
-          // }
-          color={cssVar.cWhiteV1}
-        />
-      );
+      return <Icon name={IconExpand} color={cssVar.cWhiteV1} />;
     }
     if (status == 'S' || status == 'N') return null;
 
@@ -350,25 +338,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
   const rightDetailVisit = (data: any, isSelected: any) => {
     if (data?.out_at) {
-      return (
-        <Icon
-          name={IconExpand}
-          color={cssVar.cWhiteV1}
-          // onPress={() =>
-          //   setOpenDet({
-          //     open: true,
-          //     id: data?.id,
-          //     type: 'V',
-          //   })
-          // }
-        />
-      );
+      return <Icon name={IconExpand} color={cssVar.cWhiteV1} />;
     }
     if (data?.accesses?.length == 0 || !data?.in_at) {
       return;
     }
 
-    return getCheckVisit({id: data?.id}, isSelected, 'I');
+    return getCheckVisit(data, isSelected, 'I');
   };
   const getAvatarVisit = (item: any) => {
     if (item?.type != 'P') {
@@ -416,8 +392,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                     id: data?.id,
                     type: 'V',
                   });
-                } else if (status === 'I' && data?.in_at) {
-                  // Solo permitir selección si está en estado 'I' y ya ingresó
+                } else {
                   toggleVisitSelection(data?.id);
                 }
               }}
@@ -510,14 +485,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               <ItemList
                 key={item?.id}
                 onPress={() => {
-                  if (getStatus(item) == 'C') {
+                  if (getStatus(item) == 'C' && status !== 'Y') {
                     setOpenDet({
                       open: true,
-                      id: data?.id,
+                      id: item?.id,
                       type: 'V',
                     });
                   } else if (status !== 'Y') {
-                    // Permitir selección si no está en estado 'Y'
                     toggleVisitSelection(item?.id);
                   }
                 }}
@@ -541,14 +515,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               <ItemList
                 key={item?.id}
                 onPress={() => {
-                  if (getStatus(item) == 'C') {
+                  if (getStatus(item) == 'C' && status !== 'Y') {
                     setOpenDet({
                       open: true,
-                      id: data?.id,
+                      id: item?.id,
                       type: 'V',
                     });
                   } else if (status !== 'Y') {
-                    // Permitir selección si no está en estado 'Y'
                     toggleVisitSelection(item?.id);
                   }
                 }}
