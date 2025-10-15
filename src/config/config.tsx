@@ -37,7 +37,8 @@ configApp.API_URL = configApp.API_URL_DEV;
 //configApp.API_URL = configApp.API_URL_DEMO;
 
 if (process.env.NODE_ENV == 'development') {
-  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
+  // configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
+  configApp.API_URL = configApp.API_URL_DEMO;
 }
 if (configApp.API_URL == configApp.API_URL_DEV) {
   configApp.APP_DEBUG = 0;
