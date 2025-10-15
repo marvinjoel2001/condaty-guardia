@@ -428,6 +428,7 @@ const styles = StyleSheet.create({
   },
   formSection: {
     flexDirection: 'column',
+    marginTop: 12,
   },
   subSectionTitle: {
     fontSize: 16,
