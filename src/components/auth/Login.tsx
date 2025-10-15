@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {
   ImageBackground,
   Linking,
@@ -18,7 +18,6 @@ import useAuth from '../../../mk/hooks/useAuth';
 import {checkCI, checkPasswords} from '../../../mk/utils/validations';
 import Input from '../../../mk/components/forms/Input/Input';
 import ForgotPass from './ForgotPass';
-import React from 'react';
 import Splash from '../Splash/Splash';
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
 
@@ -31,16 +30,25 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(true);
   const [load, setLoad] = useState(true);
 
-  const handleInputChange = (name: string, value: string) => {
-    setFormState({
-      ...formState,
+  const handleInputChange = React.useCallback((name: string, value: string) => {
+    setFormState((prevState: any) => ({
+      ...prevState,
       [name]: value,
-    });
-  };
+    }));
+  }, []);
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+    const togglePasswordVisibility = React.useCallback(() => {
+    setShowPassword((prev) => !prev);
+  }, []);
+
+  const goTerminos = React.useCallback(() => {
+    Linking.openURL('https://www.condaty.com/terminos');
+  }, []);
+
+  const goPoliticas = React.useCallback(() => {
+    Linking.openURL('https://www.condaty.com/politicas');
+  }, []);
+
 
   const signalInit = async () => {
     try {
@@ -108,13 +116,22 @@ const Login = () => {
       });
   };
 
-  const goTerminos = () => {
-    Linking.openURL('https://www.condaty.com/terminos');
-  };
-
-  const goPoliticas = () => {
-    Linking.openURL('https://www.condaty.com/politicas');
-  };
+  const passwordIcon = useMemo(() => {
+    return showPassword ? (
+      <Icon
+        onPress={togglePasswordVisibility}
+        name={IconEyeOff}
+        fillStroke={cssVar.cWhiteV1}
+        color={'transparent'}
+      />
+    ) : (
+      <Icon
+        onPress={togglePasswordVisibility}
+        name={IconEye}
+        color={cssVar.cWhiteV1}
+      />
+    );
+  }, [showPassword, togglePasswordVisibility]);
 
   return (
     <SafeAreaView style={theme.safeAreaView}>
@@ -160,22 +177,7 @@ const Login = () => {
                   password: checkPasswords(formState.password),
                 });
               }}
-              iconRight={
-                showPassword ? (
-                  <Icon
-                    onPress={() => togglePasswordVisibility()}
-                    name={IconEyeOff}
-                    fillStroke={cssVar.cWhiteV1}
-                    color={'transparent'}
-                  />
-                ) : (
-                  <Icon
-                    onPress={() => togglePasswordVisibility()}
-                    name={IconEye}
-                    color={cssVar.cWhiteV1}
-                  />
-                )
-              }
+              iconRight={passwordIcon}
               onChange={(value: any) => handleInputChange('password', value)}
             />
 

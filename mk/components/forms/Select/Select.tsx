@@ -136,7 +136,13 @@ const Select = ({
 
   return (
     <View style={{...styles.select, width: `${isWidth}%`, ...style}}>
-      <View ref={selectRef} pointerEvents={disabled ? 'none' : 'auto'}>
+      <TouchableOpacity
+        ref={selectRef}
+        onPress={() => {
+          if (!disabled) handleSelectClickIcon();
+        }}
+        activeOpacity={0.7}
+        style={{pointerEvents: disabled ? 'none' : 'auto'}}>
         <Input
           type={'text'}
           value={
@@ -178,7 +184,7 @@ const Select = ({
           disabled={disabled}
           error={error}
         />
-      </View>
+      </TouchableOpacity>
       {openOptions && (
         <Modal
           transparent={true}

@@ -1,5 +1,5 @@
 import React, {useState, useMemo, useCallback} from 'react';
-import {Platform, StyleSheetProperties, TextInput} from 'react-native';
+import {Platform, TextInput} from 'react-native';
 import ControlLabel, {PropsTypeInputBase} from '../ControlLabel/ControlLabel';
 import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
 
@@ -10,7 +10,30 @@ interface PropsType extends PropsTypeInputBase {
   iconRight?: any;
 }
 
-const Input = (props: PropsType) => {
+// Definir theme ANTES de usarlo en el componente
+const theme: ThemeType = {
+  form: {
+    color: cssVar.cWhiteV3,
+  },
+  default: {
+    borderWidth: cssVar.bWidth,
+    borderColor: cssVar.cWhiteV2,
+    borderRadius: cssVar.bRadiusS,
+    fontSize: cssVar.sM,
+    fontFamily: FONTS.regular,
+    backgroundColor: cssVar.cWhiteV2,
+    color: cssVar.cWhite,
+    paddingBottom: cssVar.spS,
+    paddingHorizontal: cssVar.spS,
+    paddingTop: 24,
+  },
+  errorInput: {borderColor: cssVar.cError},
+  disabled: {color: cssVar.cWhiteV1},
+  disabledInput: {color: cssVar.cWhiteV1},
+  focusInput: {borderColor: cssVar.cAccent},
+};
+
+const Input = React.memo((props: PropsType) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const handleTextChange = useCallback((text: string) => {
@@ -23,7 +46,7 @@ const Input = (props: PropsType) => {
     ...{...theme.default, paddingLeft: props.iconLeft ? 30 : cssVar.spS},
     ...{paddingRight: props.iconRight ? 30 : cssVar.spM},
     ...(isFocused ? theme.focusInput : {}),
-    ...(props.error && props.error[props.name] ? {...theme.errorInput} : {}),
+    ...(props.error?.[props.name] ? {...theme.errorInput} : {}),
     ...props.style,
     ...(props.disabled ? theme.disabled : {}),
   }), [isFocused, props.error, props.name, props.style, props.disabled, props.iconLeft, props.iconRight]);
@@ -49,10 +72,14 @@ const Input = (props: PropsType) => {
 
   const keyboardType = useMemo(() => {
     if (props.keyboardType) {
+      // Para Android, 'number-pad' es más rápido que 'numeric'
+      if (props.keyboardType === 'numeric' && Platform.OS === 'android') {
+        return 'number-pad';
+      }
       return props.keyboardType;
     }
     if (props.type === 'date') {
-      return 'numeric';
+      return Platform.OS === 'android' ? 'number-pad' : 'numeric';
     }
     if (props.type === 'email-address') {
       return 'email-address';
@@ -88,28 +115,30 @@ const Input = (props: PropsType) => {
       />
     </ControlLabel>
   );
-};
+}, (prevProps, nextProps) => {
+  // Retorna TRUE si las props son IGUALES (NO re-renderizar)
+  // Retorna FALSE si las props son DIFERENTES (SÍ re-renderizar)
+  
+  // IMPORTANTE: name debe ser diferente entre inputs
+  if (prevProps.name !== nextProps.name) {
+    return false; // Son inputs diferentes, DEBE re-renderizar
+  }
+  
+  // Comparar todas las props relevantes
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.error === nextProps.error &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.maxLength === nextProps.maxLength &&
+    prevProps.keyboardType === nextProps.keyboardType &&
+    prevProps.password === nextProps.password &&
+    prevProps.label === nextProps.label &&
+    prevProps.type === nextProps.type &&
+    prevProps.onChange === nextProps.onChange
+  );
+});
+
+Input.displayName = 'Input';
 
 export default Input;
-
-const theme: ThemeType = {
-  form: {
-    color: cssVar.cWhiteV3,
-  },
-  default: {
-    borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cWhiteV2,
-    borderRadius: cssVar.bRadiusS,
-    fontSize: cssVar.sM,
-    fontFamily: FONTS.regular,
-    backgroundColor: cssVar.cWhiteV2,
-    color: cssVar.cWhite,
-    paddingBottom: cssVar.spS,
-    paddingHorizontal: cssVar.spS,
-    paddingTop: 24,
-    // paddingVertical: cssVar.spL,
-  },
-  errorInput: {borderColor: cssVar.cError},
-  disabled: {color: cssVar.cWhiteV1},
-  focusInput: {borderColor: cssVar.cAccent},
-};
