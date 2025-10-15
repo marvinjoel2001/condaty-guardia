@@ -10,6 +10,29 @@ interface PropsType extends PropsTypeInputBase {
   iconRight?: any;
 }
 
+// Definir theme ANTES de usarlo en el componente
+const theme: ThemeType = {
+  form: {
+    color: cssVar.cWhiteV3,
+  },
+  default: {
+    borderWidth: cssVar.bWidth,
+    borderColor: cssVar.cWhiteV2,
+    borderRadius: cssVar.bRadiusS,
+    fontSize: cssVar.sM,
+    fontFamily: FONTS.regular,
+    backgroundColor: cssVar.cWhiteV2,
+    color: cssVar.cWhite,
+    paddingBottom: cssVar.spS,
+    paddingHorizontal: cssVar.spS,
+    paddingTop: 24,
+  },
+  errorInput: {borderColor: cssVar.cError},
+  disabled: {color: cssVar.cWhiteV1},
+  disabledInput: {color: cssVar.cWhiteV1},
+  focusInput: {borderColor: cssVar.cAccent},
+};
+
 const Input = React.memo((props: PropsType) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -110,25 +133,3 @@ const Input = React.memo((props: PropsType) => {
 Input.displayName = 'Input';
 
 export default Input;
-
-const theme: ThemeType = {
-  form: {
-    color: cssVar.cWhiteV3,
-  },
-  default: {
-    borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cWhiteV2,
-    borderRadius: cssVar.bRadiusS,
-    fontSize: cssVar.sM,
-    fontFamily: FONTS.regular,
-    backgroundColor: cssVar.cWhiteV2,
-    color: cssVar.cWhite,
-    paddingBottom: cssVar.spS,
-    paddingHorizontal: cssVar.spS,
-    paddingTop: 24,
-    // paddingVertical: cssVar.spL,
-  },
-  errorInput: {borderColor: cssVar.cError},
-  disabled: {color: cssVar.cWhiteV1},
-  focusInput: {borderColor: cssVar.cAccent},
-};
