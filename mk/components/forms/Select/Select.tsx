@@ -143,47 +143,49 @@ const Select = ({
         }}
         activeOpacity={0.7}
         style={{pointerEvents: disabled ? 'none' : 'auto'}}>
-        <Input
-          type={'text'}
-          value={
-            multiSelect
-              ? selectedNames
-              : Array.isArray(options)
-              ? options.find((i: any) => i[optionValue] === value)?.[
-                  optionLabel
-                ] || ''
-              : ''
-          }
-          onChange={onChange}
-          readOnly={true}
-          label={label}
-          name={name}
-          iconRight={
-            <TouchableOpacity
-              onPress={() => {
-                if (!disabled) handleSelectClickIcon();
-              }}
-              style={{
-                height: 58,
-                width: 40,
-                position: 'absolute',
-                top: -16,
-                right: 0,
-                alignItems: 'flex-end',
-                paddingTop: 15,
-              }}>
-              <Icon
-                name={openOptions ? IconArrowUp : IconArrowDown}
-                color={cssVar.cWhiteV1}
-              />
-            </TouchableOpacity>
-          }
-          placeholder={placeholder}
-          required={required}
-          onBlur={onBlur}
-          disabled={disabled}
-          error={error}
-        />
+        <View pointerEvents="none">
+          <Input
+            type={'text'}
+            value={
+              multiSelect
+                ? selectedNames
+                : Array.isArray(options)
+                ? options.find((i: any) => i[optionValue] === value)?.[
+                    optionLabel
+                  ] || ''
+                : ''
+            }
+            onChange={onChange}
+            readOnly={true}
+            label={label}
+            name={name}
+            iconRight={
+              <TouchableOpacity
+                onPress={() => {
+                  if (!disabled) handleSelectClickIcon();
+                }}
+                style={{
+                  height: 58,
+                  width: 40,
+                  position: 'absolute',
+                  top: -16,
+                  right: 0,
+                  alignItems: 'flex-end',
+                  paddingTop: 15,
+                }}>
+                <Icon
+                  name={openOptions ? IconArrowUp : IconArrowDown}
+                  color={cssVar.cWhiteV1}
+                />
+              </TouchableOpacity>
+            }
+            placeholder={placeholder}
+            required={required}
+            onBlur={onBlur}
+            disabled={disabled}
+            error={error}
+          />
+        </View>
       </TouchableOpacity>
       {openOptions && (
         <Modal
