@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useMemo, useCallback} from 'react';
 import {
   Platform,
   ScrollView,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   Modal,
+  Animated,
 } from 'react-native';
 import {
   IconArrowDown,
@@ -67,70 +68,128 @@ const Select = ({
     value || (multiSelect ? [] : ''),
   );
   const [openOptions, setOpenOptions] = useState(false);
-  const [selectedNames, setSelectedNames] = useState('');
-  const [_options, setOptions] = useState<{[key: string]: any} | any[]>([]);
   const [search, setSearch] = useState('');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const selectRef = useRef(null);
 
-  const onChangeSearch = (value: string) => {
-    setSearch(value);
-    const filteredOptions = Array.isArray(options)
-      ? options.filter((option: any) =>
-          option[optionLabel].toLowerCase().includes(value.toLowerCase()),
-        )
-      : [];
-    setOptions(filteredOptions);
-  };
+  // Memoizar las opciones filtradas
+  const filteredOptions = useMemo(() => {
+    if (!Array.isArray(options)) return options;
+    if (!search || !filter) return options;
 
-  useEffect(() => {
-    setOptions(options);
+    return options.filter((option: any) =>
+      option[optionLabel]?.toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [options, search, filter, optionLabel]);
+
+  // Memoizar el texto de selección múltiple
+  const selectedNames = useMemo(() => {
     if (
-      multiSelect &&
-      Array.isArray(options) &&
-      options.length > 0 &&
-      Array.isArray(selectValue)
+      !multiSelect ||
+      !Array.isArray(options) ||
+      !Array.isArray(selectValue)
     ) {
-      const selectedValues = options.filter((option: any) =>
-        selectValue.includes(option.id),
-      );
-      const selectedDisplay =
-        selectedValues.length > 2
-          ? `${selectedValues.length} elementos seleccionados`
-          : selectedValues.map((option: any) => option[optionLabel]).join(', ');
-      setSelectedNames(selectedDisplay);
+      return '';
     }
-  }, [selectValue, options]);
 
-  const handleSelectClickElement = (element: any) => {
-    setSelectValue(element);
-    setOpenOptions(false);
-    onChange({target: {name, value: element}});
-  };
+    const selectedValues = options.filter((option: any) =>
+      selectValue.includes(option[optionValue]),
+    );
 
-  const handleSelectMultiClickElement = (element: any) => {
-    const selectedValues = Array.isArray(selectValue) ? [...selectValue] : [];
-    const index = selectedValues.indexOf(element);
-    if (index !== -1) {
-      selectedValues.splice(index, 1);
-    } else {
-      selectedValues.push(element);
-    }
-    setSelectValue(selectedValues);
-    onChange({target: {name, value: selectedValues}});
-  };
+    return selectedValues.length > 2
+      ? `${selectedValues.length} elementos seleccionados`
+      : selectedValues.map((option: any) => option[optionLabel]).join(', ');
+  }, [selectValue, options, multiSelect, optionValue, optionLabel]);
 
-  const handleSelectClickIcon = () => {
-    setOpenOptions(!openOptions);
-  };
+  // Memoizar el valor mostrado
+  const displayValue = useMemo(() => {
+    if (multiSelect) return selectedNames;
 
+    if (!Array.isArray(options)) return '';
+
+    const found = options.find((i: any) => i[optionValue] === value);
+    return found?.[optionLabel] || '';
+  }, [multiSelect, selectedNames, options, optionValue, value, optionLabel]);
+
+  // Optimizar el callback de búsqueda
+  const onChangeSearch = useCallback((text: string) => {
+    setSearch(text);
+  }, []);
+
+  // Optimizar el toggle del modal
+  const handleToggleModal = useCallback(() => {
+    if (disabled) return;
+    setOpenOptions(prev => !prev);
+  }, [disabled]);
+
+  // Optimizar selección simple
+  const handleSelectClickElement = useCallback(
+    (element: any) => {
+      setSelectValue(element);
+      setOpenOptions(false);
+      onChange({target: {name, value: element}});
+    },
+    [name, onChange],
+  );
+
+  // Optimizar selección múltiple
+  const handleSelectMultiClickElement = useCallback(
+    (element: any) => {
+      setSelectValue((prev: any) => {
+        const selectedValues = Array.isArray(prev) ? [...prev] : [];
+        const index = selectedValues.indexOf(element);
+
+        const newValues =
+          index !== -1
+            ? selectedValues.filter((_, i) => i !== index)
+            : [...selectedValues, element];
+
+        onChange({target: {name, value: newValues}});
+        return newValues;
+      });
+    },
+    [name, onChange],
+  );
+
+  // Animación de apertura/cierre
   useEffect(() => {
-    if (!multiSelect) {
-      const valueText = Array.isArray(options)
-        ? options.find((o: any) => o[optionValue] === value)
-        : null;
-      setSelectValue(valueText ? valueText[optionLabel] : '');
+    if (openOptions) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.95,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
-  }, [value]);
+  }, [openOptions, fadeAnim, scaleAnim]);
+
+  // Limpiar búsqueda al cerrar
+  useEffect(() => {
+    if (!openOptions) {
+      setSearch('');
+    }
+  }, [openOptions]);
 
   if (!options) return null;
 
@@ -139,40 +198,22 @@ const Select = ({
       <TouchableOpacity
         ref={selectRef}
         onPress={() => {
-          if (!disabled) handleSelectClickIcon();
+          handleToggleModal();
         }}
         activeOpacity={0.7}
         style={{pointerEvents: disabled ? 'none' : 'auto'}}>
         <View pointerEvents="none">
           <Input
             type={'text'}
-            value={
-              multiSelect
-                ? selectedNames
-                : Array.isArray(options)
-                ? options.find((i: any) => i[optionValue] === value)?.[
-                    optionLabel
-                  ] || ''
-                : ''
-            }
+            value={displayValue}
             onChange={onChange}
             readOnly={true}
             label={label}
             name={name}
             iconRight={
               <TouchableOpacity
-                onPress={() => {
-                  if (!disabled) handleSelectClickIcon();
-                }}
-                style={{
-                  height: 58,
-                  width: 40,
-                  position: 'absolute',
-                  top: -16,
-                  right: 0,
-                  alignItems: 'flex-end',
-                  paddingTop: 15,
-                }}>
+                onPress={handleToggleModal}
+                style={styles.iconButton}>
                 <Icon
                   name={openOptions ? IconArrowUp : IconArrowDown}
                   color={cssVar.cWhiteV1}
@@ -187,17 +228,33 @@ const Select = ({
           />
         </View>
       </TouchableOpacity>
-      {openOptions && (
-        <Modal
-          transparent={true}
-          animationType="none"
-          visible={openOptions}
-          onRequestClose={() => setOpenOptions(false)}>
-          <TouchableOpacity
-            style={styles.overlay}
-            onPress={() => setOpenOptions(false)}>
-            <View
-              style={[styles.modalContent, {maxHeight: filter ? 280 : 140}]}>
+
+      <Modal
+        transparent={true}
+        animationType="none"
+        visible={openOptions}
+        onRequestClose={() => setOpenOptions(false)}
+        statusBarTranslucent>
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={() => setOpenOptions(false)}>
+          <Animated.View
+            style={[
+              styles.modalContent,
+              {
+                overflow: 'visible',
+                maxHeight: filter ? 280 : 140,
+                opacity: fadeAnim,
+                transform: [{scale: scaleAnim}],
+              },
+            ]}>
+            <TouchableOpacity
+              style={{
+                flexGrow: 1,
+                maxHeight: filter ? 260 : 140,
+              }}
+              activeOpacity={1}>
               {filter && (
                 <TextInput
                   style={styles.search}
@@ -205,79 +262,52 @@ const Select = ({
                   value={search}
                   onChangeText={onChangeSearch}
                   placeholder={`Buscar ${placeholder || label}...`}
+                  autoFocus={false}
                 />
               )}
               <ScrollView
-                style={{flexGrow: 1}}
+                style={{...styles.scrollView}}
                 nestedScrollEnabled={true}
-                keyboardShouldPersistTaps="handled">
-                {Array.isArray(_options)
-                  ? _options.map((option: any, key: number) => (
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}>
+                {Array.isArray(filteredOptions) &&
+                  filteredOptions.map((option: any, key: number) => {
+                    const isSelected = Array.isArray(selectValue)
+                      ? selectValue.includes(option[optionValue])
+                      : selectValue === option[optionValue];
+
+                    return (
                       <TouchableOpacity
-                        style={[
-                          styles.option,
-                          Array.isArray(selectValue)
-                            ? selectValue.includes(option[optionValue])
-                              ? styles.selected
-                              : {}
-                            : selectValue === option[optionValue]
-                            ? styles.selected
-                            : {},
-                        ]}
+                        style={[styles.option, isSelected && styles.selected]}
                         key={option[optionValue] || key}
-                        onPress={
-                          !multiSelect
-                            ? () =>
-                                handleSelectClickElement(
-                                  option[optionValue] || key,
-                                )
-                            : () =>
-                                handleSelectMultiClickElement(
-                                  option[optionValue] || key,
-                                )
+                        onPress={() =>
+                          multiSelect
+                            ? handleSelectMultiClickElement(
+                                option[optionValue] || key,
+                              )
+                            : handleSelectClickElement(
+                                option[optionValue] || key,
+                              )
                         }>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            gap: cssVar.spM,
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text style={{color: cssVar.cWhite}}>
+                        <View style={styles.optionContent}>
+                          <Text style={styles.optionText}>
                             {option[optionLabel] || option.label}
                           </Text>
-                          {multiSelect &&
-                            (Array.isArray(selectValue) &&
-                            selectValue.includes(option[optionValue]) ? (
-                              <Icon
-                                color={cssVar.cWhite}
-                                name={IconCheckSquare}
-                              />
-                            ) : (
-                              <Icon color={cssVar.cWhite} name={IconCheckOff} />
-                            ))}
+                          {multiSelect && (
+                            <Icon
+                              color={cssVar.cWhite}
+                              name={isSelected ? IconCheckSquare : IconCheckOff}
+                            />
+                          )}
                         </View>
                       </TouchableOpacity>
-                    ))
-                  : Object.keys(_options).map((key: string) => (
-                      <TouchableOpacity
-                        key={key}
-                        delayPressIn={0}
-                        onPress={() =>
-                          handleSelectClickElement(
-                            _options[key][optionValue] || _options[key].label,
-                          )
-                        }>
-                        <Text>
-                          {_options[key][optionValue] || _options[key].label}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                    );
+                  })}
               </ScrollView>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      )}
+            </TouchableOpacity>
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -286,9 +316,17 @@ export default Select;
 
 const styles = StyleSheet.create({
   select: {
-    // flex: 1,
     zIndex: 2,
     position: 'relative',
+  },
+  iconButton: {
+    height: 58,
+    width: 40,
+    position: 'absolute',
+    top: -16,
+    right: 0,
+    alignItems: 'flex-end',
+    paddingTop: 15,
   },
   overlay: {
     flex: 1,
@@ -301,14 +339,33 @@ const styles = StyleSheet.create({
     backgroundColor: cssVar.cBlackV1,
     padding: 4,
     borderRadius: cssVar.bRadius,
-    color: cssVar.cWhite,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  scrollView: {
+    flexGrow: 1,
   },
   option: {
     padding: cssVar.spS,
-    color: cssVar.cWhite,
   },
   selected: {
     backgroundColor: cssVar.cBlackV2,
+  },
+  optionContent: {
+    flexDirection: 'row',
+    gap: cssVar.spM,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  optionText: {
+    color: cssVar.cWhite,
+    flex: 1,
   },
   search: {
     color: cssVar.cWhite,
@@ -317,7 +374,8 @@ const styles = StyleSheet.create({
     fontSize: cssVar.sM,
     fontFamily: FONTS.regular,
     backgroundColor: cssVar.cBlackV1,
-    paddingVertical: Platform.OS === 'ios' ? cssVar.spL : undefined,
+    paddingVertical: Platform.OS === 'ios' ? cssVar.spL : cssVar.spM,
     paddingHorizontal: cssVar.spM,
+    marginBottom: 4,
   },
 });
