@@ -116,7 +116,15 @@ const Input = React.memo((props: PropsType) => {
     </ControlLabel>
   );
 }, (prevProps, nextProps) => {
-  // Evita re-renders innecesarios comparando solo las props relevantes
+  // Retorna TRUE si las props son IGUALES (NO re-renderizar)
+  // Retorna FALSE si las props son DIFERENTES (SÍ re-renderizar)
+  
+  // IMPORTANTE: name debe ser diferente entre inputs
+  if (prevProps.name !== nextProps.name) {
+    return false; // Son inputs diferentes, DEBE re-renderizar
+  }
+  
+  // Comparar todas las props relevantes
   return (
     prevProps.value === nextProps.value &&
     prevProps.error === nextProps.error &&
@@ -125,8 +133,9 @@ const Input = React.memo((props: PropsType) => {
     prevProps.maxLength === nextProps.maxLength &&
     prevProps.keyboardType === nextProps.keyboardType &&
     prevProps.password === nextProps.password &&
-    prevProps.iconLeft === nextProps.iconLeft &&
-    prevProps.iconRight === nextProps.iconRight
+    prevProps.label === nextProps.label &&
+    prevProps.type === nextProps.type &&
+    prevProps.onChange === nextProps.onChange
   );
 });
 
