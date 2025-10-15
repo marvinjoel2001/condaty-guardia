@@ -51,7 +51,7 @@ if (configApp.API_URL == configApp.API_URL_TEST) {
 }
 if (configApp.API_URL == configApp.API_URL_DEMO) {
   configApp.APP_DEBUG = 0;
-  configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydemo';
+  configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydemos';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEMO;
 }
 export default configApp;
