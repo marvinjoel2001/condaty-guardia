@@ -35,7 +35,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState(0);
-  // const [openAlert, setOpenAlert] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
   const [addCompanion, setAddCompanion] = useState(false);
   const [dataOwner, setDataOwner]: any = useState(null);
@@ -60,18 +59,21 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     searchBy: '',
     fullType: 'L',
   });
-
   useEffect(() => {
     if (owners?.data) {
-      const newOwners = owners?.data.map((owner: any) => ({
-        ...owner,
-        name:
-          getFullName(owner) +
-          ' - ' +
-          (owner?.dpto?.[0]?.nro || owner?.dpto_nro) +
-          ' - ' +
-          (owner?.dpto?.[0]?.type?.name || owner?.type_name),
-      }));
+      const newOwners = owners?.data.map((owner: any) => {
+        let nro = '';
+        if (owner?.dpto && owner?.dpto.length > 0) {
+          nro = owner.dpto[0].nro + ' - ' + owner.dpto[0].type.name;
+        } else {
+          nro = owner.dpto_nro + ' - ' + owner.type_name;
+        }
+
+        return {
+          ...owner,
+          name: getFullName(owner) + ' - ' + nro,
+        };
+      });
       setDataOwners(newOwners);
     }
   }, [owners?.data]);
@@ -123,7 +125,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       // });
     }
   };
-  console.log(typeSearch);
+
   const validate = () => {
     let errors: any = {};
     errors = checkRules({
@@ -394,9 +396,9 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
               name="owner_id"
               required={true}
               options={dataOwners || []}
-              value={formState.owner_id || ''}
+              value={formState?.owner_id || ''}
               onChange={value =>
-                handleChangeInput('owner_id', value.target.value)
+                handleChangeInput('owner_id', value?.target.value)
               }
               optionValue="id"
               error={errors}
@@ -415,7 +417,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
             {steps === 1 && !visit && (
               <InputNameCi
                 formStateName={formState}
-                formStateCi={formState.ci}
+                formStateCi={formState?.ci}
                 disabledCi={true}
                 handleChangeInput={handleChangeInput}
                 errors={errors}
@@ -496,7 +498,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 )}
               </>
             )}
-            {formState.acompanantes?.length > 0 && (
+            {formState?.acompanantes?.length > 0 && (
               <>
                 <Text
                   style={{
@@ -505,7 +507,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                     marginBottom: 4,
                     color: cssVar.cWhite,
                   }}>
-                  {formState.acompanantes?.length > 1
+                  {formState?.acompanantes?.length > 1
                     ? 'Acompañantes:'
                     : 'Acompañante:'}
                 </Text>
