@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
@@ -12,7 +12,6 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getFullName} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
-// import Modal from '../../../../mk/components/ui/Modal/Modal';
 import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
@@ -35,7 +34,6 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState(0);
-  // const [openAlert, setOpenAlert] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
   const [addCompanion, setAddCompanion] = useState(false);
   const [dataOwner, setDataOwner]: any = useState(null);
@@ -113,100 +111,98 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       }
     } else {
       setSteps(1);
-      // setFormState({
-      //   ...formState,
-      //   name: visitData?.data?.name,
-      //   middle_name: visitData?.data?.middle_name,
-      //   last_name: visitData?.data?.last_name,
-      //   mother_last_name: visitData?.data?.mother_last_name,
-      //   ci: visitData?.data?.ci,
-      // });
     }
   };
-  console.log(typeSearch);
+
   const validate = () => {
     let errors: any = {};
+    
+    // Validar CI siempre
     errors = checkRules({
       value: formState.ci,
       rules: ['required', 'ci'],
       key: 'ci',
       errors,
     });
-    if (steps <= 1) {
-      if (steps == 1) {
+
+    // Validar owner_id siempre que no sea paso 0
+    if (steps > 0) {
+      errors = checkRules({
+        value: formState.owner_id,
+        rules: ['required'],
+        key: 'owner_id',
+        errors,
+      });
+    }
+
+    // Validar datos del visitante solo cuando no existe visit (steps === 1)
+    if (steps === 1 && !visit) {
+      errors = checkRules({
+        value: formState.name,
+        rules: ['required', 'alpha'],
+        key: 'name',
+        errors,
+      });
+      errors = checkRules({
+        value: formState.middle_name,
+        rules: ['alpha'],
+        key: 'middle_name',
+        errors,
+      });
+      errors = checkRules({
+        value: formState.last_name,
+        rules: ['required', 'alpha'],
+        key: 'last_name',
+        errors,
+      });
+      errors = checkRules({
+        value: formState.mother_last_name,
+        rules: ['alpha'],
+        key: 'mother_last_name',
+        errors,
+      });
+    }
+
+    // Validar vehículo/taxi (aplica para steps > 0)
+    if (steps > 0 && (typeSearch === 'V' || typeSearch === 'T')) {
+      errors = checkRules({
+        value: formState.plate,
+        rules: ['required', 'plate'],
+        key: 'plate',
+        errors,
+      });
+      
+      if (typeSearch === 'T') {
         errors = checkRules({
-          value: formState.owner_id,
-          rules: ['required'],
-          key: 'owner_id',
+          value: formState.ci_taxi,
+          rules: ['required', 'ci'],
+          key: 'ci_taxi',
           errors,
         });
         errors = checkRules({
-          value: formState.name,
+          value: formState.name_taxi,
           rules: ['required', 'alpha'],
-          key: 'name',
+          key: 'name_taxi',
           errors,
         });
         errors = checkRules({
-          value: formState.middle_name,
+          value: formState.middle_name_taxi,
           rules: ['alpha'],
-          key: 'middle_name',
+          key: 'middle_name_taxi',
           errors,
         });
         errors = checkRules({
-          value: formState.last_name,
+          value: formState.last_name_taxi,
           rules: ['required', 'alpha'],
-          key: 'last_name',
+          key: 'last_name_taxi',
           errors,
         });
         errors = checkRules({
-          value: formState.mother_last_name,
+          value: formState.mother_last_name_taxi,
           rules: ['alpha'],
-          key: 'mother_last_name',
+          key: 'mother_last_name_taxi',
           errors,
         });
-      }
-
-      if (typeSearch == 'V' || typeSearch == 'T') {
-        errors = checkRules({
-          value: formState.plate,
-          rules: ['required', 'plate'],
-          key: 'plate',
-          errors,
-        });
-        if (typeSearch == 'T') {
-          errors = checkRules({
-            value: formState.ci_taxi,
-            rules: ['required', 'ci'],
-            key: 'ci_taxi',
-            errors,
-          });
-          errors = checkRules({
-            value: formState.name_taxi,
-            rules: ['required', 'alpha'],
-            key: 'name_taxi',
-            errors,
-          });
-
-          errors = checkRules({
-            value: formState.middle_name_taxi,
-            rules: ['alpha'],
-            key: 'middle_name_taxi',
-            errors,
-          });
-
-          errors = checkRules({
-            value: formState.last_name_taxi,
-            rules: ['required', 'alpha'],
-            key: 'last_name_taxi',
-            errors,
-          });
-          errors = checkRules({
-            value: formState.mother_last_name_taxi,
-            rules: ['alpha'],
-            key: 'mother_last_name_taxi',
-            errors,
-          });
-        }
       }
     }
 
