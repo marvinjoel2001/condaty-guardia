@@ -605,14 +605,14 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
     setErrors(errors);
     return errors;
-  }
+  };
   const onSaveSinQr = async () => {
     const validationErrors = validate();
-    
+
     if (Object.keys(validationErrors).length > 0) {
       return;
     }
-    
+
     const {data: dataSave} = await execute(
       '/accesses/confirm-enter-guard',
       'POST',
