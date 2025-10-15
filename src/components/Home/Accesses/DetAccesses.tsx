@@ -26,6 +26,7 @@ import ModalAccessExpand from './ModalAccessExpand';
 import Br from '../../Profile/Br';
 import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
+import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -42,6 +43,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
   const [openEnterSinQR, setOpenEnterSinQR]: any = useState(false);
+  const [errors, setErrors] = useState({});
   const [openDet, setOpenDet]: any = useState({
     open: false,
     id: null,
@@ -591,7 +593,26 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       );
     return null;
   };
+
+  const validate = () => {
+    let errors: any = {};
+
+    if (openEnterSinQR) {
+      if (!formState.obs_in || formState.obs_in.trim() === '') {
+        errors.obs_in = 'Observaciones es requerido';
+      }
+    }
+
+    setErrors(errors);
+    return errors;
+  }
   const onSaveSinQr = async () => {
+    const validationErrors = validate();
+    
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+    
     const {data: dataSave} = await execute(
       '/accesses/confirm-enter-guard',
       'POST',
@@ -657,6 +678,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             label="Observaciones"
             name="obs_in"
             required
+            error={errors}
             value={formState?.obs_in}
             onChange={(e: any) => handleInputChange('obs_in', e)}
           />
