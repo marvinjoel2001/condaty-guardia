@@ -143,20 +143,38 @@ const HeadTitle = ({
   };
 
   return (
-    <Animated.View style={{...theme.container, ...style}}>
-      <View style={theme.leftContainer}>{renderLeftComponent()}</View>
+    <Animated.View
+      style={{
+        ...theme.container,
+        ...style,
+        alignItems: route.name === 'Home' ? 'flex-start' : 'center',
+      }}>
+      {/* Lado izquierdo - 33.33% */}
+      <View style={theme.leftSection}>{renderLeftComponent()}</View>
 
-      <View style={theme.titleContainer}>
+      {/* Centro - 33.33% */}
+      <View style={theme.centerSection} pointerEvents="box-none">
         {customTitle ? (
-          customTitle
+          <>
+            {typeof customTitle === 'string' ? (
+              <Text style={theme.title}>{customTitle}</Text>
+            ) : (
+              customTitle
+            )}
+          </>
         ) : (
-          <Text style={theme.title} numberOfLines={1}>
-            {selected?.cant === 0 ? title : `${selected?.cant} seleccionados`}
+          <Text
+            ellipsizeMode="tail"
+            numberOfLines={1}
+            accessibilityLabel={title}
+            style={theme.title}>
+            {selected?.cant === 0 ? title : selected?.cant + ' seleccionados'}
           </Text>
         )}
       </View>
 
-      <View style={theme.rightSlotContainer}>{renderRightComponent()}</View>
+      {/* Lado derecho - 33.33% */}
+      <View style={theme.rightSection}>{renderRightComponent()}</View>
     </Animated.View>
   );
 };
@@ -167,31 +185,36 @@ const theme: ThemeType = {
   container: {
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    borderBottomWidth: 0.5,
+    borderWidth: 0.5,
+    borderTopWidth: 0,
     borderBottomColor: cssVar.cWhiteV1,
-    paddingVertical: cssVar.spS,
-    paddingHorizontal: cssVar.spS,
-    alignItems: 'center',
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    padding: cssVar.spS,
+    alignItems: 'flex-start',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  leftContainer: {
-    justifyContent: 'flex-start',
-  },
-  titleContainer: {
-    flex: 1,
+  leftSection: {
+    width: '33.33%',
+    alignItems: 'flex-start',
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 8,
   },
-  rightSlotContainer: {
+  centerSection: {
+    width: '33.33%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rightSection: {
+    width: '33.33%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     justifyContent: 'flex-end',
   },
   sideComponent: {
-    minWidth: 44,
-    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 8,
   },
   title: {
     color: cssVar.cWhite,
@@ -199,21 +222,16 @@ const theme: ThemeType = {
     textAlign: 'center',
     fontSize: cssVar.sXl,
   },
-  customTitle: {
-    flex: 1,
-  },
   rightContainer: {
     flexDirection: 'row',
     gap: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 44,
-    height: 44,
   },
   notifPoint: {
     position: 'absolute',
-    top: 5,
-    right: 5,
+    top: -5,
+    right: -2,
     borderRadius: 100,
     backgroundColor: cssVar.cError,
     width: 18,
@@ -226,5 +244,6 @@ const theme: ThemeType = {
     fontFamily: FONTS.bold,
     color: cssVar.cWhite,
     textAlign: 'center',
+    lineHeight: 18,
   },
 };
