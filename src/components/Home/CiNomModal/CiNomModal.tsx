@@ -119,7 +119,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
 
   const validate = () => {
     let errors: any = {};
-    
+
     // Validar CI siempre
     errors = checkRules({
       value: formState.ci,
@@ -174,7 +174,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
         key: 'plate',
         errors,
       });
-      
+
       if (typeSearch === 'T') {
         errors = checkRules({
           value: formState.ci_taxi,
@@ -212,21 +212,21 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     setErrors(errors);
     return errors;
   };
-  
+
   const onSave = async () => {
     if (formState?.ci_taxi == formState?.ci) {
       return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
     }
-    
+
     if (hasErrors(validate())) {
       return;
     }
-    
+
     if (steps === 0 && !dataOwner) {
       visitExist();
       return;
     }
-    
+
     const url = dataOwner ? '/accesses/enterqr' : '/accesses';
     let method = 'POST';
     let params: any = {
