@@ -1,6 +1,6 @@
 import React, {memo, useCallback, useRef} from 'react';
-import {FlatList, RefreshControl, View} from 'react-native';
-import {cssVar, TypeStyles} from '../../../styles/themes';
+import {FlatList, RefreshControl, View, Text, Dimensions, Platform} from 'react-native';
+import {cssVar, TypeStyles, FONTS} from '../../../styles/themes';
 import useAuth from '../../../hooks/useAuth';
 import Skeleton, {PropsTypeSkeleton} from '../Skeleton/Skeleton';
 
@@ -50,6 +50,7 @@ const ListFlat = memo((props: PropsType) => {
     refreshing = false,
     style,
     skeletonType = 'list',
+    emptyLabel,
     onPagination,
     loading = false,
   } = props;
@@ -124,6 +125,26 @@ const ListFlat = memo((props: PropsType) => {
     );
   }
 
+  const screen = Dimensions.get('window');
+
+  // If there's no data, render the emptyLabel similarly to List.tsx
+  if (!data || !data?.length || data.length === 0) {
+    return typeof emptyLabel === 'string' ? (
+      <View style={{justifyContent: 'center', alignItems: 'center', height: screen.height - 400}}>
+        <Text style={{color: cssVar.cWhiteV1, fontFamily: FONTS.semiBold, textAlign: 'left', fontSize: cssVar.sM}}>{emptyLabel}</Text>
+      </View>
+    ) : (
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: Platform.OS == 'ios' ? screen.height - 250 : screen.height - 170,
+        }}>
+        {emptyLabel}
+      </View>
+    );
+  }
+
   return (
     <FlatList
       testID="ListFlatlist"
@@ -145,6 +166,17 @@ const ListFlat = memo((props: PropsType) => {
         <RenderFooterComponent loading={loading} skeletonType={skeletonType} />
       }
       refreshControl={refreshControl()}
+      ListEmptyComponent={() =>
+        emptyLabel ? (
+          <View style={{padding: 16, alignItems: 'center'}}>
+            {typeof emptyLabel === 'string' ? (
+              <Text style={{color: cssVar.cWhiteV1}}>{emptyLabel}</Text>
+            ) : (
+              emptyLabel
+            )}
+          </View>
+        ) : null
+      }
       getItemLayout={undefined} // Añade esto si tus items tienen altura fija
     />
   );
