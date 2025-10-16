@@ -138,42 +138,41 @@ const ModalFull = ({
                     borderTopWidth: cssVar.bWidth,
                   }}>
                   {buttonText && (
-                    <View
-                      onTouchEnd={e => {
+                    // <View
+                    //   onTouchEnd={e => {
+                    //     e.stopPropagation();
+                    //     onSave(id);
+                    //   }}
+                    //   style={{height: 50, flexGrow: 1, flexBasis: 0}}>
+                    <Button
+                      variant="primary"
+                      disabled={disabled}
+                      // style={{flexGrow: 1, flexBasis: 0}}
+                      onPress={(e: any) => {
                         e.stopPropagation();
                         onSave(id);
-                      }}
-                      style={{height: 50, flexGrow: 1, flexBasis: 0}}>
-                      <Button
-                        variant="primary"
-                        disabled={disabled}
-                        // style={{flexGrow: 1, flexBasis: 0}}
-                        onPress={(e: any) => {
-                          e.stopPropagation();
-                          onSave(id);
-                        }}>
-                        {buttonText}
-                      </Button>
-                    </View>
+                      }}>
+                      {buttonText}
+                    </Button>
+                    // </View>
                   )}
                   {buttonCancel && (
-                    <View
-                      onTouchEnd={e => {
+                    // <View
+                    //   onTouchEnd={e => {
+                    //     e.stopPropagation();
+                    //     onClose('cancel');
+                    //   }}
+                    //   style={{height: 50, flexGrow: 1, flexBasis: 0}}>
+                    <Button
+                      variant="secondary"
+                      // style={{flexGrow: 1, flexBasis: 0}}
+                      onPress={(e: any) => {
                         e.stopPropagation();
                         onClose('cancel');
-                      }}
-                      style={{height: 50, flexGrow: 1, flexBasis: 0}}>
-                      <Button
-                        variant="secondary"
-                        // style={{flexGrow: 1, flexBasis: 0}}
-                        onPress={(e: any) => {
-                          e.stopPropagation();
-
-                          onClose('cancel');
-                        }}>
-                        {buttonCancel}
-                      </Button>
-                    </View>
+                      }}>
+                      {buttonCancel}
+                    </Button>
+                    // </View>
                   )}
                   {buttonExtra && (
                     // <View style={{paddingHorizontal: cssVar.spM}}>
