@@ -24,6 +24,7 @@ interface HeadTitleProps {
   back?: boolean;
   avatar?: boolean;
   iconClose?: boolean;
+  modalLayout?: boolean;
 }
 
 const HeadTitle = ({
@@ -34,8 +35,10 @@ const HeadTitle = ({
   onBack = null,
   right,
   back = false,
+  avatar = false,
   onlyBack = false,
   iconClose = true,
+  modalLayout = false,
 }: HeadTitleProps) => {
   const navigation: any = useNavigation();
   const route = useRoute();
@@ -74,74 +77,6 @@ const HeadTitle = ({
     navigation.toggleDrawer();
   };
 
-  const renderLeftComponent = () => {
-    if (route.name === 'Home' && !onlyBack) {
-      return (
-        <TouchableOpacity onPress={togleDrawer}>
-          <View style={theme.sideComponent}>
-            <Icon name={IconMenu} color={cssVar.cWhite} />
-          </View>
-        </TouchableOpacity>
-      );
-    }
-    if (iconClose) {
-      return (
-        <TouchableOpacity onPress={goBack} accessibilityLabel={'Volver atrás'}>
-          <View style={theme.sideComponent}>
-            <Icon name={IconArrowLeft} color={cssVar.cWhite} />
-          </View>
-        </TouchableOpacity>
-      );
-    }
-    return <View style={theme.sideComponent} />;
-  };
-
-  const renderRightComponent = () => {
-    if (selected?.cant > 0) {
-      return (
-        <View style={theme.rightContainer}>
-          <Icon
-            onPress={() => {
-              dispatch({action: 'delete', type: selected?.type});
-              setSelected({cant: 0, type: ''});
-            }}
-            name={IconTrash}
-            color={'transparent'}
-            fillStroke={cssVar.cWhite}
-          />
-          <Icon
-            name={IconGenericQr}
-            onPress={() => {
-              dispatch({action: 'qr', type: selected?.type});
-              setSelected({cant: 0, type: ''});
-            }}
-            color={cssVar.cWhite}
-          />
-        </View>
-      );
-    }
-    if (right) {
-      return <View style={theme.sideComponent}>{right}</View>;
-    }
-    if (route.name === 'Home' && !onlyBack) {
-      return (
-        <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
-          <View style={theme.sideComponent}>
-            <Icon name={IconNotification} color={cssVar.cWhite} />
-            {counter > 0 && (
-              <View style={theme.notifPoint}>
-                <Text style={theme.notifPointNumber}>
-                  {counter > 99 ? '99+' : counter}
-                </Text>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
-      );
-    }
-    return <View style={theme.sideComponent} />;
-  };
-
   return (
     <Animated.View
       style={{
@@ -149,19 +84,45 @@ const HeadTitle = ({
         ...style,
         alignItems: route.name === 'Home' ? 'flex-start' : 'center',
       }}>
-      {/* Lado izquierdo - 33.33% */}
-      <View style={theme.leftSection}>{renderLeftComponent()}</View>
+      {/* Lado izquierdo - 20% o 30% */}
+      <View style={modalLayout ? theme.leftSectionModal : theme.leftSection}>
+        {route.name === 'Home' && !onlyBack ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: 8,
+              backgroundColor: cssVar.cBlack,
+              borderRadius: '100%',
+              alignSelf: 'flex-start',
+            }}
+            onTouchEnd={() => togleDrawer()}>
+            <Icon name={IconMenu} color={cssVar.cWhite} />
+          </View>
+        ) : iconClose ? (
+          <TouchableOpacity
+            onPress={goBack}
+            accessibilityLabel={'Volver atrás'}
+            style={{zIndex: 10}}>
+            <View style={theme.back}>
+              <Icon name={IconArrowLeft} color={cssVar.cWhite} />
+            </View>
+          </TouchableOpacity>
+        ) : null}
+      </View>
 
-      {/* Centro - 33.33% */}
-      <View style={theme.centerSection} pointerEvents="box-none">
+      {/* Centro - 60% o 40% */}
+      <View
+        style={modalLayout ? theme.centerSectionModal : theme.centerSection}
+        pointerEvents="box-none">
         {customTitle ? (
-          <>
+          <View style={{alignItems: 'center', justifyContent: 'center'}}>
             {typeof customTitle === 'string' ? (
               <Text style={theme.title}>{customTitle}</Text>
             ) : (
               customTitle
             )}
-          </>
+          </View>
         ) : (
           <Text
             ellipsizeMode="tail"
@@ -173,8 +134,47 @@ const HeadTitle = ({
         )}
       </View>
 
-      {/* Lado derecho - 33.33% */}
-      <View style={theme.rightSection}>{renderRightComponent()}</View>
+      {/* Lado derecho - 20% o 30% */}
+      <View style={modalLayout ? theme.rightSectionModal : theme.rightSection}>
+        {selected?.cant > 0 ? (
+          <View style={{flexDirection: 'row', gap: 12}}>
+            <Icon
+              onPress={() => {
+                dispatch({action: 'delete', type: selected?.type});
+                setSelected({cant: 0, type: ''});
+              }}
+              name={IconTrash}
+              color={'transparent'}
+              fillStroke={cssVar.cWhite}
+            />
+            <Icon
+              name={IconGenericQr}
+              onPress={() => {
+                dispatch({action: 'qr', type: selected?.type});
+                setSelected({cant: 0, type: ''});
+              }}
+              color={cssVar.cWhite}
+            />
+          </View>
+        ) : (
+          right && <View style={theme.topIcon}>{right}</View>
+        )}
+
+        {route.name === 'Home' && !onlyBack && (
+          <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
+            <View style={theme.notifButton}>
+              <Icon name={IconNotification} color={cssVar.cWhite} />
+              {counter > 0 && (
+                <View style={theme.notifPoint}>
+                  <Text style={theme.notifPointNumber}>
+                    {counter > 99 ? '99+' : counter}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
     </Animated.View>
   );
 };
@@ -196,25 +196,42 @@ const theme: ThemeType = {
     justifyContent: 'space-between',
   },
   leftSection: {
-    width: '33.33%',
+    width: '30%',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  leftSectionModal: {
+    width: '20%',
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
   centerSection: {
-    width: '33.33%',
+    width: '40%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerSectionModal: {
+    width: '60%',
     alignItems: 'center',
     justifyContent: 'center',
   },
   rightSection: {
-    width: '33.33%',
+    width: '30%',
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'flex-end',
   },
-  sideComponent: {
+  rightSectionModal: {
+    width: '20%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-end',
+  },
+  back: {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 8,
+    zIndex: 10,
   },
   title: {
     color: cssVar.cWhite,
@@ -222,11 +239,23 @@ const theme: ThemeType = {
     textAlign: 'center',
     fontSize: cssVar.sXl,
   },
-  rightContainer: {
-    flexDirection: 'row',
-    gap: 12,
+  topIcon: {
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'flex-start',
+  },
+  notifButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: cssVar.cBlack,
+    borderRadius: 20,
+    marginLeft: 12,
+    alignSelf: 'flex-start',
+    position: 'relative',
   },
   notifPoint: {
     position: 'absolute',
