@@ -75,7 +75,9 @@ const Button = ({
         style={[componentStyles.view]}
         // onPress={handlePress}
       >
-        <View pointerEvents={'none'}>
+        <View
+          style={{flexDirection: 'row', alignItems: 'center'}}
+          pointerEvents={'none'}>
           {/* Corrección para el ícono: */}
           {icon !== null && typeof icon === 'string' ? (
             <Text style={componentStyles.text}>{icon}</Text>
