@@ -69,7 +69,7 @@ const Button = ({
   };
 
   return (
-    <View style={{height: 46, flexGrow: 1}} onTouchEnd={handlePress}>
+    <View style={{width: '100%', flexShrink: 1}} onTouchEnd={handlePress}>
       <TouchableOpacity
         disabled={disabled || waiting > 0}
         style={[componentStyles.view]}
@@ -122,6 +122,7 @@ const theme: ThemeType = {
   },
   button: {
     // Estos son para el <View> interno
+    // height: '100%',
     padding: cssVar.spM,
     borderRadius: cssVar.bRadiusS,
     alignItems: 'center',
