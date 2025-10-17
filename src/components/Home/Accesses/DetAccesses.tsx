@@ -458,7 +458,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             )}
             {data?.confirm_at && (
               <KeyValue
-                keys="Tipo de aprobación"
+                keys={data?.confirm == 'G' || data?.confirm == 'Y' ? 'Aprobado por' : data?.confirm == 'N' || data?.rejected_guard_id !== null ? "Rechazado por" : "Aprobado por"}
                 value={
                   <View
                     style={{
