@@ -37,12 +37,14 @@ const typeInvitation: any = {
   F: 'QR Frecuente',
 };
 const DetAccesses = ({id, open, close, reload}: any) => {
+
   const {showToast, waiting} = useAuth();
   const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
   const [openEnterSinQR, setOpenEnterSinQR]: any = useState(false);
+  const [openDecline, setOpenDecline] = useState(false);
   const [errors, setErrors] = useState({});
   const [openDet, setOpenDet]: any = useState({
     open: false,
@@ -50,7 +52,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     type: '',
     invitation: null,
   });
+
   const getData = async () => {
+
     try {
       const {data} = await execute(
         '/accesses',
@@ -62,7 +66,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         false,
         3,
       );
-
+      
       if (data.success && data.data.length > 0) {
         const accessData = data.data[0];
         if (accessData.access_id) {
@@ -82,6 +86,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       showToast('Error al obtener los datos', 'error');
     }
   };
+
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
 
@@ -101,8 +106,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const status = getStatus();
   useEffect(() => {
     if (id) {
+      // console.log(id)
       getData();
-    }
+    } 
   }, [id]);
 
   const saveEntry = async () => {
@@ -180,6 +186,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       N: 'Cerrar',
     };
     return buttonTexts[status] || '';
+  };
+
+  const handleOpenDecline = () => {
+    setFormState({obs_confirm: ''});
+    setErrors({});
+    setOpenDecline(true);
   };
 
   const labelAccess = () => {
@@ -451,7 +463,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                   <View
                     style={{
                       backgroundColor:
-                        data?.confirm == 'G'
+                        data?.confirm == 'G' || data?.rejected_guard_id !== null
                           ? '#F37F3D33'
                           : cssVar.cHoverSuccess,
                       paddingHorizontal: 8,
@@ -461,12 +473,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                     <Text
                       style={{
                         color:
-                          data?.confirm == 'G'
+                          data?.confirm == 'G' || data?.rejected_guard_id !== null
                             ? cssVar.cAlertMedio
                             : cssVar.cSuccess,
                         fontSize: 12,
                       }}>
-                      {data?.confirm == 'G'
+                      {data?.confirm == 'G' || data?.rejected_guard_id !== null
                         ? 'Por el guardia'
                         : 'Por el residente'}
                     </Text>
@@ -576,6 +588,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       }
     }
 
+    if (openDecline) {
+      if (!formState.obs_confirm || formState.obs_confirm.trim() === '') {
+        errors.obs_confirm = 'El motivo es requerido';
+      }
+    }
+
     setErrors(errors);
     return errors;
   };
@@ -600,6 +618,38 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     }
   };
 
+  const onConfirm = async (confirm = 'Y') => {
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+    const {data: confirma, error: err} = await execute(
+      '/accesses/confirm',
+      'POST',
+      {
+        confirm,
+        id: data.id,
+        obs_confirm: formState?.obs_confirm,
+      },
+    );
+
+    if (confirma?.success === true) {
+      if (reload) {
+        reload();
+      }
+     setOpenDecline(false)
+     close();
+
+      if (confirma.data.status === 'Y') {
+        showToast('Tu visita fue aprobada con éxito', 'success');
+      } else {
+        showToast('Visita rechazada', 'info');
+      }
+    } else {
+      showToast(err, 'error');
+    }
+  };
+
   return (
     <ModalFull
       onClose={() => close()}
@@ -611,11 +661,20 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         status == 'S' &&
         !data?.in_at &&
         waiting <= 0 && (
-          <Button
-            style={{backgroundColor: cssVar.cError, borderColor: cssVar.cError}}
-            onPress={() => setOpenEnterSinQR(true)}>
-            Dejar ingresar
-          </Button>
+          <View style={{display:'flex', width:'100%', gap:'3%',  flexDirection:"row", justifyContent:"space-between"}}>
+            <View style={{width:'35%'}}>
+              <Button style={{}} variant="secondary" onPress={handleOpenDecline}>
+                Rechazar
+              </Button>
+            </View>
+            <View style={{width:'62%'}}>
+              <Button
+                style={{backgroundColor: cssVar.cSuccess, borderColor: cssVar.cSuccess}}
+                onPress={() => setOpenEnterSinQR(true)}>
+                Dejar ingresar
+              </Button>
+            </View>
+          </View>
         )
       }>
       {!data ? (
@@ -654,6 +713,29 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             error={errors}
             value={formState?.obs_in}
             onChange={(e: any) => handleInputChange('obs_in', e)}
+          />
+        </Modal>
+      )}
+
+       {openDecline && (
+        <Modal
+          title="Rechazar ingreso"
+          open={openDecline}
+          buttonText="Enviar"
+          onSave={() => onConfirm('N')}
+          onClose={() => setOpenDecline(false)}>
+          <Text style={{color: cssVar.cWhite, marginBottom: 12}}>
+            Por favor indica un motivo para rechazar el acceso a esta visita
+          </Text>
+          <TextArea
+            required
+            lines={4}
+            name="obs_confirm"
+            onChange={value => handleInputChange('obs_confirm', value)}
+            label="Motivo"
+            value={formState?.obs_confirm}
+            error={errors}
+            expandable={true}
           />
         </Modal>
       )}
