@@ -254,7 +254,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       };
     }
 
-    const {data: In} = await execute(
+    const {data: In, error} = await execute(
       '/accesses/enterqr',
       'POST',
       params,
@@ -270,16 +270,12 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       setFormState({});
       onClose();
     } else {
-      let errorMsg = '';
-      if (typeof In.message === 'string') {
-        errorMsg = In.message;
-      } else if (typeof In.message === 'object') {
-        errorMsg = JSON.stringify(In.message);
-      } else {
-        errorMsg = 'Error desconocido';
-      }
-      showToast(errorMsg, 'error');
-      onClose();
+      console.log(error);
+      showToast(
+        error?.data?.message || 'Error al registrar la entrada.',
+        'error',
+      );
+      // onClose();
     }
   };
 
