@@ -334,7 +334,7 @@ const Notifications = () => {
         renderItem={NotifisList}
         // skeletonType="list"
         refreshing={!loaded && params.perPage === -1}
-        emptyLabel="No hay datos en la bitácora"
+        emptyLabel="No hay datos"
         onRefresh={handleReload}
         loading={!loaded && params.perPage > -1}
         onPagination={onPagination}
