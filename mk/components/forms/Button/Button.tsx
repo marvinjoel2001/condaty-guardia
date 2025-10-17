@@ -1,7 +1,7 @@
-import React, {useMemo} from 'react'; // Asegúrate de que React esté importado si no lo estaba explícitamente
+import React, {useMemo} from 'react';
 import {TouchableOpacity, Text, View} from 'react-native';
-import useApi from '../../../hooks/useApi'; // Ajusta la ruta si es necesario
-import {FONTS, ThemeType, TypeStyles, cssVar} from '../../../styles/themes'; // Ajusta la ruta si es necesario
+import useApi from '../../../hooks/useApi';
+import {FONTS, ThemeType, TypeStyles, cssVar} from '../../../styles/themes';
 
 interface PropsType {
   onPress: Function;
@@ -24,22 +24,22 @@ const Button = ({
   disabled = false,
   children,
   variant = 'primary',
-  style = {}, // Esta prop 'style' viene de Profile.js
+  style = {},
   styleText = {},
   icon = null,
 }: PropsType) => {
   const {waiting} = useApi();
   const componentStyles = useMemo(() => {
     const viewStyle = {
-      ...theme.button, // Estilos base del View interno
-      ...theme[variant], // Estilos de la variante para el View interno
+      ...theme.button,
+      ...theme[variant],
       ...(disabled || waiting > 0
         ? {
-            ...theme.disabled, // Estilos de deshabilitado para el View interno
+            ...theme.disabled,
             borderColor:
               variant == 'secondary'
                 ? cssVar.cWhiteV1
-                : theme.button.borderColor, // Ajuste para mantener borde si es secundario
+                : theme.button.borderColor,
           }
         : {}),
       ...style,
@@ -64,12 +64,13 @@ const Button = ({
   const handlePress = (e: any) => {
     e.stopPropagation();
     if (!disabled && waiting <= 0) {
-      onPress(e); // Ejecuta la acción del botón
+      onPress(e);
     }
   };
-
   return (
-    <View style={{width: '100%', flexShrink: 1}} onTouchEnd={handlePress}>
+    <View
+      style={{width: '100%', flexShrink: waiting <= 0 ? 1 : 0}}
+      onTouchEnd={handlePress}>
       <TouchableOpacity
         disabled={disabled || waiting > 0}
         style={[componentStyles.view]}
@@ -78,32 +79,30 @@ const Button = ({
         <View
           style={{flexDirection: 'row', alignItems: 'center'}}
           pointerEvents={'none'}>
-          {/* Corrección para el ícono: */}
           {icon !== null && typeof icon === 'string' ? (
             <Text style={componentStyles.text}>{icon}</Text>
           ) : (
             icon
           )}
-          {children && (
-            <Text
-              style={{
-                ...componentStyles.text,
-                ...(icon !== null && {
-                  marginLeft:
-                    typeof icon === 'string' || React.isValidElement(icon)
-                      ? cssVar.spS || 8
-                      : 0,
-                }), // cssVar.spS o un valor como 8
-                ...(variant == 'terciary'
-                  ? {
-                      textDecorationLine: 'underline',
-                      textDecorationStyle: 'solid',
-                    }
-                  : {}),
-              }}>
-              {children}
-            </Text>
-          )}
+
+          <Text
+            style={{
+              ...componentStyles.text,
+              ...(icon !== null && {
+                marginLeft:
+                  typeof icon === 'string' || React.isValidElement(icon)
+                    ? cssVar.spS || 8
+                    : 0,
+              }),
+              ...(variant == 'terciary'
+                ? {
+                    textDecorationLine: 'underline',
+                    textDecorationStyle: 'solid',
+                  }
+                : {}),
+            }}>
+            {children}
+          </Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -112,10 +111,9 @@ const Button = ({
 
 export default Button;
 
-// Tu 'theme' existente (asegúrate que las rutas a cssVar, FONTS sean correctas)
 const theme: ThemeType = {
   touchable: {
-    borderRadius: cssVar.bRadiusS, // Mantenemos el borde redondeado si se aplica al touchable
+    borderRadius: cssVar.bRadiusS,
     overflow: 'hidden',
   },
   text: {
@@ -123,43 +121,38 @@ const theme: ThemeType = {
     fontFamily: FONTS.semiBold,
   },
   button: {
-    // Estos son para el <View> interno
-    // height: '100%',
     padding: cssVar.spM,
     borderRadius: cssVar.bRadiusS,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
     borderWidth: cssVar.bWidth,
-    borderColor: cssVar.cAccent, // Este será el borde por defecto del View
+    borderColor: cssVar.cAccent,
   },
   primary: {
     backgroundColor: cssVar.cAccent,
-    color: cssVar.cBlack, // color para el texto de la variante primaria
-    borderColor: cssVar.cAccent, // Asegurar que el borde coincida
+    color: cssVar.cBlack,
+    borderColor: cssVar.cAccent,
   },
   secondary: {
-    // backgroundColor: 'transparent', // El View interno es transparente
     borderWidth: cssVar.bWidth,
     borderColor: cssVar.cWhiteV1,
-    color: cssVar.cWhiteV1, // color para el texto de la variante secundaria
+    color: cssVar.cWhiteV1,
   },
   terciary: {
     padding: 0,
     borderWidth: 0,
-    color: cssVar.cAccent, // color para el texto
+    color: cssVar.cAccent,
     borderColor: 'transparent',
   },
   disabled: {
-    opacity: 0.5, // Aplicar opacidad es una forma común de deshabilitar visualmente
-    // El borderColor en disabled se maneja en useMemo para casos específicos
+    opacity: 0.5,
   },
   icon: {
     paddingHorizontal: cssVar.spS,
     paddingVertical: cssVar.spS,
-    borderRadius: 100, // Esto es para un botón completamente redondo tipo ícono
-    fontSize: cssVar.sM, // Esto es para el texto, no para el botón en sí
+    borderRadius: 100,
+    fontSize: cssVar.sM,
     alignItems: 'center',
-    // borderWidth: 0, // Usualmente los botones de ícono no tienen borde
   },
 };
