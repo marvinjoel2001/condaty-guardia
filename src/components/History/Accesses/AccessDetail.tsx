@@ -532,7 +532,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     <View
                       style={{
                         backgroundColor:
-                          item?.confirm == 'G'
+                          item?.confirm == 'G' || item?.rejected_guard_id !== null
                             ? '#F37F3D33'
                             : cssVar.cHoverSuccess,
                         paddingHorizontal: 8,
@@ -542,11 +542,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       <Text
                         style={{
                           color:
-                            item?.confirm == 'G'
+                            item?.confirm == 'G' || item?.rejected_guard_id !== null
                               ? cssVar.cAlertMedio
                               : cssVar.cSuccess,
                         }}>
-                        {item?.confirm == 'G'
+                        {item?.confirm == 'G' || item?.rejected_guard_id !== null
                           ? 'Por el guardia'
                           : 'Por el residente'}
                       </Text>
