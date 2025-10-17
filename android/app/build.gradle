@@ -82,8 +82,8 @@ android {
         applicationId "com.rnguard"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 13
-        versionName "1.1.10"
+        versionCode 14
+        versionName "1.1.11"
     }
     signingConfigs {
         debug {
@@ -117,6 +117,9 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    
+    // Requerido para Photo Picker en Android < 30 (sin permisos)
+    implementation("androidx.activity:activity:1.9.+")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

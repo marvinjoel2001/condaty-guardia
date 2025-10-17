@@ -106,6 +106,7 @@ const ModalFull = ({
                   onlyBack={open}
                   right={right}
                   iconClose={iconClose}
+                  modalLayout={true}
                 />
               )}
               {scrollViewHide ? (

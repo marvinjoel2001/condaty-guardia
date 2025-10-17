@@ -121,6 +121,8 @@ export const uploadImage = ({
         includeBase64: true,
         quality: 1,
         selectionLimit: 1,
+        // Usar el Photo Picker de Android (no requiere permisos)
+        presentationStyle: 'fullScreen',
       });
       await processImage(result);
     } catch (error) {
