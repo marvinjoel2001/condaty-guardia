@@ -142,7 +142,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
   };
 
   const getStatusForTaxiDriver = (mainAccessItem: any) => {
-    let text = 'Denegado';
+    let text = 'Rechazado';
     let color = cssVar.cError;
 
     if (mainAccessItem.out_at) {
@@ -242,7 +242,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       ? 'Por ingresar'
       : item.status === 'X'
       ? 'Anulado'
-      : 'Denegado';
+      : 'Rechazado';
 
     if (
       statusText === 'Completado' ||
@@ -250,7 +250,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       statusText === 'Por ingresar'
     )
       statusColor = cssVar.cSuccess;
-    if (statusText === 'Anulado' || statusText === 'Denegado')
+    if (statusText === 'Anulado' || statusText === 'Rechazado')
       statusColor = cssVar.cError;
     if (statusText === 'Por confirmar') statusColor = cssVar.cWarning;
 
@@ -512,7 +512,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     value={item.invitation.obs}
                   />
                 )}
-              {statusText === 'Denegado' && (
+              {statusText === 'Rechazado' && (
                 <>
                   <DetailRow
                     label="Fecha de denegación"
@@ -527,12 +527,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
               {item?.confirm_at && (
                 <DetailRow
-                  label="Tipo de aprobación"
+                  label={item?.confirm == 'G' || item?.confirm == 'Y' ? 'Aprobado por' : item?.confirm == 'N' || item?.rejected_guard_id !== null ? "Rechazado por" : "Aprobado por"}
                   value={
                     <View
                       style={{
                         backgroundColor:
-                          item?.confirm == 'G'
+                          item?.confirm == 'G' || item?.rejected_guard_id !== null
                             ? '#F37F3D33'
                             : cssVar.cHoverSuccess,
                         paddingHorizontal: 8,
@@ -542,11 +542,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       <Text
                         style={{
                           color:
-                            item?.confirm == 'G'
+                            item?.confirm == 'G' || item?.rejected_guard_id !== null
                               ? cssVar.cAlertMedio
                               : cssVar.cSuccess,
                         }}>
-                        {item?.confirm == 'G'
+                        {item?.confirm == 'G' || item?.rejected_guard_id !== null
                           ? 'Por el guardia'
                           : 'Por el residente'}
                       </Text>

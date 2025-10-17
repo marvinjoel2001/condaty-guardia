@@ -148,7 +148,7 @@ const ModalFull = ({
                     <Button
                       variant="primary"
                       disabled={disabled}
-                      style={{flexGrow: 1, flexBasis: 0}}
+                      // style={{flexGrow: 1, flexBasis: 0}}
                       onPress={(e: any) => {
                         e.stopPropagation();
                         onSave(id);
@@ -166,7 +166,7 @@ const ModalFull = ({
                     //   style={{height: 50, flexGrow: 1, flexBasis: 0}}>
                     <Button
                       variant="secondary"
-                      style={{flexGrow: 1, flexBasis: 0}}
+                      // style={{flexGrow: 1, flexBasis: 0}}
                       onPress={(e: any) => {
                         e.stopPropagation();
                         onClose('cancel');
