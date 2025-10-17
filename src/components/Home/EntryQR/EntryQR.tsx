@@ -270,7 +270,6 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       setFormState({});
       onClose();
     } else {
-      console.log(error);
       showToast(
         error?.data?.message || 'Error al registrar la entrada.',
         'error',
