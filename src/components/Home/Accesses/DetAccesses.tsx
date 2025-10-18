@@ -637,7 +637,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     <ModalFull
       onClose={close}
       open={open}
-      title={status != 'I' ? 'Visitante sin QR 2' : 'Detalle del ingreso'}
+      title={status != 'I' ? 'Visitante sin QR' : 'Detalle del ingreso'}
       onSave={handleSave}
       buttonText={getButtonText()}
       buttonExtra={
