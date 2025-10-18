@@ -547,8 +547,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                               : cssVar.cSuccess,
                         }}>
                         {item?.confirm == 'G' || item?.rejected_guard_id !== null
-                          ? 'Por el guardia'
-                          : 'Por el residente'}
+                          ? 'Guardia'
+                          : 'Residente'}
                       </Text>
                     </View>
                   }

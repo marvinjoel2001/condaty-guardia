@@ -485,8 +485,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                         fontSize: 12,
                       }}>
                       {data?.confirm == 'G' || data?.rejected_guard_id !== null
-                        ? 'Por el guardia'
-                        : 'Por el residente'}
+                        ? 'Guardia'
+                        : 'Residente'}
                     </Text>
                   </View>
                 }
@@ -639,64 +639,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     }
   };
 
-  // const onSaveSinQr = async () => {
-  //   const validationErrors = validate();
-
-  //   if (Object.keys(validationErrors).length > 0) {
-  //     return;
-  //   }
-
-  //   const {data: dataSave} = await execute(
-  //     '/accesses/confirm-enter-guard',
-  //     'POST',
-  //     {
-  //       id: data.id,
-  //       obs_in: formState?.obs_in,
-  //     },
-  //   );
-  //   if (dataSave?.success) {
-  //     if (reload) reload();
-  //     close();
-  //   }
-  // };
-
-  // const onConfirm = async (confirm = 'Y') => {
-  //   const validationErrors = validate();
-  //   if (Object.keys(validationErrors||{})?.length > 0) {
-  //     return;
-  //   }
-  //   const {data: confirma} = await execute(
-  //     '/accesses/confirm',
-  //     'POST',
-  //     {
-  //       confirm,
-  //       id: data.id,
-  //       obs_confirm: formState?.obs_confirm,
-  //     },false,3
-  //   );
-
-  //   if (confirma?.success === true) {
-  //     if (reload) {
-  //       reload();
-  //     }
-  //    setOpenDecline(null)
-  //    close();
-
-  //     if (confirma?.data?.status === 'Y') {
-  //       showToast('Tu visita fue aprobada con éxito', 'success');
-  //     } else {
-  //       showToast('Visita rechazada', 'info');
-  //     }
-  //   } else {
-  //     showToast("Ocurió un error", 'error');
-  //   }
-  // };
-
   return (
     <ModalFull
       onClose={close}
       open={open}
-      title={status != 'I' ? 'Visitante sin QR' : 'Detalle del ingreso'}
+      title={status != 'I' ? 'Visitante sin QR 2' : 'Detalle del ingreso'}
       onSave={handleSave}
       buttonText={getButtonText()}
       buttonExtra={
@@ -711,18 +658,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               flexDirection: 'row',
               justifyContent: 'space-between',
             }}>
-            {/* <View style={{width:'35%'}}>
-              <Button style={{}} variant="secondary" onPress={handleOpenDecline}>
-                Rechazar
-              </Button>
-            </View>
-            <View style={{width:'62%'}}>
-              <Button
-                style={{backgroundColor: cssVar.cSuccess, borderColor: cssVar.cSuccess}}
-                onPress={() => setOpenEnterSinQR(true)}>
-                Dejar ingresar
-              </Button>
-            </View> */}
             <View style={{width: '35%'}}>
               <Button
                 style={{}}
