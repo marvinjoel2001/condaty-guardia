@@ -656,8 +656,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             <View style={{width: '62%'}}>
               <Button
                 style={{
-                  backgroundColor: cssVar.cSuccess,
-                  borderColor: cssVar.cSuccess,
+                  backgroundColor: cssVar.cAccent,
+                  borderColor: cssVar.cAccent,
                 }}
                 onPress={() => setOpenDecline('Y')}>
                 Dejar ingresar
