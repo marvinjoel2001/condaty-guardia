@@ -1,4 +1,3 @@
-// DetAccesses.tsx
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
@@ -26,7 +25,6 @@ import ModalAccessExpand from './ModalAccessExpand';
 import Br from '../../Profile/Br';
 import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -37,14 +35,13 @@ const typeInvitation: any = {
   F: 'QR Frecuente',
 };
 const DetAccesses = ({id, open, close, reload}: any) => {
-
   const {showToast, waiting} = useAuth();
   const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
   const [openEnterSinQR, setOpenEnterSinQR]: any = useState(false);
-  const [openDecline, setOpenDecline] = useState(false);
+  const [openDecline, setOpenDecline] = useState<string | null>(null);
   const [errors, setErrors] = useState({});
   const [openDet, setOpenDet]: any = useState({
     open: false,
@@ -54,7 +51,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   });
 
   const getData = async () => {
-
     try {
       const {data} = await execute(
         '/accesses',
@@ -66,7 +62,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         false,
         3,
       );
-      
+
       if (data.success && data.data.length > 0) {
         const accessData = data.data[0];
         if (accessData.access_id) {
@@ -106,9 +102,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const status = getStatus();
   useEffect(() => {
     if (id) {
-      // console.log(id)
       getData();
-    } 
+    }
   }, [id]);
 
   const saveEntry = async () => {
@@ -186,12 +181,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       N: 'Cerrar',
     };
     return buttonTexts[status] || '';
-  };
-
-  const handleOpenDecline = () => {
-    setFormState({obs_confirm: ''});
-    setErrors({});
-    setOpenDecline(true);
   };
 
   const labelAccess = () => {
@@ -458,7 +447,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             )}
             {data?.confirm_at && (
               <KeyValue
-                keys={data?.confirm == 'G' || data?.confirm == 'Y' ? 'Aprobado por' : data?.confirm == 'N' || data?.rejected_guard_id !== null ? "Rechazado por" : "Aprobado por"}
+                keys={
+                  data?.confirm == 'G' || data?.confirm == 'Y'
+                    ? 'Aprobado por'
+                    : data?.confirm == 'N' || data?.rejected_guard_id !== null
+                    ? 'Rechazado por'
+                    : 'Aprobado por'
+                }
                 value={
                   <View
                     style={{
@@ -473,14 +468,15 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                     <Text
                       style={{
                         color:
-                          data?.confirm == 'G' || data?.rejected_guard_id !== null
+                          data?.confirm == 'G' ||
+                          data?.rejected_guard_id !== null
                             ? cssVar.cAlertMedio
                             : cssVar.cSuccess,
                         fontSize: 12,
                       }}>
                       {data?.confirm == 'G' || data?.rejected_guard_id !== null
-                        ? 'Por el guardia'
-                        : 'Por el residente'}
+                        ? 'Guardia'
+                        : 'Residente'}
                     </Text>
                   </View>
                 }
@@ -597,30 +593,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     setErrors(errors);
     return errors;
   };
-  const onSaveSinQr = async () => {
+
+  const onGuardRespond = async (confirm = 'N') => {
     const validationErrors = validate();
 
-    if (Object.keys(validationErrors).length > 0) {
-      return;
-    }
-
-    const {data: dataSave} = await execute(
-      '/accesses/confirm-enter-guard',
-      'POST',
-      {
-        id: data.id,
-        obs_in: formState?.obs_in,
-      },
-    );
-    if (dataSave?.success) {
-      if (reload) reload();
-      close();
-    }
-  };
-
-  const onConfirm = async (confirm = 'Y') => {
-    const validationErrors = validate();
-    if (Object.keys(validationErrors||{})?.length > 0) {
+    if (!formState?.obs_confirm) {
       return;
     }
     const {data: confirma} = await execute(
@@ -630,47 +607,62 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         confirm,
         id: data.id,
         obs_confirm: formState?.obs_confirm,
-      },false,3
+      },
+      false,
+      3,
     );
 
     if (confirma?.success === true) {
       if (reload) {
         reload();
       }
-     setOpenDecline(false)
-     close();
+      setOpenDecline(null);
+      close();
 
-      if (confirma?.data?.status === 'Y') {
+      if (openDecline !== 'N') {
         showToast('Tu visita fue aprobada con éxito', 'success');
       } else {
         showToast('Visita rechazada', 'info');
       }
     } else {
-      showToast("Ocurió un error", 'error');
+      showToast('Ocurió un error', 'error');
     }
   };
 
   return (
     <ModalFull
-      onClose={() => close()}
+      onClose={close}
       open={open}
-      title={status != 'I' ? 'Visitante sin QR' : 'Detalle del ingreso'}
+      title={status != 'I' ? 'Visitante sin QR 2' : 'Detalle del ingreso'}
       onSave={handleSave}
       buttonText={getButtonText()}
       buttonExtra={
         status == 'S' &&
         !data?.in_at &&
         waiting <= 0 && (
-          <View style={{display:'flex', width:'100%', gap:'3%',  flexDirection:"row", justifyContent:"space-between"}}>
-            <View style={{width:'35%'}}>
-              <Button style={{}} variant="secondary" onPress={handleOpenDecline}>
+          <View
+            style={{
+              display: 'flex',
+              width: '100%',
+              gap: '3%',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <View style={{width: '35%'}}>
+              <Button
+                style={{}}
+                variant="secondary"
+                onPress={() => setOpenDecline('N')}>
                 Rechazar
               </Button>
             </View>
-            <View style={{width:'62%'}}>
+            <View style={{width: '62%'}}>
               <Button
-                style={{backgroundColor: cssVar.cSuccess, borderColor: cssVar.cSuccess}}
-                onPress={() => setOpenEnterSinQR(true)}>
+                style={{
+                  backgroundColor: cssVar.cSuccess,
+                  borderColor: cssVar.cSuccess,
+                }}
+                onPress={() => setOpenDecline('Y')}>
                 Dejar ingresar
               </Button>
             </View>
@@ -696,36 +688,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           }
         />
       )}
-      {openEnterSinQR && (
-        <Modal
-          title="Dejar ingresar"
-          open={openEnterSinQR}
-          onClose={() => setOpenEnterSinQR(false)}
-          buttonText="Confirmar"
-          onSave={onSaveSinQr}>
-          <Text style={{color: cssVar.cWhite, marginBottom: 12}}>
-            ¿Estas seguro de dejar ingresar al visitante?
-          </Text>
-          <TextArea
-            label="Observaciones"
-            name="obs_in"
-            required
-            error={errors}
-            value={formState?.obs_in}
-            onChange={(e: any) => handleInputChange('obs_in', e)}
-          />
-        </Modal>
-      )}
 
-       {openDecline && (
+      {openDecline != null && (
         <Modal
-          title="Rechazar ingreso"
-          open={openDecline}
+          title={openDecline == 'Y' ? 'Dejar Ingresar' : 'Rechazar Ingreso'}
+          open={openDecline !== null}
           buttonText="Enviar"
-          onSave={() => onConfirm('N')}
-          onClose={() => setOpenDecline(false)}>
+          onSave={() => onGuardRespond(openDecline)}
+          onClose={() => setOpenDecline(null)}>
           <Text style={{color: cssVar.cWhite, marginBottom: 12}}>
-            Por favor indica un motivo para rechazar el acceso a esta visita
+            Por favor indica el motivo
           </Text>
           <TextArea
             required
