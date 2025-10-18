@@ -1,4 +1,3 @@
-// DetAccesses.tsx
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
@@ -26,8 +25,6 @@ import ModalAccessExpand from './ModalAccessExpand';
 import Br from '../../Profile/Br';
 import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
-import {SensorType} from 'react-native-reanimated';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -105,7 +102,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const status = getStatus();
   useEffect(() => {
     if (id) {
-      // console.log(id)
       getData();
     }
   }, [id]);
@@ -186,12 +182,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     };
     return buttonTexts[status] || '';
   };
-
-  // const handleOpenDecline = () => {
-  //   setFormState({obs_confirm: ''});
-  //   setErrors({});
-  //   setOpenDecline();
-  // };
 
   const labelAccess = () => {
     if (data?.type === 'O') {
