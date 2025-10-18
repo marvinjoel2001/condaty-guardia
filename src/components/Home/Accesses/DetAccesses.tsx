@@ -583,13 +583,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     let errors: any = {};
 
     if (openEnterSinQR) {
-      if (!formState.obs_in || formState.obs_in.trim() === '') {
+      if (!formState?.obs_in || formState?.obs_in?.trim() === '') {
         errors.obs_in = 'Observaciones es requerido';
       }
     }
 
     if (openDecline) {
-      if (!formState.obs_confirm || formState.obs_confirm.trim() === '') {
+      if (!formState?.obs_confirm || formState?.obs_confirm?.trim() === '') {
         errors.obs_confirm = 'El motivo es requerido';
       }
     }
@@ -620,17 +620,17 @@ const DetAccesses = ({id, open, close, reload}: any) => {
 
   const onConfirm = async (confirm = 'Y') => {
     const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
+    if (Object.keys(validationErrors||{})?.length > 0) {
       return;
     }
-    const {data: confirma, error: err} = await execute(
+    const {data: confirma} = await execute(
       '/accesses/confirm',
       'POST',
       {
         confirm,
         id: data.id,
         obs_confirm: formState?.obs_confirm,
-      },
+      },false,3
     );
 
     if (confirma?.success === true) {
@@ -640,13 +640,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
      setOpenDecline(false)
      close();
 
-      if (confirma.data.status === 'Y') {
+      if (confirma?.data?.status === 'Y') {
         showToast('Tu visita fue aprobada con éxito', 'success');
       } else {
         showToast('Visita rechazada', 'info');
       }
     } else {
-      showToast(err, 'error');
+      showToast("Ocurió un error", 'error');
     }
   };
 
