@@ -482,13 +482,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 label="Fecha y hora de salida"
                 value={getDateTimeStrMes(item.out_at)}
               />
+             
               <DetailRow
                 label="Guardia de ingreso"
-                value={getFullName(item.guardia)}
+                value={ statusText === 'Rechazado' ? '-/-' : getFullName(item.guardia)}
               />
               <DetailRow
                 label="Guardia de salida"
-                value={getFullName(item.out_guard)}
+                value={ statusText === 'Rechazado' ? '-/-' : getFullName(item.out_guard)}
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
@@ -549,11 +550,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                         {item?.confirm == 'G' || item?.rejected_guard_id !== null
                           ? 'Guardia'
                           : 'Residente'}
+                        
                       </Text>
                     </View>
                   }
                 />
               )}
+               <DetailRow
+                label=""
+                value={ getFullName(item.guardia)}
+              />
             </View>
           </View>
 
