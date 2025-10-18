@@ -482,14 +482,20 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 label="Fecha y hora de salida"
                 value={getDateTimeStrMes(item.out_at)}
               />
-             
+
               <DetailRow
                 label="Guardia de ingreso"
-                value={ statusText === 'Rechazado' ? '-/-' : getFullName(item.guardia)}
+                value={
+                  statusText === 'Rechazado' ? '-/-' : getFullName(item.guardia)
+                }
               />
               <DetailRow
                 label="Guardia de salida"
-                value={ statusText === 'Rechazado' ? '-/-' : getFullName(item.out_guard)}
+                value={
+                  statusText === 'Rechazado'
+                    ? '-/-'
+                    : getFullName(item.out_guard)
+                }
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
@@ -528,12 +534,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
               {item?.confirm_at && (
                 <DetailRow
-                  label={item?.confirm == 'G' || item?.confirm == 'Y' ? 'Aprobado por' : item?.confirm == 'N' || item?.rejected_guard_id !== null ? "Rechazado por" : "Aprobado por"}
+                  label={
+                    item?.confirm == 'Y' ? 'Aprobado por' : 'Rechazado por'
+                  }
                   value={
                     <View
                       style={{
                         backgroundColor:
-                          item?.confirm == 'G' || item?.rejected_guard_id !== null
+                          item?.rejected_guard_id !== null
                             ? '#F37F3D33'
                             : cssVar.cHoverSuccess,
                         paddingHorizontal: 8,
@@ -543,23 +551,21 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       <Text
                         style={{
                           color:
-                            item?.confirm == 'G' || item?.rejected_guard_id !== null
+                            item?.rejected_guard_id !== null
                               ? cssVar.cAlertMedio
                               : cssVar.cSuccess,
                         }}>
-                        {item?.confirm == 'G' || item?.rejected_guard_id !== null
+                        {item?.rejected_guard_id !== null
                           ? 'Guardia'
                           : 'Residente'}
-                        
                       </Text>
                     </View>
                   }
                 />
               )}
-               <DetailRow
-                label=""
-                value={ getFullName(item.guardia)}
-              />
+              {item?.rejected_guard_id !== null && (
+                <DetailRow label="" value={getFullName(item.guardia)} />
+              )}
             </View>
           </View>
 

@@ -205,10 +205,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           <ItemList
             title={getFullName(data?.owner)}
             subtitle={
-              'Unidad: ' +
-              data?.owner?.dpto?.[0]?.nro +
-              ', ' +
-              data?.owner?.dpto?.[0]?.description
+              data?.owner?.dpto?.length
+                ? 'Unidad: ' +
+                  data?.owner?.dpto?.[0]?.nro +
+                  ', ' +
+                  data?.owner?.dpto?.[0]?.description
+                : ''
             }
             left={
               <Avatar
@@ -257,10 +259,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             <ItemList
               title={getFullName(data?.owner)}
               subtitle={
-                'Unidad: ' +
-                data?.owner?.dpto?.[0]?.nro +
-                ', ' +
-                data?.owner?.dpto?.[0]?.description
+                data?.owner?.dpto?.length
+                  ? 'Unidad: ' +
+                    data?.owner?.dpto?.[0]?.nro +
+                    ', ' +
+                    data?.owner?.dpto?.[0]?.description
+                  : ''
               }
               left={
                 <Avatar
@@ -447,18 +451,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             )}
             {data?.confirm_at && (
               <KeyValue
-                keys={
-                  data?.confirm == 'G' || data?.confirm == 'Y'
-                    ? 'Aprobado por'
-                    : data?.confirm == 'N' || data?.rejected_guard_id !== null
-                    ? 'Rechazado por'
-                    : 'Aprobado por'
-                }
+                keys={data?.confirm == 'Y' ? 'Aprobado por' : 'Rechazado por'}
                 value={
                   <View
                     style={{
                       backgroundColor:
-                        data?.confirm == 'G' || data?.rejected_guard_id !== null
+                        data?.rejected_guard_id !== null
                           ? '#F37F3D33'
                           : cssVar.cHoverSuccess,
                       paddingHorizontal: 8,
@@ -468,13 +466,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                     <Text
                       style={{
                         color:
-                          data?.confirm == 'G' ||
                           data?.rejected_guard_id !== null
                             ? cssVar.cAlertMedio
                             : cssVar.cSuccess,
                         fontSize: 12,
                       }}>
-                      {data?.confirm == 'G' || data?.rejected_guard_id !== null
+                      {data?.rejected_guard_id !== null
                         ? 'Guardia'
                         : 'Residente'}
                     </Text>
@@ -659,8 +656,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             <View style={{width: '62%'}}>
               <Button
                 style={{
-                  backgroundColor: cssVar.cSuccess,
-                  borderColor: cssVar.cSuccess,
+                  backgroundColor: cssVar.cAccent,
+                  borderColor: cssVar.cAccent,
                 }}
                 onPress={() => setOpenDecline('Y')}>
                 Dejar ingresar
