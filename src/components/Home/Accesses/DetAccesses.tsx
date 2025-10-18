@@ -215,10 +215,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           <ItemList
             title={getFullName(data?.owner)}
             subtitle={
-              'Unidad: ' +
-              data?.owner?.dpto?.[0]?.nro +
-              ', ' +
-              data?.owner?.dpto?.[0]?.description
+              data?.owner?.dpto?.length
+                ? 'Unidad: ' +
+                  data?.owner?.dpto?.[0]?.nro +
+                  ', ' +
+                  data?.owner?.dpto?.[0]?.description
+                : ''
             }
             left={
               <Avatar
@@ -267,10 +269,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             <ItemList
               title={getFullName(data?.owner)}
               subtitle={
-                'Unidad: ' +
-                data?.owner?.dpto?.[0]?.nro +
-                ', ' +
-                data?.owner?.dpto?.[0]?.description
+                data?.owner?.dpto?.length
+                  ? 'Unidad: ' +
+                    data?.owner?.dpto?.[0]?.nro +
+                    ', ' +
+                    data?.owner?.dpto?.[0]?.description
+                  : ''
               }
               left={
                 <Avatar
@@ -485,8 +489,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                         fontSize: 12,
                       }}>
                       {data?.confirm == 'G' || data?.rejected_guard_id !== null
-                        ? 'Por el guardia'
-                        : 'Por el residente'}
+                        ? 'El guardia'
+                        : 'El residente'}
                     </Text>
                   </View>
                 }
