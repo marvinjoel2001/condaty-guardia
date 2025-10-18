@@ -139,12 +139,6 @@ const ModalFull = ({
                     borderTopWidth: cssVar.bWidth,
                   }}>
                   {buttonText && (
-                    // <View
-                    //   onTouchEnd={e => {
-                    //     e.stopPropagation();
-                    //     onSave(id);
-                    //   }}
-                    //   style={{height: 50, flexGrow: 1, flexBasis: 0}}>
                     <Button
                       variant="primary"
                       disabled={disabled}
@@ -155,15 +149,8 @@ const ModalFull = ({
                       }}>
                       {buttonText}
                     </Button>
-                    // </View>
                   )}
                   {buttonCancel && (
-                    // <View
-                    //   onTouchEnd={e => {
-                    //     e.stopPropagation();
-                    //     onClose('cancel');
-                    //   }}
-                    //   style={{height: 50, flexGrow: 1, flexBasis: 0}}>
                     <Button
                       variant="secondary"
                       // style={{flexGrow: 1, flexBasis: 0}}
@@ -173,14 +160,8 @@ const ModalFull = ({
                       }}>
                       {buttonCancel}
                     </Button>
-                    // </View>
                   )}
-                  {buttonExtra && (
-                    // <View style={{paddingHorizontal: cssVar.spM}}>
-                    <View style={{flexGrow: 1, flexBasis: 0}}>
-                      {buttonExtra}
-                    </View>
-                  )}
+                  {buttonExtra && buttonExtra}
                 </View>
               )}
             </View>
