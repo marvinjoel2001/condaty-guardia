@@ -1,4 +1,3 @@
-// DetAccesses.tsx
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
@@ -26,8 +25,6 @@ import ModalAccessExpand from './ModalAccessExpand';
 import Br from '../../Profile/Br';
 import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
-import {SensorType} from 'react-native-reanimated';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -105,7 +102,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   const status = getStatus();
   useEffect(() => {
     if (id) {
-      // console.log(id)
       getData();
     }
   }, [id]);
@@ -186,12 +182,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     };
     return buttonTexts[status] || '';
   };
-
-  // const handleOpenDecline = () => {
-  //   setFormState({obs_confirm: ''});
-  //   setErrors({});
-  //   setOpenDecline();
-  // };
 
   const labelAccess = () => {
     if (data?.type === 'O') {
@@ -485,8 +475,8 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                         fontSize: 12,
                       }}>
                       {data?.confirm == 'G' || data?.rejected_guard_id !== null
-                        ? 'Por el guardia'
-                        : 'Por el residente'}
+                        ? 'Guardia'
+                        : 'Residente'}
                     </Text>
                   </View>
                 }
@@ -639,64 +629,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     }
   };
 
-  // const onSaveSinQr = async () => {
-  //   const validationErrors = validate();
-
-  //   if (Object.keys(validationErrors).length > 0) {
-  //     return;
-  //   }
-
-  //   const {data: dataSave} = await execute(
-  //     '/accesses/confirm-enter-guard',
-  //     'POST',
-  //     {
-  //       id: data.id,
-  //       obs_in: formState?.obs_in,
-  //     },
-  //   );
-  //   if (dataSave?.success) {
-  //     if (reload) reload();
-  //     close();
-  //   }
-  // };
-
-  // const onConfirm = async (confirm = 'Y') => {
-  //   const validationErrors = validate();
-  //   if (Object.keys(validationErrors||{})?.length > 0) {
-  //     return;
-  //   }
-  //   const {data: confirma} = await execute(
-  //     '/accesses/confirm',
-  //     'POST',
-  //     {
-  //       confirm,
-  //       id: data.id,
-  //       obs_confirm: formState?.obs_confirm,
-  //     },false,3
-  //   );
-
-  //   if (confirma?.success === true) {
-  //     if (reload) {
-  //       reload();
-  //     }
-  //    setOpenDecline(null)
-  //    close();
-
-  //     if (confirma?.data?.status === 'Y') {
-  //       showToast('Tu visita fue aprobada con éxito', 'success');
-  //     } else {
-  //       showToast('Visita rechazada', 'info');
-  //     }
-  //   } else {
-  //     showToast("Ocurió un error", 'error');
-  //   }
-  // };
-
   return (
     <ModalFull
       onClose={close}
       open={open}
-      title={status != 'I' ? 'Visitante sin QR' : 'Detalle del ingreso'}
+      title={status != 'I' ? 'Visitante sin QR 2' : 'Detalle del ingreso'}
       onSave={handleSave}
       buttonText={getButtonText()}
       buttonExtra={
@@ -711,18 +648,6 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               flexDirection: 'row',
               justifyContent: 'space-between',
             }}>
-            {/* <View style={{width:'35%'}}>
-              <Button style={{}} variant="secondary" onPress={handleOpenDecline}>
-                Rechazar
-              </Button>
-            </View>
-            <View style={{width:'62%'}}>
-              <Button
-                style={{backgroundColor: cssVar.cSuccess, borderColor: cssVar.cSuccess}}
-                onPress={() => setOpenEnterSinQR(true)}>
-                Dejar ingresar
-              </Button>
-            </View> */}
             <View style={{width: '35%'}}>
               <Button
                 style={{}}
