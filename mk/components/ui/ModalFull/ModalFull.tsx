@@ -137,6 +137,7 @@ const ModalFull = ({
                   style={{
                     ...theme.footer,
                     borderTopWidth: cssVar.bWidth,
+                    ...styleFooter,
                   }}>
                   {buttonText && (
                     <Button
