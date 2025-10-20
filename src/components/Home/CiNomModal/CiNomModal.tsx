@@ -78,10 +78,10 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
   }, [owners?.data]);
 
   const handleChangeInput = (name: string, value: string) => {
-    setFormState({
-      ...formState,
+    setFormState((prevState: any) => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
   };
 
   const visitExist = async () => {

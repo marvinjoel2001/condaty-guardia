@@ -35,7 +35,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypePro
   }, [open, editItem]);
 
   const handleChange = (key: string, value: any) => {
-    setFormState({...formState, [key]: value});
+    setFormState((prevState: any) => ({...prevState, [key]: value}));
   };
   const onExist = async () => {
     const {data: exist} = await execute('/visits', 'GET', {

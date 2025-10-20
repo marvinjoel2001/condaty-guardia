@@ -121,7 +121,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
     }
   };
   const handleInputChange = (name: string, value: string) => {
-    setFormState({...formState, [name]: value});
+    setFormState((prevState: any) => ({...prevState, [name]: value}));
   };
 
   const validate = () => {
