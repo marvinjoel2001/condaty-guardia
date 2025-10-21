@@ -1,44 +1,21 @@
-import {
-  KeyboardAvoidingView,
-  View,
-  Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
-import {TypeStyles} from '../../../styles/themes';
-
-interface PropsType {
-  children: any;
-  style?: TypeStyles;
-  behaviorAndroid?: 'position' | 'height';
-  hideKeyboard?: boolean;
-  keyboardVerticalOffset?: number;
-  behaviorIos?: 'position' | 'padding';
-  contentContainerStyle?: TypeStyles;
+import React, {ReactNode} from 'react';
+import {View, StyleProp, ViewStyle} from 'react-native';
+import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
+import {isAndroid} from '../../../utils/utils';
+interface FormProps {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
 }
-const Form = ({
-  children,
-  style = {},
-  behaviorAndroid = undefined,
-  hideKeyboard = false,
-  behaviorIos = 'padding',
-  keyboardVerticalOffset = 0,
-  contentContainerStyle = {},
-}: PropsType) => {
-  const Wrapper: any = hideKeyboard ? TouchableWithoutFeedback : View;
+
+const Form: React.FC<FormProps> = ({children, style}) => {
+  const content = <View style={{flex: 1}}>{children}</View>;
 
   return (
     <KeyboardAvoidingView
-      keyboardVerticalOffset={keyboardVerticalOffset}
-      behavior={Platform.OS === 'ios' ? behaviorIos : behaviorAndroid}
+      behavior={'padding'}
+      keyboardVerticalOffset={isAndroid() ? 30 : 0}
       style={[{flex: 1}, style]}>
-      <Wrapper
-        {...(hideKeyboard && {onPress: Keyboard.dismiss})}
-        style={{flex: 1}}>
-        <SafeAreaView style={{flex: 1}}>{children}</SafeAreaView>
-      </Wrapper>
+      {content}
     </KeyboardAvoidingView>
   );
 };

@@ -1,11 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
@@ -23,6 +17,7 @@ import InputFullName from '../../../../mk/components/forms/InputFullName/InputFu
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Br from '../../Profile/Br';
+import useAuth from '../../../../mk/hooks/useAuth';
 
 type PropsType = {
   setFormState: any;
@@ -46,6 +41,7 @@ const FrequentQR = ({
   const [openAcom, setOpenAcom] = useState(false);
   const [editAcom, setEditAcom] = useState(null);
   const meesageforUndefined = 'Indefinido';
+  const {showToast} = useAuth();
 
   const invitation = data;
   const [visit, setVisit] = useState(invitation?.visit || {});
@@ -117,25 +113,54 @@ const FrequentQR = ({
   }, [tab, setFormState]);
 
   const onExistTaxi = async () => {
-    if (!formState?.ci_taxi || formState.ci_taxi.length < 5) {
-      setFormState((prevState: any) => ({
-        ...prevState,
+    if (formState?.ci_taxi === '') {
+      return;
+    }
+    if (formState?.ci_taxi == formState?.ci) {
+      showToast('El ci del visitante y el taxi son iguales', 'error');
+      setFormState({
+        ...formState,
+        ci_taxi: '',
         name_taxi: '',
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate,
+        plate: '',
         disbledTaxi: false,
-      }));
+      });
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
+    if (
+      formState?.acompanantes?.find(
+        (item: {ci: string}) => item.ci === formState?.ci_taxi,
+      )
+    ) {
+      showToast('El ci del taxi está registrado como acompanante', 'error');
+      setFormState({
+        ...formState,
+        ci_taxi: '',
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      });
+      return;
+    }
+    const {data: existData} = await execute(
+      '/visits',
+      'GET',
+      {
+        perPage: 1,
+        page: 1,
+        exist: '1',
+        fullType: 'L',
+        ci_visit: formState?.ci_taxi,
+      },
+      false,
+      3,
+    );
     if (existData?.data) {
       setFormState((prevState: any) => ({
         ...prevState,
@@ -243,244 +268,204 @@ const FrequentQR = ({
 
   return (
     <>
-      <ScrollView style={styles.scrollViewContainer}>
-        <Card>
-          <Text style={styles.summaryTitle}>Visita a</Text>
-          <ItemList
-            style={{marginBottom: 12}}
-            title={getFullName(owner)}
-            subtitle={'Unidad: ' + getUnitInfo(owner)}
-            left={
-              <Avatar
-                src={getUrlImages(
-                  '/OWNER-' + owner?.id + '.webp?d=' + owner?.updated_at,
-                )}
-                name={getFullName(owner)}
-              />
-            }
-          />
+      <Card>
+        <Text style={styles.summaryTitle}>Visita a</Text>
+        <ItemList
+          style={{marginBottom: 12}}
+          title={getFullName(owner)}
+          subtitle={'Unidad: ' + getUnitInfo(owner)}
+          left={
+            <Avatar
+              src={getUrlImages(
+                '/OWNER-' + owner?.id + '.webp?d=' + owner?.updated_at,
+              )}
+              name={getFullName(owner)}
+            />
+          }
+        />
 
+        <KeyValue
+          keys="Tipo de invitación"
+          value={invitation.type === 'F' ? 'QR frecuente' : 'Otro'}
+        />
+        {invitation.start_date && (
           <KeyValue
-            keys="Tipo de invitación"
-            value={invitation.type === 'F' ? 'QR frecuente' : 'Otro'}
-          />
-          {invitation.start_date && (
-            <KeyValue
-              keys="Validez del QR"
-              value={
-                invitation.start_date && invitation.end_date
-                  ? `${formatSimpleDate(
-                      invitation.start_date,
-                    )} - ${formatSimpleDate(invitation.end_date)}`
-                  : meesageforUndefined
-              }
-            />
-          )}
-          {invitation.weekday && (
-            <KeyValue
-              keys="Días de acceso"
-              value={formatWeekdays(invitation.weekday)}
-            />
-          )}
-          {invitation.start_time && (
-            <KeyValue
-              keys="Horario permitido"
-              value={
-                invitation.start_time && invitation.end_time
-                  ? `${invitation.start_time.substring(
-                      0,
-                      5,
-                    )} - ${invitation.end_time.substring(0, 5)}`
-                  : null
-              }
-            />
-          )}
-          {invitation.max_entries && (
-            <KeyValue
-              keys="Cantidad de accesos"
-              value={invitation.max_entries}
-            />
-          )}
-          <KeyValue keys="Descripción" value={data?.obs || '-/-'} />
-          <Br />
-          <Text style={styles.summaryTitle}>Invitado</Text>
-          <ItemList
-            style={{marginTop: 12}}
-            title={getFullName(visit)}
-            subtitle={'C.I. ' + (visit.ci || '-/-')}
-            left={
-              <Avatar
-                src={getUrlImages(
-                  `/VISIT-${visit?.id}.png?d=${visit?.updated_at}`,
-                )}
-                name={getFullName(visit)}
-              />
+            keys="Validez del QR"
+            value={
+              invitation.start_date && invitation.end_date
+                ? `${formatSimpleDate(
+                    invitation.start_date,
+                  )} - ${formatSimpleDate(invitation.end_date)}`
+                : meesageforUndefined
             }
           />
-        </Card>
-
-        {!visit?.ci && data?.status !== 'X' && (
-          <>
-            <Input
-              label="Carnet del visitante"
-              name="ci"
-              maxLength={10}
-              keyboardType="numeric"
-              value={formState?.ci || ''}
-              error={errors}
-              required
-              onChange={(value: string) => handleChange('ci', value)}
-              onBlur={onExistVisits}
-            />
-            <InputFullName
-              formState={formState}
-              errors={errors}
-              handleChangeInput={handleChange}
-              inputGrid={true}
-            />
-          </>
         )}
-
-        {!isCurrentlyInside && data?.status !== 'X' && (
-          <TabsButtons
-            tabs={[
-              {value: 'P', text: 'A pie'},
-              {value: 'V', text: 'En vehículo'},
-              {value: 'T', text: 'En taxi'},
-            ]}
-            sel={tab}
-            setSel={setTab}
+        {invitation.weekday && (
+          <KeyValue
+            keys="Días de acceso"
+            value={formatWeekdays(invitation.weekday)}
           />
         )}
+        {invitation.start_time && (
+          <KeyValue
+            keys="Horario permitido"
+            value={
+              invitation.start_time && invitation.end_time
+                ? `${invitation.start_time.substring(
+                    0,
+                    5,
+                  )} - ${invitation.end_time.substring(0, 5)}`
+                : null
+            }
+          />
+        )}
+        {invitation.max_entries && (
+          <KeyValue keys="Cantidad de accesos" value={invitation.max_entries} />
+        )}
+        <KeyValue keys="Descripción" value={data?.obs || '-/-'} />
+        <Br />
+        <Text style={styles.summaryTitle}>Invitado</Text>
+        <ItemList
+          style={{marginTop: 12}}
+          title={getFullName(visit)}
+          subtitle={'C.I. ' + (visit.ci || '-/-')}
+          left={
+            <Avatar
+              src={getUrlImages(
+                `/VISIT-${visit?.id}.png?d=${visit?.updated_at}`,
+              )}
+              name={getFullName(visit)}
+            />
+          }
+        />
+      </Card>
 
-        {!isCurrentlyInside && data?.status !== 'X' && (
-          <>
-            {tab === 'V' && (
+      {!visit?.ci && data?.status !== 'X' && (
+        <>
+          <Input
+            label="Carnet del visitante"
+            name="ci"
+            maxLength={10}
+            keyboardType="numeric"
+            value={formState?.ci || ''}
+            error={errors}
+            required
+            onChange={(value: string) => handleChange('ci', value)}
+            onBlur={onExistVisits}
+          />
+          <InputFullName
+            formState={formState}
+            errors={errors}
+            handleChangeInput={handleChange}
+            inputGrid={true}
+          />
+        </>
+      )}
+
+      {!isCurrentlyInside && data?.status !== 'X' && (
+        <TabsButtons
+          tabs={[
+            {value: 'P', text: 'A pie'},
+            {value: 'V', text: 'En vehículo'},
+            {value: 'T', text: 'En taxi'},
+          ]}
+          sel={tab}
+          setSel={setTab}
+        />
+      )}
+
+      {!isCurrentlyInside && data?.status !== 'X' && (
+        <>
+          {tab === 'V' && (
+            <Input
+              label="Placa del vehículo"
+              type="text"
+              name="plate"
+              error={errors}
+              required={tab === 'V'}
+              value={formState?.plate || ''}
+              onChange={(value: string) =>
+                handleChange('plate', value.toUpperCase())
+              }
+              autoCapitalize="characters"
+            />
+          )}
+          {tab === 'T' && (
+            <View style={styles.taxiFormContainer}>
+              <Text style={{...styles.summaryTitle, marginBottom: 12}}>
+                Datos del conductor
+              </Text>
               <Input
-                label="Placa del vehículo"
+                label="Carnet de identidad"
+                name="ci_taxi"
+                keyboardType="numeric"
+                maxLength={10}
+                error={errors}
+                required
+                value={formState?.ci_taxi || ''}
+                onBlur={onExistTaxi}
+                onChange={(value: string) => handleChange('ci_taxi', value)}
+              />
+              <InputFullName
+                formState={formState}
+                errors={errors}
+                handleChangeInput={handleChange}
+                disabled={formState?.disbledTaxi}
+                prefijo={'_taxi'}
+                inputGrid={true}
+              />
+              <Input
+                label="Placa"
                 type="text"
                 name="plate"
                 error={errors}
-                required={tab === 'V'}
-                value={formState?.plate || ''}
-                onChange={(value: string) =>
-                  handleChange('plate', value.toUpperCase())
-                }
-                autoCapitalize="characters"
+                required={tab == 'T'}
+                value={formState['plate']}
+                onChange={(value: any) => handleChange('plate', value)}
               />
-            )}
-            {tab === 'T' && (
-              <View style={styles.taxiFormContainer}>
-                <Text style={{...styles.summaryTitle, marginBottom: 12}}>
-                  Datos del conductor del taxi
-                </Text>
-                <Input
-                  label="Carnet de identidad (Taxista)"
-                  name="ci_taxi"
-                  keyboardType="numeric"
-                  maxLength={10}
-                  error={errors}
-                  required
-                  value={formState?.ci_taxi || ''}
-                  onBlur={onExistTaxi}
-                  onChange={(value: string) => handleChange('ci_taxi', value)}
-                />
-                <Input
-                  label="Nombre del taxista"
-                  name="name_taxi"
-                  error={errors}
-                  required
-                  disabled={formState?.disbledTaxi}
-                  value={formState?.name_taxi || ''}
-                  onChange={(value: string) => handleChange('name_taxi', value)}
-                />
-                <Input
-                  label="Segundo nombre"
-                  name="middle_name_taxi"
-                  error={errors}
-                  disabled={formState?.disbledTaxi}
-                  value={formState?.middle_name_taxi || ''}
-                  onChange={(value: string) =>
-                    handleChange('middle_name_taxi', value)
-                  }
-                />
-                <Input
-                  label="Apellido paterno"
-                  name="last_name_taxi"
-                  error={errors}
-                  required
-                  disabled={formState?.disbledTaxi}
-                  value={formState?.last_name_taxi || ''}
-                  onChange={(value: string) =>
-                    handleChange('last_name_taxi', value)
-                  }
-                />
-                <Input
-                  label="Apellido materno"
-                  name="mother_last_name_taxi"
-                  error={errors}
-                  disabled={formState?.disbledTaxi}
-                  value={formState?.mother_last_name_taxi || ''}
-                  onChange={(value: string) =>
-                    handleChange('mother_last_name_taxi', value)
-                  }
-                />
-                <Input
-                  label="Placa del taxi"
-                  type="text"
-                  name="plate"
-                  error={errors}
-                  required={tab === 'T'}
-                  value={formState?.plate || ''}
-                  onChange={(value: string) =>
-                    handleChange('plate', value.toUpperCase())
-                  }
-                  autoCapitalize="characters"
-                />
-              </View>
-            )}
+            </View>
+          )}
 
-            <TouchableOpacity
-              style={styles.addCompanionButton}
-              onPress={() => setOpenAcom(true)}>
-              <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
-              <Text style={styles.addCompanionText}>Agregar acompañante</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addCompanionButton}
+            onPress={() => setOpenAcom(true)}>
+            <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
+            <Text style={styles.addCompanionText}>Agregar acompañante</Text>
+          </TouchableOpacity>
 
-            {(formState?.acompanantes?.length || 0) > 0 && (
-              <View style={styles.taxiFormContainer}>
-                <Text style={styles.summaryTitle}>Acompañantes:</Text>
-                <List
-                  data={formState?.acompanantes}
-                  renderItem={acompanantesList}
-                />
-              </View>
-            )}
-          </>
-        )}
-
-        {data?.status !== 'X' && (
-          <View style={styles.textAreaContainer}>
-            {!isCurrentlyInside ? (
-              <TextArea
-                label="Observaciones de entrada"
-                placeholder="Ej: El visitante está ingresando con 1 mascota."
-                name="obs_in"
-                value={formState?.obs_in || ''}
-                onChange={(value: string) => handleChange('obs_in', value)}
+          {(formState?.acompanantes?.length || 0) > 0 && (
+            <View style={styles.taxiFormContainer}>
+              <Text style={styles.summaryTitle}>Acompañantes:</Text>
+              <List
+                data={formState?.acompanantes}
+                renderItem={acompanantesList}
               />
-            ) : (
-              <TextArea
-                label="Observaciones de salida"
-                placeholder="Ej: El visitante está saliendo con 3 cajas"
-                name="obs_out"
-                value={formState?.obs_out || ''}
-                onChange={(value: string) => handleChange('obs_out', value)}
-              />
-            )}
-          </View>
-        )}
-      </ScrollView>
+            </View>
+          )}
+        </>
+      )}
+
+      {data?.status !== 'X' && (
+        <View style={styles.textAreaContainer}>
+          {!isCurrentlyInside ? (
+            <TextArea
+              label="Observaciones de entrada"
+              placeholder="Ej: El visitante está ingresando con 1 mascota."
+              name="obs_in"
+              value={formState?.obs_in || ''}
+              onChange={(value: string) => handleChange('obs_in', value)}
+            />
+          ) : (
+            <TextArea
+              label="Observaciones de salida"
+              placeholder="Ej: El visitante está saliendo con 3 cajas"
+              name="obs_out"
+              value={formState?.obs_out || ''}
+              onChange={(value: string) => handleChange('obs_out', value)}
+            />
+          )}
+        </View>
+      )}
 
       <AccompaniedAdd
         open={openAcom}

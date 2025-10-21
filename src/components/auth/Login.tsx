@@ -37,8 +37,8 @@ const Login = () => {
     }));
   }, []);
 
-    const togglePasswordVisibility = React.useCallback(() => {
-    setShowPassword((prev) => !prev);
+  const togglePasswordVisibility = React.useCallback(() => {
+    setShowPassword(prev => !prev);
   }, []);
 
   const goTerminos = React.useCallback(() => {
@@ -48,7 +48,6 @@ const Login = () => {
   const goPoliticas = React.useCallback(() => {
     Linking.openURL('https://www.condaty.com/politicas');
   }, []);
-
 
   const signalInit = async () => {
     try {
@@ -138,7 +137,7 @@ const Login = () => {
       {splash ? (
         <Splash />
       ) : (
-        <Form behaviorAndroid="height" hideKeyboard={true}>
+        <Form>
           <ImageBackground
             source={require('../../images/ImageLogin.png')}
             style={{
@@ -293,7 +292,7 @@ const theme: ThemeType = {
 
   container: {
     paddingHorizontal: 16,
-    backgroundColor: cssVar.cBlack
+    backgroundColor: cssVar.cBlack,
   },
   noAccountContainer: {
     flexDirection: 'row',

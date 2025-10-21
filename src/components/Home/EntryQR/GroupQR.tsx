@@ -29,6 +29,7 @@ import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import {getDateStrMes} from '../../../../mk/utils/dates';
+import useAuth from '../../../../mk/hooks/useAuth';
 
 type PropsType = {
   setFormState: any;
@@ -91,7 +92,7 @@ const OwnerInvitationInfoDisplay = ({
           'Unidad: ' +
           invitationData?.owner?.dpto?.[0]?.nro +
           ', ' +
-          invitationData?.owner?.dpto?.[0]?.description
+          (invitationData?.owner?.dpto?.[0]?.description || '')
         }
         left={
           <Avatar
@@ -139,6 +140,7 @@ const GroupQR = ({
   const [selectedVisit, setSelectedVisit]: any = useState(null);
   const [openAcom, setOpenAcom] = useState(false);
   const [editAcom, setEditAcom] = useState(null);
+  const {showToast} = useAuth();
   const getStatus = (item: any) => {
     if (item?.access?.out_at) {
       return 'C';
@@ -178,9 +180,7 @@ const GroupQR = ({
           }
         }}
         title={getFullName(item.visit) || getFullName(item)}
-        subtitle={
-          item.visit?.ci ? 'C.I. ' + item.visit?.ci : 'C.I. (Sin registrar)'
-        }
+        subtitle={item.visit?.ci ? 'C.I. ' + item.visit?.ci : 'C.I. -/-'}
         right={
           data?.status !== 'X' && (
             <View
@@ -235,6 +235,18 @@ const GroupQR = ({
       setErrors({...errors, ci: ''});
       return;
     }
+    if (
+      data?.guests?.find(
+        (invitado: any) => invitado?.visit?.ci === formState?.ci,
+      )
+    ) {
+      showToast('El ci ya se encuentra en la lista de invitados', 'error');
+      setFormState({
+        ...formState,
+        ci: '',
+      });
+      return;
+    }
     const {data: existData} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -242,10 +254,16 @@ const GroupQR = ({
       fullType: 'L',
       ci_visit: formState?.ci,
     });
+
     if (existData?.data) {
-      setErrors({
-        ...errors,
-        ci: 'Ya existe un registro de entrada para este CI',
+      setSelectedVisit({...selectedVisit, visit: existData?.data});
+
+      setFormState({
+        ...formState,
+        name: existData?.data?.name || '',
+        middle_name: existData?.data?.middle_name || '',
+        last_name: existData?.data?.last_name || '',
+        mother_last_name: existData?.data?.mother_last_name || '',
       });
     } else {
       setErrors({...errors, ci: ''});
@@ -284,7 +302,41 @@ const GroupQR = ({
   };
 
   const onExistTaxi = async () => {
-    if (!formState?.ci_taxi) return;
+    if (formState?.ci_taxi === '') {
+      return;
+    }
+    if (formState?.ci_taxi == formState?.ci) {
+      showToast('El ci del visitante y el taxi son iguales', 'error');
+      setFormState({
+        ...formState,
+        ci_taxi: '',
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      });
+      return;
+    }
+    if (
+      formState?.acompanantes?.find(
+        (item: {ci: string}) => item.ci === formState?.ci_taxi,
+      )
+    ) {
+      showToast('El ci del taxi está registrado como acompanante', 'error');
+      setFormState({
+        ...formState,
+        ci_taxi: '',
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      });
+      return;
+    }
     const {data: exist} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -362,7 +414,7 @@ const GroupQR = ({
                 subtitle={
                   selectedVisit?.visit.ci
                     ? 'C.I. ' + selectedVisit?.visit.ci
-                    : 'C.I. (Sin registrar)'
+                    : 'C.I. -/-'
                 }
                 left={<Avatar name={getFullName(selectedVisit?.visit)} />}
               />
@@ -373,7 +425,7 @@ const GroupQR = ({
             )}
           </Card>
           {openSelected && (
-            <ScrollView>
+            <>
               {!selectedVisit?.visit?.ci && (
                 <>
                   <Input
@@ -515,7 +567,7 @@ const GroupQR = ({
                     />
                   ))}
               </View>
-            </ScrollView>
+            </>
           )}
         </View>
       )}

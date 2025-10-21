@@ -280,7 +280,7 @@ const Profile = () => {
             style={{flex: 1}}
             contentContainerStyle={styles.editScrollContent}
             keyboardShouldPersistTaps="handled">
-            <Form behaviorIos="position" keyboardVerticalOffset={100}>
+            <Form>
               <InputFullName
                 formState={formState}
                 errors={errors}
