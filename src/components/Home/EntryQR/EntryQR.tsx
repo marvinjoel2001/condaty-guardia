@@ -69,18 +69,12 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     };
 
     const getInvitation = async () => {
-      const {data: invitation} = await execute(
-        '/invitations',
-        'GET',
-        {
-          perPage: -1,
-          qr: typeFromQr,
-          searchBy: codeId,
-          fullType: 'L',
-        },
-        false,
-        3,
-      );
+      const {data: invitation} = await execute('/invitations', 'GET', {
+        perPage: -1,
+        qr: typeFromQr,
+        searchBy: codeId,
+        fullType: 'L',
+      });
       if (invitation?.success && invitation.data?.[0]) {
         setData(invitation.data[0]);
       } else {
@@ -258,8 +252,6 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       '/accesses/enterqr',
       'POST',
       params,
-      false,
-      3,
     );
     if (In?.success) {
       if (reload) reload();

@@ -48,7 +48,7 @@ const FrequentQR = ({
   const meesageforUndefined = 'Indefinido';
 
   const invitation = data;
-  const visit = invitation?.visit;
+  const [visit, setVisit] = useState(invitation?.visit || {});
   const owner = invitation?.owner;
   const access = invitation?.access;
 
@@ -87,10 +87,15 @@ const FrequentQR = ({
       fullType: 'L',
       ci_visit: formState?.ci,
     });
+
     if (existData?.data) {
-      setErrors({
-        ...errors,
-        ci: 'Ya existe un registro de entrada para este CI',
+      setVisit(existData?.data || {});
+      setFormState({
+        ...formState,
+        name: existData?.data?.name || '',
+        middle_name: existData?.data?.middle_name || '',
+        last_name: existData?.data?.last_name || '',
+        mother_last_name: existData?.data?.mother_last_name || '',
       });
     } else {
       setErrors({...errors, ci: ''});

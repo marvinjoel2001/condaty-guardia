@@ -23,6 +23,7 @@ import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Br from '../../Profile/Br';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
+import useAuth from '../../../../mk/hooks/useAuth';
 
 type PropsType = {
   setFormState: any;
@@ -45,11 +46,11 @@ const IndividualQR = ({
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
   const [editAcom, setEditAcom] = useState(null);
-
-  const visit = data?.visit;
+  const {showToast} = useAuth();
+  const [visit, setVisit] = useState(data?.visit || {});
   const owner = data?.owner;
   const access = data?.access;
-  console.log(data);
+
   useEffect(() => {
     const currentVisit = data?.visit;
     const currentAccess = data?.access;
@@ -82,10 +83,15 @@ const IndividualQR = ({
       fullType: 'L',
       ci_visit: formState?.ci,
     });
+
     if (existData?.data) {
-      setErrors({
-        ...errors,
-        ci: 'Ya existe un registro de entrada para este CI',
+      setVisit(existData?.data || {});
+      setFormState({
+        ...formState,
+        name: existData?.data?.name || '',
+        middle_name: existData?.data?.middle_name || '',
+        last_name: existData?.data?.last_name || '',
+        mother_last_name: existData?.data?.mother_last_name || '',
       });
     } else {
       setErrors({...errors, ci: ''});
@@ -146,25 +152,54 @@ const IndividualQR = ({
   };
 
   const onExistTaxi = async () => {
-    if (!formState?.ci_taxi || formState.ci_taxi.length < 5) {
-      setFormState((prevState: any) => ({
-        ...prevState,
+    if (formState?.ci_taxi === '') {
+      return;
+    }
+    if (formState?.ci_taxi == formState?.ci) {
+      showToast('El ci del visitante y el taxi son iguales', 'error');
+      setFormState({
+        ...formState,
+        ci_taxi: '',
         name_taxi: '',
         last_name_taxi: '',
         middle_name_taxi: '',
         mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate,
+        plate: '',
         disbledTaxi: false,
-      }));
+      });
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
+    if (
+      formState?.acompanantes?.find(
+        (item: {ci: string}) => item.ci === formState?.ci_taxi,
+      )
+    ) {
+      showToast('El ci del taxi está registrado como acompanante', 'error');
+      setFormState({
+        ...formState,
+        ci_taxi: '',
+        name_taxi: '',
+        last_name_taxi: '',
+        middle_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      });
+      return;
+    }
+    const {data: existData} = await execute(
+      '/visits',
+      'GET',
+      {
+        perPage: 1,
+        page: 1,
+        exist: '1',
+        fullType: 'L',
+        ci_visit: formState?.ci_taxi,
+      },
+      false,
+      3,
+    );
     if (existData?.data) {
       setFormState((prevState: any) => ({
         ...prevState,

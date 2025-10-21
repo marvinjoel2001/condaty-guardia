@@ -13,7 +13,13 @@ type TypeProps = {
   editItem?: any;
 };
 
-export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypeProps) => {
+export const AccompaniedAdd = ({
+  open,
+  onClose,
+  item,
+  setItem,
+  editItem,
+}: TypeProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors]: any = useState({});
   const {execute} = useApi();
@@ -38,6 +44,21 @@ export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypePro
     setFormState({...formState, [key]: value});
   };
   const onExist = async () => {
+    if (formState?.ci === item.ci) {
+      showToast(
+        'El ci del acompañante no puede ser igual al ci del visitante',
+        'error',
+      );
+      setFormState({
+        ...formState,
+        ci: '',
+        name: '',
+        middle_name: '',
+        last_name: '',
+        mother_last_name: '',
+      });
+      return;
+    }
     const {data: exist} = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
@@ -117,7 +138,7 @@ export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypePro
               last_name: formState.last_name,
               mother_last_name: formState.mother_last_name,
             }
-          : acompanante
+          : acompanante,
       );
       setItem({...item, acompanantes});
       _onClose();
