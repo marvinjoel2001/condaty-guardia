@@ -41,7 +41,7 @@ export const AccompaniedAdd = ({
   }, [open, editItem]);
 
   const handleChange = (key: string, value: any) => {
-    setFormState({...formState, [key]: value});
+    setFormState((prevState: any) => ({...prevState, [key]: value}));
   };
   const onExist = async () => {
     if (formState?.ci === item.ci) {

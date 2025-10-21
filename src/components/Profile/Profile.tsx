@@ -116,10 +116,10 @@ const Profile = () => {
   }, [user, isEdit]);
 
   const handleInputChange = (name: string, value: string) => {
-    setFormState({
-      ...formState,
+    setFormState((prevState: any) => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
   };
 
   const validate = () => {
