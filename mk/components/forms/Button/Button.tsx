@@ -69,7 +69,10 @@ const Button = ({
   };
   return (
     <View
-      style={{width: '100%', flexShrink: waiting <= 0 ? 1 : 0}}
+      style={{
+        width: '100%',
+        flexShrink: waiting <= 0 && variant != 'terciary' ? 1 : 0,
+      }}
       onTouchEnd={handlePress}>
       <TouchableOpacity
         disabled={disabled || waiting > 0}
