@@ -1,5 +1,5 @@
 const configApp = {
-  API_URL: 'https://api.condaty.com/api',
+  API_URL: 'https://phplaravel-1383823-5943224.cloudwaysapps.com/api',
   API_URL_PROD: 'https://api.condaty.com/api',
   API_URL_DEV: 'https://phplaravel-1214481-5270819.cloudwaysapps.com/api',
   API_URL_TEST: 'https://phplaravel-1214481-5534746.cloudwaysapps.com/api',
