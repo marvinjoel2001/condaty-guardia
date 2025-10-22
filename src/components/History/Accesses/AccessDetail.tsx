@@ -402,7 +402,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             <ItemList
               title={getFullName(resident)}
               subtitle2={
-                'Unidad:' +
+                'Unidad: ' +
                 resident?.dpto?.[0]?.nro +
                 ', ' +
                 resident?.dpto?.[0]?.description
@@ -638,7 +638,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           <ItemList
             title={getFullName(resident)}
             subtitle={
-              'Unidad:' +
+              'Unidad: ' +
               resident?.dpto?.[0]?.nro +
               ', ' +
               resident?.dpto?.[0]?.description
@@ -702,7 +702,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     style={{marginBottom: 12}}
                     title={getFullName(modalPersonData.person)}
                     subtitle={
-                      'Unidad:' +
+                      'Unidad: ' +
                       modalPersonData.person?.dpto?.[0]?.nro +
                       ', ' +
                       modalPersonData.person?.dpto?.[0]?.description
