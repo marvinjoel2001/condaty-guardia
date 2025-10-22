@@ -446,7 +446,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             {mainVisitor ? (
               <ItemList
                 title={mainUserFullName}
-                subtitle={mainUserCi ? `C.I. ${mainUserCi}` : ''}
+                // subtitle={(mainUserCi ? `C.I. ${mainUserCi}` : '')}
+                subtitle={`C.I. ${
+                  (item?.type == 'O' ? item?.owner?.ci : item?.visit?.ci) ||
+                  '-/-'
+                } ${
+                  (item?.plate && driverAccess && '- Placa: ' + item?.plate) ||
+                  ''
+                } `}
                 left={
                   <Avatar
                     name={mainUserFullName}

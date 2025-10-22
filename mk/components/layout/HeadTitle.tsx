@@ -47,6 +47,9 @@ const HeadTitle = ({
   const [selected, setSelected]: any = useState({cant: 0, type: ''});
 
   const onNotif = useCallback((data: any) => {
+    if (data?.payload?.act == 'reload') {
+      return;
+    }
     setCounter(old => old + 1);
   }, []);
   const onResetNotif = useCallback((data: any) => {
@@ -161,7 +164,8 @@ const HeadTitle = ({
         )}
 
         {route.name === 'Home' && !onlyBack && (
-          <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Notifications')}>
             <View style={theme.notifButton}>
               <Icon name={IconNotification} color={cssVar.cWhite} />
               {counter > 0 && (
