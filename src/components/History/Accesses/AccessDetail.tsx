@@ -435,7 +435,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         </ScrollView>
       );
     }
-
+    console.log(item);
     return (
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.mainCard}>
@@ -451,7 +451,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   (item?.type == 'O' ? item?.owner?.ci : item?.visit?.ci) ||
                   '-/-'
                 } ${
-                  (item?.plate && driverAccess && '- Placa: ' + item?.plate) ||
+                  (item?.plate && !driverAccess && '- Placa: ' + item?.plate) ||
                   ''
                 } `}
                 left={
@@ -641,7 +641,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               'Unidad:' +
               resident?.dpto?.[0]?.nro +
               ', ' +
-              resident?.dpto?.[0]?.description
+              (resident?.dpto?.[0]?.description || '')
             }
             left={
               <Avatar
