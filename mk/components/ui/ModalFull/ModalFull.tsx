@@ -5,7 +5,8 @@ import {
   ScrollView,
   SafeAreaView,
   RefreshControl,
-  Keyboard,
+  Animated,
+  Easing,
 } from 'react-native';
 import Button from '../../forms/Button/Button';
 import {AuthContext} from '../../../contexts/AuthContext';
@@ -33,7 +34,6 @@ type PropsType = {
   disabled?: boolean;
   enScroll?: boolean;
   reload?: any;
-  typeAnimation?: 'slide' | 'fade' | 'book';
   scrollViewHide?: boolean;
   onBack?: () => void;
   headerHide?: boolean;
@@ -55,7 +55,6 @@ const ModalFull = ({
   disabled = false,
   enScroll = false,
   reload = false,
-  typeAnimation = 'fade', // El valor predeterminado es 'slide'
   scrollViewHide = false,
   headerHide = false,
   onShow,
@@ -65,14 +64,33 @@ const ModalFull = ({
   const {toast, showToast}: any = useContext(AuthContext);
   const scrollViewRef: any = useRef(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [visible, setVisible] = useState(open);
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (open) {
-      if (enScroll) {
-        setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({animated: false});
-        }, 100);
-      }
+      setVisible(true);
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(opacityAnim, {
+        toValue: 0,
+        duration: 200,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }).start(() => setVisible(false));
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (open && enScroll) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({animated: false});
+      }, 100);
     }
   }, [open, children]);
 
@@ -82,94 +100,97 @@ const ModalFull = ({
     setRefreshing(false);
   };
 
+  if (!visible) return null;
+
   return (
     <ModalRN
-      animationType={typeAnimation === 'book' ? 'none' : typeAnimation}
+      animationType="none"
       transparent={true}
-      onShow={onShow}
-      visible={open}
+      visible={visible}
       presentationStyle="overFullScreen"
+      onShow={onShow}
       onRequestClose={() => {
-        iconClose ? null : onClose('x');
+        if (!iconClose) onClose('x');
       }}>
-      <SafeAreaViewAndroid style={{flex: 1, backgroundColor: cssVar.cBlack}}>
-        <SafeAreaView style={{flex: 1}}>
-          <Form>
-            <View
-              style={{
-                ...theme.container,
-              }}>
-              {!headerHide && (
-                <HeadTitle
-                  title={title}
-                  onBack={onBack ? onBack : () => onClose('x')}
-                  onlyBack={open}
-                  right={right}
-                  iconClose={iconClose}
-                  modalLayout={true}
-                />
-              )}
-              {scrollViewHide ? (
-                children
-              ) : (
-                <ScrollView
-                  ref={scrollViewRef}
-                  refreshControl={
-                    reload ? (
-                      <RefreshControl
-                        progressBackgroundColor={cssVar.cBlack}
-                        colors={[cssVar.cAccent]}
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        tintColor={cssVar.cAccent}
-                      />
-                    ) : undefined
-                  }
-                  style={{
-                    ...theme.body,
-                    ...style,
-                  }}>
-                  {children}
-                </ScrollView>
-              )}
-              {(buttonText || buttonCancel || buttonExtra) && (
-                <View
-                  style={{
-                    ...theme.footer,
-                    borderTopWidth: cssVar.bWidth,
-                    ...styleFooter,
-                  }}>
-                  {buttonText && (
-                    <Button
-                      variant="primary"
-                      disabled={disabled}
-                      // style={{flexGrow: 1, flexBasis: 0}}
-                      onPress={(e: any) => {
-                        e.stopPropagation();
-                        onSave(id);
-                      }}>
-                      {buttonText}
-                    </Button>
-                  )}
-                  {buttonCancel && (
-                    <Button
-                      variant="secondary"
-                      // style={{flexGrow: 1, flexBasis: 0}}
-                      onPress={(e: any) => {
-                        e.stopPropagation();
-                        onClose('cancel');
-                      }}>
-                      {buttonCancel}
-                    </Button>
-                  )}
-                  {buttonExtra && buttonExtra}
-                </View>
-              )}
-            </View>
-          </Form>
-          <Toast toast={toast} showToast={showToast} />
-        </SafeAreaView>
-      </SafeAreaViewAndroid>
+      <Animated.View
+        style={{
+          flex: 1,
+          opacity: opacityAnim,
+          backgroundColor: cssVar.cBlack,
+        }}>
+        <SafeAreaViewAndroid style={{flex: 1, backgroundColor: cssVar.cBlack}}>
+          <SafeAreaView style={{flex: 1}}>
+            <Form>
+              <View style={{...theme.container}}>
+                {!headerHide && (
+                  <HeadTitle
+                    title={title}
+                    onBack={onBack ? onBack : () => onClose('x')}
+                    onlyBack={open}
+                    right={right}
+                    iconClose={iconClose}
+                    modalLayout={true}
+                  />
+                )}
+                {scrollViewHide ? (
+                  children
+                ) : (
+                  <ScrollView
+                    ref={scrollViewRef}
+                    refreshControl={
+                      reload ? (
+                        <RefreshControl
+                          progressBackgroundColor={cssVar.cBlack}
+                          colors={[cssVar.cAccent]}
+                          refreshing={refreshing}
+                          onRefresh={onRefresh}
+                          tintColor={cssVar.cAccent}
+                        />
+                      ) : undefined
+                    }
+                    style={{
+                      ...theme.body,
+                      ...style,
+                    }}>
+                    {children}
+                  </ScrollView>
+                )}
+                {(buttonText || buttonCancel || buttonExtra) && (
+                  <View
+                    style={{
+                      ...theme.footer,
+                      ...styleFooter,
+                    }}>
+                    {buttonText && (
+                      <Button
+                        variant="primary"
+                        disabled={disabled}
+                        onPress={(e: any) => {
+                          e.stopPropagation();
+                          onSave(id);
+                        }}>
+                        {buttonText}
+                      </Button>
+                    )}
+                    {buttonCancel && (
+                      <Button
+                        variant="secondary"
+                        onPress={(e: any) => {
+                          e.stopPropagation();
+                          onClose('cancel');
+                        }}>
+                        {buttonCancel}
+                      </Button>
+                    )}
+                    {buttonExtra && buttonExtra}
+                  </View>
+                )}
+              </View>
+            </Form>
+            <Toast toast={toast} showToast={showToast} />
+          </SafeAreaView>
+        </SafeAreaViewAndroid>
+      </Animated.View>
     </ModalRN>
   );
 };
@@ -179,12 +200,7 @@ const theme: ThemeType = {
     flex: 1,
     justifyContent: 'space-between',
     backgroundColor: cssVar.cBlack,
-    // shadowOffset: {width: 0, height: 2},
-    // shadowOpacity: 0.1,
-    // shadowRadius: 2,
-    // elevation: 10,
     overflow: 'hidden',
-    // alignItems: 'center',
     width: '100%',
   },
   header: {
@@ -202,7 +218,6 @@ const theme: ThemeType = {
     flexGrow: 1,
   },
   body: {
-    // flexGrow: 1,
     padding: cssVar.spM,
     color: cssVar.cWhiteV3,
     width: '100%',
