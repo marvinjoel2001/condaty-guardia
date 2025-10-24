@@ -99,17 +99,32 @@ const FrequentQR = ({
   };
 
   useEffect(() => {
-    setFormState((prevState: any) => ({
-      ...prevState,
-      tab: tab,
-      ci_taxi: '',
-      name_taxi: '',
-      middle_name_taxi: '',
-      last_name_taxi: '',
-      mother_last_name_taxi: '',
-      plate: tab === 'V' ? prevState?.plate || '' : '',
-      disbledTaxi: false,
-    }));
+    if (tab === 'V') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: tab,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        disbledTaxi: false,
+        plate: prevState?.plate || visit?.vehicle?.plate || '',
+      }));
+    }
+    if (tab === 'P' || tab == 'T') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: tab,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      }));
+    }
   }, [tab, setFormState]);
 
   const onExistTaxi = async () => {
@@ -148,19 +163,13 @@ const FrequentQR = ({
       });
       return;
     }
-    const {data: existData} = await execute(
-      '/visits',
-      'GET',
-      {
-        perPage: 1,
-        page: 1,
-        exist: '1',
-        fullType: 'L',
-        ci_visit: formState?.ci_taxi,
-      },
-      false,
-      3,
-    );
+    const {data: existData} = await execute('/visits', 'GET', {
+      perPage: 1,
+      page: 1,
+      exist: '1',
+      fullType: 'L',
+      ci_visit: formState?.ci_taxi,
+    });
     if (existData?.data) {
       setFormState((prevState: any) => ({
         ...prevState,
@@ -204,7 +213,12 @@ const FrequentQR = ({
             ? 'Observaciones de entrada: ' + acompanante.obs_in
             : ''
         }
-        left={<Avatar name={getFullName(acompanante)} />}
+        left={
+          <Avatar
+            name={getFullName(acompanante)}
+            hasImage={acompanante?.has_image}
+          />
+        }
         right={
           <Icon
             name={IconX}
@@ -276,6 +290,7 @@ const FrequentQR = ({
           subtitle={'Unidad: ' + getUnitInfo(owner)}
           left={
             <Avatar
+              hasImage={owner?.has_image}
               src={getUrlImages(
                 '/OWNER-' + owner?.id + '.webp?d=' + owner?.updated_at,
               )}
@@ -331,6 +346,7 @@ const FrequentQR = ({
           subtitle={'C.I. ' + (visit.ci || '-/-')}
           left={
             <Avatar
+              hasImage={0}
               src={getUrlImages(
                 `/VISIT-${visit?.id}.png?d=${visit?.updated_at}`,
               )}

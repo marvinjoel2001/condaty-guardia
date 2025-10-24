@@ -2,20 +2,18 @@ import React, {useEffect, useState} from 'react';
 import useApi from '../../../mk/hooks/useApi';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
-import { StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
-import {formatToDayDDMMYYYYHHMM, getDateTimeStrMes} from '../../../mk/utils/dates';
-import KeyValue from '../../../mk/components/ui/KeyValue';
 import {
-  IconClock,
-} from '../../icons/IconLibrary';
+  formatToDayDDMMYYYYHHMM,
+  getDateTimeStrMes,
+} from '../../../mk/utils/dates';
+import KeyValue from '../../../mk/components/ui/KeyValue';
+import {IconClock} from '../../icons/IconLibrary';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {
-  ALERT_LEVEL_COLORS,
-  EMERGENCY_TYPES,
-} from './alertConstants';
+import {ALERT_LEVEL_COLORS, EMERGENCY_TYPES} from './alertConstants';
 
 type PropsType = {
   id: any;
@@ -45,7 +43,8 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     setDetails({});
   };
   const renderAlertPanic = () => {
-    const emergencyType = EMERGENCY_TYPES[details?.type as keyof typeof EMERGENCY_TYPES];
+    const emergencyType =
+      EMERGENCY_TYPES[details?.type as keyof typeof EMERGENCY_TYPES];
 
     return (
       <View
@@ -84,7 +83,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
         </View>
       );
     }
-
+    console.log(details);
     return (
       <View style={styles.mainCard}>
         {details?.level == 4 ? (
@@ -105,6 +104,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 }
                 left={
                   <Avatar
+                    hasImage={details?.owner?.has_image}
                     src={getUrlImages(
                       '/OWNER-' +
                         details?.owner?.id +
@@ -136,10 +136,17 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 <Text
                   style={{
                     fontSize: 14,
-                    color: ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.color,
+                    color:
+                      ALERT_LEVEL_COLORS[
+                        details?.level as keyof typeof ALERT_LEVEL_COLORS
+                      ]?.color,
                     fontFamily: FONTS.medium,
                   }}>
-                  {ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.label}
+                  {
+                    ALERT_LEVEL_COLORS[
+                      details?.level as keyof typeof ALERT_LEVEL_COLORS
+                    ]?.label
+                  }
                 </Text>
               }
             />
@@ -166,11 +173,16 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                   )}
                   subtitle={
                     details?.gua_attend
-                      ? details?.gua_attend?.phone ? details?.gua_attend?.phone + ' - Guardia' : 'Guardia'
-                      : details?.adm_attend?.phone ? details?.adm_attend?.phone + ' - Administrador' : 'Administrador'
+                      ? details?.gua_attend?.phone
+                        ? details?.gua_attend?.phone + ' - Guardia'
+                        : 'Guardia'
+                      : details?.adm_attend?.phone
+                      ? details?.adm_attend?.phone + ' - Administrador'
+                      : 'Administrador'
                   }
                   left={
                     <Avatar
+                      hasImage={details?.gua_attend?.has_image}
                       src={
                         details?.gua_attend
                           ? getUrlImages(
@@ -226,6 +238,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                 subtitle={'Guardia'}
                 left={
                   <Avatar
+                    hasImage={details?.guardia?.has_image}
                     src={getUrlImages(
                       '/GUARD-' +
                         details?.guardia?.id +
@@ -258,11 +271,18 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                   value={
                     <Text
                       style={{
-                        color: ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.color,
+                        color:
+                          ALERT_LEVEL_COLORS[
+                            details?.level as keyof typeof ALERT_LEVEL_COLORS
+                          ]?.color,
                         fontSize: 14,
                         fontFamily: FONTS.medium,
                       }}>
-                      {ALERT_LEVEL_COLORS[details?.level as keyof typeof ALERT_LEVEL_COLORS]?.label}
+                      {
+                        ALERT_LEVEL_COLORS[
+                          details?.level as keyof typeof ALERT_LEVEL_COLORS
+                        ]?.label
+                      }
                     </Text>
                   }
                 />
@@ -284,6 +304,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                     }
                     left={
                       <Avatar
+                        hasImage={details?.gua_attend?.has_image}
                         src={
                           details?.gua_attend
                             ? getUrlImages(
@@ -319,7 +340,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
       title="Detalle de alerta"
       open={open}
       onClose={_onClose}
-      buttonText={!details?.date_at && details?.level == 4 ? "Atender" : ""}
+      buttonText={!details?.date_at && details?.level == 4 ? 'Atender' : ''}
       onSave={onSaveAttend}>
       {renderContent()}
     </Modal>

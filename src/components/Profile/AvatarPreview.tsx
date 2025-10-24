@@ -1,4 +1,3 @@
-
 import {useEffect, useRef} from 'react';
 import {Animated, Easing, Modal, StyleSheet, View} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
@@ -12,7 +11,7 @@ interface PropsType {
   name: string;
   open: boolean;
   onClose: () => void;
-
+  hasImage: number;
   w?: number;
   h?: number;
 }
@@ -24,6 +23,7 @@ const AvatarPreview = ({
   name,
   open,
   onClose,
+  hasImage,
   w,
   h,
 }: PropsType) => {
@@ -66,6 +66,7 @@ const AvatarPreview = ({
               onTouchEnd={closeImage}
               style={[styles.animatedContainer]}>
               <Avatar
+                hasImage={hasImage}
                 src={getUrlImages(`/${prefijo}-${id}.webp?d=${updated_at}`)}
                 w={w || 240}
                 h={h || 240}

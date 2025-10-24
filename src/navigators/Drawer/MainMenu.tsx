@@ -56,6 +56,7 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
         subtitle={'Guardia'}
         left={
           <Avatar
+            hasImage={user?.has_image}
             name={getFullName(user)}
             onClick={() => navigationn.navigate('Profile')}
             src={getUrlImages(
@@ -182,21 +183,22 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
         />
       </View>
       {/* About App - Build Info */}
-      {(configApp.API_URL != configApp.API_URL_PROD) && (
+      {configApp.API_URL != configApp.API_URL_PROD && (
         <View style={theme.aboutContainer}>
           <Text style={theme.aboutText}>
             Versión {buildInfo.version} - Build #{buildInfo.buildNumber}
           </Text>
-        <Text style={theme.aboutSubtext}>
-          {new Date(buildInfo.buildDate).toLocaleString('es-BO', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </Text>
-      </View>)}
+          <Text style={theme.aboutSubtext}>
+            {new Date(buildInfo.buildDate).toLocaleString('es-BO', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

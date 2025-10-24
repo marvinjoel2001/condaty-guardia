@@ -128,7 +128,7 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
               {enteredGuests.map((guest: any, index: any) => (
                 <ItemList
                   key={index}
-                  left={<Avatar name={getFullName(guest.visit)} />}
+                  left={<Avatar name={getFullName(guest.visit)} hasImage={0} />}
                   title={getFullName(guest.visit)}
                   subtitle={`CI: ${guest.visit.ci}`}
                   children={<DateAccess access={guest?.access} />}
@@ -148,7 +148,7 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
               {notEnteredGuests.map((guest: any, index: any) => (
                 <ItemList
                   key={index}
-                  left={<Avatar name={getFullName(guest.visit)} />}
+                  left={<Avatar name={getFullName(guest.visit)} hasImage={0} />}
                   title={getFullName(guest.visit)}
                   subtitle={`CI: ${guest.visit.ci}`}
                   //   children={
@@ -173,7 +173,7 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
                 Invitado que ingresó:
               </Text>
               <ItemList
-                left={<Avatar name={getFullName(data?.visit)} />}
+                left={<Avatar name={getFullName(data?.visit)} hasImage={0} />}
                 title={getFullName(data?.visit)}
                 subtitle={`CI: ${data?.visit?.ci}`}
                 children={<DateAccess access={data.access[0]} />}

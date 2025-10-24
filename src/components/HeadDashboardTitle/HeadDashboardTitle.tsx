@@ -18,6 +18,7 @@ const HeadDashboardTitle = ({user, stop, setOpenDropdown, theme}: Props) => {
   return (
     <View style={styles?.container}>
       <Avatar
+        hasImage={user?.has_image}
         onClick={() => {
           navigation.navigate('Profile');
         }}

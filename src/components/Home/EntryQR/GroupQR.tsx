@@ -96,6 +96,7 @@ const OwnerInvitationInfoDisplay = ({
         }
         left={
           <Avatar
+            hasImage={invitationData?.owner?.has_image}
             src={getUrlImages(
               '/OWNER-' +
                 invitationData?.owner?.id +
@@ -200,7 +201,7 @@ const GroupQR = ({
             </View>
           )
         }
-        left={<Avatar name={getFullName(item.visit)} style={{}} />}
+        left={<Avatar name={getFullName(item.visit)} style={{}} hasImage={0} />}
       />
     );
   };
@@ -212,24 +213,40 @@ const GroupQR = ({
   };
 
   useEffect(() => {
-    setFormState((prevState: any) => ({
-      ...prevState,
-      tab: tab,
-      ci_taxi: '',
-      name_taxi: '',
-      middle_name_taxi: '',
-      last_name_taxi: '',
-      mother_last_name_taxi: '',
-      plate: tab === 'P' ? '' : prevState.plate,
-      disbledTaxi: false,
-    }));
-  }, [tab]);
+    if (tab === 'V') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: tab,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        disbledTaxi: false,
+        plate: prevState?.plate || selectedVisit?.visit?.vehicle?.plate || '',
+      }));
+    }
+    if (tab === 'P' || tab == 'T') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: tab,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      }));
+    }
+  }, [tab, setFormState]);
 
   const onDelAcom = (acom: any) => {
     const acomps = formState?.acompanantes;
     const newAcomps = acomps.filter((item: any) => item.ci !== acom.ci);
     setFormState({...formState, acompanantes: newAcomps});
   };
+
   const onExistVisits = async () => {
     if (!formState?.ci || formState.ci.length < 5) {
       setErrors({...errors, ci: ''});
@@ -281,7 +298,7 @@ const GroupQR = ({
             ? 'Observaciones de entrada: ' + acompanante.obs_in
             : ''
         }
-        left={<Avatar name={getFullName(acompanante)} />}
+        left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
         right={
           <Icon
             name={IconX}
@@ -416,7 +433,12 @@ const GroupQR = ({
                     ? 'C.I. ' + selectedVisit?.visit.ci
                     : 'C.I. -/-'
                 }
-                left={<Avatar name={getFullName(selectedVisit?.visit)} />}
+                left={
+                  <Avatar
+                    name={getFullName(selectedVisit?.visit)}
+                    hasImage={0}
+                  />
+                }
               />
             ) : (
               <ScrollView>

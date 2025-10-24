@@ -65,6 +65,7 @@ const QR = ({data, loaded}: Props) => {
         subtitle={subTitle}
         left={
           <Avatar
+            hasImage={user?.has_image}
             name={getFullName(user)}
             src={
               !item?.visit

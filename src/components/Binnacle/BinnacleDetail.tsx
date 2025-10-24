@@ -43,15 +43,13 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
   };
 
   const renderImageSection = () => {
-
-  if (Number(details?.has_image) === 0) {
+    if (Number(details?.has_image) === 0) {
       return (
         <View style={styles.noImageContainer}>
           <Text style={styles.noImageText}>Sin imagen</Text>
         </View>
       );
     }
-
 
     if (imageError) {
       return (
@@ -61,13 +59,13 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
       );
     }
 
-
     return (
       <>
         <Text style={styles.text}>Imagen del reporte</Text>
         <View style={styles.imageContainer}>
           {Number(details?.has_image) === 0 ? null : (
             <Avatar
+              // hasImage={details?.has_image}
               expandable={true}
               src={getUrlImages(
                 `/GNEW-${details?.id}.webp?d=${details?.updated_at}`,
