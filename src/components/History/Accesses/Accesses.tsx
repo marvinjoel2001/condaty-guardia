@@ -66,6 +66,7 @@ const Accesses = ({data, loaded}: Props) => {
         subtitle={getAccessSubtitle(item)}
         left={
           <Avatar
+            hasImage={user?.has_image}
             name={getFullName(user)}
             src={
               !item?.visit

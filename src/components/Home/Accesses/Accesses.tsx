@@ -234,6 +234,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
 
     return (
       <Avatar
+        hasImage={item?.visit?.has_image || item?.owner?.has_image}
         src={avatarSrc}
         name={getFullName(item.visit) || getFullName(item.owner)}
       />

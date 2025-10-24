@@ -279,7 +279,7 @@ const Notifications = () => {
         );
       }
 
-      return <Avatar src={image} name={name} />;
+      return <Avatar src={image} name={name} hasImage={0} />;
     };
     const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
 

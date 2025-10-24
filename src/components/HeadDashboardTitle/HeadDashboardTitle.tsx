@@ -22,6 +22,7 @@ const HeadDashboardTitle = ({user, stop, setOpenDropdown, theme}: Props) => {
         alignItems: 'center',
       }}>
       <Avatar
+        hasImage={user?.has_image}
         onClick={() => {
           navigation.navigate('Profile');
         }}
