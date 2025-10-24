@@ -96,6 +96,7 @@ const OwnerInvitationInfoDisplay = ({
         }
         left={
           <Avatar
+            hasImage={invitationData?.owner?.has_image}
             src={getUrlImages(
               '/OWNER-' +
                 invitationData?.owner?.id +
@@ -200,7 +201,7 @@ const GroupQR = ({
             </View>
           )
         }
-        left={<Avatar name={getFullName(item.visit)} style={{}} />}
+        left={<Avatar name={getFullName(item.visit)} style={{}} hasImage={0} />}
       />
     );
   };
@@ -297,7 +298,7 @@ const GroupQR = ({
             ? 'Observaciones de entrada: ' + acompanante.obs_in
             : ''
         }
-        left={<Avatar name={getFullName(acompanante)} />}
+        left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
         right={
           <Icon
             name={IconX}
@@ -432,7 +433,12 @@ const GroupQR = ({
                     ? 'C.I. ' + selectedVisit?.visit.ci
                     : 'C.I. -/-'
                 }
-                left={<Avatar name={getFullName(selectedVisit?.visit)} />}
+                left={
+                  <Avatar
+                    name={getFullName(selectedVisit?.visit)}
+                    hasImage={0}
+                  />
+                }
               />
             ) : (
               <ScrollView>

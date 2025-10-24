@@ -61,6 +61,7 @@ export const Orders = ({data, loaded}: Props) => {
         subtitle={orderTypeString}
         left={
           <Avatar
+            hasImage={item?.access?.visit?.has_image}
             name={visitFullName}
             src={getUrlImages(
               '/VISIT-' +

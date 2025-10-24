@@ -274,7 +274,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       <ItemList
         title={getFullName(item)}
         subtitle={`CI: ${item.ci}`}
-        left={<Avatar name={getFullName(item)} />}
+        left={<Avatar name={getFullName(item)} hasImage={item?.has_image} />}
         right={
           <Icon
             name={IconX}
@@ -409,7 +409,12 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
               <ItemList
                 title={getFullName(visit)}
                 subtitle={`CI: ${visit?.ci}`}
-                left={<Avatar name={getFullName(visit)} />}
+                left={
+                  <Avatar
+                    name={getFullName(visit)}
+                    hasImage={visit?.has_image}
+                  />
+                }
               />
             )}
 

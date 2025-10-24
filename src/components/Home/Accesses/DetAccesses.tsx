@@ -214,6 +214,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             }
             left={
               <Avatar
+                hasImage={data?.owner?.has_image}
                 name={getFullName(data?.owner)}
                 src={getUrlImages(
                   '/OWNER-' +
@@ -268,6 +269,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               }
               left={
                 <Avatar
+                  hasImage={data?.owner?.has_image}
                   name={getFullName(data?.owner)}
                   src={getUrlImages(
                     '/OWNER-' +
@@ -353,7 +355,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   };
   const getAvatarVisit = (item: any) => {
     if (item?.type != 'P') {
-      return <Avatar name={getFullName(item.visit)} />;
+      return (
+        <Avatar
+          name={getFullName(item.visit)}
+          hasImage={item?.visit?.has_image}
+        />
+      );
     } else {
       const icon =
         item?.other?.other_type_id == 1
@@ -502,7 +509,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 }}
                 title={getFullName(item?.visit)}
                 subtitle={'C.I:' + item?.visit?.ci}
-                left={<Avatar name={getFullName(item?.visit)} />}
+                left={
+                  <Avatar
+                    name={getFullName(item?.visit)}
+                    hasImage={item?.visit?.has_image}
+                  />
+                }
                 right={
                   status === 'Y'
                     ? null
@@ -534,7 +546,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 subtitle={
                   'C.I:' + item?.visit?.ci + ' - ' + 'Placa: ' + item?.plate
                 }
-                left={<Avatar name={getFullName(item?.visit)} />}
+                left={
+                  <Avatar
+                    name={getFullName(item?.visit)}
+                    hasImage={item?.visit?.has_image}
+                  />
+                }
                 right={
                   status === 'Y'
                     ? null

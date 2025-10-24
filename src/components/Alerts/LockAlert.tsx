@@ -11,8 +11,8 @@ import useApi from '../../../mk/hooks/useApi';
 import {typeAlerts} from './alertConstants';
 import useAuth from '../../../mk/hooks/useAuth';
 
-const LockAlert = ({ open, onClose, data }: any) => {
-  const { execute } = useApi();
+const LockAlert = ({open, onClose, data}: any) => {
+  const {execute} = useApi();
   const {showToast} = useAuth();
 
   if (!data) {
@@ -53,7 +53,7 @@ const LockAlert = ({ open, onClose, data }: any) => {
     });
     if (response?.success) {
       _onClose();
-    }else{
+    } else {
       showToast(response?.message, 'error');
       _onClose();
     }
@@ -83,6 +83,7 @@ const LockAlert = ({ open, onClose, data }: any) => {
         subtitle={'Unidad: ' + data?.unit}
         left={
           <Avatar
+            hasImage={data?.owner?.has_image}
             src={getUrlImages(
               '/OWNER-' + data?.owner_id + '.webp?d=' + data?.owner_updated_at,
             )}
@@ -101,16 +102,25 @@ const LockAlert = ({ open, onClose, data }: any) => {
       <View
         style={{
           width: 164,
-          backgroundColor: data?.type && typeAlerts[data.type as keyof typeof typeAlerts]?.color?.background || 'transparent',
+          backgroundColor:
+            (data?.type &&
+              typeAlerts[data.type as keyof typeof typeAlerts]?.color
+                ?.background) ||
+            'transparent',
           borderWidth: 1,
-          borderColor: data?.type && typeAlerts[data?.type as keyof typeof typeAlerts]?.color?.border,
+          borderColor:
+            data?.type &&
+            typeAlerts[data?.type as keyof typeof typeAlerts]?.color?.border,
           padding: 8,
           borderRadius: 8,
           alignSelf: 'center',
           marginTop: 12,
         }}>
         <Icon
-          name={data?.type && typeAlerts[data?.type as keyof typeof typeAlerts]?.icon}
+          name={
+            data?.type &&
+            typeAlerts[data?.type as keyof typeof typeAlerts]?.icon
+          }
           color={cssVar.cWhite}
           size={36}
         />

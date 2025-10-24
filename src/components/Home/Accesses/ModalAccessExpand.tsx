@@ -60,7 +60,12 @@ const ModalAccessExpand = ({
           key={data?.id}
           title={getFullName(data?.visit)}
           subtitle={'C.I:' + data?.visit?.ci}
-          left={<Avatar name={getFullName(data?.visit)} />}
+          left={
+            <Avatar
+              name={getFullName(data?.visit)}
+              hasImage={data?.visit?.has_image}
+            />
+          }
         />
         <KeyValue keys="Tipo de acceso" value={typeInvitation[data?.type]} />
         {data?.plate && type == 'T' && (
@@ -119,6 +124,7 @@ const ModalAccessExpand = ({
           }
           left={
             <Avatar
+              hasImage={invitation?.owner?.has_image}
               name={getFullName(invitation?.owner)}
               src={getUrlImages(
                 '/OWNER-' +
@@ -214,6 +220,7 @@ const ModalAccessExpand = ({
           }
           left={
             <Avatar
+              hasImage={invitation?.owner?.has_image}
               name={getFullName(invitation?.owner)}
               src={getUrlImages(
                 '/OWNER-' +

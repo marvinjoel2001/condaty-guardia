@@ -104,6 +104,7 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
             }
             left={
               <Avatar
+                hasImage={accessInfo?.visit?.has_image}
                 name={getFullName(accessInfo?.visit)}
                 src={getUrlImages(
                   '/VISIT-' +
@@ -159,6 +160,7 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
             subtitle={item?.owner?.ci}
             left={
               <Avatar
+                hasImage={item?.owner?.has_image}
                 name={getFullName(item?.owner)}
                 src={getUrlImages(
                   '/OWNER-' +

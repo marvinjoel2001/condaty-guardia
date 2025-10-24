@@ -146,7 +146,7 @@ const IndividualQR = ({
             ? 'Observaciones de entrada: ' + acompanante.obs_in
             : ''
         }
-        left={<Avatar name={getFullName(acompanante)} />}
+        left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
         right={
           <Icon
             name={IconX}
@@ -254,6 +254,7 @@ const IndividualQR = ({
             subtitle={'Unidad: ' + getUnitInfo(owner)}
             left={
               <Avatar
+                hasImage={owner?.has_image}
                 src={getUrlImages(
                   `/OWNER-${owner?.id}.webp?d=${owner?.updated_at}`,
                 )}
@@ -270,6 +271,7 @@ const IndividualQR = ({
             subtitle={'C.I. ' + (visit?.ci || '-/-')}
             left={
               <Avatar
+                hasImage={0}
                 src={getUrlImages(
                   `/VISIT-${visit?.id}.webp?d=${visit?.updated_at}`,
                 )}
