@@ -136,7 +136,6 @@ const Home = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
-  console.log(user);
 
   return (
     <>
