@@ -520,13 +520,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
 
             {steps > 0 && (
               <TouchableOpacity
-                style={{
-                  alignSelf: 'flex-start',
-                  marginBottom: 12,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
+                style={styles.boxAcompanante}
                 onPress={() => setAddCompanion(true)}>
                 <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
                 <Text
@@ -570,13 +564,26 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
 export default CiNomModal;
 
 const styles = StyleSheet.create({
+  textAcompanante: {
+    fontSize: cssVar.sL,
+    fontFamily: FONTS.medium,
+    marginBottom: 4,
+    color: cssVar.cWhite,
+  },
+  boxAcompanante: {
+    alignSelf: 'flex-start',
+    marginBottom: cssVar.sS,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   modalAlert: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
   },
   modalAlertText: {
-    fontSize: 20,
+    fontSize: cssVar.sXl,
     color: cssVar.cWhite,
     fontFamily: FONTS.regular,
   },
