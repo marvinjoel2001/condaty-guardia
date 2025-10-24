@@ -99,17 +99,32 @@ const IndividualQR = ({
   };
 
   useEffect(() => {
-    setFormState((prevState: any) => ({
-      ...prevState,
-      tab: tab,
-      ci_taxi: '',
-      name_taxi: '',
-      middle_name_taxi: '',
-      last_name_taxi: '',
-      mother_last_name_taxi: '',
-      plate: tab === 'V' ? prevState?.plate || '' : '', // Limpiar 'plate' si no es Vehículo (Taxi lo llenará con onExistTaxi)
-      disbledTaxi: false,
-    }));
+    if (tab === 'V') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: tab,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        disbledTaxi: false,
+        plate: prevState?.plate || visit?.vehicle?.plate || '',
+      }));
+    }
+    if (tab === 'P' || tab == 'T') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: tab,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      }));
+    }
   }, [tab, setFormState]);
 
   const onDelAcom = (acom: {ci: string}) => {
@@ -187,19 +202,13 @@ const IndividualQR = ({
       });
       return;
     }
-    const {data: existData} = await execute(
-      '/visits',
-      'GET',
-      {
-        perPage: 1,
-        page: 1,
-        exist: '1',
-        fullType: 'L',
-        ci_visit: formState?.ci_taxi,
-      },
-      false,
-      3,
-    );
+    const {data: existData} = await execute('/visits', 'GET', {
+      perPage: 1,
+      page: 1,
+      exist: '1',
+      fullType: 'L',
+      ci_visit: formState?.ci_taxi,
+    });
     if (existData?.data) {
       setFormState((prevState: any) => ({
         ...prevState,

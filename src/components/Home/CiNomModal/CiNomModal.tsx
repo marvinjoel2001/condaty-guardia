@@ -255,7 +255,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       };
     }
 
-    const {data, error: err} = await execute(url, method, params, false, 3);
+    const {data, error: err} = await execute(url, method, params);
 
     if (data?.success === true) {
       onClose();

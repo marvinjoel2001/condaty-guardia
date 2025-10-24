@@ -597,17 +597,11 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (!formState?.obs_confirm) {
       return;
     }
-    const {data: confirma} = await execute(
-      '/accesses/confirm',
-      'POST',
-      {
-        confirm,
-        id: data.id,
-        obs_confirm: formState?.obs_confirm,
-      },
-      false,
-      3,
-    );
+    const {data: confirma} = await execute('/accesses/confirm', 'POST', {
+      confirm,
+      id: data.id,
+      obs_confirm: formState?.obs_confirm,
+    });
 
     if (confirma?.success === true) {
       if (reload) {
