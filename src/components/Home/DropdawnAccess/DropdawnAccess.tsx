@@ -20,7 +20,7 @@ import {isIos} from '../../../../mk/utils/utils';
 const CLOSED_HEIGHT = 40;
 const OPEN_HEIGHT = 204;
 const SPRING_CONFIG = {damping: 15, stiffness: 120};
-const SHOW_DELAY = 250; // tiempo para mostrar los botones después de abrir
+const SHOW_DELAY = 250;
 
 type PropsType = {
   onPressQr: () => void;
@@ -32,7 +32,6 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
   const [showButtons, setShowButtons] = useState(false);
   const translateY = useSharedValue(CLOSED_HEIGHT);
 
-  // Referencia para limpiar el timeout si se desmonta
   const delayTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
