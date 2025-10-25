@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useRef, useEffect} from 'react';
 import {Text, View, Dimensions, StyleSheet} from 'react-native';
 import {PanGestureHandler} from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  runOnJS,
 } from 'react-native-reanimated';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
@@ -18,6 +19,8 @@ import {isIos} from '../../../../mk/utils/utils';
 
 const CLOSED_HEIGHT = 40;
 const OPEN_HEIGHT = 204;
+const SPRING_CONFIG = {damping: 15, stiffness: 120};
+const SHOW_DELAY = 250; // tiempo para mostrar los botones después de abrir
 
 type PropsType = {
   onPressQr: () => void;
@@ -26,45 +29,54 @@ type PropsType = {
 
 const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
   const [openDrop, setOpenDrop] = useState(false);
-  const translateY = useSharedValue(CLOSED_HEIGHT);
   const [showButtons, setShowButtons] = useState(false);
+  const translateY = useSharedValue(CLOSED_HEIGHT);
+
+  // Referencia para limpiar el timeout si se desmonta
+  const delayTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (delayTimeout.current) clearTimeout(delayTimeout.current);
+    };
+  }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
     height: translateY.value,
   }));
 
-  const toggleDropdown = () => {
-    const newHeight = openDrop ? CLOSED_HEIGHT : OPEN_HEIGHT;
-    translateY.value = withSpring(newHeight, {damping: 15, stiffness: 120});
-    setOpenDrop(!openDrop);
-    if (!openDrop) {
-      setTimeout(() => {
-        setShowButtons(true);
-      }, 300);
-    } else {
-      setShowButtons(false);
-    }
-  };
+  const open = useCallback(() => {
+    translateY.value = withSpring(OPEN_HEIGHT, SPRING_CONFIG);
+    runOnJS(setOpenDrop)(true);
 
-  const handlePanGesture = ({nativeEvent}: any) => {
-    if (nativeEvent.translationY < -10) {
-      translateY.value = withSpring(OPEN_HEIGHT, {
-        damping: 15,
-        stiffness: 120,
-      });
-      setOpenDrop(true);
-      setTimeout(() => {
-        setShowButtons(true);
-      }, 300);
-    } else if (nativeEvent.translationY > 10) {
-      translateY.value = withSpring(CLOSED_HEIGHT, {
-        damping: 15,
-        stiffness: 120,
-      });
-      setOpenDrop(false);
-      setShowButtons(false);
-    }
-  };
+    // Esperar a que se abra completamente antes de mostrar los botones
+    delayTimeout.current = setTimeout(() => {
+      runOnJS(setShowButtons)(true);
+    }, SHOW_DELAY);
+  }, [translateY]);
+
+  const close = useCallback(() => {
+    if (delayTimeout.current) clearTimeout(delayTimeout.current);
+    translateY.value = withSpring(CLOSED_HEIGHT, SPRING_CONFIG);
+    runOnJS(setOpenDrop)(false);
+    runOnJS(setShowButtons)(false);
+  }, [translateY]);
+
+  const toggleDropdown = useCallback(() => {
+    if (openDrop) close();
+    else open();
+  }, [openDrop, open, close]);
+
+  const handlePanGesture = useCallback(
+    ({nativeEvent}: any) => {
+      if (nativeEvent.translationY < -10 && !openDrop) {
+        open();
+      } else if (nativeEvent.translationY > 10 && openDrop) {
+        close();
+      }
+    },
+    [openDrop, open, close],
+  );
 
   return (
     <PanGestureHandler onGestureEvent={handlePanGesture}>
@@ -88,15 +100,11 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
             top: -30,
             left: Dimensions.get('window').width / 2 - 47,
           }}>
-          {openDrop ? (
-            <Icon
-              style={{marginTop: 2}} name={IconArrowDown} color={cssVar.cWhite}
-            />
-          ) : (
-            <Icon
-              style={{marginTop: 2}} name={IconArrowUp} color={cssVar.cWhite}
-            />
-          )}
+          <Icon
+            style={{marginTop: 2}}
+            name={openDrop ? IconArrowDown : IconArrowUp}
+            color={cssVar.cWhite}
+          />
         </View>
 
         {showButtons && (
@@ -105,18 +113,25 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
               Permitir ingreso
             </Text>
             <View
-              onTouchEnd={e => {
-                e.stopPropagation();
-              }}
+              onTouchEnd={e => e.stopPropagation()}
               style={styles.containerButtons}>
               <View onTouchEnd={onPressCiNom} style={styles.buttons}>
-                <Icon size={50} style={{marginBottom: 8, marginTop: 2}}
-                  name={IconNoQr} color={'transparent'} fillStroke={cssVar.cWhite}
+                <Icon
+                  size={50}
+                  style={{marginBottom: 8, marginTop: 2}}
+                  name={IconNoQr}
+                  color={'transparent'}
+                  fillStroke={cssVar.cWhite}
                 />
                 <Text style={{color: cssVar.cWhite}}>Sin QR</Text>
               </View>
               <View onTouchEnd={onPressQr} style={styles.buttons}>
-                <Icon size={50} name={IconGenericQr} color={cssVar.cWhite} style={{marginBottom: 8}} />
+                <Icon
+                  size={50}
+                  name={IconGenericQr}
+                  color={cssVar.cWhite}
+                  style={{marginBottom: 8}}
+                />
                 <Text style={{color: cssVar.cWhite}}>Leer QR</Text>
               </View>
             </View>
@@ -127,14 +142,14 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
   );
 };
 
-export default DropdawnAccess;
+export default React.memo(DropdawnAccess);
 
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    bottom: isIos() ? 68.5 : 72.5,
+    bottom: isIos() ? 68.5 : 72.4,
     borderTopRightRadius: cssVar.bRadius,
     borderTopLeftRadius: cssVar.bRadius,
     borderWidth: 0.5,
@@ -150,8 +165,8 @@ const styles = StyleSheet.create({
   },
   containerButtons: {
     flexDirection: 'row',
-    justifyContent:'center',
-    gap:32
+    justifyContent: 'center',
+    gap: 32,
   },
   buttons: {
     backgroundColor: cssVar.cBlackV2,
