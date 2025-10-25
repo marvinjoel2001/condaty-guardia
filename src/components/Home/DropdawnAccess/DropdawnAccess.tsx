@@ -20,7 +20,7 @@ import {isIos} from '../../../../mk/utils/utils';
 const CLOSED_HEIGHT = 40;
 const OPEN_HEIGHT = 204;
 const SPRING_CONFIG = {damping: 15, stiffness: 120};
-const SHOW_DELAY = 250;
+const SHOW_DELAY = 180;
 
 type PropsType = {
   onPressQr: () => void;
