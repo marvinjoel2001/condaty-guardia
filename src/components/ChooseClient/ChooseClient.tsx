@@ -33,6 +33,7 @@ const ChooseClient = ({open, onClose}: PropsType) => {
         }}
         left={
           <Avatar
+            hasImage={1}
             name={item?.name}
             src={getUrlImages(
               '/CLIENT-' + item?.id + '.webp?d=' + item?.updated_at,
@@ -67,6 +68,7 @@ const ChooseClient = ({open, onClose}: PropsType) => {
         // }}
         left={
           <Avatar
+            hasImage={1}
             name={item?.name}
             src={getUrlImages(
               '/CLIENT-' + item?.id + '.webp?d=' + item?.updated_at,
@@ -111,7 +113,6 @@ const ChooseClient = ({open, onClose}: PropsType) => {
     );
     return pendingClients;
   };
-  console.log(user);
   return (
     <ModalFull title="Cambiar Condominio" open={open} onClose={onClose}>
       <List data={getActiveClients()} renderItem={renderItemActive} />

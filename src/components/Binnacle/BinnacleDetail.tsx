@@ -65,7 +65,7 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
         <View style={styles.imageContainer}>
           {Number(details?.has_image) === 0 ? null : (
             <Avatar
-              // hasImage={details?.has_image}
+              hasImage={1}
               expandable={true}
               src={getUrlImages(
                 `/GNEW-${details?.id}.webp?d=${details?.updated_at}`,
