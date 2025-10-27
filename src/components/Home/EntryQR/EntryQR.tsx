@@ -50,10 +50,16 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
           : 'X';
       let id = codeId.replace(ltime, '');
       id = id.replace(ltime - 4, '');
-      const {data: QR} = await execute('/owners', 'GET', {
-        searchBy: id,
-        fullType: 'KEY',
-      });
+      const {data: QR} = await execute(
+        '/owners',
+        'GET',
+        {
+          searchBy: id,
+          fullType: 'KEY',
+        },
+        false,
+        3,
+      );
       if (QR?.success && QR.data?.[0]) {
         setData({
           invitation: QR.data[0],
@@ -69,12 +75,18 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     };
 
     const getInvitation = async () => {
-      const {data: invitation} = await execute('/invitations', 'GET', {
-        perPage: -1,
-        qr: typeFromQr,
-        searchBy: codeId,
-        fullType: 'L',
-      });
+      const {data: invitation} = await execute(
+        '/invitations',
+        'GET',
+        {
+          perPage: -1,
+          qr: typeFromQr,
+          searchBy: codeId,
+          fullType: 'L',
+        },
+        false,
+        3,
+      );
       if (invitation?.success && invitation.data?.[0]) {
         setData(invitation.data[0]);
       } else {
