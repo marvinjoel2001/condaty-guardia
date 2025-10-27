@@ -14,12 +14,12 @@ import {
   RefreshControl,
   Animated,
   Easing,
-  Platform,
+  StyleSheet,
 } from 'react-native';
 import Button from '../../forms/Button/Button';
 import {AuthContext} from '../../../contexts/AuthContext';
 import Toast from '../Toast/Toast';
-import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
+import {cssVar, TypeStyles} from '../../../styles/themes';
 import Form from '../../forms/Form/Form';
 import HeadTitle from '../../layout/HeadTitle';
 import {SafeAreaView as SafeAreaViewAndroid} from 'react-native-safe-area-context';
@@ -47,7 +47,7 @@ type PropsType = {
   headerHide?: boolean;
 };
 
-const ModalFull: React.FC<PropsType> = memo(
+const ModalFull = memo(
   ({
     children,
     onClose,
@@ -69,7 +69,7 @@ const ModalFull: React.FC<PropsType> = memo(
     onShow,
     right,
     onBack,
-  }) => {
+  }: PropsType) => {
     const {toast, showToast}: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [refreshing, setRefreshing] = useState(false);
@@ -220,7 +220,7 @@ const ModalFull: React.FC<PropsType> = memo(
   },
 );
 
-const theme: ThemeType = {
+const theme = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
@@ -242,6 +242,6 @@ const theme: ThemeType = {
     borderTopWidth: 0.5,
     borderTopColor: cssVar.cWhiteV1,
   },
-};
+});
 
 export default ModalFull;

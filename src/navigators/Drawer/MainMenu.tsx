@@ -1,7 +1,6 @@
 import {Alert, ScrollView, Text, View} from 'react-native';
 import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
 import {
-  IconAlert,
   IconAlertNotification,
   IconDepartments,
   IconDocs,
@@ -30,12 +29,10 @@ import configApp from '../../config/config';
 import buildInfo from '../../../buildInfo.json';
 
 const MainMenu = ({navigation}: DrawerContentComponentProps) => {
+  
   const {logout, user, setStore, store} = useAuth();
   const activeItem = getActivePage(navigation);
 
-  // const navigateTo = (screen: string) => {
-  //   navigation.navigate(screen);
-  // };
   const handleLogout = () => {
     Alert.alert('', '¿Cerrar la sesión de tu cuenta?', [
       {
@@ -46,6 +43,65 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
       {text: 'Salir', style: 'destructive', onPress: () => logout()},
     ]);
   };
+
+  const menuItems = [
+    {
+      screen: 'Home',
+      text: 'Inicio',
+      icon: IconHome,
+      reverse: true,
+    },
+    {
+      screen: 'Profile',
+      text: 'Mi perfil',
+      icon: IconUser,
+    },
+    {
+      screen: 'History',
+      text: 'Historial',
+      icon: IconHistorial,
+      reverse: true,
+    },
+    {
+      screen: 'Alerts',
+      text: 'Alertas',
+      icon: IconAlertNotification,
+      reverse: true,
+    },
+    {
+      screen: 'Binnacle',
+      text: 'Bitácora',
+      icon: IconBitacora,
+      color: cssVar.cWhiteV1,
+    },
+    {
+      screen: 'Notifications',
+      text: 'Notificaciones',
+      icon: IconNotification,
+      reverse: true,
+    },
+    {
+      screen: 'Documents',
+      text: 'Documentos',
+      icon: IconDocs,
+    },
+    {
+      text: 'Cerrar sesión',
+      icon: IconLogout,
+      color: cssVar.cError,
+      colorText: cssVar.cError,
+      onPress: handleLogout,
+    },
+  ];
+
+  const socialIconsNetwork = [
+    { icon: IconFacebook, link: 'https://www.facebook.com/CondatyApp' },
+    { icon: IconInstagram, link: 'https://www.instagram.com/condatyapp/' },
+    { icon: IconLinkedin, link: 'https://www.linkedin.com/company/condatyapp/' },
+    { icon: IconYoutube, link: 'https://www.youtube.com/@CondatyApp' },
+    { icon: IconTikTok, link: 'https://www.tiktok.com/@condatyapp' }
+  ]
+
   const Head = () => {
     const navigationn: any = useNavigation();
     return (
@@ -76,112 +132,43 @@ const MainMenu = ({navigation}: DrawerContentComponentProps) => {
       <Head />
       <View style={theme.content}>
         <ScrollView>
-          <ItemMenu
-            screen="Home"
-            text="Inicio"
-            icon={IconHome}
-            activeItem={activeItem}
-            reverse
-          />
 
-          <ItemMenu
-            screen="Profile"
-            text="Mi perfil"
-            icon={IconUser}
-            activeItem={activeItem}
-          />
-          <ItemMenu
-            screen="History"
-            text="Historial"
-            icon={IconHistorial}
-            activeItem={activeItem}
-            reverse
-          />
-          <ItemMenu
-            screen="Alerts"
-            text="Alertas"
-            icon={IconAlertNotification}
-            activeItem={activeItem}
-            reverse
-          />
-
-          <ItemMenu
-            screen="Binnacle"
-            text="Bitácora"
-            color={cssVar.cWhiteV1}
-            icon={IconBitacora}
-            activeItem={activeItem}
-          />
-          <ItemMenu
-            screen="Notifications"
-            text="Notificaciones"
-            icon={IconNotification}
-            activeItem={activeItem}
-            reverse
-          />
+          {menuItems.map((item, index) => (
+            <ItemMenu
+              key={`menu-item-${index}`}
+              screen={item.screen}
+              text={item.text}
+              icon={item.icon}
+              activeItem={activeItem}
+              reverse={item.reverse}
+              color={item.color}
+              colorText={item.colorText}
+              onPress={item.onPress}
+            />
+          ))}
+          
           {user?.clients && user.clients.length > 1 && (
             <ItemMenu
-              // screen="CambiarCondo"
               text="Cambiar Condominio"
               icon={IconDepartments}
-              // activeItem={activeItem}
-
               onPress={() => setStore({...store, openClient: true})}
             />
           )}
-          <ItemMenu
-            screen="Documents"
-            text="Documentos"
-            icon={IconDocs}
-            activeItem={activeItem}
-          />
-          <ItemMenu
-            text="Cerrar sesión"
-            onPress={() => handleLogout()}
-            icon={IconLogout}
-            color={cssVar.cError}
-            colorText={cssVar.cError}
-          />
+
         </ScrollView>
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          paddingVertical: cssVar.spM,
-          borderTopWidth: 1,
-          borderTopColor: cssVar.cBlackV2,
-        }}>
-        <Icon
-          name={IconFacebook}
-          color={cssVar.cWhiteV1}
-          onPress={() => openLink('https://www.facebook.com/condaty.bo')}
-        />
-        <Icon
-          name={IconInstagram}
-          color={cssVar.cWhiteV1}
-          onPress={() => openLink('https://www.instagram.com/condaty.bo')}
-        />
-        <Icon
-          name={IconTikTok}
-          color={cssVar.cWhiteV1}
-          onPress={() => openLink('https://www.tiktok.com/@condaty.bo')}
-        />
-        <Icon
-          name={IconYoutube}
-          color={cssVar.cWhiteV1}
-          onPress={() =>
-            openLink('https://www.youtube.com/channel/UCoMKYylu7j4gg9hoyHexV-A')
-          }
-        />
-        <Icon
-          name={IconLinkedin}
-          color={cssVar.cWhiteV1}
-          onPress={() =>
-            openLink('https://www.linkedin.com/in/condaty-by-fos-54a58627a/')
-          }
-        />
+      <View 
+        style={theme.socialIconsContainer}>
+        {socialIconsNetwork.map((item, index) => (
+          <Icon
+            key={`social-icon-${index}`} 
+            name={item.icon}
+            color={cssVar.cWhiteV1}
+            onPress={() => openLink(item.link)}
+          />
+        ))}
       </View>
+
       {/* About App - Build Info */}
       {configApp.API_URL != configApp.API_URL_PROD && (
         <View style={theme.aboutContainer}>
@@ -255,6 +242,13 @@ const theme: ThemeType = {
     fontSize: 10,
     fontFamily: FONTS.regular,
   },
+  socialIconsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: cssVar.spM,
+    borderTopWidth: 1,
+    borderTopColor: cssVar.cBlackV2,
+  }
 };
 
 export default MainMenu;

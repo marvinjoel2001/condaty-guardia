@@ -4,16 +4,8 @@ import Icon from '../../../mk/components/ui/Icon/Icon';
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 
-interface PropsType {
-  screen?: string | null;
-  text: string;
-  onPress?: any;
-  icon?: string;
-  color?: string;
-  colorText?: string;
-  activeItem?: string;
-  reverse?: boolean;
-}
+import {ItemMenuProps } from '../../types/menu-types';
+
 const ItemMenu = ({
   screen = null,
   text,
@@ -23,7 +15,7 @@ const ItemMenu = ({
   reverse = false,
   colorText,
   color,
-}: PropsType) => {
+}: ItemMenuProps) => {
   const navigation: any = useNavigation();
   const isActive = activeItem === screen;
   const press = () => {
