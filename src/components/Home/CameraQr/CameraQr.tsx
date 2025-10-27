@@ -1,4 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react';
+import {View, Dimensions} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import {
   Camera,
@@ -7,127 +8,134 @@ import {
   useCameraPermission,
 } from 'react-native-vision-camera';
 import AnimationQr from './AnimationQr';
-import {Dimensions, View} from 'react-native';
-import useAuth from '../../../../mk/hooks/useAuth';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
+import useAuth from '../../../../mk/hooks/useAuth';
 
 interface CameraQrProps {
   open: boolean;
   onClose: () => void;
-  setCode?: any;
-  onMsg?: any;
+  setCode?: (data: any) => void;
+  onMsg?: (title: string, msg: string, type: string) => void;
 }
+
 const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
+  const {height} = Dimensions.get('window');
   const isFocused = useIsFocused();
-  useAuth();
-  const screen = Dimensions.get('window');
-  const camera = useRef<Camera>(null);
-  let isActive = isFocused && open;
+  const device = useCameraDevice('back');
   const {hasPermission, requestPermission} = useCameraPermission();
-  const [codeQr, setCodeQr]: any = useState('');
-  const device: any = useCameraDevice('back');
-  const [isPermissionRequested, setIsPermissionRequested] = useState(false);
   const {showToast} = useAuth();
 
+  const [codeQr, setCodeQr] = useState('');
+  const [permissionRequested, setPermissionRequested] = useState(false);
+  const cameraRef = useRef<Camera>(null);
+  const isActiveRef = useRef<boolean>(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isActive = isFocused && open && hasPermission && !!device;
+
+  // Solicita permisos una sola vez
   useEffect(() => {
-    const checkPermission = async () => {
-      if (!hasPermission && !isPermissionRequested) {
-        setIsPermissionRequested(true);
-        try {
-          await requestPermission();
-        } catch (error) {
-          console.error('Error requesting camera permission:', error);
-          onMsg &&
-            onMsg(
-              'Camera Permission Required',
-              'Please enable camera access in your device settings to scan QR codes.',
-              'error',
-            );
-        }
-      }
-    };
-
-    checkPermission();
-  }, [hasPermission, requestPermission, isPermissionRequested]);
-
-  const codeLoaded = async (_codes: any) => {
-    if (isActive == false) return;
-    isActive = false;
-
-    const codes = _codes[0].value;
-    const data = (codes + '||').split('|');
-    if (data[0] === 'condaty' && data[1] === 'qr') {
-      const time: any = data[3].substring(data[3].length - 10);
-
-      if (time * 1 > 2024 + 10 + 27 + 9 + 27) {
-        // if (isValidTimeTemp(time) == false) {
-        //   isActive = true;
-        //   console.log('expiradop');
-        //   onMsg(
-        //     'Afiliado no identificado',
-        //     'Revisa que el afiliado tenga el QR actualizado.',
-        //     'I',
-        //   );
-
-        //   data[3] = '';
-        //   setId(null);
-        // }
-        data[3] = data[3].slice(0, -10);
-      }
-      console.log('codes03', data[3]);
-      await setCode(data);
-      onClose();
-    } else {
-      isActive = true;
-      console.log('Codigo no Reconocido!!!', 'error');
-      showToast('QR inválido', 'error');
-
-      // onMsg(
-      //   '¡QR no válido!',
-      //   'Asegúrate de que el afiliado tenga el QR correcto de Elekta.',
-      //   'Q',
-      // );
-
-      onClose();
+    if (!hasPermission && !permissionRequested) {
+      setPermissionRequested(true);
+      requestPermission().catch(err => {
+        console.error('Error requesting camera permission:', err);
+        onMsg?.(
+          'Camera Permission Required',
+          'Please enable camera access in your device settings to scan QR codes.',
+          'error',
+        );
+      });
     }
-  };
+  }, [hasPermission, permissionRequested, requestPermission, onMsg]);
 
-  const codeScanner: CodeScanner = {
-    codeTypes: ['qr'],
-    onCodeScanned: codes => {
-      if (codeQr != codes[0].value) {
-        setCodeQr(codes[0].value);
-        setTimeout(() => {
-          setCodeQr('');
-        }, 10000);
+  // Limpia timeout al desmontar
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
-        codeLoaded(codes);
+  const handleValidQr = useCallback(
+    async (data: string[]) => {
+      await setCode?.(data);
+      onClose();
+    },
+    [setCode, onClose],
+  );
+
+  const handleInvalidQr = useCallback(() => {
+    showToast('QR inválido', 'error');
+    onClose();
+  }, [showToast, onClose]);
+
+  const processCode = useCallback(
+    async (_codes: any[]) => {
+      if (!isActiveRef.current) return;
+      isActiveRef.current = false;
+
+      const rawValue = _codes?.[0]?.value ?? '';
+      const data = (rawValue + '||').split('|');
+
+      if (data[0] === 'condaty' && data[1] === 'qr') {
+        const time = Number(data[3].slice(-10));
+        if (time > 2024 + 10 + 27 + 9 + 27) {
+          data[3] = data[3].slice(0, -10);
+        }
+        await handleValidQr(data);
+      } else {
+        handleInvalidQr();
       }
     },
-  };
+    [handleValidQr, handleInvalidQr],
+  );
+
+  const onCodeScanned = useCallback(
+    (codes: any[]) => {
+      const value = codes?.[0]?.value;
+      if (!value || value === codeQr) return;
+
+      setCodeQr(value);
+      timeoutRef.current = setTimeout(() => setCodeQr(''), 8000);
+      processCode(codes);
+    },
+    [codeQr, processCode],
+  );
+
+  const codeScanner: CodeScanner = useMemo(
+    () => ({
+      codeTypes: ['qr'],
+      onCodeScanned,
+    }),
+    [onCodeScanned],
+  );
+
+  // Controla activación de cámara con ref, sin causar renders
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
 
   if (!device) {
-    console.log('No se encontró el dispositivo de cámara');
+    console.warn('No se encontró el dispositivo de cámara');
     return null;
   }
+
   return (
     <ModalFull
       open={open && device && hasPermission}
       onClose={onClose}
-      title={'Lector Qr'}>
-      <View style={{height: screen.height - 100}}>
+      title="Lector Qr">
+      <View style={{height: height - 100}}>
         <Camera
+          ref={cameraRef}
           style={{
             position: 'absolute',
             height: '100%',
             width: '100%',
             zIndex: 1,
-            flex: 1,
           }}
           device={device}
-          isActive={open}
+          isActive={isActive}
           codeScanner={codeScanner}
-          ref={camera}
           enableZoomGesture
           photo={false}
           video={false}
@@ -138,4 +146,4 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
   );
 };
 
-export default CameraQr;
+export default React.memo(CameraQr);
