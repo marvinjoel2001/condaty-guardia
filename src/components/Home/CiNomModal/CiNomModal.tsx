@@ -109,6 +109,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
           last_name: visitData?.data?.last_name,
           mother_last_name: visitData?.data?.mother_last_name,
           ci: visitData?.data?.ci,
+          plate: visitData?.data?.plate,
         });
         setSteps(2);
       }
@@ -168,12 +169,14 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
 
     // Validar vehículo/taxi (aplica para steps > 0)
     if (steps >= 0 && (typeSearch === 'V' || typeSearch === 'T')) {
-      errors = checkRules({
-        value: formState.plate,
-        rules: ['required', 'plate'],
-        key: 'plate',
-        errors,
-      });
+      if (steps > 0) {
+        errors = checkRules({
+          value: formState.plate,
+          rules: ['required', 'plate'],
+          key: 'plate',
+          errors,
+        });
+      }
 
       if (typeSearch === 'T') {
         errors = checkRules({
@@ -255,7 +258,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       };
     }
 
-    const {data, error: err} = await execute(url, method, params);
+    const {data, error: err} = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
       onClose();
@@ -291,16 +294,32 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     );
   };
   useEffect(() => {
-    setFormState({
-      ...formState,
-      ci_taxi: '',
-      name_taxi: '',
-      middle_name_taxi: '',
-      last_name_taxi: '',
-      mother_last_name_taxi: '',
-      plate: '',
-      disbledTaxi: false,
-    });
+    if (typeSearch === 'V') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: typeSearch,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        disbledTaxi: false,
+        plate: prevState?.plate || visit?.plate || '',
+      }));
+    }
+    if (typeSearch === 'P' || typeSearch == 'T') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: typeSearch,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      }));
+    }
   }, [typeSearch]);
 
   const onExistTaxi = async () => {
