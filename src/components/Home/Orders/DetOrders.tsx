@@ -232,6 +232,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
           }
           left={
             <Avatar
+              hasImage={data?.owner?.has_image}
               name={getFullName(data?.owner)}
               src={getUrlImages(
                 '/OWNER-' +
@@ -318,7 +319,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
               ? 'Observaciones de entrada: ' + acompanante.obs_in
               : ''
           }
-          left={<Avatar name={getFullName(acompanante)} />}
+          left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
           right={
             <Icon
               name={IconX}
@@ -357,7 +358,12 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                 <ItemList
                   title={getFullName(data?.access?.visit)}
                   subtitle={'C.I.' + data?.access?.visit?.ci}
-                  left={<Avatar name={getFullName(data?.access?.visit)} />}>
+                  left={
+                    <Avatar
+                      name={getFullName(data?.access?.visit)}
+                      hasImage={0}
+                    />
+                  }>
                   <ItemListDate
                     inDate={data?.access?.in_at}
                     outDate={data?.access?.out_at}

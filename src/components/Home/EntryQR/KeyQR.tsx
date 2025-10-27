@@ -145,7 +145,7 @@ const KeyQR = ({
             ? 'Observaciones de entrada: ' + acompanante.obs_in
             : ''
         }
-        left={<Avatar name={getFullName(acompanante)} />}
+        left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
         right={
           <Icon
             name={IconX}
@@ -178,6 +178,7 @@ const KeyQR = ({
       ) : (
         <>
           <Avatar
+            hasImage={data?.invitation?.has_image}
             h={180}
             fontSize={44}
             w={180}

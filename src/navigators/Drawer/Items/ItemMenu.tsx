@@ -1,20 +1,12 @@
 import {Text, TouchableOpacity, View} from 'react-native';
-import {cssVar} from '../../../mk/styles/themes';
-import Icon from '../../../mk/components/ui/Icon/Icon';
+import {cssVar, ThemeType} from '../../../../mk/styles/themes';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 
-interface PropsType {
-  screen?: string | null;
-  text: string;
-  onPress?: any;
-  icon?: string;
-  color?: string;
-  colorText?: string;
-  activeItem?: string;
-  reverse?: boolean;
-}
-const ItemMenu = ({
+import {ItemMenuProps } from '../../../types/menu-types';
+
+export const ItemMenu = ({
   screen = null,
   text,
   onPress = null,
@@ -23,36 +15,22 @@ const ItemMenu = ({
   reverse = false,
   colorText,
   color,
-}: PropsType) => {
+}: ItemMenuProps) => {
   const navigation: any = useNavigation();
   const isActive = activeItem === screen;
   const press = () => {
-    if (onPress) {
-      onPress();
-    } else {
-      navigation.navigate(screen);
-    }
+    onPress ? onPress() : navigation.navigate(screen);
   };
   return (
     <TouchableOpacity
-      style={[
-        {
-          paddingVertical: 12,
-          marginHorizontal: 8,
-        },
+      style={[theme.containerBox,
         // isActive && {
         //   backgroundColor: cssVar.cPrimary,
         // },
       ]}
       onPress={() => press()}>
       <View
-        style={{
-          flexDirection: 'row',
-          paddingHorizontal: 32,
-          paddingVertical: 8,
-          borderRadius: 8,
-          gap: 10,
-          alignItems: 'center',
+        style={{...theme.containerItem,
           backgroundColor: isActive ? cssVar.cBlackV1 : cssVar.cBlack,
         }}>
         {icon != '' && (
@@ -94,3 +72,18 @@ const ItemMenu = ({
 };
 
 export default ItemMenu;
+
+const theme: ThemeType = {
+  containerBox: {
+    paddingVertical: 12,
+    marginHorizontal: 8
+  },
+  containerItem: {
+    flexDirection: 'row',
+    paddingHorizontal: 32,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 10,
+    alignItems: 'center'
+  }
+};

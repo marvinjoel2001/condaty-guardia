@@ -30,7 +30,6 @@ const Home = () => {
   const onNotif = useCallback(
     (data: any) => {
       if (data?.event === 'confirm' || data?.event === 'in-pedido') {
-        // reloadNotif();
         getAccesses('', '/accesses', 'P');
       }
       if (data?.event === 'confirm' && typeSearch !== 'I') {
@@ -46,9 +45,7 @@ const Home = () => {
 
   const onNotifReload = useCallback(
     (data: any) => {
-      // console.log('data fnewoijn', data);
       if (data?.modulo === 'access' || data?.modulo === 'others') {
-        // reloadNotif(typeSearch);
         getAccesses('', '/accesses', 'P');
       }
       if (
@@ -96,16 +93,6 @@ const Home = () => {
     set_TypeSearch(typeSearch);
   }, [typeSearch]);
 
-  const customTitle = () => (
-    <View>
-      <HeadDashboardTitle
-        user={user}
-        setOpenDropdown={() => {}}
-        stop={false}
-        theme={theme}
-      />
-    </View>
-  );
   useEffect(() => {
     if (code) {
       setShowEntryQR(true);
@@ -141,7 +128,7 @@ const Home = () => {
     <>
       <Layout
         title="Home"
-        customTitle={customTitle()}
+        customTitle={<HeadDashboardTitle user={user} stop={false} theme={theme} />}
         refresh={() => getAccesses('', '/accesses', 'P')}>
         <TabsButtons
           tabs={[
@@ -184,7 +171,6 @@ const Home = () => {
           <CiNomModal
             open={openCiNom}
             onClose={() => setOpenCiNom(false)}
-            // setCode={setCode}
             reload={() => getAccesses('', '/accesses', 'P')}
           />
         )}
@@ -207,7 +193,6 @@ export default Home;
 const styles = StyleSheet.create({
   listContainer: {
     width: '100%',
-
     paddingBottom: 40,
   },
 });

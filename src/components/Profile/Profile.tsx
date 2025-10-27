@@ -237,6 +237,7 @@ const Profile = () => {
       {/* Contenedor del Avatar y botón de cámara */}
       <View style={styles.avatarContainer}>
         <Avatar
+          hasImage={user?.has_image}
           onClick={() => setImagePreview(true)}
           src={getAvatarSource()}
           w={116}
@@ -456,6 +457,7 @@ const Profile = () => {
       {/* Modales (AvatarPreview y AccessEdit) */}
       {imagePreview && (
         <AvatarPreview
+          hasImage={user?.has_image}
           open={imagePreview}
           onClose={() => setImagePreview(false)}
           id={user.id}

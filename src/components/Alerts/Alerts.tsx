@@ -39,7 +39,8 @@ const Alerts = () => {
   };
 
   const renderRight = (alerta: any) => {
-    const levelConfig = ALERT_LEVEL_COLORS[alerta?.level as keyof typeof ALERT_LEVEL_COLORS];
+    const levelConfig =
+      ALERT_LEVEL_COLORS[alerta?.level as keyof typeof ALERT_LEVEL_COLORS];
     return (
       <View
         style={{
@@ -61,7 +62,8 @@ const Alerts = () => {
   };
 
   const renderLeft = (alerta: any) => {
-    const emergencyType = EMERGENCY_TYPES[alerta.type as keyof typeof EMERGENCY_TYPES];
+    const emergencyType =
+      EMERGENCY_TYPES[alerta.type as keyof typeof EMERGENCY_TYPES];
 
     return (
       <View
@@ -95,16 +97,13 @@ const Alerts = () => {
           setOpenView({open: true, id: alerta.id});
         }}
         title={
-          alerta.level === 4
-            ? alerta.descrip
-            : getFullName(alerta.guardia)
+          alerta.level === 4 ? alerta.descrip : getFullName(alerta.guardia)
         }
         subtitle={
           alerta.level === 4
             ? 'Residente: ' + getFullName(user)
             : 'Guardia - ' + getDateTimeAgo(alerta.created_at)
         }
-
         subtitle2={
           alerta.level === 4 && alerta.owner?.dpto?.length > 0
             ? `Unidad: ${alerta.owner.dpto[0].nro}`
@@ -115,6 +114,7 @@ const Alerts = () => {
             renderLeft(alerta)
           ) : (
             <Avatar
+              hasImage={alerta?.guardia?.has_image}
               src={getUrlImages(
                 '/GUARD-' +
                   alerta?.guard_id +
@@ -135,7 +135,6 @@ const Alerts = () => {
               color: cssVar.cWhiteV1,
               fontSize: 14,
               fontFamily: FONTS.regular,
-
             }}>
             {alerta.descrip}
           </Text>
@@ -168,7 +167,7 @@ const Alerts = () => {
           tabs={ALERT_TABS}
           sel={typeSearch}
           setSel={setTypeSearch}
-          style={{marginVertical:12}}
+          style={{marginVertical: 12}}
         />
 
         <DataSearch setSearch={onSearch} name="Novedades" value={search} />

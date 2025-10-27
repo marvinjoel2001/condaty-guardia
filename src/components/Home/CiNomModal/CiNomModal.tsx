@@ -109,6 +109,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
           last_name: visitData?.data?.last_name,
           mother_last_name: visitData?.data?.mother_last_name,
           ci: visitData?.data?.ci,
+          plate: visitData?.data?.plate,
         });
         setSteps(2);
       }
@@ -168,12 +169,14 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
 
     // Validar vehículo/taxi (aplica para steps > 0)
     if (steps >= 0 && (typeSearch === 'V' || typeSearch === 'T')) {
-      errors = checkRules({
-        value: formState.plate,
-        rules: ['required', 'plate'],
-        key: 'plate',
-        errors,
-      });
+      if (steps > 0) {
+        errors = checkRules({
+          value: formState.plate,
+          rules: ['required', 'plate'],
+          key: 'plate',
+          errors,
+        });
+      }
 
       if (typeSearch === 'T') {
         errors = checkRules({
@@ -274,7 +277,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
       <ItemList
         title={getFullName(item)}
         subtitle={`CI: ${item.ci}`}
-        left={<Avatar name={getFullName(item)} />}
+        left={<Avatar name={getFullName(item)} hasImage={item?.has_image} />}
         right={
           <Icon
             name={IconX}
@@ -291,16 +294,32 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     );
   };
   useEffect(() => {
-    setFormState({
-      ...formState,
-      ci_taxi: '',
-      name_taxi: '',
-      middle_name_taxi: '',
-      last_name_taxi: '',
-      mother_last_name_taxi: '',
-      plate: '',
-      disbledTaxi: false,
-    });
+    if (typeSearch === 'V') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: typeSearch,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        disbledTaxi: false,
+        plate: prevState?.plate || visit?.plate || '',
+      }));
+    }
+    if (typeSearch === 'P' || typeSearch == 'T') {
+      setFormState((prevState: any) => ({
+        ...prevState,
+        tab: typeSearch,
+        ci_taxi: '',
+        name_taxi: '',
+        middle_name_taxi: '',
+        last_name_taxi: '',
+        mother_last_name_taxi: '',
+        plate: '',
+        disbledTaxi: false,
+      }));
+    }
   }, [typeSearch]);
 
   const onExistTaxi = async () => {
@@ -409,7 +428,12 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
               <ItemList
                 title={getFullName(visit)}
                 subtitle={`CI: ${visit?.ci}`}
-                left={<Avatar name={getFullName(visit)} />}
+                left={
+                  <Avatar
+                    name={getFullName(visit)}
+                    hasImage={visit?.has_image}
+                  />
+                }
               />
             )}
 
@@ -520,13 +544,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
 
             {steps > 0 && (
               <TouchableOpacity
-                style={{
-                  alignSelf: 'flex-start',
-                  marginBottom: 12,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
+                style={styles.boxAcompanante}
                 onPress={() => setAddCompanion(true)}>
                 <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
                 <Text
@@ -570,13 +588,26 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
 export default CiNomModal;
 
 const styles = StyleSheet.create({
+  textAcompanante: {
+    fontSize: cssVar.sL,
+    fontFamily: FONTS.medium,
+    marginBottom: 4,
+    color: cssVar.cWhite,
+  },
+  boxAcompanante: {
+    alignSelf: 'flex-start',
+    marginBottom: cssVar.sS,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   modalAlert: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
   },
   modalAlertText: {
-    fontSize: 20,
+    fontSize: cssVar.sXl,
     color: cssVar.cWhite,
     fontFamily: FONTS.regular,
   },

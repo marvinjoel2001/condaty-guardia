@@ -75,6 +75,7 @@ const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
       subtitle={companionCi}
       left={
         <Avatar
+          hasImage={person?.has_image}
           name={companionFullName}
           src={person.url_avatar ? getUrlImages(person.url_avatar) : undefined}
           w={40}
@@ -294,6 +295,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               }
               left={
                 <Avatar
+                  hasImage={mainVisitor?.has_image}
                   name={mainUserFullName}
                   src={
                     mainVisitor?.url_avatar
@@ -367,6 +369,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     }
                     left={
                       <Avatar
+                        hasImage={driver?.has_image}
                         name={getFullName(driver)}
                         src={getUrlImages(
                           '/VISIT-' +
@@ -409,6 +412,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               }
               left={
                 <Avatar
+                  hasImage={resident?.has_image}
                   name={getFullName(resident)}
                   src={getUrlImages(
                     '/OWNER-' +
@@ -435,7 +439,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         </ScrollView>
       );
     }
-
+    console.log(item);
     return (
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.mainCard}>
@@ -451,11 +455,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   (item?.type == 'O' ? item?.owner?.ci : item?.visit?.ci) ||
                   '-/-'
                 } ${
-                  (item?.plate && driverAccess && '- Placa: ' + item?.plate) ||
+                  (item?.plate && !driverAccess && '- Placa: ' + item?.plate) ||
                   ''
                 } `}
                 left={
                   <Avatar
+                    hasImage={mainVisitor?.has_image}
                     name={mainUserFullName}
                     src={getUrlImages(
                       '/VISIT-' +
@@ -611,6 +616,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 }
                 left={
                   <Avatar
+                    hasImage={driver?.has_image}
                     name={getFullName(driver)}
                     src={getUrlImages(
                       '/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at,
@@ -641,10 +647,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               'Unidad: ' +
               resident?.dpto?.[0]?.nro +
               ', ' +
-              resident?.dpto?.[0]?.description
+              (resident?.dpto?.[0]?.description || '')
             }
             left={
               <Avatar
+                hasImage={resident?.has_image}
                 name={getFullName(resident)}
                 src={getUrlImages(
                   '/OWNER-' + resident?.id + '.webp?d=' + resident?.updated_at,
@@ -709,6 +716,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     }
                     left={
                       <Avatar
+                        hasImage={modalPersonData.person?.has_image}
                         name={getFullName(modalPersonData.person)}
                         src={getUrlImages(
                           '/OWNER-' +
@@ -858,6 +866,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     }
                     left={
                       <Avatar
+                        hasImage={modalPersonData.person?.has_image}
                         name={getFullName(modalPersonData.person)}
                         src={getUrlImages(
                           '/OWNER-' +
