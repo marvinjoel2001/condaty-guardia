@@ -1,8 +1,8 @@
 export interface ItemMenuProps {
   screen?: string | null;
   text: string;
-  onPress?: any;
-  icon?: string;
+  onPress?: (() => void) | any;
+  icon?: any;
   color?: string;
   colorText?: string;
   activeItem?: string;
