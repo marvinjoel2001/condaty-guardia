@@ -4,7 +4,7 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 
-import {ItemMenuProps } from '../../../types/menu-types';
+import {ItemMenuProps } from '../../../types/menu-item-types';
 
 export const ItemMenu = ({
   screen = null,
