@@ -1,10 +1,10 @@
-export interface ItemMenuProps {
-  screen?: string | null;
-  text: string;
-  onPress?: (() => void) | any;
-  icon?: any;
-  color?: string;
-  colorText?: string;
+import { ItemMenuProps } from './menu-item-types';
+import { User } from './user-types';
+
+export type MenuProps = {
+  menuItems: ItemMenuProps[];
   activeItem?: string;
-  reverse?: boolean;
-}
+  user: User | null;
+  store: any;
+  setStore: Function;
+};

@@ -1,3 +1,3 @@
 // types/index.ts
 
-export * from './menu-types';
+export * from './menu-item-types';

@@ -9,7 +9,7 @@ import {
   IconBitacora,
   IconUser,
 } from '../../../icons/IconLibrary';
-import {ItemMenuProps} from '../../../types/menu-types';
+import {ItemMenuProps} from '../../../types/menu-item-types';
 
 type GetMenuItemsOptions = {
   onLogout: () => void;
