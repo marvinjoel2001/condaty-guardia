@@ -44,10 +44,10 @@ const Menu: React.FC<Props> = ({menuItems, activeItem, user, store, setStore}) =
   );
 };
 
+export default Menu;
+
 const theme: ThemeType = {
   content: {
     flex: 1,
   },
 };
-
-export default Menu;
