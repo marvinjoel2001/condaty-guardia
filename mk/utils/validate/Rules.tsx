@@ -45,7 +45,10 @@ export const validRule = (
     phone: () =>
       !/^\d{8,}$/.test(value) ? 'Debe tener al menos 8 números' : '',
     alpha: () =>
-      !/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]+$/.test(value) ? 'No es un texto válido' : '',
+      !/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+(?:\s[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*$/.test(value)
+        ? 'No es un texto válido'
+        : '',
+
     noSpaces: () => (!/^\S+$/.test(value) ? 'No debe tener espacios' : ''),
     number: () => (!/^[0-9.,-]+$/.test(value) ? 'No es un numero valido' : ''),
     integer: () =>
