@@ -313,12 +313,14 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     return items?.filter(item => {
       const visitName = item?.visit ? getFullName(item.visit) : '';
       const ownerName = item?.owner ? getFullName(item.owner) : '';
+      const visitCI = item?.visit?.ci || '';
       const otherTypeName = item?.other_type?.name || '';
 
       return (
         removeAccents(visitName)?.includes(removeAccents(searchTerm)) ||
         removeAccents(ownerName)?.includes(removeAccents(searchTerm)) ||
         removeAccents(otherTypeName)?.includes(removeAccents(searchTerm)) ||
+        removeAccents(visitCI)?.includes(removeAccents(searchTerm)) ||
         removeAccents(item?.plate)?.includes(removeAccents(searchTerm))
       );
     });
