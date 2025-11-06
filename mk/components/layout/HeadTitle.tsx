@@ -47,7 +47,7 @@ const HeadTitle = ({
   const [selected, setSelected]: any = useState({cant: 0, type: ''});
 
   const onNotif = useCallback((data: any) => {
-    if (data?.payload?.act == 'reload') {
+    if (data?.payload?.act == 'reload' || data?.event == 'accessTrans') {
       return;
     }
     setCounter(old => old + 1);
