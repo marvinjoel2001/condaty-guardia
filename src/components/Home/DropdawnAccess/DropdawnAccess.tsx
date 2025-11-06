@@ -1,12 +1,6 @@
-import React, {useState, useCallback, useRef, useEffect} from 'react';
+import React, {useState, useCallback} from 'react';
 import {Text, View, Dimensions, StyleSheet} from 'react-native';
 import {PanGestureHandler} from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {
@@ -29,57 +23,30 @@ type PropsType = {
 
 const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
   const [openDrop, setOpenDrop] = useState(false);
-  const [showButtons, setShowButtons] = useState(false);
-  const translateY = useSharedValue(CLOSED_HEIGHT);
+  // El dropdown se abre/cierra instantáneamente, sin animación ni delay
+  const height = openDrop ? OPEN_HEIGHT : CLOSED_HEIGHT;
+  const animatedStyle = { height };
 
-  const delayTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (delayTimeout.current) clearTimeout(delayTimeout.current);
-    };
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: translateY.value,
-  }));
-
-  const open = useCallback(() => {
-    translateY.value = withSpring(OPEN_HEIGHT, SPRING_CONFIG);
-    runOnJS(setOpenDrop)(true);
-
-    // Esperar a que se abra completamente antes de mostrar los botones
-    delayTimeout.current = setTimeout(() => {
-      runOnJS(setShowButtons)(true);
-    }, SHOW_DELAY);
-  }, [translateY]);
-
-  const close = useCallback(() => {
-    if (delayTimeout.current) clearTimeout(delayTimeout.current);
-    translateY.value = withSpring(CLOSED_HEIGHT, SPRING_CONFIG);
-    runOnJS(setOpenDrop)(false);
-    runOnJS(setShowButtons)(false);
-  }, [translateY]);
+  // open y close ya no son necesarios, se usa toggleDropdown directamente
 
   const toggleDropdown = useCallback(() => {
-    if (openDrop) close();
-    else open();
-  }, [openDrop, open, close]);
+    setOpenDrop(prev => !prev);
+  }, []);
 
   const handlePanGesture = useCallback(
     ({nativeEvent}: any) => {
       if (nativeEvent.translationY < -10 && !openDrop) {
-        open();
+        setOpenDrop(true);
       } else if (nativeEvent.translationY > 10 && openDrop) {
-        close();
+        setOpenDrop(false);
       }
     },
-    [openDrop, open, close],
+    [openDrop],
   );
 
   return (
     <PanGestureHandler onGestureEvent={handlePanGesture}>
-      <Animated.View style={[styles.container, animatedStyle]}>
+      <View style={[styles.container, animatedStyle]}>
         <View
           onTouchEnd={toggleDropdown}
           style={{
@@ -106,7 +73,7 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
           />
         </View>
 
-        {showButtons && (
+        {openDrop && (
           <>
             <Text style={{...styles.text, marginTop: 20}}>
               Permitir ingreso
@@ -136,8 +103,8 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
             </View>
           </>
         )}
-      </Animated.View>
-    </PanGestureHandler>
+      </View>
+  </PanGestureHandler>
   );
 };
 

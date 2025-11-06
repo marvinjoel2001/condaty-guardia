@@ -26,9 +26,10 @@ interface CiNomModalProps {
   open: boolean;
   onClose: () => void;
   reload: any;
+  data: any;
 }
 
-const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
+const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const {showToast} = useAuth();
   const [visit, setVisit]: any = useState(null);
   const [formState, setFormState]: any = useState({});
@@ -44,38 +45,42 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     );
     setFormState((old: any) => ({...old, acompanantes: newAcompanante}));
   };
-
   const [dataOwners, setDataOwners] = useState([]);
-
-  const {
-    data: owners,
-    loaded,
-    execute,
-  } = useApi('/owners', 'GET', {
-    perPage: -1,
-    sortBy: 'name',
-    orderBy: 'asc',
-    searchBy: '',
-    fullType: 'L',
-  });
+  const {execute} = useApi();
+  // const {
+  //   data: owners,
+  //   loaded,
+  //   execute,
+  // } = useApi(
+  //   '/owners',
+  //   'GET',
+  //   {
+  //     perPage: -1,
+  //     sortBy: 'name',
+  //     orderBy: 'asc',
+  //     searchBy: '',
+  //     fullType: 'SG',
+  //   },
+  //   3,
+  // );
   useEffect(() => {
-    if (owners?.data) {
-      const newOwners = owners?.data.map((owner: any) => {
+    if (data) {
+      const newOwners = data.map((owner: any) => {
         let nro = '';
         if (owner?.dpto && owner?.dpto.length > 0) {
-          nro = owner.dpto[0].nro + ' - ' + owner.dpto[0].type.name;
+          nro = owner.dpto[0].type.name + ' ' + owner.dpto[0].nro;
         } else {
-          nro = owner.dpto_nro + ' - ' + owner.type_name;
+          nro = owner.type_name + ' ' + owner.dpto_nro;
         }
 
         return {
           ...owner,
-          name: getFullName(owner) + ' - ' + nro,
+          name: nro + ' - ' + getFullName(owner),
         };
       });
       setDataOwners(newOwners);
     }
-  }, [owners?.data]);
+  }, [data]);
 
   const handleChangeInput = (name: string, value: string) => {
     setFormState((prevState: any) => ({
@@ -537,7 +542,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
                 <List
                   data={formState.acompanantes}
                   renderItem={acompanantesList}
-                  refreshing={!loaded}
+                  // refreshing={!loaded}
                 />
               </>
             )}
