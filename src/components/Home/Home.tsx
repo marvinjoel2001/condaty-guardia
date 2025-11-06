@@ -130,7 +130,40 @@ const Home = () => {
       searchBy: searchParam || '',
     }, false, false);
     setLoaded(false);
-    setData(data?.data || []);
+    
+    // Función de ordenamiento
+    const sortAccesses = (items: any[]) => {
+      return items.sort((itemActual: any, itemSiguiente: any) => {
+        // 1. Prioridad: sin confirm_at (esperando confirmación) van primero
+        const itemActualTieneConfirmacion = itemActual.confirm_at != null;
+        const itemSiguienteTieneConfirmacion = itemSiguiente.confirm_at != null;
+        
+        // Si el item actual NO tiene confirmación pero el siguiente SÍ, el actual va primero
+        if (!itemActualTieneConfirmacion && itemSiguienteTieneConfirmacion) return -1;
+        // Si el item actual SÍ tiene confirmación pero el siguiente NO, el siguiente va primero
+        if (itemActualTieneConfirmacion && !itemSiguienteTieneConfirmacion) return 1;
+        
+        // 2. Prioridad: sin in_at (no han ingresado) van primero
+        const itemActualTieneIngreso = itemActual.in_at != null;
+        const itemSiguienteTieneIngreso = itemSiguiente.in_at != null;
+        
+        // Si el item actual NO tiene ingreso pero el siguiente SÍ, el actual va primero
+        if (!itemActualTieneIngreso && itemSiguienteTieneIngreso) return -1;
+        // Si el item actual SÍ tiene ingreso pero el siguiente NO, el siguiente va primero
+        if (itemActualTieneIngreso && !itemSiguienteTieneIngreso) return 1;
+        
+        // 3. Ordenar por id descendente (más recientes primero)
+        return itemSiguiente.id - itemActual.id;
+      });
+    };
+    
+    // Ordenar los datos
+    const sortedData = {
+      accesses: sortAccesses([...(data?.data?.accesses || [])]),
+      others: sortAccesses([...(data?.data?.others || [])])
+    };
+    
+    setData(sortedData);
   };
 
   useEffect(() => {
