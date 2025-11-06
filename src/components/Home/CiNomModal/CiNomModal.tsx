@@ -56,7 +56,7 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     sortBy: 'name',
     orderBy: 'asc',
     searchBy: '',
-    fullType: 'L',
+    fullType: 'SG',
   });
   useEffect(() => {
     if (owners?.data) {
