@@ -128,7 +128,7 @@ const Home = () => {
       page: 1,
       fullType,
       searchBy: searchParam || '',
-    }, false, true);
+    }, false, false);
     setLoaded(false);
     setData(data?.data || []);
   };
