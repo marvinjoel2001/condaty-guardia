@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
@@ -45,14 +45,6 @@ const WithoutQR = ({data, loaded}: Props) => {
         ? 'Pedido'
         : '';
 
-    if (search && search !== '') {
-      if (
-        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
-        false
-      ) {
-        return null;
-      }
-    }
     return (
       <ItemList
         onPress={() => {
@@ -81,6 +73,14 @@ const WithoutQR = ({data, loaded}: Props) => {
       />
     );
   };
+  const filteredData = useMemo(() => {
+    if (!search) return data || [];
+    const s = removeAccents(search);
+    return (data || []).filter((item: any) => {
+      const user = item?.visit ? item?.visit : item?.owner;
+      return removeAccents(getFullName(user))?.includes(s);
+    });
+  }, [data, search]);
 
   const onSearch = (value: string) => {
     setSearch(value);
@@ -122,10 +122,11 @@ const WithoutQR = ({data, loaded}: Props) => {
         /> */}
       </View>
       <ListFlat
-        data={data}
+        data={filteredData}
         renderItem={renderItem}
         refreshing={loaded}
         skeletonType="access"
+        keyExtractor={(item: any) => String(item?.access_id || item?.id)}
         style={{flex: 1}}
       />
       {openDetail?.open && (
