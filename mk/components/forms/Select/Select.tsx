@@ -279,7 +279,7 @@ const Select = ({
                     return (
                       <TouchableOpacity
                         style={[styles.option, isSelected && styles.selected]}
-                        key={option[optionValue] || key}
+                        key={option[optionValue] + key || key + 'options'}
                         onPress={() =>
                           multiSelect
                             ? handleSelectMultiClickElement(
