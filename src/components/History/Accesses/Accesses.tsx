@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
@@ -101,7 +101,7 @@ const Accesses = ({data, loaded}: Props) => {
           style={{flex: 1}}
         />
       </View>
-      <List
+      <ListFlat
         data={data}
         renderItem={renderItem}
         refreshing={loaded}

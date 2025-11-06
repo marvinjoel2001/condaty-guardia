@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -89,7 +89,7 @@ export const Orders = ({data, loaded}: Props) => {
         value={search}
         style={{marginBottom: 8}}
       />
-      <List data={data} renderItem={renderItem} refreshing={loaded} />
+      <ListFlat data={data} renderItem={renderItem} refreshing={loaded} style={{flex: 1}} />
       {openDetail.open && (
         <OrdersDetail
           open={openDetail.open}
