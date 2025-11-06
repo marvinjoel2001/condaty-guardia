@@ -186,7 +186,6 @@ const Home = () => {
     
     setData(sortedData);
   };
-  console.log(data);
   useEffect(() => {
     setData([]);
     getAccesses('', '/accesses', 'P');
