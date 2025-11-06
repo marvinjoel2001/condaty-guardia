@@ -86,7 +86,7 @@ const Accesses = ({data, loaded}: Props) => {
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -106,6 +106,7 @@ const Accesses = ({data, loaded}: Props) => {
         renderItem={renderItem}
         refreshing={loaded}
         skeletonType="access"
+        style={{flex: 1}}
       />
       {openDetail?.open && (
         <AccessDetail

@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import { View } from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import useApi from '../../../mk/hooks/useApi';
@@ -70,6 +71,7 @@ const History = () => {
   return (
     <Layout
       title="Historial"
+      scroll={false}
       refresh={() =>
         tab == 'A'
           ? getHistory('', '/accesses', 'L')
@@ -92,12 +94,12 @@ const History = () => {
         sel={tab}
         setSel={setTab}
       />
-
-      {_tab === 'A' && <Accesses data={data} loaded={loaded} />}
-      {_tab === 'Q' && <QR data={data} loaded={loaded} />}
-      {_tab === 'WQ' && <WithoutQR data={data} loaded={loaded} />}
-      {/* {_tab === 'I' && <Invitations data={data} loaded={loaded} />} */}
-      {_tab === 'P' && <Orders data={data} loaded={loaded} />}
+      <View style={{flex: 1}}>
+        {_tab === 'A' && <Accesses data={data} loaded={loaded} />}
+        {_tab === 'Q' && <QR data={data} loaded={loaded} />}
+        {_tab === 'WQ' && <WithoutQR data={data} loaded={loaded} />}
+        {_tab === 'P' && <Orders data={data} loaded={loaded} />}
+      </View>
     </Layout>
   );
 };
