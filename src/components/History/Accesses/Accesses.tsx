@@ -46,12 +46,21 @@ const Accesses = ({data, loaded}: Props) => {
     let user = item?.visit ? item?.visit : item?.owner;
 
     if (search && search !== '') {
-      if (
-        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
-        false
-      ) {
+      const s = removeAccents(search);
+      const nameMatch = removeAccents(getFullName(user))?.includes(s);
+      const ownerNameMatch = item?.owner
+        ? removeAccents(getFullName(item.owner))?.includes(s)
+        : false;
+      const visitCiMatch = item?.visit?.ci
+        ? removeAccents(String(item.visit.ci)).includes(s)
+        : false;
+      const dptoMatch = Array.isArray(item?.owner?.dpto)
+        ? item.owner.dpto.some((d: any) =>
+            removeAccents(String(d?.nro || '')).includes(s),
+          )
+        : false;
+      if (!nameMatch && !ownerNameMatch && !visitCiMatch && !dptoMatch)
         return null;
-      }
     }
     return (
       <ItemList
