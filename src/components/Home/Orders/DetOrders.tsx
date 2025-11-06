@@ -484,8 +484,8 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                 <TextArea
                   label="Observaciones"
                   name="obs_out"
-                  value={formState?.obs_out || ''}
-                  onChange={e => handleInputChange('obs_out', e)}
+                  value={getStatus() === 'I' ? formState?.obs_out || '' : formState?.obs_in || ''}
+                  onChange={e => handleInputChange(getStatus() === 'I' ? 'obs_out' : 'obs_in', e)}
                   placeholder="Ej: El visitante está ingresando con 2 mascotas"
                 />
               </>
