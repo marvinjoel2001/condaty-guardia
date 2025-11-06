@@ -51,13 +51,18 @@ const CiNomModal = ({open, onClose, reload}: CiNomModalProps) => {
     data: owners,
     loaded,
     execute,
-  } = useApi('/owners', 'GET', {
-    perPage: -1,
-    sortBy: 'name',
-    orderBy: 'asc',
-    searchBy: '',
-    fullType: 'SG',
-  });
+  } = useApi(
+    '/owners',
+    'GET',
+    {
+      perPage: -1,
+      sortBy: 'name',
+      orderBy: 'asc',
+      searchBy: '',
+      fullType: 'SG',
+    },
+    3,
+  );
   useEffect(() => {
     if (owners?.data) {
       const newOwners = owners?.data.map((owner: any) => {
