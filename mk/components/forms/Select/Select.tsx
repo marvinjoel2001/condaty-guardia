@@ -202,7 +202,7 @@ const Select = ({
       return (
         <TouchableOpacity
           style={[styles.option, isSelected && styles.selected]}
-          key={item[optionValue] + index}
+          key={item[optionValue] + index || index + 'options'}
           onPress={() =>
             multiSelect
               ? handleSelectMultiClickElement(item[optionValue])
@@ -313,7 +313,7 @@ const Select = ({
                 data={visibleData}
                 renderItem={renderOption}
                 keyExtractor={(item, index) =>
-                  String(item[optionValue] ?? index)
+                  String(item[optionValue] ?? index) + index
                 }
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.4}
