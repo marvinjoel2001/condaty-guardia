@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { StyleSheet, View, Keyboard } from 'react-native';
+import React, {useEffect, useState, useContext, useCallback} from 'react';
+import {StyleSheet, View, Keyboard} from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import HeadDashboardTitle from '../HeadDashboardTitle/HeadDashboardTitle';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import Accesses from './Accesses/Accesses';
 import DropdawnAccess from './DropdawnAccess/DropdawnAccess';
 import CameraQr from './CameraQr/CameraQr';
-import { ThemeContext } from '../../../mk/contexts/ThemeContext';
+import {ThemeContext} from '../../../mk/contexts/ThemeContext';
 import useApi from '../../../mk/hooks/useApi';
 import useAuth from '../../../mk/hooks/useAuth';
 import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
-import { isAndroid } from '../../../mk/utils/utils';
-import { useEvent } from '../../../mk/hooks/useEvent';
+import {isAndroid} from '../../../mk/utils/utils';
+import {useEvent} from '../../../mk/hooks/useEvent';
 
 const Home = () => {
-  const { user, store, setStore } = useAuth();
+  const {user, store, setStore} = useAuth();
   const [openQr, setOpenQr] = useState(false);
   const [openCiNom, setOpenCiNom] = useState(false);
   const [code, setCode]: any = useState(null);
@@ -23,67 +23,87 @@ const Home = () => {
   const [data, setData]: any = useState([]);
   const [typeSearch, setTypeSearch] = useState('I');
   const [_typeSearch, set_TypeSearch] = useState('I');
-  const { theme } = useContext(ThemeContext);
-  const { execute } = useApi();
+  const {theme} = useContext(ThemeContext);
+  const {execute} = useApi();
   const [loaded, setLoaded] = useState(false);
 
   const onNotif = useCallback(
     (dataSocket: any) => {
-      if (dataSocket?.event == "accessTrans") {
-        const dataAcess = data?.accesses?.find((item: any) => item?.id == dataSocket?.payload?.data?.id);
-        const dataOthers = data?.others?.find((item: any) => item?.id == dataSocket?.payload?.data?.id);
+      if (dataSocket?.event == 'accessTrans') {
+        const dataAcess = data?.accesses?.find(
+          (item: any) => item?.id == dataSocket?.payload?.data?.id,
+        );
+        const dataOthers = data?.others?.find(
+          (item: any) => item?.id == dataSocket?.payload?.data?.id,
+        );
         if (dataAcess) {
-          if (dataSocket?.payload?.data?.status == "O") {
+          if (dataSocket?.payload?.data?.status == 'O') {
             // console.log("ENTRO 1");
             setData({
               ...data,
-              accesses: data?.accesses?.filter((item: any) => item?.id != dataSocket?.payload?.data?.id)
+              accesses: data?.accesses?.filter(
+                (item: any) => item?.id != dataSocket?.payload?.data?.id,
+              ),
             });
           } else {
             // console.log("ENTRO 2");
             setData({
               ...data,
-              accesses: data?.accesses?.map((item: any) => item?.id == dataSocket?.payload?.data?.id ? dataSocket?.payload?.data : item)
+              accesses: data?.accesses?.map((item: any) =>
+                item?.id == dataSocket?.payload?.data?.id
+                  ? dataSocket?.payload?.data
+                  : item,
+              ),
             });
           }
         } else {
-          if (dataSocket?.payload?.type != "P") {
-           // console.log("ENTRO 3");
-            
+          if (dataSocket?.payload?.type != 'P') {
+            // console.log("ENTRO 3");
+
             setData({
               ...data,
-              accesses: [dataSocket?.payload?.data, ...(data?.accesses || [])]
+              accesses: [dataSocket?.payload?.data, ...(data?.accesses || [])],
             });
-          } 
+          }
         }
 
         if (dataOthers) {
-         // console.log("ENTRO 5");
+          // console.log("ENTRO 5");
           setData({
             ...data,
-            others: data?.others?.map((item: any) => item?.id == dataSocket?.payload?.data?.id ? dataSocket?.payload?.data : item)
+            others: data?.others?.map((item: any) =>
+              item?.id == dataSocket?.payload?.data?.id
+                ? dataSocket?.payload?.data
+                : item,
+            ),
           });
-
         } else {
-         // console.log("ENTRO 6");
-         if( dataSocket?.payload?.data?.status != "O"&&dataSocket?.payload?.type == "P"){
-         // console.log("ENTRO 6,5");
-          
-           setData({
-              ...data,
-              others: data?.others?.filter((item: any) => item?.id != dataSocket?.payload?.data?.other_id),
-              accesses: [dataSocket?.payload?.data, ...(data?.accesses || [])]
-            });
-         }
-          if (!dataSocket?.payload?.data?.in_at&&dataSocket?.payload?.type == "P") {
-             // console.log("ENTRO 7");
+          // console.log("ENTRO 6");
+          if (
+            dataSocket?.payload?.data?.status != 'O' &&
+            dataSocket?.payload?.type == 'P'
+          ) {
+            // console.log("ENTRO 6,5");
+
             setData({
               ...data,
-              others: [dataSocket?.payload?.data, ...(data?.others || [])]
+              others: data?.others?.filter(
+                (item: any) => item?.id != dataSocket?.payload?.data?.other_id,
+              ),
+              accesses: [dataSocket?.payload?.data, ...(data?.accesses || [])],
+            });
+          }
+          if (
+            !dataSocket?.payload?.data?.in_at &&
+            dataSocket?.payload?.type == 'P'
+          ) {
+            // console.log("ENTRO 7");
+            setData({
+              ...data,
+              others: [dataSocket?.payload?.data, ...(data?.others || [])],
             });
           }
         }
-
       }
     },
     [typeSearch, data],
@@ -102,14 +122,14 @@ const Home = () => {
         data?._act != 'new-visit' &&
         data?._act != 'out-visit'
       ) {
-        setStore({ ...store, bagePending: true });
+        setStore({...store, bagePending: true});
       }
       if (
         data?.modulo === 'others' &&
         typeSearch !== 'P' &&
         data?._act != 'new-visit'
       ) {
-        setStore({ ...store, bageOthers: true });
+        setStore({...store, bageOthers: true});
       }
     },
     [typeSearch],
@@ -123,12 +143,12 @@ const Home = () => {
   ) => {
     setData([]);
     setLoaded(true);
-    const { data } = await execute(endpoint, 'GET', {
+    const {data} = await execute(endpoint, 'GET', {
       perPage: -1,
       page: 1,
       fullType,
       searchBy: searchParam || '',
-    }, false, false);
+    });
     setLoaded(false);
     
     // Función de ordenamiento
@@ -160,16 +180,17 @@ const Home = () => {
     // Ordenar los datos
     const sortedData = {
       accesses: sortAccesses([...(data?.data?.accesses || [])]),
-      others: sortAccesses([...(data?.data?.others || [])])
+      others: sortAccesses([...(data?.data?.others || [])]),
+      residents: data?.data?.residents || [],
     };
     
     setData(sortedData);
   };
-
+  console.log(data);
   useEffect(() => {
     setData([]);
     getAccesses('', '/accesses', 'P');
-    setStore({ ...store, bagePending: false });
+    setStore({...store, bagePending: false});
 
     set_TypeSearch(typeSearch);
   }, [typeSearch]);
@@ -220,7 +241,7 @@ const Home = () => {
               text: 'Pendiente de ingreso',
               isNew: store?.bagePending,
             },
-            { value: 'S', text: 'Pendiente de salida' },
+            {value: 'S', text: 'Pendiente de salida'},
           ]}
           sel={typeSearch}
           setSel={setTypeSearch}
@@ -253,6 +274,7 @@ const Home = () => {
         {openCiNom && (
           <CiNomModal
             open={openCiNom}
+            data={data?.residents}
             onClose={() => setOpenCiNom(false)}
             reload={() => getAccesses('', '/accesses', 'P')}
           />

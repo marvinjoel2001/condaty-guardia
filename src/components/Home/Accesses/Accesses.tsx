@@ -81,7 +81,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [search, setSearch] = useState('');
 
   const {dataAccesses, dataOrders} = useMemo(() => {
-    console.log('[Accesses] 🔄 Iniciando useMemo dataAccesses/dataOrders');
     const startTime = performance.now();
     
     if (!data) return {dataAccesses: null, dataOrders: null};
@@ -105,10 +104,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       dataOrders: filterByType(data?.others, typeSearch),
     };
 
-    const endTime = performance.now();
-    console.log(`[Accesses] ⏱️ useMemo dataAccesses/dataOrders: ${(endTime - startTime).toFixed(2)}ms`);
-    console.log(`[Accesses] 📊 Accesos: ${result.dataAccesses?.length || 0}, Órdenes: ${result.dataOrders?.length || 0}`);
-    
     return result;
   }, [data, typeSearch]);
 
@@ -337,28 +332,17 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const filteredAccesses = useMemo(() => {
-    console.log('[Accesses] 🔍 Iniciando filtrado de accesos con búsqueda:', search);
-    const startTime = performance.now();
     const result = filterBySearch(dataAccesses || [], search);
-    const endTime = performance.now();
-    console.log(`[Accesses] ⏱️ Filtrado accesos: ${(endTime - startTime).toFixed(2)}ms - Resultados: ${result?.length || 0}`);
     return result;
   }, [dataAccesses, search]);
 
   const filteredOrders = useMemo(() => {
-    console.log('[Accesses] 🔍 Iniciando filtrado de órdenes con búsqueda:', search);
-    const startTime = performance.now();
     const result = filterBySearch(dataOrders || [], search);
-    const endTime = performance.now();
-    console.log(`[Accesses] ⏱️ Filtrado órdenes: ${(endTime - startTime).toFixed(2)}ms - Resultados: ${result?.length || 0}`);
     return result;
   }, [dataOrders, search]);
 
   // Combinar ambos arreglos en uno solo para ListFlat
-  const combinedData = useMemo(() => {
-    console.log('[Accesses] 🔗 Iniciando combinación de datos');
-    const startTime = performance.now();
-    
+  const combinedData = useMemo(() => {    
     const accesses = (filteredAccesses || []).map((item: any) => ({
       ...item,
       itemType: 'access',
@@ -368,10 +352,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       itemType: 'order',
     }));
     const result = [...accesses, ...orders];
-    
-    const endTime = performance.now();
-    console.log(`[Accesses] ⏱️ Combinación de datos: ${(endTime - startTime).toFixed(2)}ms - Total items: ${result.length}`);
-    
+        
     return result;
   }, [filteredAccesses, filteredOrders]);
 
@@ -387,10 +368,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
         result = renderItemOrder(item);
       }
       
-      const endTime = performance.now();
-      if (endTime - startTime > 5) {
-        console.log(`[Accesses] ⚠️ Renderizado lento de ${item.itemType}: ${(endTime - startTime).toFixed(2)}ms`);
-      }
       
       return result;
     },
@@ -411,9 +388,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
           />
 
           {(() => {
-            console.log('[Accesses] 🎨 Renderizando ListFlat con', combinedData.length, 'items');
-            const startTime = performance.now();
-            
             const list = (
               <ListFlat
                 data={combinedData}
@@ -433,9 +407,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
                 }
               />
             );
-            
-            const endTime = performance.now();
-            console.log(`[Accesses] ⏱️ Tiempo de setup ListFlat: ${(endTime - startTime).toFixed(2)}ms`);
             
             return list;
           })()}
