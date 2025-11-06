@@ -205,13 +205,14 @@ const Home = () => {
     };
   }, []);
 
+  const reloadAccesses = useCallback(() => getAccesses('', '/accesses', 'P'), [getAccesses]);
   return (
     <>
       <Layout
         scroll={false}
         title="Home"
         customTitle={<HeadDashboardTitle user={user} stop={false} theme={theme} />}
-        refresh={() => getAccesses('', '/accesses', 'P')}>
+        refresh={reloadAccesses}>
         <TabsButtons
           tabs={[
             {
@@ -228,7 +229,7 @@ const Home = () => {
           {(_typeSearch === 'S' || _typeSearch == 'I') && (
             <Accesses
               data={data}
-              reload={() => getAccesses('', '/accesses', 'P')}
+              reload={reloadAccesses}
               typeSearch={_typeSearch}
               isLoading={loaded}
             />

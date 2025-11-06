@@ -461,7 +461,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     </>
   );
 };
-export default Accesses;
+export default React.memo(Accesses);
 
 const styles = StyleSheet.create({
   noResultsContainer: {
