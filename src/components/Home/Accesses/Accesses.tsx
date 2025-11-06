@@ -419,6 +419,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
                 data={combinedData}
                 renderItem={renderCombinedItem}
                 keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
+                onRefresh={reload}
+                refreshing={isLoading}
                 emptyLabel={
                   <NoResults
                     icon={search ? IconSearch : IconEmpty}
