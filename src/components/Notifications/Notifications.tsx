@@ -93,6 +93,7 @@ const Notifications = () => {
 
   const NotifisList = (notifi: any) => {
     let data = JSON.parse(notifi.message);
+    if (data.info?.act == 'accessTrans') return;
     const left = (data: any) => {
       let image = '';
       let name = '';

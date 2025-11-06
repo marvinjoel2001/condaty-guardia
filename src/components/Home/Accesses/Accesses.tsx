@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
@@ -17,6 +17,7 @@ import {buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
 interface PropsType {
   data: any;
@@ -80,6 +81,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [search, setSearch] = useState('');
 
   const {dataAccesses, dataOrders} = useMemo(() => {
+    console.log('[Accesses] 🔄 Iniciando useMemo dataAccesses/dataOrders');
+    const startTime = performance.now();
+    
     if (!data) return {dataAccesses: null, dataOrders: null};
 
     const filterByType = (items: any[], type: string) => {
@@ -96,10 +100,16 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       return [];
     };
 
-    return {
+    const result = {
       dataAccesses: filterByType(data?.accesses, typeSearch),
       dataOrders: filterByType(data?.others, typeSearch),
     };
+
+    const endTime = performance.now();
+    console.log(`[Accesses] ⏱️ useMemo dataAccesses/dataOrders: ${(endTime - startTime).toFixed(2)}ms`);
+    console.log(`[Accesses] 📊 Accesos: ${result.dataAccesses?.length || 0}, Órdenes: ${result.dataOrders?.length || 0}`);
+    
+    return result;
   }, [data, typeSearch]);
 
   useEffect(() => {
@@ -326,15 +336,67 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     });
   };
 
-  const filteredAccesses = useMemo(
-    () => filterBySearch(dataAccesses || [], search),
-    [dataAccesses, search],
+  const filteredAccesses = useMemo(() => {
+    console.log('[Accesses] 🔍 Iniciando filtrado de accesos con búsqueda:', search);
+    const startTime = performance.now();
+    const result = filterBySearch(dataAccesses || [], search);
+    const endTime = performance.now();
+    console.log(`[Accesses] ⏱️ Filtrado accesos: ${(endTime - startTime).toFixed(2)}ms - Resultados: ${result?.length || 0}`);
+    return result;
+  }, [dataAccesses, search]);
+
+  const filteredOrders = useMemo(() => {
+    console.log('[Accesses] 🔍 Iniciando filtrado de órdenes con búsqueda:', search);
+    const startTime = performance.now();
+    const result = filterBySearch(dataOrders || [], search);
+    const endTime = performance.now();
+    console.log(`[Accesses] ⏱️ Filtrado órdenes: ${(endTime - startTime).toFixed(2)}ms - Resultados: ${result?.length || 0}`);
+    return result;
+  }, [dataOrders, search]);
+
+  // Combinar ambos arreglos en uno solo para ListFlat
+  const combinedData = useMemo(() => {
+    console.log('[Accesses] 🔗 Iniciando combinación de datos');
+    const startTime = performance.now();
+    
+    const accesses = (filteredAccesses || []).map((item: any) => ({
+      ...item,
+      itemType: 'access',
+    }));
+    const orders = (filteredOrders || []).map((item: any) => ({
+      ...item,
+      itemType: 'order',
+    }));
+    const result = [...accesses, ...orders];
+    
+    const endTime = performance.now();
+    console.log(`[Accesses] ⏱️ Combinación de datos: ${(endTime - startTime).toFixed(2)}ms - Total items: ${result.length}`);
+    
+    return result;
+  }, [filteredAccesses, filteredOrders]);
+
+  // Función de renderizado para ListFlat
+  const renderCombinedItem = useCallback(
+    (item: any) => {
+      const startTime = performance.now();
+      let result;
+      
+      if (item.itemType === 'access') {
+        result = renderItemAccess(item);
+      } else {
+        result = renderItemOrder(item);
+      }
+      
+      const endTime = performance.now();
+      if (endTime - startTime > 5) {
+        console.log(`[Accesses] ⚠️ Renderizado lento de ${item.itemType}: ${(endTime - startTime).toFixed(2)}ms`);
+      }
+      
+      return result;
+    },
+    [],
   );
 
-  const filteredOrders = useMemo(
-    () => filterBySearch(dataOrders || [], search),
-    [dataOrders, search],
-  );
   return (
     <>
       {isLoading && !dataAccesses && !dataOrders ? (
@@ -348,23 +410,33 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             style={{marginBottom: 8}}
           />
 
-          {(filteredAccesses?.length > 0 || filteredOrders?.length > 0) && (
-            <>
-              {filteredAccesses?.map((item: any) => renderItemAccess(item))}
-              {filteredOrders?.map((item: any) => renderItemOrder(item))}
-            </>
-          )}
-
-          {filteredAccesses?.length === 0 && filteredOrders?.length === 0 && (
-            <NoResults
-              icon={search ? IconSearch : IconEmpty}
-              text={
-                search
-                  ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
-                  : 'No hay datos'
-              }
-            />
-          )}
+          {(() => {
+            console.log('[Accesses] 🎨 Renderizando ListFlat con', combinedData.length, 'items');
+            const startTime = performance.now();
+            
+            const list = (
+              <ListFlat
+                data={combinedData}
+                renderItem={renderCombinedItem}
+                keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
+                emptyLabel={
+                  <NoResults
+                    icon={search ? IconSearch : IconEmpty}
+                    text={
+                      search
+                        ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
+                        : 'No hay datos'
+                    }
+                  />
+                }
+              />
+            );
+            
+            const endTime = performance.now();
+            console.log(`[Accesses] ⏱️ Tiempo de setup ListFlat: ${(endTime - startTime).toFixed(2)}ms`);
+            
+            return list;
+          })()}
         </>
       )}
 
@@ -387,6 +459,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     </>
   );
 };
+export default Accesses;
+
 const styles = StyleSheet.create({
   noResultsContainer: {
     flex: 1,
@@ -403,4 +477,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-export default Accesses;

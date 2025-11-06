@@ -175,6 +175,7 @@ const Home = () => {
   return (
     <>
       <Layout
+        scroll={false}
         title="Home"
         customTitle={<HeadDashboardTitle user={user} stop={false} theme={theme} />}
         refresh={() => getAccesses('', '/accesses', 'P')}>
