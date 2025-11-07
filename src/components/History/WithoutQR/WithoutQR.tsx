@@ -8,11 +8,6 @@ import AccessDetail from '../Accesses/AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
 import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import {openLink} from '../../../../mk/utils/utils';
-import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDownload} from '../../../icons/IconLibrary';
-import {cssVar} from '../../../../mk/styles/themes';
-import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
 const paramsInitial = {
   perPage: 10,
@@ -79,14 +74,6 @@ const WithoutQR = () => {
       />
     );
   };
-  const filteredData = useMemo(() => {
-    if (!search) return data || [];
-    const s = removeAccents(search);
-    return (data || []).filter((item: any) => {
-      const user = item?.visit ? item?.visit : item?.owner;
-      return removeAccents(getFullName(user))?.includes(s);
-    });
-  }, [data, search]);
 
   const onSearch = (value: string) => {
     setSearch(value);

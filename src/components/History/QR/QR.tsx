@@ -77,14 +77,6 @@ const QR = () => {
       />
     );
   };
-  const filteredData = useMemo(() => {
-    if (!search) return data || [];
-    const s = removeAccents(search);
-    return (data || []).filter((item: any) => {
-      const user = item?.visit ? item?.visit : item?.owner;
-      return removeAccents(getFullName(user))?.includes(s);
-    });
-  }, [data, search]);
 
   const onSearch = (value: string) => {
     setSearch(value);
