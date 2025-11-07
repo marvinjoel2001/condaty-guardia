@@ -35,6 +35,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState(0);
+  const [saving, setSaving] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
   const [addCompanion, setAddCompanion] = useState(false);
   const [dataOwner, setDataOwner]: any = useState(null);
@@ -222,6 +223,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   };
 
   const onSave = async () => {
+    if (saving) return;
     if (formState?.ci_taxi == formState?.ci) {
       return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
     }
@@ -231,7 +233,9 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     }
 
     if (steps === 0 && !dataOwner) {
-      visitExist();
+      setSaving(true);
+      await visitExist();
+      setSaving(false);
       return;
     }
 
@@ -263,6 +267,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       };
     }
 
+    setSaving(true);
     const {data, error: err} = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
@@ -273,6 +278,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         'success',
       );
     } else {
+      setSaving(false);
       showToast(data?.message, 'error');
     }
   };
@@ -379,7 +385,9 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       onClose={_onClose}
       title={'Visitante sin QR'}
       buttonText={
-        steps > 0
+        saving
+          ? 'Procesando...'
+          : steps > 0
           ? 'Notificar al residente'
           : steps <= 0
           ? dataOwner
@@ -387,6 +395,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
             : 'Buscar'
           : ''
       }
+      disabled={saving}
       onSave={onSave}>
       <>
         {dataOwner ? (

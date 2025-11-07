@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from '../Accesses/AccessDetail';
@@ -51,14 +51,6 @@ const WithoutQR = () => {
         ? 'Pedido'
         : '';
 
-    if (search && search !== '') {
-      if (
-        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
-        false
-      ) {
-        return null;
-      }
-    }
     return (
       <ItemList
         onPress={() => {
@@ -87,6 +79,14 @@ const WithoutQR = () => {
       />
     );
   };
+  const filteredData = useMemo(() => {
+    if (!search) return data || [];
+    const s = removeAccents(search);
+    return (data || []).filter((item: any) => {
+      const user = item?.visit ? item?.visit : item?.owner;
+      return removeAccents(getFullName(user))?.includes(s);
+    });
+  }, [data, search]);
 
   const onSearch = (value: string) => {
     setSearch(value);
@@ -110,7 +110,7 @@ const WithoutQR = () => {
     }));
   };
   return (
-    <View>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',

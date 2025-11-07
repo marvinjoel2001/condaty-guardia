@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -50,7 +50,6 @@ export const Orders = () => {
       ?.toLowerCase();
   };
   const renderItem = (item: any) => {
-    console.log(item);
     if (search && search !== '') {
       if (
         !removeAccents(getFullName(item?.access?.visit)).includes(
