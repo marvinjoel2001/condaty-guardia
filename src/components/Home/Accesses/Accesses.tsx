@@ -225,12 +225,13 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
         />
       );
     }
-
-    const avatarSrc = getUrlImages(
-      item.visit
-        ? `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`
-        : `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`,
-    );
+    
+    // Quitando el avatar temporalmente por problemas de performance 07/11/2025
+    // const avatarSrc = getUrlImages(
+    //   item.visit
+    //     ? `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`
+    //     : `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`,
+    // );
 
     return (
       <Avatar
