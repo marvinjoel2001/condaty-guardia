@@ -1,27 +1,28 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from '../Accesses/AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
 import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
-import {openLink} from '../../../../mk/utils/utils';
-import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconDownload} from '../../../icons/IconLibrary';
-import {cssVar} from '../../../../mk/styles/themes';
 
-type Props = {
-  data: any;
-  loaded: boolean;
+const paramsInitial = {
+  perPage: 10,
+  page: 1,
+  fullType: 'WQ',
+  section: 'ACT',
 };
-
-const WithoutQR = ({data, loaded}: Props) => {
-  const {execute} = useApi();
+const WithoutQR = () => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
+  const [params, setParams] = useState(paramsInitial);
+  const {data, reload, loaded} = useApi('/accesses', 'GET', params, 3);
+  useEffect(() => {
+    reload(params);
+  }, [params]);
   const removeAccents = (str: string) => {
     return str
       ?.normalize('NFD')
@@ -45,14 +46,6 @@ const WithoutQR = ({data, loaded}: Props) => {
         ? 'Pedido'
         : '';
 
-    if (search && search !== '') {
-      if (
-        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
-        false
-      ) {
-        return null;
-      }
-    }
     return (
       <ItemList
         onPress={() => {
@@ -86,21 +79,25 @@ const WithoutQR = ({data, loaded}: Props) => {
     setSearch(value);
   };
 
-  const onExport = async () => {
-    const {data: file} = await execute('/accesses', 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType: 'WQ',
-      section: 'ACT',
-      _export: 'pdf',
-    });
-    if (file?.success == true) {
-      openLink(getUrlImages('/' + file?.data.path));
-    }
+  const handleReload = () => {
+    setParams(paramsInitial);
   };
+  const onPagination = () => {
+    const total = data?.message?.total || 0;
+    const currentLength = data?.data?.length || 0;
+    const maxPage = Math.ceil(total / params.perPage);
 
+    if (currentLength >= total || params.page >= maxPage || !loaded) {
+      return;
+    }
+
+    setParams(prev => ({
+      ...prev,
+      perPage: prev.perPage + 20,
+    }));
+  };
   return (
-    <View>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -114,18 +111,18 @@ const WithoutQR = ({data, loaded}: Props) => {
           value={search}
           style={{flex: 1}}
         />
-        {/*  <Icon
-          name={IconDownload}
-          onPress={onExport}
-          fillStroke={cssVar.cWhiteV2}
-          color={'transparent'}
-        /> */}
       </View>
-      <List
-        data={data}
+
+      <ListFlat
+        data={data?.data}
         renderItem={renderItem}
-        refreshing={loaded}
-        skeletonType="access"
+        // skeletonType="survey"
+        refreshing={!loaded && params.perPage === -1}
+        emptyLabel="No hay datos"
+        onRefresh={handleReload}
+        loading={!loaded && params.perPage > -1}
+        onPagination={onPagination}
+        total={data?.message?.total || 0}
       />
       {openDetail?.open && (
         <AccessDetail

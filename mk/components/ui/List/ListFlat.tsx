@@ -149,7 +149,8 @@ const ListFlat = memo((props: PropsType) => {
     <FlatList
       testID="ListFlatlist"
       data={data}
-      contentContainerStyle={[{paddingBottom: 24},style]}
+      style={style as any}
+      contentContainerStyle={[{paddingBottom: 24}]}
       keyExtractor={getItemKey}
       renderItem={renderItemMemo}
       onScroll={handleScroll}
