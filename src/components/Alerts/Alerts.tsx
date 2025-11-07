@@ -4,7 +4,6 @@ import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import {Text, View} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
-import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
@@ -19,6 +18,13 @@ import {
   ALERT_TABS,
   EMERGENCY_TYPES,
 } from './alertConstants';
+import ListFlat from '../../../mk/components/ui/List/ListFlat';
+
+const paramsInitial = {
+  perPage: -1,
+  page: 1,
+  fullType: 'L',
+};
 
 const Alerts = () => {
   const [search, setSearch] = useState('');
@@ -26,11 +32,7 @@ const Alerts = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState({open: false, id: null});
   const [dataFilter, setDataFilter] = useState([]);
-  const [params, setParams]: any = useState({
-    perPage: -1,
-    page: 1,
-    fullType: 'L',
-  });
+  const [params, setParams]: any = useState(paramsInitial);
 
   const {data: alertas, reload, loaded} = useApi('/alerts', 'GET', params);
 
@@ -162,7 +164,7 @@ const Alerts = () => {
 
   return (
     <>
-      <Layout title="Alertas" refresh={() => reload()}>
+      <Layout title="Alertas" refresh={() => reload()} scroll={false}>
         <TabsButtons
           tabs={ALERT_TABS}
           sel={typeSearch}
@@ -172,13 +174,14 @@ const Alerts = () => {
 
         <DataSearch setSearch={onSearch} name="Novedades" value={search} />
 
-        <List
-          style={{marginTop: 8}}
+        <ListFlat
           data={dataFilter}
           renderItem={alertList}
+          keyExtractor={(item: any) => item.id}
+          onRefresh={() => reload()}
           refreshing={!loaded}
+          style={{marginTop: 12}}
         />
-
         {openAdd && (
           <AlertAdd
             open={openAdd}

@@ -1,5 +1,12 @@
 import React, {memo, useCallback, useRef} from 'react';
-import {FlatList, RefreshControl, View, Text, Dimensions, Platform} from 'react-native';
+import {
+  FlatList,
+  RefreshControl,
+  View,
+  Text,
+  Dimensions,
+  Platform,
+} from 'react-native';
 import {cssVar, TypeStyles, FONTS} from '../../../styles/themes';
 import useAuth from '../../../hooks/useAuth';
 import Skeleton, {PropsTypeSkeleton} from '../Skeleton/Skeleton';
@@ -38,6 +45,14 @@ interface PropsType {
   onPagination?: () => void;
   total?: number;
   loading?: boolean;
+  removeClippedSubviews?: boolean;
+  windowSize?: number;
+  initialNumToRender?: number;
+  maxToRenderPerBatch?: number;
+  getItemLayout?: (
+    item: any,
+    index: number,
+  ) => {length: number; offset: number; index: number};
 }
 
 const ListFlat = memo((props: PropsType) => {
@@ -53,6 +68,11 @@ const ListFlat = memo((props: PropsType) => {
     emptyLabel,
     onPagination,
     loading = false,
+    removeClippedSubviews = true,
+    initialNumToRender = 30,
+    windowSize = 20,
+    maxToRenderPerBatch = 50,
+    getItemLayout,
   } = props;
 
   const {setStore} = useAuth();
@@ -130,15 +150,29 @@ const ListFlat = memo((props: PropsType) => {
   // If there's no data, render the emptyLabel similarly to List.tsx
   if (!data || !data?.length || data.length === 0) {
     return typeof emptyLabel === 'string' ? (
-      <View style={{justifyContent: 'center', alignItems: 'center', height: screen.height - 400}}>
-        <Text style={{color: cssVar.cWhiteV1, fontFamily: FONTS.semiBold, textAlign: 'left', fontSize: cssVar.sM}}>{emptyLabel}</Text>
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: screen.height - 400,
+        }}>
+        <Text
+          style={{
+            color: cssVar.cWhiteV1,
+            fontFamily: FONTS.semiBold,
+            textAlign: 'left',
+            fontSize: cssVar.sM,
+          }}>
+          {emptyLabel}
+        </Text>
       </View>
     ) : (
       <View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          height: Platform.OS == 'ios' ? screen.height - 250 : screen.height - 170,
+          height:
+            Platform.OS == 'ios' ? screen.height - 250 : screen.height - 170,
         }}>
         {emptyLabel}
       </View>
@@ -156,17 +190,17 @@ const ListFlat = memo((props: PropsType) => {
       onScroll={handleScroll}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
-      initialNumToRender={30}
-      maxToRenderPerBatch={50}
-      windowSize={20}
-      removeClippedSubviews={true}
+      initialNumToRender={initialNumToRender}
+      maxToRenderPerBatch={maxToRenderPerBatch}
+      windowSize={windowSize}
+      removeClippedSubviews={removeClippedSubviews}
       updateCellsBatchingPeriod={50}
       onEndReached={onPagination}
       onEndReachedThreshold={0.5}
       ListFooterComponent={
         <RenderFooterComponent loading={loading} skeletonType={skeletonType} />
       }
-      refreshControl={refreshControl()}
+      refreshControl={onRefresh ? refreshControl() : undefined}
       ListEmptyComponent={() =>
         emptyLabel ? (
           <View style={{padding: 16, alignItems: 'center'}}>
@@ -178,7 +212,12 @@ const ListFlat = memo((props: PropsType) => {
           </View>
         ) : null
       }
-      getItemLayout={undefined} // Añade esto si tus items tienen altura fija
+      // getItemLayout={getItemLayout} // Añade esto si tus items tienen altura fija
+      getItemLayout={(_: any, index: any) => ({
+        length: 70,
+        offset: 70 * index,
+        index,
+      })}
     />
   );
 });
