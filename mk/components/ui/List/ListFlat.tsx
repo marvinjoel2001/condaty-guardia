@@ -156,9 +156,9 @@ const ListFlat = memo((props: PropsType) => {
       onScroll={handleScroll}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
-      initialNumToRender={10}
-      maxToRenderPerBatch={10}
-      windowSize={10}
+      initialNumToRender={30}
+      maxToRenderPerBatch={50}
+      windowSize={20}
       removeClippedSubviews={true}
       updateCellsBatchingPeriod={50}
       onEndReached={onPagination}

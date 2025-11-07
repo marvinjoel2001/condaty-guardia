@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
@@ -17,6 +17,7 @@ import {buttonSecondary} from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
 interface PropsType {
   data: any;
@@ -80,6 +81,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [search, setSearch] = useState('');
 
   const {dataAccesses, dataOrders} = useMemo(() => {
+    const startTime = performance.now();
+    
     if (!data) return {dataAccesses: null, dataOrders: null};
 
     const filterByType = (items: any[], type: string) => {
@@ -96,10 +99,12 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       return [];
     };
 
-    return {
+    const result = {
       dataAccesses: filterByType(data?.accesses, typeSearch),
       dataOrders: filterByType(data?.others, typeSearch),
     };
+
+    return result;
   }, [data, typeSearch]);
 
   useEffect(() => {
@@ -326,15 +331,49 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     });
   };
 
-  const filteredAccesses = useMemo(
-    () => filterBySearch(dataAccesses || [], search),
-    [dataAccesses, search],
+  const filteredAccesses = useMemo(() => {
+    const result = filterBySearch(dataAccesses || [], search);
+    return result;
+  }, [dataAccesses, search]);
+
+  const filteredOrders = useMemo(() => {
+    const result = filterBySearch(dataOrders || [], search);
+    return result;
+  }, [dataOrders, search]);
+
+  // Combinar ambos arreglos en uno solo para ListFlat
+  const combinedData = useMemo(() => {    
+    const accesses = (filteredAccesses || []).map((item: any) => ({
+      ...item,
+      itemType: 'access',
+    }));
+    const orders = (filteredOrders || []).map((item: any) => ({
+      ...item,
+      itemType: 'order',
+    }));
+    const result = [...accesses, ...orders];
+        
+    return result;
+  }, [filteredAccesses, filteredOrders]);
+
+  // Función de renderizado para ListFlat
+  const renderCombinedItem = useCallback(
+    (item: any) => {
+      const startTime = performance.now();
+      let result;
+      
+      if (item.itemType === 'access') {
+        result = renderItemAccess(item);
+      } else {
+        result = renderItemOrder(item);
+      }
+      
+      
+      return result;
+    },
+    [],
   );
 
-  const filteredOrders = useMemo(
-    () => filterBySearch(dataOrders || [], search),
-    [dataOrders, search],
-  );
   return (
     <>
       {isLoading && !dataAccesses && !dataOrders ? (
@@ -348,23 +387,29 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             style={{marginBottom: 8}}
           />
 
-          {(filteredAccesses?.length > 0 || filteredOrders?.length > 0) && (
-            <>
-              {filteredAccesses?.map((item: any) => renderItemAccess(item))}
-              {filteredOrders?.map((item: any) => renderItemOrder(item))}
-            </>
-          )}
-
-          {filteredAccesses?.length === 0 && filteredOrders?.length === 0 && (
-            <NoResults
-              icon={search ? IconSearch : IconEmpty}
-              text={
-                search
-                  ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
-                  : 'No hay datos'
-              }
-            />
-          )}
+          {(() => {
+            const list = (
+              <ListFlat
+                data={combinedData}
+                renderItem={renderCombinedItem}
+                keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
+                onRefresh={reload}
+                refreshing={isLoading}
+                emptyLabel={
+                  <NoResults
+                    icon={search ? IconSearch : IconEmpty}
+                    text={
+                      search
+                        ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
+                        : 'No hay datos'
+                    }
+                  />
+                }
+              />
+            );
+            
+            return list;
+          })()}
         </>
       )}
 
@@ -387,6 +432,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     </>
   );
 };
+export default React.memo(Accesses);
+
 const styles = StyleSheet.create({
   noResultsContainer: {
     flex: 1,
@@ -403,4 +450,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-export default Accesses;

@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
@@ -7,6 +7,7 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import OrdersDetail from './OrdersDetail';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 import DateAccess from '../DateAccess/DateAccess';
+import useApi from '../../../../mk/hooks/useApi';
 
 const getOrderTypeName = (typeId: number | string): string => {
   const id = Number(typeId);
@@ -20,17 +21,27 @@ const getOrderTypeName = (typeId: number | string): string => {
   }
 };
 
-type Props = {
-  data: any[];
-  loaded: boolean;
+const paramsInitial = {
+  perPage: 10,
+  page: 1,
+  fullType: 'L',
+  section: 'ACT',
 };
 
-export const Orders = ({data, loaded}: Props) => {
+export const Orders = () => {
   const [openDetail, setOpenDetail] = useState({
     open: false,
     id: null as number | string | null,
   });
   const [search, setSearch] = useState('');
+  const [params, setParams] = useState(paramsInitial);
+
+  const {data, reload, loaded} = useApi('/others', 'GET', params, 3);
+
+  useEffect(() => {
+    reload(params);
+  }, [params]);
+
   const removeAccents = (str: string) => {
     return str
       ?.normalize('NFD')
@@ -79,16 +90,23 @@ export const Orders = ({data, loaded}: Props) => {
   const onSearch = (value: string) => {
     setSearch(value);
   };
-  const filteredData = useMemo(() => {
-    if (!search) return data || [];
-    const s = removeAccents(search);
-    return (data || []).filter((item: any) => {
-      const visitName = removeAccents(getFullName(item?.access?.visit));
-      const otherName = removeAccents(item?.other_type?.name || '');
-      return visitName.includes(s) || otherName.includes(s);
-    });
-  }, [data, search]);
+  const handleReload = () => {
+    setParams(paramsInitial);
+  };
+  const onPagination = () => {
+    const total = data?.message?.total || 0;
+    const currentLength = data?.data?.length || 0;
+    const maxPage = Math.ceil(total / params.perPage);
 
+    if (currentLength >= total || params.page >= maxPage || !loaded) {
+      return;
+    }
+
+    setParams(prev => ({
+      ...prev,
+      perPage: prev.perPage + 20,
+    }));
+  };
   return (
     <View style={styles.pageContainer}>
       <DataSearch
@@ -97,7 +115,17 @@ export const Orders = ({data, loaded}: Props) => {
         value={search}
         style={{marginBottom: 8}}
       />
-      <ListFlat data={filteredData} renderItem={renderItem} refreshing={loaded} style={{flex: 1}} keyExtractor={(item: any) => String(item?.id)} />
+      <ListFlat
+        data={data?.data}
+        renderItem={renderItem}
+        // skeletonType="survey"
+        refreshing={!loaded && params.perPage === -1}
+        emptyLabel="No hay datos"
+        onRefresh={handleReload}
+        loading={!loaded && params.perPage > -1}
+        onPagination={onPagination}
+        total={data?.message?.total || 0}
+      />
       {openDetail.open && (
         <OrdersDetail
           open={openDetail.open}

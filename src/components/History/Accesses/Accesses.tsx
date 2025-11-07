@@ -1,20 +1,24 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
+import useApi from '../../../../mk/hooks/useApi';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
-type Props = {
-  data: any;
-  loaded: boolean;
+const paramsInitial = {
+  perPage: 10,
+  page: 1,
+  fullType: 'L',
+  section: 'ACT',
 };
-const Accesses = ({data, loaded}: Props) => {
+const Accesses = () => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
+  const [params, setParams] = useState(paramsInitial);
 
   const removeAccents = (str: string) => {
     return str
@@ -22,6 +26,18 @@ const Accesses = ({data, loaded}: Props) => {
       ?.replace(/[\u0300-\u036f]/g, '')
       ?.toLowerCase();
   };
+  const {data, reload, loaded} = useApi(
+    '/accesses',
+    'GET',
+    {
+      ...params,
+    },
+    3,
+  );
+
+  useEffect(() => {
+    reload(params);
+  }, [params]);
   const getAccessSubtitle = (item: any): string => {
     const groupTitle = item.invitation?.title || item.access?.invitation?.title;
 
@@ -72,30 +88,27 @@ const Accesses = ({data, loaded}: Props) => {
       />
     );
   };
-  const filteredData = useMemo(() => {
-    if (!search) return data || [];
-    const s = removeAccents(search);
-    return (data || []).filter((item: any) => {
-      const user = item?.visit ? item?.visit : item?.owner;
-      const nameMatch = removeAccents(getFullName(user))?.includes(s);
-      const ownerNameMatch = item?.owner
-        ? removeAccents(getFullName(item.owner))?.includes(s)
-        : false;
-      const visitCiMatch = item?.visit?.ci
-        ? removeAccents(String(item.visit.ci)).includes(s)
-        : false;
-      const dptoMatch = Array.isArray(item?.owner?.dpto)
-        ? item.owner.dpto.some((d: any) =>
-            removeAccents(String(d?.nro || '')).includes(s),
-          )
-        : false;
-      return nameMatch || ownerNameMatch || visitCiMatch || dptoMatch;
-    });
-  }, [data, search]);
   const onSearch = (value: string) => {
     setSearch(value);
   };
+  const handleReload = () => {
+    setParams(paramsInitial);
+  };
 
+  const onPagination = () => {
+    const total = data?.message?.total || 0;
+    const currentLength = data?.data?.length || 0;
+    const maxPage = Math.ceil(total / params.perPage);
+
+    if (currentLength >= total || params.page >= maxPage || !loaded) {
+      return;
+    }
+
+    setParams(prev => ({
+      ...prev,
+      perPage: prev.perPage + 20,
+    }));
+  };
   return (
     <View style={{flex: 1}}>
       <View
@@ -113,12 +126,15 @@ const Accesses = ({data, loaded}: Props) => {
         />
       </View>
       <ListFlat
-        data={filteredData}
+        data={data?.data}
         renderItem={renderItem}
-        refreshing={loaded}
-        skeletonType="access"
-        keyExtractor={(item: any) => String(item?.access_id || item?.id)}
-        style={{flex: 1}}
+        // skeletonType="survey"
+        refreshing={!loaded && params.perPage === -1}
+        emptyLabel="No hay datos en la bitácora"
+        onRefresh={handleReload}
+        loading={!loaded && params.perPage > -1}
+        onPagination={onPagination}
+        total={data?.message?.total || 0}
       />
       {openDetail?.open && (
         <AccessDetail
