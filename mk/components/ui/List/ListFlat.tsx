@@ -145,12 +145,18 @@ const ListFlat = memo((props: PropsType) => {
     );
   }
 
+  // Permitir que el paddingBottom de style sobrescriba el valor por defecto
+  const mergedContentContainerStyle = [
+    {paddingBottom: 24},
+    style && (typeof style === 'object' ? style : {}),
+  ];
+
   return (
     <FlatList
       testID="ListFlatlist"
       data={data}
       style={style as any}
-      contentContainerStyle={[{paddingBottom: 24}]}
+      contentContainerStyle={mergedContentContainerStyle}
       keyExtractor={getItemKey}
       renderItem={renderItemMemo}
       onScroll={handleScroll}
