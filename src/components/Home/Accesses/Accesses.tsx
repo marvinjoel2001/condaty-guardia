@@ -234,8 +234,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
 
     return (
       <Avatar
-      hasImage={0}  
-      //hasImage={item?.visit?.has_image || item?.owner?.has_image}
+        hasImage={0}  
+        // Quitando el avatar temporalmente por problemas de performance 07/11/2025
+        //hasImage={item?.visit?.has_image || item?.owner?.has_image}
         //src={avatarSrc}
         name={getFullName(item.visit) || getFullName(item.owner)}
       />
