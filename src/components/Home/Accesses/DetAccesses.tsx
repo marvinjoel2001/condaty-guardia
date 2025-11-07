@@ -59,8 +59,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           fullType: 'DET',
           searchBy: id,
         },
-        false,
-        3,
+        false
       );
 
       if (data.success && data.data.length > 0) {
@@ -114,9 +113,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         id: data?.id,
         obs_in: formState?.obs_in || '',
       },
-      false,
-      3,
-    );
+      false    );
     if (result?.success) {
       if (reload) reload();
       close();
