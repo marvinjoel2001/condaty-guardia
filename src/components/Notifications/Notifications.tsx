@@ -18,7 +18,7 @@ import {
 } from '../../icons/IconLibrary';
 import {Text} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import {getDateTimeAgo, getTimeAgoSimple} from '../../../mk/utils/dates';
 import {useEvent} from '../../../mk/hooks/useEvent';
 import {useFocusEffect, useRoute} from '@react-navigation/native';

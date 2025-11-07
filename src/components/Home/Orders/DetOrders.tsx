@@ -10,7 +10,7 @@ import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import List from '../../../../mk/components/ui/List/List';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {
   IconX,

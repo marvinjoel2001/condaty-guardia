@@ -7,7 +7,7 @@ import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Select from '../../../../mk/components/forms/Select/Select';
 import Input from '../../../../mk/components/forms/Input/Input';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getFullName} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';

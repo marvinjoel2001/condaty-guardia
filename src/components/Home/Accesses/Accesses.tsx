@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';

@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import {Text, View} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import Sound from 'react-native-sound';

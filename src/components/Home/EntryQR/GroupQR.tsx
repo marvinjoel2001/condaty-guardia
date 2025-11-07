@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';

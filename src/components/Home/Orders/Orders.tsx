@@ -1,7 +1,7 @@
 // Pedidos.tsx
 import React, {useEffect, useState, useContext} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import List from '../../../../mk/components/ui/List/List';

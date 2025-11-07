@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import useApi from '../../../../mk/hooks/useApi';
 import {Text, View} from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import KeyValue from '../../../../mk/components/ui/KeyValue';

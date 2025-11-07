@@ -17,7 +17,7 @@ import {AccompaniedAdd} from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 
 type PropsType = {
   formState: any;

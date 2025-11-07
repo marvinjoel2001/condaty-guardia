@@ -9,7 +9,7 @@ import useApi from '../../../mk/hooks/useApi';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getDateTimeAgo} from '../../../mk/utils/dates';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
 import AlertDetail from './AlertDetail';
