@@ -1,12 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import OrdersDetail from './OrdersDetail';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 import DateAccess from '../DateAccess/DateAccess';
+import useApi from '../../../../mk/hooks/useApi';
 
 const getOrderTypeName = (typeId: number | string): string => {
   const id = Number(typeId);
@@ -20,17 +21,27 @@ const getOrderTypeName = (typeId: number | string): string => {
   }
 };
 
-type Props = {
-  data: any[];
-  loaded: boolean;
+const paramsInitial = {
+  perPage: 10,
+  page: 1,
+  fullType: 'L',
+  section: 'ACT',
 };
 
-export const Orders = ({data, loaded}: Props) => {
+export const Orders = () => {
   const [openDetail, setOpenDetail] = useState({
     open: false,
     id: null as number | string | null,
   });
   const [search, setSearch] = useState('');
+  const [params, setParams] = useState(paramsInitial);
+
+  const {data, reload, loaded} = useApi('/others', 'GET', params, 3);
+
+  useEffect(() => {
+    reload(params);
+  }, [params]);
+
   const removeAccents = (str: string) => {
     return str
       ?.normalize('NFD')
@@ -38,7 +49,6 @@ export const Orders = ({data, loaded}: Props) => {
       ?.toLowerCase();
   };
   const renderItem = (item: any) => {
-    console.log(item);
     if (search && search !== '') {
       if (
         !removeAccents(getFullName(item?.access?.visit)).includes(
@@ -80,7 +90,23 @@ export const Orders = ({data, loaded}: Props) => {
   const onSearch = (value: string) => {
     setSearch(value);
   };
+  const handleReload = () => {
+    setParams(paramsInitial);
+  };
+  const onPagination = () => {
+    const total = data?.message?.total || 0;
+    const currentLength = data?.data?.length || 0;
+    const maxPage = Math.ceil(total / params.perPage);
 
+    if (currentLength >= total || params.page >= maxPage || !loaded) {
+      return;
+    }
+
+    setParams(prev => ({
+      ...prev,
+      perPage: prev.perPage + 20,
+    }));
+  };
   return (
     <View style={styles.pageContainer}>
       <DataSearch
@@ -89,7 +115,17 @@ export const Orders = ({data, loaded}: Props) => {
         value={search}
         style={{marginBottom: 8}}
       />
-      <List data={data} renderItem={renderItem} refreshing={loaded} />
+      <ListFlat
+        data={data?.data}
+        renderItem={renderItem}
+        // skeletonType="survey"
+        refreshing={!loaded && params.perPage === -1}
+        emptyLabel="No hay datos"
+        onRefresh={handleReload}
+        loading={!loaded && params.perPage > -1}
+        onPagination={onPagination}
+        total={data?.message?.total || 0}
+      />
       {openDetail.open && (
         <OrdersDetail
           open={openDetail.open}
