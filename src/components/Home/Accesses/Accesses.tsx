@@ -46,9 +46,6 @@ const NoResults = ({text, icon}: any) => (
 );
 
 const subtitleAccess = (item: any) => {
-  // if (item.type === 'O') {
-  //   return 'USO LLAVE VIRTUAL QR';
-  // }
   let prefix = 'Visitó a: ';
   if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {
     prefix = 'Recogió a: ';
@@ -80,9 +77,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
-  const {dataAccesses, dataOrders} = useMemo(() => {
-    const startTime = performance.now();
-    
+  const {dataAccesses, dataOrders} = useMemo(() => {    
     if (!data) return {dataAccesses: null, dataOrders: null};
 
     const filterByType = (items: any[], type: string) => {
@@ -239,8 +234,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
 
     return (
       <Avatar
-        hasImage={item?.visit?.has_image || item?.owner?.has_image}
-        src={avatarSrc}
+      hasImage={0}  
+      //hasImage={item?.visit?.has_image || item?.owner?.has_image}
+        //src={avatarSrc}
         name={getFullName(item.visit) || getFullName(item.owner)}
       />
     );
@@ -359,7 +355,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   // Función de renderizado para ListFlat
   const renderCombinedItem = useCallback(
     (item: any) => {
-      const startTime = performance.now();
       let result;
       
       if (item.itemType === 'access') {

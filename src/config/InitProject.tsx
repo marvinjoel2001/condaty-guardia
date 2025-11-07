@@ -60,10 +60,6 @@ const InitProject = () => {
 
     //   showToast(text, 'info');
     // }
-    if (data?.event === 'confirm') {
-      showToast('¡Una visita fue confirmada!', 'success');
-    }
-
     if (data?.event === 'sessionDel') {
       logout();
     }
