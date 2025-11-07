@@ -17,7 +17,6 @@ const paramsInitial = {
 };
 
 const QR = () => {
-  const {execute} = useApi();
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const [params, setParams] = useState(paramsInitial);
