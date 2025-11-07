@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useCallback, useRef} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
-import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {cssVar} from '../../../mk/styles/themes';
@@ -19,7 +18,7 @@ import {
 import {Text} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import ItemList from '../../../mk/components/ui/ItemList/ItemList';
-import {getDateTimeAgo, getTimeAgoSimple} from '../../../mk/utils/dates';
+import {getDateTimeAgo} from '../../../mk/utils/dates';
 import {useEvent} from '../../../mk/hooks/useEvent';
 import {useFocusEffect, useRoute} from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';

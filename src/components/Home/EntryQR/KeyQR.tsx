@@ -7,7 +7,6 @@ import ItemInfo, {
 } from '../../../../mk/components/ui/ItemInfo/ItemInfo';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import Card from '../../../../mk/components/ui/Card/Card';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import Input from '../../../../mk/components/forms/Input/Input';

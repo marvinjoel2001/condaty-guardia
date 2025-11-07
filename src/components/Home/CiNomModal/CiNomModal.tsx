@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
@@ -15,7 +15,6 @@ import InputNameCi from './shared/InputNameCi';
 import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {TouchableOpacity} from 'react-native';
 import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
 import {getUTCNow} from '../../../../mk/utils/dates';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';

@@ -3,7 +3,6 @@ import React, {useEffect, useState, useContext} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName} from '../../../../mk/utils/strings';
-import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import List from '../../../../mk/components/ui/List/List';
 import DetOrders from './DetOrders';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
@@ -16,10 +15,6 @@ const Orders = ({data, reload, setDataID, loaded}: any) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
 
-  //   useEffect(() => {
-  //     // Si usas setDataID para alguna navegación o estado externo
-  //     setDataID(62);
-  //   }, [openDetail]);
   const icon = (item: any) => {
     const orderIcons: Record<string, any> = {
       Taxi: IconTaxi,
@@ -27,7 +22,6 @@ const Orders = ({data, reload, setDataID, loaded}: any) => {
       Delivery: IconDelivery,
       Otro: IconOther,
     };
-    // console.log(item?.other_type?.name,'icono')
 
     const iconName = orderIcons[item?.other_type?.name] || IconOther;
     return (
