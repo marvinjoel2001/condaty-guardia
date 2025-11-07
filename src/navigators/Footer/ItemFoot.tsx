@@ -21,6 +21,7 @@ const ItemFoot = ({path, text, icon, reverse, isActived}: PropsType) => {
   const [iconColor, setIconColor] = useState('transparent');
   const {store, setStore} = useAuth();
   const _onPress = () => {
+    if (activeItem == path) return;
     navigation.navigate(path);
     setStore({...store, scrollTop: true});
   };
@@ -30,7 +31,6 @@ const ItemFoot = ({path, text, icon, reverse, isActived}: PropsType) => {
       style={{
         ...theme.container,
         height: Platform.OS === 'android' ? 48 : 44,
-
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: iconColor,
@@ -70,6 +70,8 @@ const ItemFoot = ({path, text, icon, reverse, isActived}: PropsType) => {
   );
 };
 
+export default ItemFoot;
+
 const theme: ThemeType = {
   container: {
     paddingVertical: cssVar.spXs,
@@ -96,5 +98,3 @@ const theme: ThemeType = {
     backgroundColor: cssVar.cSuccess,
   },
 };
-
-export default ItemFoot;
