@@ -32,9 +32,9 @@ const configApp = {
   APP_INSTANTDB_APP_ID_DEMO: 'f0c317b9-4d4c-413d-b960-b4f922b43aff',
   APP_DEBUG: 0,
 };
-//configApp.API_URL = configApp.API_URL_PROD;
-configApp.API_URL = configApp.API_URL_DEV;
-// configApp.API_URL = configApp.API_URL_TEST;
+// configApp.API_URL = configApp.API_URL_PROD;
+//configApp.API_URL = configApp.API_URL_DEV;
+configApp.API_URL = configApp.API_URL_TEST;
 // configApp.API_URL = configApp.API_URL_DEMO;
 
 if (process.env.NODE_ENV == 'development') {

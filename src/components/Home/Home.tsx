@@ -13,6 +13,7 @@ import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
 import {isAndroid} from '../../../mk/utils/utils';
 import {useEvent} from '../../../mk/hooks/useEvent';
+import VersionChecker from '../../../mk/utils/VersionChecker';
 
 const Home = () => {
   const {user, store, setStore} = useAuth();
@@ -150,40 +151,42 @@ const Home = () => {
       searchBy: searchParam || '',
     });
     setLoaded(false);
-    
+
     // Función de ordenamiento
     const sortAccesses = (items: any[]) => {
       return items.sort((itemActual: any, itemSiguiente: any) => {
         // 1. Prioridad: sin confirm_at (esperando confirmación) van primero
         const itemActualTieneConfirmacion = itemActual.confirm_at != null;
         const itemSiguienteTieneConfirmacion = itemSiguiente.confirm_at != null;
-        
+
         // Si el item actual NO tiene confirmación pero el siguiente SÍ, el actual va primero
-        if (!itemActualTieneConfirmacion && itemSiguienteTieneConfirmacion) return -1;
+        if (!itemActualTieneConfirmacion && itemSiguienteTieneConfirmacion)
+          return -1;
         // Si el item actual SÍ tiene confirmación pero el siguiente NO, el siguiente va primero
-        if (itemActualTieneConfirmacion && !itemSiguienteTieneConfirmacion) return 1;
-        
+        if (itemActualTieneConfirmacion && !itemSiguienteTieneConfirmacion)
+          return 1;
+
         // 2. Prioridad: sin in_at (no han ingresado) van primero
         const itemActualTieneIngreso = itemActual.in_at != null;
         const itemSiguienteTieneIngreso = itemSiguiente.in_at != null;
-        
+
         // Si el item actual NO tiene ingreso pero el siguiente SÍ, el actual va primero
         if (!itemActualTieneIngreso && itemSiguienteTieneIngreso) return -1;
         // Si el item actual SÍ tiene ingreso pero el siguiente NO, el siguiente va primero
         if (itemActualTieneIngreso && !itemSiguienteTieneIngreso) return 1;
-        
+
         // 3. Ordenar por id descendente (más recientes primero)
         return itemSiguiente.id - itemActual.id;
       });
     };
-    
+
     // Ordenar los datos
     const sortedData = {
       accesses: sortAccesses([...(data?.data?.accesses || [])]),
       others: sortAccesses([...(data?.data?.others || [])]),
       residents: data?.data?.residents || [],
     };
-    
+
     setData(sortedData);
   };
   useEffect(() => {
@@ -225,60 +228,67 @@ const Home = () => {
     };
   }, []);
 
-  const reloadAccesses = useCallback(() => getAccesses('', '/accesses', 'P'), [getAccesses]);
+  const reloadAccesses = useCallback(
+    () => getAccesses('', '/accesses', 'P'),
+    [getAccesses],
+  );
   return (
     <>
-      <Layout
-        scroll={false}
-        title="Home"
-        customTitle={<HeadDashboardTitle user={user} stop={false} theme={theme} />}
-        refresh={reloadAccesses}>
-        <TabsButtons
-          tabs={[
-            {
-              value: 'I',
-              text: 'Pendiente de ingreso',
-              isNew: store?.bagePending,
-            },
-            {value: 'S', text: 'Pendiente de salida'},
-          ]}
-          sel={typeSearch}
-          setSel={setTypeSearch}
-        />
-        <View style={styles.listContainer}>
-          {(_typeSearch === 'S' || _typeSearch == 'I') && (
-            <Accesses
-              data={data}
-              reload={reloadAccesses}
-              typeSearch={_typeSearch}
-              isLoading={loaded}
+      <VersionChecker>
+        <Layout
+          scroll={false}
+          title="Home"
+          customTitle={
+            <HeadDashboardTitle user={user} stop={false} theme={theme} />
+          }
+          refresh={reloadAccesses}>
+          <TabsButtons
+            tabs={[
+              {
+                value: 'I',
+                text: 'Pendiente de ingreso',
+                isNew: store?.bagePending,
+              },
+              {value: 'S', text: 'Pendiente de salida'},
+            ]}
+            sel={typeSearch}
+            setSel={setTypeSearch}
+          />
+          <View style={styles.listContainer}>
+            {(_typeSearch === 'S' || _typeSearch == 'I') && (
+              <Accesses
+                data={data}
+                reload={reloadAccesses}
+                typeSearch={_typeSearch}
+                isLoading={loaded}
+              />
+            )}
+          </View>
+          {openQr && (
+            <CameraQr
+              open={openQr}
+              onClose={() => setOpenQr(false)}
+              setCode={setCode}
             />
           )}
-        </View>
-        {openQr && (
-          <CameraQr
-            open={openQr}
-            onClose={() => setOpenQr(false)}
-            setCode={setCode}
-          />
-        )}
-        {showEntryQR && (
-          <EntryQR
-            reload={() => getAccesses('', '/accesses', 'P')}
-            code={code}
-            open={showEntryQR}
-            onClose={handleEntryQRClose}
-          />
-        )}
-        {openCiNom && (
-          <CiNomModal
-            open={openCiNom}
-            data={data?.residents}
-            onClose={() => setOpenCiNom(false)}
-            reload={() => getAccesses('', '/accesses', 'P')}
-          />
-        )}
-      </Layout>
+          {showEntryQR && (
+            <EntryQR
+              reload={() => getAccesses('', '/accesses', 'P')}
+              code={code}
+              open={showEntryQR}
+              onClose={handleEntryQRClose}
+            />
+          )}
+          {openCiNom && (
+            <CiNomModal
+              open={openCiNom}
+              data={data?.residents}
+              onClose={() => setOpenCiNom(false)}
+              reload={() => getAccesses('', '/accesses', 'P')}
+            />
+          )}
+        </Layout>
+      </VersionChecker>
       {!isKeyboardVisible && (
         <DropdawnAccess
           onPressQr={() => {
