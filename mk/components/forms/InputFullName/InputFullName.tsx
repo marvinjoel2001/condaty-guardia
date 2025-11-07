@@ -28,6 +28,7 @@ const InputFullName = ({
   inputGrid = false,
   onBlur = (e: any) => {},
 }: PropsType) => {
+  // se esta dejando los comentarios por si piden volver a la version anterior donde no se permitía dejar espacios en blanco 6/10/2025
   // const removeSpaces = (text: string) => {
   //   return text.replaceAll(' ', '');
   // };

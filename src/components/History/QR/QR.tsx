@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from '../Accesses/AccessDetail';
@@ -44,14 +44,6 @@ const QR = ({data, loaded}: Props) => {
         ? 'Pedido'
         : '';
 
-    if (search && search !== '') {
-      if (
-        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
-        false
-      ) {
-        return null;
-      }
-    }
     return (
       <ItemList
         onPress={() => {
@@ -80,6 +72,14 @@ const QR = ({data, loaded}: Props) => {
       />
     );
   };
+  const filteredData = useMemo(() => {
+    if (!search) return data || [];
+    const s = removeAccents(search);
+    return (data || []).filter((item: any) => {
+      const user = item?.visit ? item?.visit : item?.owner;
+      return removeAccents(getFullName(user))?.includes(s);
+    });
+  }, [data, search]);
 
   const onSearch = (value: string) => {
     setSearch(value);
@@ -99,7 +99,7 @@ const QR = ({data, loaded}: Props) => {
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -120,11 +120,13 @@ const QR = ({data, loaded}: Props) => {
           color={'transparent'}
         /> */}
       </View>
-      <List
-        data={data}
+      <ListFlat
+        data={filteredData}
         renderItem={renderItem}
         refreshing={loaded}
         skeletonType="access"
+        keyExtractor={(item: any) => String(item?.access_id || item?.id)}
+        style={{flex: 1}}
       />
       {openDetail?.open && (
         <AccessDetail

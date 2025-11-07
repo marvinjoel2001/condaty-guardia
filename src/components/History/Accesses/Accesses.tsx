@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
@@ -44,15 +44,6 @@ const Accesses = ({data, loaded}: Props) => {
   };
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
-
-    if (search && search !== '') {
-      if (
-        removeAccents(getFullName(user))?.includes(removeAccents(search)) ===
-        false
-      ) {
-        return null;
-      }
-    }
     return (
       <ItemList
         onPress={() => {
@@ -81,12 +72,32 @@ const Accesses = ({data, loaded}: Props) => {
       />
     );
   };
+  const filteredData = useMemo(() => {
+    if (!search) return data || [];
+    const s = removeAccents(search);
+    return (data || []).filter((item: any) => {
+      const user = item?.visit ? item?.visit : item?.owner;
+      const nameMatch = removeAccents(getFullName(user))?.includes(s);
+      const ownerNameMatch = item?.owner
+        ? removeAccents(getFullName(item.owner))?.includes(s)
+        : false;
+      const visitCiMatch = item?.visit?.ci
+        ? removeAccents(String(item.visit.ci)).includes(s)
+        : false;
+      const dptoMatch = Array.isArray(item?.owner?.dpto)
+        ? item.owner.dpto.some((d: any) =>
+            removeAccents(String(d?.nro || '')).includes(s),
+          )
+        : false;
+      return nameMatch || ownerNameMatch || visitCiMatch || dptoMatch;
+    });
+  }, [data, search]);
   const onSearch = (value: string) => {
     setSearch(value);
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -101,11 +112,13 @@ const Accesses = ({data, loaded}: Props) => {
           style={{flex: 1}}
         />
       </View>
-      <List
-        data={data}
+      <ListFlat
+        data={filteredData}
         renderItem={renderItem}
         refreshing={loaded}
         skeletonType="access"
+        keyExtractor={(item: any) => String(item?.access_id || item?.id)}
+        style={{flex: 1}}
       />
       {openDetail?.open && (
         <AccessDetail

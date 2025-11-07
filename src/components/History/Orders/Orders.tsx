@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import List from '../../../../mk/components/ui/List/List';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -38,7 +38,6 @@ export const Orders = ({data, loaded}: Props) => {
       ?.toLowerCase();
   };
   const renderItem = (item: any) => {
-    console.log(item);
     if (search && search !== '') {
       if (
         !removeAccents(getFullName(item?.access?.visit)).includes(
@@ -80,6 +79,15 @@ export const Orders = ({data, loaded}: Props) => {
   const onSearch = (value: string) => {
     setSearch(value);
   };
+  const filteredData = useMemo(() => {
+    if (!search) return data || [];
+    const s = removeAccents(search);
+    return (data || []).filter((item: any) => {
+      const visitName = removeAccents(getFullName(item?.access?.visit));
+      const otherName = removeAccents(item?.other_type?.name || '');
+      return visitName.includes(s) || otherName.includes(s);
+    });
+  }, [data, search]);
 
   return (
     <View style={styles.pageContainer}>
@@ -89,7 +97,7 @@ export const Orders = ({data, loaded}: Props) => {
         value={search}
         style={{marginBottom: 8}}
       />
-      <List data={data} renderItem={renderItem} refreshing={loaded} />
+      <ListFlat data={filteredData} renderItem={renderItem} refreshing={loaded} style={{flex: 1}} keyExtractor={(item: any) => String(item?.id)} />
       {openDetail.open && (
         <OrdersDetail
           open={openDetail.open}
