@@ -26,6 +26,7 @@ const paramsInitial = {
   page: 1,
   fullType: 'L',
   section: 'ACT',
+  searchBy: '',
 };
 
 export const Orders = () => {
@@ -42,24 +43,14 @@ export const Orders = () => {
     reload(params);
   }, [params]);
 
-  const removeAccents = (str: string) => {
-    return str
-      ?.normalize('NFD')
-      ?.replace(/[\u0300-\u036f]/g, '')
-      ?.toLowerCase();
-  };
+  // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
+  // const removeAccents = (str: string) => {
+  //   return str
+  //     ?.normalize('NFD')
+  //     ?.replace(/[\u0300-\u036f]/g, '')
+  //     ?.toLowerCase();
+  // };
   const renderItem = (item: any) => {
-    if (search && search !== '') {
-      if (
-        !removeAccents(getFullName(item?.access?.visit)).includes(
-          removeAccents(search),
-        ) &&
-        !removeAccents(item?.other_type?.name).includes(removeAccents(search))
-      ) {
-        return null;
-      }
-    }
-
     const visitFullName = getFullName(item?.access?.visit);
     const orderTypeString = 'Pedido: ' + getOrderTypeName(item?.other_type_id);
 
@@ -89,6 +80,15 @@ export const Orders = () => {
 
   const onSearch = (value: string) => {
     setSearch(value);
+    if (value == '') {
+      setParams(paramsInitial);
+      return;
+    }
+    setParams({
+      ...params,
+      perPage: -1,
+      searchBy: value,
+    });
   };
   const handleReload = () => {
     setParams(paramsInitial);
@@ -118,7 +118,6 @@ export const Orders = () => {
       <ListFlat
         data={data?.data}
         renderItem={renderItem}
-        // skeletonType="survey"
         refreshing={!loaded && params.perPage === -1}
         emptyLabel="No hay datos"
         onRefresh={handleReload}

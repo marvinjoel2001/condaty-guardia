@@ -14,6 +14,7 @@ const paramsInitial = {
   page: 1,
   fullType: 'Q',
   section: 'ACT',
+  searchBy: '',
 };
 
 const QR = () => {
@@ -24,12 +25,13 @@ const QR = () => {
   useEffect(() => {
     reload(params);
   }, [params]);
-  const removeAccents = (str: string) => {
-    return str
-      ?.normalize('NFD')
-      ?.replace(/[\u0300-\u036f]/g, '')
-      ?.toLowerCase();
-  };
+  // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
+  // const removeAccents = (str: string) => {
+  //   return str
+  //     ?.normalize('NFD')
+  //     ?.replace(/[\u0300-\u036f]/g, '')
+  //     ?.toLowerCase();`
+  // };
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
     const groupTitle = item.invitation?.title || item.access?.invitation?.title;
@@ -79,6 +81,15 @@ const QR = () => {
 
   const onSearch = (value: string) => {
     setSearch(value);
+    if (value == '') {
+      setParams(paramsInitial);
+      return;
+    }
+    setParams({
+      ...params,
+      perPage: -1,
+      searchBy: value,
+    });
   };
 
   const handleReload = () => {
@@ -98,6 +109,7 @@ const QR = () => {
       perPage: prev.perPage + 20,
     }));
   };
+
   return (
     <View style={{flex: 1}}>
       <View

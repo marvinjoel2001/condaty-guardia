@@ -2,6 +2,7 @@ const configApp = {
   API_URL: 'https://phplaravel-1383823-5943224.cloudwaysapps.com/api',
   API_URL_PROD: 'https://phplaravel-1383823-5943224.cloudwaysapps.com/api',
   API_URL_DEV: 'https://phplaravel-1214481-5270819.cloudwaysapps.com/api',
+  // API_URL_DEV: 'https://unnotched-unabsorbingly-naomi.ngrok-free.dev/api',
   API_URL_TEST: 'https://phplaravel-1214481-5534746.cloudwaysapps.com/api',
   API_URL_DEMO: 'https://phplaravel-1383823-5546919.cloudwaysapps.com/api',
   APP_NAME: 'Condaty Guards',
@@ -37,9 +38,9 @@ configApp.API_URL = configApp.API_URL_PROD;
 // configApp.API_URL = configApp.API_URL_DEMO;
 
 if (process.env.NODE_ENV == 'development') {
-  // configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
+  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
   // configApp.API_URL = configApp.API_URL_DEMO;
-  configApp.API_URL = configApp.API_URL_TEST;
+  // configApp.API_URL = configApp.API_URL_TEST;
 }
 if (configApp.API_URL == configApp.API_URL_DEV) {
   configApp.APP_DEBUG = 0;
