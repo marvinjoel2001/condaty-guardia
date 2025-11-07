@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
@@ -46,9 +46,6 @@ const NoResults = ({text, icon}: any) => (
 );
 
 const subtitleAccess = (item: any) => {
-  // if (item.type === 'O') {
-  //   return 'USO LLAVE VIRTUAL QR';
-  // }
   let prefix = 'Visitó a: ';
   if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {
     prefix = 'Recogió a: ';
@@ -80,9 +77,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
-  const {dataAccesses, dataOrders} = useMemo(() => {
-    const startTime = performance.now();
-    
+  const {dataAccesses, dataOrders} = useMemo(() => {    
     if (!data) return {dataAccesses: null, dataOrders: null};
 
     const filterByType = (items: any[], type: string) => {
@@ -230,17 +225,20 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
         />
       );
     }
-
-    const avatarSrc = getUrlImages(
-      item.visit
-        ? `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`
-        : `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`,
-    );
+    
+    // Quitando el avatar temporalmente por problemas de performance 07/11/2025
+    // const avatarSrc = getUrlImages(
+    //   item.visit
+    //     ? `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`
+    //     : `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`,
+    // );
 
     return (
       <Avatar
-        hasImage={item?.visit?.has_image || item?.owner?.has_image}
-        src={avatarSrc}
+        hasImage={0}  
+        // Quitando el avatar temporalmente por problemas de performance 07/11/2025
+        //hasImage={item?.visit?.has_image || item?.owner?.has_image}
+        //src={avatarSrc}
         name={getFullName(item.visit) || getFullName(item.owner)}
       />
     );
@@ -359,7 +357,6 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   // Función de renderizado para ListFlat
   const renderCombinedItem = useCallback(
     (item: any) => {
-      const startTime = performance.now();
       let result;
       
       if (item.itemType === 'access') {
@@ -392,6 +389,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
               <ListFlat
                 data={combinedData}
                 renderItem={renderCombinedItem}
+                style={{paddingBottom: 150}}
                 keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
                 onRefresh={reload}
                 refreshing={isLoading}

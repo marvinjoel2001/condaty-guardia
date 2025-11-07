@@ -14,7 +14,7 @@ import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconExpand} from '../../../icons/IconLibrary';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 
 type Props = {
   open: boolean;

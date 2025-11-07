@@ -5,9 +5,8 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
-  Image,
 } from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -16,7 +15,6 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {
   IconArrowLeft,
   IconX,
-  IconAdd,
   IconSimpleAdd,
 } from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
 import Input from '../../../../mk/components/forms/Input/Input';
