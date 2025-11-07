@@ -9,6 +9,7 @@ import {
   View,
   Modal,
   Animated,
+  FlatList,
 } from 'react-native';
 import {
   IconArrowDown,
@@ -43,7 +44,7 @@ interface SelectListProps {
   filter?: boolean;
   isWidth?: number;
 }
-
+const PAGE_SIZE = 30; // cantidad de ítems por carga
 const Select = ({
   value,
   name,
@@ -73,7 +74,6 @@ const Select = ({
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const selectRef = useRef(null);
 
-  // Memoizar las opciones filtradas
   const filteredOptions = useMemo(() => {
     if (!Array.isArray(options)) return options;
     if (!search || !filter) return options;
@@ -83,7 +83,10 @@ const Select = ({
     );
   }, [options, search, filter, optionLabel]);
 
-  // Memoizar el texto de selección múltiple
+  const [visibleData, setVisibleData] = useState(
+    filteredOptions.slice(0, PAGE_SIZE),
+  );
+
   const selectedNames = useMemo(() => {
     if (
       !multiSelect ||
@@ -102,7 +105,6 @@ const Select = ({
       : selectedValues.map((option: any) => option[optionLabel]).join(', ');
   }, [selectValue, options, multiSelect, optionValue, optionLabel]);
 
-  // Memoizar el valor mostrado
   const displayValue = useMemo(() => {
     if (multiSelect) return selectedNames;
 
@@ -112,18 +114,15 @@ const Select = ({
     return found?.[optionLabel] || '';
   }, [multiSelect, selectedNames, options, optionValue, value, optionLabel]);
 
-  // Optimizar el callback de búsqueda
   const onChangeSearch = useCallback((text: string) => {
     setSearch(text);
   }, []);
 
-  // Optimizar el toggle del modal
   const handleToggleModal = useCallback(() => {
     if (disabled) return;
     setOpenOptions(prev => !prev);
   }, [disabled]);
 
-  // Optimizar selección simple
   const handleSelectClickElement = useCallback(
     (element: any) => {
       setSelectValue(element);
@@ -133,7 +132,6 @@ const Select = ({
     [name, onChange],
   );
 
-  // Optimizar selección múltiple
   const handleSelectMultiClickElement = useCallback(
     (element: any) => {
       setSelectValue((prev: any) => {
@@ -152,7 +150,6 @@ const Select = ({
     [name, onChange],
   );
 
-  // Animación de apertura/cierre
   useEffect(() => {
     if (openOptions) {
       Animated.parallel([
@@ -183,8 +180,55 @@ const Select = ({
       ]).start();
     }
   }, [openOptions, fadeAnim, scaleAnim]);
+  useEffect(() => {
+    setVisibleData(filteredOptions.slice(0, PAGE_SIZE));
+  }, [filteredOptions]);
 
-  // Limpiar búsqueda al cerrar
+  const handleLoadMore = () => {
+    if (visibleData.length < filteredOptions.length) {
+      const nextItems = filteredOptions.slice(
+        visibleData.length,
+        visibleData.length + PAGE_SIZE,
+      );
+      setVisibleData((prev: any) => [...prev, ...nextItems]);
+    }
+  };
+  const renderOption = useCallback(
+    ({item, index}: {item: any; index: number}) => {
+      const isSelected = Array.isArray(selectValue)
+        ? selectValue.includes(item[optionValue])
+        : selectValue === item[optionValue];
+
+      return (
+        <TouchableOpacity
+          style={[styles.option, isSelected && styles.selected]}
+          key={item[optionValue] + index || index + 'options'}
+          onPress={() =>
+            multiSelect
+              ? handleSelectMultiClickElement(item[optionValue])
+              : handleSelectClickElement(item[optionValue])
+          }>
+          <View style={styles.optionContent}>
+            <Text style={styles.optionText}>
+              {item[optionLabel] || item.label}
+            </Text>
+            {multiSelect && (
+              <Icon
+                color={cssVar.cWhite}
+                name={isSelected ? IconCheckSquare : IconCheckOff}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    },
+    [
+      selectValue,
+      multiSelect,
+      handleSelectClickElement,
+      handleSelectMultiClickElement,
+    ],
+  );
   useEffect(() => {
     if (!openOptions) {
       setSearch('');
@@ -265,45 +309,20 @@ const Select = ({
                   autoFocus={false}
                 />
               )}
-              <ScrollView
-                style={{...styles.scrollView}}
-                nestedScrollEnabled={true}
+              <FlatList
+                data={visibleData}
+                renderItem={renderOption}
+                keyExtractor={(item, index) =>
+                  String(item[optionValue] ?? index) + index
+                }
+                onEndReached={handleLoadMore}
+                onEndReachedThreshold={0.4}
+                showsVerticalScrollIndicator={true}
                 keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={true}>
-                {Array.isArray(filteredOptions) &&
-                  filteredOptions.map((option: any, key: number) => {
-                    const isSelected = Array.isArray(selectValue)
-                      ? selectValue.includes(option[optionValue])
-                      : selectValue === option[optionValue];
-
-                    return (
-                      <TouchableOpacity
-                        style={[styles.option, isSelected && styles.selected]}
-                        key={option[optionValue] || key}
-                        onPress={() =>
-                          multiSelect
-                            ? handleSelectMultiClickElement(
-                                option[optionValue] || key,
-                              )
-                            : handleSelectClickElement(
-                                option[optionValue] || key,
-                              )
-                        }>
-                        <View style={styles.optionContent}>
-                          <Text style={styles.optionText}>
-                            {option[optionLabel] || option.label}
-                          </Text>
-                          {multiSelect && (
-                            <Icon
-                              color={cssVar.cWhite}
-                              name={isSelected ? IconCheckSquare : IconCheckOff}
-                            />
-                          )}
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  })}
-              </ScrollView>
+                initialNumToRender={15}
+                windowSize={5}
+                maxToRenderPerBatch={20}
+              />
             </TouchableOpacity>
           </Animated.View>
         </TouchableOpacity>

@@ -43,37 +43,34 @@ const History = () => {
     }
   };
 
-  useEffect(() => {
-    switch (tab) {
-      case 'A':
-        getHistory('', '/accesses', 'L');
-        break;
-      case 'Q':
-        getHistory('', '/accesses', 'Q');
-        break;
-      case 'WQ':
-        getHistory('', '/accesses', 'WQ');
-        break;
-      case 'I':
-        getHistory('', '/invitations', 'L');
-        break;
-      case 'P':
-        getHistory('', '/others', 'L');
-        break;
-      default:
-        console.log('Tipo de búsqueda no válido:', tab);
-        break;
-    }
-    set_tab(tab);
-  }, [tab]);
+  // useEffect(() => {
+  //   switch (tab) {
+     
+  //     case 'Q':
+  //       getHistory('', '/accesses', 'Q');
+  //       break;
+  //     case 'WQ':
+  //       getHistory('', '/accesses', 'WQ');
+  //       break;
+  //     case 'I':
+  //       getHistory('', '/invitations', 'L');
+  //       break;
+  //     case 'P':
+  //       getHistory('', '/others', 'L');
+  //       break;
+  //     default:
+  //       console.log('Tipo de búsqueda no válido:', tab);
+  //       break;
+  //   }
+  //   set_tab(tab);
+  // }, [tab]);
 
   return (
     <Layout
       title="Historial"
+      scroll={false}
       refresh={() =>
-        tab == 'A'
-          ? getHistory('', '/accesses', 'L')
-          : tab == 'Q'
+        tab == 'Q'
           ? getHistory('', '/accesses', 'Q')
           : tab == 'WQ'
           ? getHistory('', '/accesses', 'WQ')
@@ -93,7 +90,7 @@ const History = () => {
         setSel={setTab}
       />
 
-      {_tab === 'A' && <Accesses data={data} loaded={loaded} />}
+      {_tab === 'A' && <Accesses  />}
       {_tab === 'Q' && <QR data={data} loaded={loaded} />}
       {_tab === 'WQ' && <WithoutQR data={data} loaded={loaded} />}
       {/* {_tab === 'I' && <Invitations data={data} loaded={loaded} />} */}
