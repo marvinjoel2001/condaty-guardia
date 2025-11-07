@@ -7,22 +7,22 @@ import useApi from '../hooks/useApi';
 const VersionChecker = ({children}: {children: React.ReactNode}) => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updateUrl, setUpdateUrl] = useState('');
-  const {data} = useApi('/app-version', 'GET', {}, 3);
+  const {data} = useApi('/app-version', 'GET', {});
   const checkForUpdate = async () => {
     try {
       const currentVersion = VersionCheck.getCurrentVersion();
       const platform = Platform.OS;
-      const minVersion = data.min_version_guard?.[platform];
+      const minVersion = data.guard?.min_version?.[platform];
 
       if (!minVersion) return;
       const needsUpdate = VersionCheck.needUpdate({
         currentVersion,
         latestVersion: minVersion,
       });
-
+      console.log('needsUpdate', currentVersion, minVersion);
       if ((await needsUpdate)?.isNeeded) {
         setUpdateUrl(
-          data.update_url_guard?.[platform] ||
+          data.guard?.update_url?.[platform] ||
             (await VersionCheck.getStoreUrl()),
         );
         setShowUpdateModal(true);
