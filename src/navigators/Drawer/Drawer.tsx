@@ -14,7 +14,7 @@ const MyDrawer = () => {
       <SafeAreaViewIos style={{flex: 1, backgroundColor: cssVar.cBlack}}>
         <Drawer.Navigator
           initialRouteName="navigate"
-          screenOptions={({navigation}) => ({
+          screenOptions={({}) => ({
             drawerStyle: {backgroundColor: cssVar.cBlack},
             swipeEnabled: false,
             headerShown: false,

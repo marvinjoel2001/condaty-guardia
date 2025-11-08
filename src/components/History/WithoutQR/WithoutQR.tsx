@@ -14,6 +14,7 @@ const paramsInitial = {
   page: 1,
   fullType: 'WQ',
   section: 'ACT',
+  searchBy: '',
 };
 const WithoutQR = () => {
   const [search, setSearch] = useState('');
@@ -23,12 +24,15 @@ const WithoutQR = () => {
   useEffect(() => {
     reload(params);
   }, [params]);
-  const removeAccents = (str: string) => {
-    return str
-      ?.normalize('NFD')
-      ?.replace(/[\u0300-\u036f]/g, '')
-      ?.toLowerCase();
-  };
+
+  // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
+  // const removeAccents = (str: string) => {
+  //   return str
+  //     ?.normalize('NFD')
+  //     ?.replace(/[\u0300-\u036f]/g, '')
+  //     ?.toLowerCase();`
+  // };
+
   const renderItem = (item: any) => {
     let user = item?.visit ? item?.visit : item?.owner;
     const subTitle =
@@ -74,9 +78,17 @@ const WithoutQR = () => {
       />
     );
   };
-
   const onSearch = (value: string) => {
     setSearch(value);
+    if (value == '') {
+      setParams(paramsInitial);
+      return;
+    }
+    setParams({
+      ...params,
+      perPage: -1,
+      searchBy: value,
+    });
   };
 
   const handleReload = () => {
@@ -116,7 +128,6 @@ const WithoutQR = () => {
       <ListFlat
         data={data?.data}
         renderItem={renderItem}
-        // skeletonType="survey"
         refreshing={!loaded && params.perPage === -1}
         emptyLabel="No hay datos"
         onRefresh={handleReload}
