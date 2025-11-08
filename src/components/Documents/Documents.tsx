@@ -3,7 +3,7 @@ import Layout from '../../../mk/components/layout/Layout';
 import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
 import { View, StyleSheet } from 'react-native';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 
 import {
