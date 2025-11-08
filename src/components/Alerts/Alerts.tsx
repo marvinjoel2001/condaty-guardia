@@ -162,7 +162,7 @@ const Alerts = () => {
 
   return (
     <>
-      <Layout title="Alertas" refresh={() => reload()}>
+      <Layout title="Alertas" refresh={() => reload()} scroll={false}>
         <TabsButtons
           tabs={ALERT_TABS}
           sel={typeSearch}
@@ -170,14 +170,21 @@ const Alerts = () => {
           style={{marginVertical: 12}}
         />
 
-        <DataSearch setSearch={onSearch} name="Novedades" value={search} />
+        <View style={{flex: 1}}>
+          <DataSearch
+            setSearch={onSearch}
+            name="Novedades"
+            value={search}
+            style={{marginBottom: 8}}
+          />
 
-        <List
-          style={{marginTop: 8}}
-          data={dataFilter}
-          renderItem={alertList}
-          refreshing={!loaded}
-        />
+          <List
+            style={{marginTop: 8}}
+            data={dataFilter}
+            renderItem={alertList}
+            refreshing={!loaded}
+          />
+        </View>
 
         {openAdd && (
           <AlertAdd
