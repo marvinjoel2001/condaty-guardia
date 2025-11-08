@@ -4,7 +4,7 @@ import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import {Text, View} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
-import List from '../../../mk/components/ui/List/List';
+import ListFlat from '../../../mk/components/ui/List/ListFlat';
 import useApi from '../../../mk/hooks/useApi';
 import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
@@ -80,14 +80,7 @@ const Alerts = () => {
   };
 
   const alertList = (alerta: any) => {
-    if (
-      search != '' &&
-      (alerta.descrip + '').toLowerCase().indexOf(search.toLowerCase()) == -1 &&
-      (getFullName(alerta.guardia) + '')
-        .toLowerCase()
-        .indexOf(search.toLowerCase()) == -1
-    )
-      return null;
+    // Filtrado lo manejaremos antes de pasar los datos a la lista
 
     const user = alerta.level === 4 ? alerta.owner : alerta.guardia;
 
@@ -160,9 +153,21 @@ const Alerts = () => {
     }
   }, [typeSearch, alertas?.data]);
 
+  // Pre-filtra los datos según el texto de búsqueda para evitar renderItem null
+  const flatData = React.useMemo(() => {
+    const list = Array.isArray(dataFilter) ? dataFilter : [];
+    if (!search) return list;
+    const q = (search + '').toLowerCase();
+    return list.filter((alerta: any) => {
+      const d = (alerta.descrip + '').toLowerCase();
+      const g = (getFullName(alerta.guardia) + '').toLowerCase();
+      return d.indexOf(q) !== -1 || g.indexOf(q) !== -1;
+    });
+  }, [dataFilter, search]);
+
   return (
     <>
-      <Layout title="Alertas" refresh={() => reload()}>
+      <Layout title="Alertas" refresh={() => reload()} scroll={false}>
         <TabsButtons
           tabs={ALERT_TABS}
           sel={typeSearch}
@@ -170,14 +175,23 @@ const Alerts = () => {
           style={{marginVertical: 12}}
         />
 
-        <DataSearch setSearch={onSearch} name="Novedades" value={search} />
+        <View style={{flex: 1}}>
+          <DataSearch
+            setSearch={onSearch}
+            name="Novedades"
+            value={search}
+            style={{marginBottom: 8}}
+          />
 
-        <List
-          style={{marginTop: 8}}
-          data={dataFilter}
-          renderItem={alertList}
-          refreshing={!loaded}
-        />
+          <ListFlat
+            data={flatData}
+            renderItem={alertList}
+            keyExtractor={(item: any, index: number) => `AL-${item.id}`}
+            refreshing={!loaded}
+            onRefresh={() => reload()}
+            emptyLabel="No hay alertas"
+          />
+        </View>
 
         {openAdd && (
           <AlertAdd
