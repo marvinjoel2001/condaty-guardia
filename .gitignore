@@ -62,9 +62,6 @@ yarn-error.log
 # CocoaPods lockfile
 ios/Podfile.lock
 
-# Xcode project file
-ios/rnGuard.xcodeproj/project.pbxproj
-
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
 
