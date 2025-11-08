@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Input from '../../../../mk/components/forms/Input/Input';
 import useApi from '../../../../mk/hooks/useApi';

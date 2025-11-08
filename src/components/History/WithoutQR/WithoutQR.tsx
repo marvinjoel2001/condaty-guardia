@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from '../Accesses/AccessDetail';
 import DateAccess from '../DateAccess/DateAccess';

@@ -3,7 +3,7 @@ import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import {Text, View} from 'react-native';
 import useApi from '../../../../mk/hooks/useApi';
 import {cssVar} from '../../../../mk/styles/themes';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getDateStrMes} from '../../../../mk/utils/dates';

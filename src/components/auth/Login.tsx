@@ -20,6 +20,7 @@ import Input from '../../../mk/components/forms/Input/Input';
 import ForgotPass from './ForgotPass';
 import Splash from '../Splash/Splash';
 import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
+import VersionChecker from '../../../mk/utils/VersionChecker';
 
 const Login = () => {
   const [formState, setFormState]: any = useState({});
@@ -137,113 +138,115 @@ const Login = () => {
       {splash ? (
         <Splash />
       ) : (
-        <Form>
-          <ImageBackground
-            source={require('../../images/ImageLogin.png')}
-            style={{
-              flex: 1,
-              marginTop: -70,
-            }}
-            resizeMode="cover"
-          />
-          <View style={theme.container}>
-            <Text style={theme.titleLogin}>¡Te damos la bienvenida!</Text>
-            <Text style={theme.subtitleLogin}>Guardia</Text>
-            <Input
-              label="Cédula de identidad"
-              name="email"
-              required
-              type="number"
-              maxLength={11}
-              keyboardType="numeric"
-              value={formState['email']}
-              onBlur={() => {
-                setErrors({...errors, email: checkCI(formState.email)});
+        <VersionChecker>
+          <Form>
+            <ImageBackground
+              source={require('../../images/ImageLogin.png')}
+              style={{
+                flex: 1,
+                marginTop: -70,
               }}
-              error={errors}
-              onChange={(value: any) => handleInputChange('email', value)}
+              resizeMode="cover"
             />
-            <Input
-              label="Contraseña"
-              name="password"
-              required
-              password={showPassword}
-              error={errors}
-              value={formState['password']}
-              onBlur={() => {
-                setErrors({
-                  ...errors,
-                  password: checkPasswords(formState.password),
-                });
-              }}
-              iconRight={passwordIcon}
-              onChange={(value: any) => handleInputChange('password', value)}
-            />
+            <View style={theme.container}>
+              <Text style={theme.titleLogin}>¡Te damos la bienvenida!</Text>
+              <Text style={theme.subtitleLogin}>Guardia</Text>
+              <Input
+                label="Cédula de identidad"
+                name="email"
+                required
+                type="number"
+                maxLength={11}
+                keyboardType="numeric"
+                value={formState['email']}
+                onBlur={() => {
+                  setErrors({...errors, email: checkCI(formState.email)});
+                }}
+                error={errors}
+                onChange={(value: any) => handleInputChange('email', value)}
+              />
+              <Input
+                label="Contraseña"
+                name="password"
+                required
+                password={showPassword}
+                error={errors}
+                value={formState['password']}
+                onBlur={() => {
+                  setErrors({
+                    ...errors,
+                    password: checkPasswords(formState.password),
+                  });
+                }}
+                iconRight={passwordIcon}
+                onChange={(value: any) => handleInputChange('password', value)}
+              />
 
-            <Button
-              onPress={handleSubmit}
-              disabled={!formState.email || !formState.password}>
-              Iniciar sesión
-            </Button>
-            <Text
-              onPress={() => {
-                setErrors('');
-                setOnForgotPass(true);
-              }}
-              style={{
-                marginTop: cssVar.spL,
-                marginBottom: cssVar.spL,
-                textAlign: 'center',
-                color: cssVar.cWhite,
-                textDecorationLine: 'underline',
-              }}>
-              Olvidé mi contraseña
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-              }}>
+              <Button
+                onPress={handleSubmit}
+                disabled={!formState.email || !formState.password}>
+                Iniciar sesión
+              </Button>
               <Text
+                onPress={() => {
+                  setErrors('');
+                  setOnForgotPass(true);
+                }}
                 style={{
+                  marginTop: cssVar.spL,
+                  marginBottom: cssVar.spL,
+                  textAlign: 'center',
                   color: cssVar.cWhite,
-                  fontSize: 10,
+                  textDecorationLine: 'underline',
                 }}>
-                Al iniciar sesión aceptas los
+                Olvidé mi contraseña
               </Text>
-              <TouchableOpacity onPress={goTerminos} style={{height: 48}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}>
                 <Text
                   style={{
-                    color: cssVar.cAccent,
+                    color: cssVar.cWhite,
                     fontSize: 10,
                   }}>
-                  {' Términos y Condiciones '}
+                  Al iniciar sesión aceptas los
                 </Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={goTerminos} style={{height: 48}}>
+                  <Text
+                    style={{
+                      color: cssVar.cAccent,
+                      fontSize: 10,
+                    }}>
+                    {' Términos y Condiciones '}
+                  </Text>
+                </TouchableOpacity>
 
-              <Text
-                style={{
-                  color: cssVar.cWhite,
-                  fontSize: 10,
-                }}>
-                y nuestras
-              </Text>
-              <TouchableOpacity onPress={goPoliticas} style={{height: 20}}>
                 <Text
                   style={{
-                    color: cssVar.cAccent,
+                    color: cssVar.cWhite,
                     fontSize: 10,
-                    marginBottom: 0,
-                    top: -30,
-                    fontFamily: 'Poppins Regular',
                   }}>
-                  Políticas de Privacidad
+                  y nuestras
                 </Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={goPoliticas} style={{height: 20}}>
+                  <Text
+                    style={{
+                      color: cssVar.cAccent,
+                      fontSize: 10,
+                      marginBottom: 0,
+                      top: -30,
+                      fontFamily: 'Poppins Regular',
+                    }}>
+                    Políticas de Privacidad
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </Form>
+          </Form>
+        </VersionChecker>
       )}
       <ForgotPass
         open={onForgotPass}

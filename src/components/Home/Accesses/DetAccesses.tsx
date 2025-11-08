@@ -7,7 +7,7 @@ import useApi from '../../../../mk/hooks/useApi';
 import {getDateTimeStrMes} from '../../../../mk/utils/dates';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {
@@ -59,8 +59,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           fullType: 'DET',
           searchBy: id,
         },
-        false,
-        3,
+        false
       );
 
       if (data.success && data.data.length > 0) {
@@ -114,9 +113,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         id: data?.id,
         obs_in: formState?.obs_in || '',
       },
-      false,
-      3,
-    );
+      false    );
     if (result?.success) {
       if (reload) reload();
       close();
