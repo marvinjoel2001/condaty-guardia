@@ -89,6 +89,9 @@ export const cssVar = {
   cRandom17: '#fdf0d5',
   cRandom18: '#f7b267',
   cRandom19: '#b8c0ff',
+
+  cToastFill: '#4E4E4E',
+
   /* Paleta de complementos */
   cCompl1: '#FAFF7F',
   cCompl2: '#A2FAA3',
@@ -100,8 +103,56 @@ export const cssVar = {
   cCompl8: '#DE6A60',
   cCompl9: '#5AB0E9',
 
+  /* Green */
+  cGreen100: '#A2FAA3',
+  cGreen200: '#6CD16D',
+  cGreen300: '#18F662',
+  cGreen400: '#00E38C',
+  cGreen500: '#34A853',
+  cGreen600: '#00AF90',
+  cGreen700: '#246950',
+  cGreen800: '#35463E',
+  cGreen900: '#1F2D27',
 
-  cToastFill: '#4E4E4E',
+  /* Neutral */
+  cNeutral50: '#FAFAFA',
+  cNeutral100: '#D6D6D6',
+  cNeutral200: '#A2A2A2',
+  cNeutral300: '#808080',
+  cNeutral400: '#646464',
+  cNeutral500: '#505050',
+  cNeutral600: '#424242',
+  cNeutral700: '#323232',
+  cNeutral800: '#262626',
+  cNeutral900: '#191919',
+
+  /* Red */
+  cRed100: '#DE6A60',
+  cRed200: '#DA5D5D',
+  cRed300: '#E46055',
+  cRed400: '#6E4B48',
+
+  /* Blue */
+  cBlue100: '#A9CCE3',
+  cBlue200: '#5AB0E9',
+  cBlue300: '#39ACEC',
+  cBlue400: '#4285FA',
+  cBlue500: '#596376',
+  cBlue600: '#6087D2',
+
+  /* Yellow */
+  cYellow100: '#FFDD7F',
+  cYellow200: '#E1C151',
+  cYellow300: '#E9B01E',
+  cYellow400: '#6E6648',
+
+  /* Orange */
+  cOrange100: '#F7B267',
+  cOrange200: '#FF7F51',
+  cOrange300: '#F37F3D',
+
+  /* Purple */
+  cPurple100: '#B382D9',
 
   //sizes
   sXxl: 24,

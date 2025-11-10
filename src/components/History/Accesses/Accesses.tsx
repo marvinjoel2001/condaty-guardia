@@ -14,26 +14,20 @@ const paramsInitial = {
   page: 1,
   fullType: 'L',
   section: 'ACT',
+  searchBy: '',
 };
 const Accesses = () => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const [params, setParams] = useState(paramsInitial);
-
-  const removeAccents = (str: string) => {
-    return str
-      ?.normalize('NFD')
-      ?.replace(/[\u0300-\u036f]/g, '')
-      ?.toLowerCase();
-  };
-  const {data, reload, loaded} = useApi(
-    '/accesses',
-    'GET',
-    {
-      ...params,
-    },
-    3,
-  );
+  // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
+  // const removeAccents = (str: string) => {
+  //   return str
+  //     ?.normalize('NFD')
+  //     ?.replace(/[\u0300-\u036f]/g, '')
+  //     ?.toLowerCase();
+  // };
+  const {data, reload, loaded} = useApi('/accesses', 'GET', params);
 
   useEffect(() => {
     reload(params);
@@ -90,6 +84,15 @@ const Accesses = () => {
   };
   const onSearch = (value: string) => {
     setSearch(value);
+    if (value == '') {
+      setParams(paramsInitial);
+      return;
+    }
+    setParams({
+      ...params,
+      perPage: -1,
+      searchBy: value,
+    });
   };
   const handleReload = () => {
     setParams(paramsInitial);
@@ -128,9 +131,8 @@ const Accesses = () => {
       <ListFlat
         data={data?.data}
         renderItem={renderItem}
-        // skeletonType="survey"
         refreshing={!loaded && params.perPage === -1}
-        emptyLabel="No hay datos en la bitácora"
+        emptyLabel="No hay datos"
         onRefresh={handleReload}
         loading={!loaded && params.perPage > -1}
         onPagination={onPagination}

@@ -1,3 +1,4 @@
+//initProject
 import {OneSignal} from 'react-native-onesignal';
 import {useCallback, useEffect} from 'react';
 import useAuth from '../../mk/hooks/useAuth';
@@ -9,7 +10,6 @@ const InitProject = () => {
   const {dispatch} = useEvent('onReload');
   // para rcibir notificaciones
   const onNotif = useCallback((data: any) => {
-    console.log('onNotif**********', data);
 
     if (data?.event === 'ping') {
       showToast('se recibio Ping');
@@ -18,7 +18,6 @@ const InitProject = () => {
     try {
       info = JSON.parse(data?.payload);
     } catch (error: unknown) {
-      // console.log('Error parsing notification payload:', error);
       info = data?.payload;
     }
 
@@ -66,96 +65,53 @@ const InitProject = () => {
   }, []);
   useEvent('onNotif', onNotif);
   /// hasat aqui notificaciones
-
   useEffect(() => {
-    OneSignal.Notifications.addEventListener('click', event => {
-      console.log('OneSignal: notification clicked:', event);
-      const data: any = event.notification?.additionalData || null;
+    // register handlers and keep references so we can remove them
+    const handleClick = (event: any) => {
+      try {
+        
+        const data: any = event.notification?.additionalData || null;
 
-      const params = {fromPush: true, pushData: data};
-      if (navigationRef.isReady()) {
-        navigationRef.navigate('Notifications', params);
-      } else {
-        setTimeout(() => {
+        const params = {fromPush: true, pushData: data};
+        if (navigationRef.isReady()) {
           navigationRef.navigate('Notifications', params);
-        }, 300);
-      }
-      // const data: any = event.notification?.additionalData || null;
-      // if (data) {
-      //   switch (data.act) {
-      //     case 'new-visit':
-      //       navigator.navigate('Pending', {act: 'acceso', id: data.id});
-      //       break;
-      //     case 'alerts':
-      //       navigator?.navigate('Alertas');
-      //       break;
-      //     case 'in-visit':
-      //       navigator?.navigate('Pending', {
-      //         act: 'acceso',
-      //         id: data.access_id,
-      //       });
-      //       break;
-      //     case 'newExpensa':
-      //       navigator.navigate('ExpensesPayments');
-      //       break;
-      //     case 'confirmPayment':
-      //       navigator.navigate('Historial', {
-      //         act: 'pago',
-      //         confirm: data.confirm,
-      //         id: data.id,
-      //       });
-      //       break;
-      //     case 'in-pedido':
-      //       navigator.navigate('Pending', {
-      //         act: 'acceso',
-      //         id: data.id,
-      //       });
-      //       break;
-      //     case 'out-visit':
-      //       navigator.navigate('Historial', {
-      //         act: 'acceso',
-      //         id: data.id,
-      //       });
-      //       break;
-      //     default:
-      //       break;
-      //   }
-      // }
-    });
-
-    OneSignal.Notifications.addEventListener('foregroundWillDisplay', event => {
-      event.getNotification().display();
-      const data: any = event.notification?.additionalData || null;
-      if (data) {
-        if (data.act == 'alerts') {
-          // navigationRef.current?.navigate("Alertas");
+        } else {
+          setTimeout(() => {
+            navigationRef.navigate('Notifications', params);
+          }, 300);
         }
+      } catch (e) {
+        // swallow errors in handler
       }
-    });
+    };
+
+    const handleForeground = (event: any) => {
+      try {
+        event.getNotification().display();
+        const data: any = event.notification?.additionalData || null;
+        if (data && data.act == 'alerts') {
+          // navigationRef.current?.navigate('Alertas');
+        }
+      } catch (e) {}
+    };
+
+    OneSignal.Notifications.addEventListener('click', handleClick);
+    OneSignal.Notifications.addEventListener('foregroundWillDisplay', handleForeground);
 
     return () => {
-      OneSignal.Notifications.clearAll();
+      try {
+        OneSignal.Notifications.removeEventListener('click', handleClick);
+      } catch (e) {}
+      try {
+        OneSignal.Notifications.removeEventListener('foregroundWillDisplay', handleForeground);
+      } catch (e) {}
+      try {
+        OneSignal.Notifications.clearAll();
+      } catch (e) {}
     };
   }, []);
 
-  return (
-    <>
-      {/* {openAlert.open && openAlert.id != '' && (
-        <AlertDetails
-          id={openAlert.id}
-          open={openAlert.open}
-          close={(f: boolean) => setOpenAlert({open: f, id: ''})}
-        />
-      )} */}
-      {/* {openMedal.open && (
-        <ModalCongratulationMedal
-          item={openMedal.item}
-          open={openMedal.open}
-          onClose={() => setOpenMedal({open: false, item: ''})}
-        />
-      )} */}
-    </>
-  );
+  return <></>;
 };
 
 export default InitProject;

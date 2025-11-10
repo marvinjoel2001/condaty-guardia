@@ -1,14 +1,11 @@
 import {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 import Input from '../../../mk/components/forms/Input/Input';
 import useAuth from '../../../mk/hooks/useAuth';
 import useApi from '../../../mk/hooks/useApi';
 import {cssVar} from '../../../mk/styles/themes';
 import InputCode from '../../../mk/components/forms/InputCode/InputCode';
-import {checkCI, checkPasswords} from '../../../mk/utils/validations';
 import {InputPassworAndRepeat} from './ShowIconPassword';
-import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import Title from '../../../mk/components/ui/Title';
 import SubTitle from '../../../mk/components/ui/SubTitle';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import React from 'react';
@@ -32,21 +29,24 @@ const ForgotPass = ({open, onClose, mod}: any) => {
   const [minutos, setMinutos] = useState(0);
   const [segundos, setSegundos] = useState(0);
 
+  const intervaloRef = React.useRef<number | null>(null);
+
   useEffect(() => {
     setErrors({});
     setFormState({newPassword: null, pinned: 0});
     return () => {
-      if (intervalo) clearInterval(intervalo);
+      if (intervaloRef.current) {
+        clearInterval(intervaloRef.current as any);
+        intervaloRef.current = null;
+      }
     };
   }, [open]);
-
-  let intervalo: any = null;
 
   const cuentaRegresiva = (tiempoTotal: number) => {
     const fechaInicio = new Date().getTime();
     const fechaObjetivo = fechaInicio + tiempoTotal;
 
-    intervalo = setInterval(function () {
+    const id = setInterval(function () {
       const fechaActual = new Date().getTime();
       const diferencia = fechaObjetivo - fechaActual;
 
@@ -57,12 +57,16 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       setSegundos(segundost);
 
       if (diferencia < 0) {
-        clearInterval(intervalo);
+        if (intervaloRef.current) {
+          clearInterval(intervaloRef.current as any);
+          intervaloRef.current = null;
+        }
         setMinutos(0);
         setSegundos(0);
       }
     }, 1000);
-    return intervalo;
+    intervaloRef.current = id as unknown as number;
+    return id;
   };
 
   const validationCi = () => {
@@ -158,7 +162,6 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       setErrors({});
       onClose(false);
     } else {
-      // showToast('Codigo de verificación no válido', 'error');
       if (data?.errors?.token) {
         setErrors({...errors, newPassword: data?.errors?.token});
       } else {
@@ -167,56 +170,6 @@ const ForgotPass = ({open, onClose, mod}: any) => {
     }
   };
 
-  // const OnCheckCI = async (ci: string) => {
-  //   const {data} = await execute(
-  //     'aff-exist',
-  //     'GET',
-  //     {
-  //       searchBy: ci,
-  //       _exist: 1,
-  //     },
-  //     false,
-  //     3,
-  //   );
-  //   if (data?.data == null) {
-  //     if (checkCI(ci)) {
-  //       setErrors({...errors, ci: checkCI(ci)});
-  //     } else {
-  //       setErrors({...errors, ci: ''});
-  //       showToast('Cédula no registrada', 'error');
-  //       setFormState({...formState, ci: ''});
-  //     }
-  //   } else {
-  //     setErrors({...errors, ci: ''});
-  //   }
-  // };
-
-  // const validatePasswords = (formState: any) => {
-  //   let errors = {};
-  //   const passwordError = checkPasswords(formState.newPassword);
-  //   if (passwordError) errors = {...errors, newPassword: passwordError};
-
-  //   if (formState.newPassword !== formState.repPassword)
-  //     errors = {...errors, repPassword: 'La contraseña no coincide'};
-
-  //   setErrors(errors);
-  // };
-
-  // const buttonDisabled = () => {
-  //   if (formState.pinned != 1) {
-  //     return !!errors.ci || !formState.ci;
-  //   } else if (buttonState) {
-  //     return !isCodeFilled;
-  //   } else {
-  //     return (
-  //       !!errors.newPassword ||
-  //       !!errors.repPassword ||
-  //       !formState.newPassword ||
-  //       !formState.repPassword
-  //     );
-  //   }
-  // };
-
   const onSave = () => {
     if (formState.pinned != 1) {
       onGetCode();
@@ -224,9 +177,6 @@ const ForgotPass = ({open, onClose, mod}: any) => {
       onChangePass();
     }
   };
-
-  // console.log('pin', pin);
-  // console.log('errors-code', errors.code);
 
   return (
     <Modal
@@ -238,7 +188,6 @@ const ForgotPass = ({open, onClose, mod}: any) => {
           : 'Introduce el código de 4 dígitos'
       }
       buttonText={formState.pinned != 1 ? 'Obtener código' : 'Guardar cambios'}
-      // disabled={buttonDisabled()}
       buttonCancel=""
       onSave={onSave}
       style={{padding: 20}}>
@@ -267,8 +216,6 @@ const ForgotPass = ({open, onClose, mod}: any) => {
             maxLength={11}
             keyboardType="numeric"
             value={formState['ci']}
-            // onBlur={() => OnCheckCI(formState['ci'])}
-            // onBlur={() => validationCi(formState['ci'])}
             error={errors}
             onChange={(value: any) => handleInputChange('ci', value)}
           />
