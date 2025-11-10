@@ -246,7 +246,7 @@ const Select = ({
         }}
         activeOpacity={0.7}
         style={{pointerEvents: disabled ? 'none' : 'auto'}}>
-        <View pointerEvents="none">
+        <View pointerEvents="box-none">
           <Input
             type={'text'}
             value={displayValue}
@@ -256,7 +256,10 @@ const Select = ({
             name={name}
             iconRight={
               <TouchableOpacity
-                onPress={handleToggleModal}
+                onPress={(e: any) => {
+                  e.stopPropagation();
+                  handleToggleModal();
+                }}
                 style={styles.iconButton}>
                 <Icon
                   name={openOptions ? IconArrowUp : IconArrowDown}
