@@ -13,6 +13,7 @@ import EntryQR from './EntryQR/EntryQR';
 import CiNomModal from './CiNomModal/CiNomModal';
 import {isAndroid} from '../../../mk/utils/utils';
 import {useEvent} from '../../../mk/hooks/useEvent';
+import VersionChecker from '../../../mk/utils/VersionChecker';
 
 const Home = () => {
   const {user, store, setStore} = useAuth();
@@ -30,6 +31,15 @@ const Home = () => {
   const onNotif = useCallback(
     (dataSocket: any) => {
       if (dataSocket?.event == 'accessTrans') {
+        // Función de ordenamiento por updated_at descendente
+        const sortByUpdatedAt = (items: any[]) => {
+          return items.sort((a: any, b: any) => {
+            const fechaA = new Date(a.updated_at).getTime();
+            const fechaB = new Date(b.updated_at).getTime();
+            return fechaB - fechaA;
+          });
+        };
+
         const dataAcess = data?.accesses?.find(
           (item: any) => item?.id == dataSocket?.payload?.data?.id,
         );
@@ -41,28 +51,34 @@ const Home = () => {
             // console.log("ENTRO 1");
             setData({
               ...data,
-              accesses: data?.accesses?.filter(
-                (item: any) => item?.id != dataSocket?.payload?.data?.id,
+              accesses: sortByUpdatedAt(
+                data?.accesses?.filter(
+                  (item: any) => item?.id != dataSocket?.payload?.data?.id,
+                )
               ),
             });
           } else {
             // console.log("ENTRO 2");
             setData({
               ...data,
-              accesses: data?.accesses?.map((item: any) =>
-                item?.id == dataSocket?.payload?.data?.id
-                  ? dataSocket?.payload?.data
-                  : item,
+              accesses: sortByUpdatedAt(
+                data?.accesses?.map((item: any) =>
+                  item?.id == dataSocket?.payload?.data?.id
+                    ? dataSocket?.payload?.data
+                    : item,
+                )
               ),
             });
           }
         } else {
           if (dataSocket?.payload?.type != 'P') {
             // console.log("ENTRO 3");
-
             setData({
               ...data,
-              accesses: [dataSocket?.payload?.data, ...(data?.accesses || [])],
+              accesses: sortByUpdatedAt([
+                dataSocket?.payload?.data,
+                ...(data?.accesses || []),
+              ]),
             });
           }
         }
@@ -71,10 +87,12 @@ const Home = () => {
           // console.log("ENTRO 5");
           setData({
             ...data,
-            others: data?.others?.map((item: any) =>
-              item?.id == dataSocket?.payload?.data?.id
-                ? dataSocket?.payload?.data
-                : item,
+            others: sortByUpdatedAt(
+              data?.others?.map((item: any) =>
+                item?.id == dataSocket?.payload?.data?.id
+                  ? dataSocket?.payload?.data
+                  : item,
+              )
             ),
           });
         } else {
@@ -84,13 +102,17 @@ const Home = () => {
             dataSocket?.payload?.type == 'P'
           ) {
             // console.log("ENTRO 6,5");
-
             setData({
               ...data,
-              others: data?.others?.filter(
-                (item: any) => item?.id != dataSocket?.payload?.data?.other_id,
+              others: sortByUpdatedAt(
+                data?.others?.filter(
+                  (item: any) => item?.id != dataSocket?.payload?.data?.other_id,
+                )
               ),
-              accesses: [dataSocket?.payload?.data, ...(data?.accesses || [])],
+              accesses: sortByUpdatedAt([
+                dataSocket?.payload?.data,
+                ...(data?.accesses || []),
+              ]),
             });
           }
           if (
@@ -100,7 +122,10 @@ const Home = () => {
             // console.log("ENTRO 7");
             setData({
               ...data,
-              others: [dataSocket?.payload?.data, ...(data?.others || [])],
+              others: sortByUpdatedAt([
+                dataSocket?.payload?.data,
+                ...(data?.others || []),
+              ]),
             });
           }
         }
@@ -113,9 +138,6 @@ const Home = () => {
 
   const onNotifReload = useCallback(
     (data: any) => {
-      // if (data?.modulo === 'access' || data?.modulo === 'others') {
-      //   getAccesses('', '/accesses', 'P');
-      // }
       if (
         data?.modulo === 'access' &&
         typeSearch !== 'I' &&
@@ -150,40 +172,24 @@ const Home = () => {
       searchBy: searchParam || '',
     });
     setLoaded(false);
-    
+
     // Función de ordenamiento
     const sortAccesses = (items: any[]) => {
       return items.sort((itemActual: any, itemSiguiente: any) => {
-        // 1. Prioridad: sin confirm_at (esperando confirmación) van primero
-        const itemActualTieneConfirmacion = itemActual.confirm_at != null;
-        const itemSiguienteTieneConfirmacion = itemSiguiente.confirm_at != null;
-        
-        // Si el item actual NO tiene confirmación pero el siguiente SÍ, el actual va primero
-        if (!itemActualTieneConfirmacion && itemSiguienteTieneConfirmacion) return -1;
-        // Si el item actual SÍ tiene confirmación pero el siguiente NO, el siguiente va primero
-        if (itemActualTieneConfirmacion && !itemSiguienteTieneConfirmacion) return 1;
-        
-        // 2. Prioridad: sin in_at (no han ingresado) van primero
-        const itemActualTieneIngreso = itemActual.in_at != null;
-        const itemSiguienteTieneIngreso = itemSiguiente.in_at != null;
-        
-        // Si el item actual NO tiene ingreso pero el siguiente SÍ, el actual va primero
-        if (!itemActualTieneIngreso && itemSiguienteTieneIngreso) return -1;
-        // Si el item actual SÍ tiene ingreso pero el siguiente NO, el siguiente va primero
-        if (itemActualTieneIngreso && !itemSiguienteTieneIngreso) return 1;
-        
-        // 3. Ordenar por id descendente (más recientes primero)
-        return itemSiguiente.id - itemActual.id;
+        // Ordenar por updated_at descendente (más recientes primero)
+        const fechaA = new Date(itemActual.updated_at).getTime();
+        const fechaB = new Date(itemSiguiente.updated_at).getTime();
+        return fechaB - fechaA;
       });
     };
-    
+
     // Ordenar los datos
     const sortedData = {
       accesses: sortAccesses([...(data?.data?.accesses || [])]),
       others: sortAccesses([...(data?.data?.others || [])]),
       residents: data?.data?.residents || [],
     };
-    
+
     setData(sortedData);
   };
   useEffect(() => {
@@ -225,60 +231,67 @@ const Home = () => {
     };
   }, []);
 
-  const reloadAccesses = useCallback(() => getAccesses('', '/accesses', 'P'), [getAccesses]);
+  const reloadAccesses = useCallback(
+    () => getAccesses('', '/accesses', 'P'),
+    [getAccesses],
+  );
   return (
     <>
-      <Layout
-        scroll={false}
-        title="Home"
-        customTitle={<HeadDashboardTitle user={user} stop={false} theme={theme} />}
-        refresh={reloadAccesses}>
-        <TabsButtons
-          tabs={[
-            {
-              value: 'I',
-              text: 'Pendiente de ingreso',
-              isNew: store?.bagePending,
-            },
-            {value: 'S', text: 'Pendiente de salida'},
-          ]}
-          sel={typeSearch}
-          setSel={setTypeSearch}
-        />
-        <View style={styles.listContainer}>
-          {(_typeSearch === 'S' || _typeSearch == 'I') && (
-            <Accesses
-              data={data}
-              reload={reloadAccesses}
-              typeSearch={_typeSearch}
-              isLoading={loaded}
+      <VersionChecker>
+        <Layout
+          scroll={false}
+          title="Home"
+          customTitle={
+            <HeadDashboardTitle user={user} stop={false} theme={theme} />
+          }
+          refresh={reloadAccesses}>
+          <TabsButtons
+            tabs={[
+              {
+                value: 'I',
+                text: 'Pendiente de ingreso',
+                isNew: store?.bagePending,
+              },
+              {value: 'S', text: 'Pendiente de salida'},
+            ]}
+            sel={typeSearch}
+            setSel={setTypeSearch}
+          />
+          <View style={styles.listContainer}>
+            {(_typeSearch === 'S' || _typeSearch == 'I') && (
+              <Accesses
+                data={data}
+                reload={reloadAccesses}
+                typeSearch={_typeSearch}
+                isLoading={loaded}
+              />
+            )}
+          </View>
+          {openQr && (
+            <CameraQr
+              open={openQr}
+              onClose={() => setOpenQr(false)}
+              setCode={setCode}
             />
           )}
-        </View>
-        {openQr && (
-          <CameraQr
-            open={openQr}
-            onClose={() => setOpenQr(false)}
-            setCode={setCode}
-          />
-        )}
-        {showEntryQR && (
-          <EntryQR
-            reload={() => getAccesses('', '/accesses', 'P')}
-            code={code}
-            open={showEntryQR}
-            onClose={handleEntryQRClose}
-          />
-        )}
-        {openCiNom && (
-          <CiNomModal
-            open={openCiNom}
-            data={data?.residents}
-            onClose={() => setOpenCiNom(false)}
-            reload={() => getAccesses('', '/accesses', 'P')}
-          />
-        )}
-      </Layout>
+          {showEntryQR && (
+            <EntryQR
+              reload={() => getAccesses('', '/accesses', 'P')}
+              code={code}
+              open={showEntryQR}
+              onClose={handleEntryQRClose}
+            />
+          )}
+          {openCiNom && (
+            <CiNomModal
+              open={openCiNom}
+              data={data?.residents}
+              onClose={() => setOpenCiNom(false)}
+              reload={() => getAccesses('', '/accesses', 'P')}
+            />
+          )}
+        </Layout>
+      </VersionChecker>
       {!isKeyboardVisible && (
         <DropdawnAccess
           onPressQr={() => {

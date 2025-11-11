@@ -1,6 +1,6 @@
 import React from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import useAuth from '../../../mk/hooks/useAuth';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getUrlImages} from '../../../mk/utils/strings';

@@ -11,7 +11,7 @@ import {
 import KeyValue from '../../../mk/components/ui/KeyValue';
 import {IconClock} from '../../icons/IconLibrary';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {ALERT_LEVEL_COLORS, EMERGENCY_TYPES} from './alertConstants';
 

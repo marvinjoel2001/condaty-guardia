@@ -3,7 +3,7 @@ import Layout from '../../../mk/components/layout/Layout';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import ListFlat from '../../../mk/components/ui/List/ListFlat';
 import useApi from '../../../mk/hooks/useApi';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import BinnacleAdd from './BinnacleAdd';
 import BinnacleDetail from './BinnacleDetail';
