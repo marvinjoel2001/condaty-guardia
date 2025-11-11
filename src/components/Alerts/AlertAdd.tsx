@@ -39,7 +39,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
     });
     errors = checkRules({
       value: formState.descrip,
-      rules: ['required', 'max:100'],
+      rules: ['required'],
       key: 'descrip',
       errors,
     });
