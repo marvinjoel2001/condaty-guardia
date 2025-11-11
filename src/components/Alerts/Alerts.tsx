@@ -19,6 +19,13 @@ import {
   ALERT_TABS,
   EMERGENCY_TYPES,
 } from './alertConstants';
+import ListFlat from '../../../mk/components/ui/List/ListFlat';
+
+const paramsInitial = {
+  perPage: -1,
+  page: 1,
+  fullType: 'L',
+};
 
 const Alerts = () => {
   const [search, setSearch] = useState('');
@@ -26,11 +33,7 @@ const Alerts = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState({open: false, id: null});
   const [dataFilter, setDataFilter] = useState([]);
-  const [params, setParams]: any = useState({
-    perPage: -1,
-    page: 1,
-    fullType: 'L',
-  });
+  const [params, setParams]: any = useState(paramsInitial);
 
   const {data: alertas, reload, loaded} = useApi('/alerts', 'GET', params);
 

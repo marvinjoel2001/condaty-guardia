@@ -14,6 +14,7 @@ import InvitationDetail from './InvitationDetail';
 import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 import {openLink} from '../../../../mk/utils/utils';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
 type Props = {
   data: any;
@@ -116,7 +117,7 @@ const Invitations = ({data, loaded}: Props) => {
           color={'transparent'}
         />
       </View>
-      <List data={data} renderItem={renderItem} refreshing={loaded} />
+      <ListFlat data={data} renderItem={renderItem} refreshing={loaded} />
       {openDetail?.open && (
         <InvitationDetail
           open={openDetail.open}
