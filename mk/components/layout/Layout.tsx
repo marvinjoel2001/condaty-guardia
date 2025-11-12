@@ -158,20 +158,21 @@ const Layout = (props: PropsType) => {
   }, []);
   return (
     <View style={[theme.layout]} onTouchEnd={onPress}>
-      <View
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 10,
-          backgroundColor: 'red',
-        }}>
-        <Text style={{color: 'white', textAlign: 'center'}}>
-          {!isInternetReachable ? 'Sin conexión' : 'Conexión'}
-          {type}
-        </Text>
-      </View>
+      {!isInternetReachable && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 10,
+            backgroundColor: 'red',
+          }}>
+          <Text style={{color: 'white', textAlign: 'center'}}>
+            Sin conexión
+          </Text>
+        </View>
+      )}
       <HeadTitle
         title={title}
         customTitle={customTitle}

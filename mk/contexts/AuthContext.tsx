@@ -6,6 +6,7 @@ import Toast, {TIME_TOAST} from '../components/ui/Toast/Toast';
 import configApp from '../../src/config/config';
 import {Platform} from 'react-native';
 import React from 'react';
+import {useNetwork} from './NetworkContext';
 
 interface AuthProviderProps {
   children: any;
@@ -34,6 +35,7 @@ export interface AuthContextType {
 export const AuthContext = createContext({} as AuthContextType);
 const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
   const {data, error, loaded, execute, waiting, setWaiting} = useApi();
+  const {isInternetReachable, isConnecting, type} = useNetwork();
   const [user, setUser] = useState<any>(null);
   const [store, setStore] = useState<any>(null);
   const storeRef = useRef<any>(null);
@@ -139,6 +141,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
             JSON.stringify(error, null, 5),
           );
           console.log('====================================');
+          return currentUser;
         }
         try {
           await AsyncStorage.removeItem(configApp.APP_AUTH_IAM + 'token');
