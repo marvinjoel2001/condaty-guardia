@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
-import {Text, View} from 'react-native';
-import {cssVar, FONTS} from '../../../mk/styles/themes';
+import { Text, View } from 'react-native';
+import { cssVar, FONTS } from '../../../mk/styles/themes';
 import ListFlat from '../../../mk/components/ui/List/ListFlat';
 import useApi from '../../../mk/hooks/useApi';
-import {getFullName, getUrlImages} from '../../../mk/utils/strings';
+import { getFullName, getUrlImages } from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {getDateTimeAgo} from '../../../mk/utils/dates';
+import { getDateTimeAgo } from '../../../mk/utils/dates';
 import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
@@ -19,7 +19,6 @@ import {
   ALERT_TABS,
   EMERGENCY_TYPES,
 } from './alertConstants';
-import ListFlat from '../../../mk/components/ui/List/ListFlat';
 
 const paramsInitial = {
   perPage: -1,
@@ -31,11 +30,11 @@ const Alerts = () => {
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('T');
   const [openAdd, setOpenAdd] = useState(false);
-  const [openView, setOpenView] = useState({open: false, id: null});
+  const [openView, setOpenView] = useState({ open: false, id: null });
   const [dataFilter, setDataFilter] = useState([]);
   const [params, setParams]: any = useState(paramsInitial);
 
-  const {data: alertas, reload, loaded} = useApi('/alerts', 'GET', params);
+  const { data: alertas, reload, loaded } = useApi('/alerts', 'GET', params);
 
   const onSearch = (search: string) => {
     setSearch(search);
@@ -90,7 +89,7 @@ const Alerts = () => {
     return (
       <ItemList
         onPress={() => {
-          setOpenView({open: true, id: alerta.id});
+          setOpenView({ open: true, id: alerta.id });
         }}
         title={
           alerta.level === 4 ? alerta.descrip : getFullName(alerta.guardia)
@@ -113,9 +112,9 @@ const Alerts = () => {
               hasImage={alerta?.guardia?.has_image}
               src={getUrlImages(
                 '/GUARD-' +
-                  alerta?.guard_id +
-                  '.webp?d=' +
-                  alerta?.guardia?.updated_at,
+                alerta?.guard_id +
+                '.webp?d=' +
+                alerta?.guardia?.updated_at,
               )}
               name={getFullName(alerta.guardia)}
             />
@@ -175,15 +174,15 @@ const Alerts = () => {
           tabs={ALERT_TABS}
           sel={typeSearch}
           setSel={setTypeSearch}
-          style={{marginVertical: 12}}
+          style={{ marginVertical: 12 }}
         />
 
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <DataSearch
             setSearch={onSearch}
             name="Novedades"
             value={search}
-            style={{marginBottom: 8}}
+            style={{ marginBottom: 8 }}
           />
 
           <ListFlat
@@ -206,7 +205,7 @@ const Alerts = () => {
         {openView.open && (
           <AlertDetail
             open={openView.open}
-            onClose={() => setOpenView({open: false, id: null})}
+            onClose={() => setOpenView({ open: false, id: null })}
             id={openView.id}
           />
         )}
