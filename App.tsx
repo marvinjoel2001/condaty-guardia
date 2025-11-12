@@ -11,30 +11,33 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import ActiveNotificationDB from './mk/hooks/ActiveNotificationDB';
 import {navigationRef} from './src/navigators/navigationRef';
 import {KeyboardProvider} from 'react-native-keyboard-controller';
+import {NetworkProvider} from './mk/contexts/NetworkContext';
 
 function App() {
   (Text as any).defaultProps = (Text as any).defaultProps || {};
   (Text as any).defaultProps.allowFontScaling = false;
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <AxiosProvider interceptors={axiosInterceptors}>
-        <KeyboardProvider>
-          <StatusBar
-            animated={true}
-            backgroundColor={cssVar.cBlack}
-            barStyle={'light-content'}
-          />
-          <NavigationContainer ref={navigationRef}>
-            <AuthProvider>
-              <ActiveNotificationDB />
-              <OneSignalContextProvider>
-                <InitProject />
-                <MyDrawer />
-              </OneSignalContextProvider>
-            </AuthProvider>
-          </NavigationContainer>
-        </KeyboardProvider>
-      </AxiosProvider>
+      <NetworkProvider>
+        <AxiosProvider interceptors={axiosInterceptors}>
+          <KeyboardProvider>
+            <StatusBar
+              animated={true}
+              backgroundColor={cssVar.cBlack}
+              barStyle={'light-content'}
+            />
+            <NavigationContainer ref={navigationRef}>
+              <AuthProvider>
+                <ActiveNotificationDB />
+                <OneSignalContextProvider>
+                  <InitProject />
+                  <MyDrawer />
+                </OneSignalContextProvider>
+              </AuthProvider>
+            </NavigationContainer>
+          </KeyboardProvider>
+        </AxiosProvider>
+      </NetworkProvider>
     </GestureHandlerRootView>
   );
 }

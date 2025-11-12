@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View, RefreshControl, Keyboard, ScrollView} from 'react-native';
+import {View, RefreshControl, Keyboard, ScrollView, Text} from 'react-native';
 import Animated from 'react-native-reanimated';
 import HeadTitle from './HeadTitle';
 import {cssVar, ThemeType, TypeStyles} from '../../styles/themes';
@@ -16,6 +16,7 @@ import {
 } from '../../../src/icons/IconLibrary';
 import {useEvent} from '../../hooks/useEvent';
 import ChooseClient from '../../../src/components/ChooseClient/ChooseClient';
+import {useNetwork} from '../../contexts/NetworkContext';
 
 type PropsType = {
   title?: string;
@@ -59,8 +60,20 @@ const Layout = (props: PropsType) => {
   const route = useRoute();
   const scrollViewRef: any = useRef(null);
   const [openAlert, setOpenAlert]: any = useState({open: false, data: null});
-  const [openAlertDetail, setOpenAlertDetail]: any = useState({open: false, id: null});
+  const [openAlertDetail, setOpenAlertDetail]: any = useState({
+    open: false,
+    id: null,
+  });
   const shouldDisableScroll = route.name === 'QrIndividual';
+  const {isInternetReachable, isConnecting, type} = useNetwork();
+
+  // useEffect(() => {
+  //   if (isConnecting) return;
+
+  //   if (!isInternetReachable) {
+  //     Alert.alert('Sin conexión', 'Verifica tu conexión a internet');
+  //   }
+  // }, [isInternetReachable, isConnecting]);
 
   const onNotif = useCallback((data: any) => {
     if (data?.event === 'alerts') {
@@ -145,6 +158,20 @@ const Layout = (props: PropsType) => {
   }, []);
   return (
     <View style={[theme.layout]} onTouchEnd={onPress}>
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
+          backgroundColor: 'red',
+        }}>
+        <Text style={{color: 'white', textAlign: 'center'}}>
+          {!isInternetReachable ? 'Sin conexión' : 'Conexión'}
+          {type}
+        </Text>
+      </View>
       <HeadTitle
         title={title}
         customTitle={customTitle}
