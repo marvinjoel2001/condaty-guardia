@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, Keyboard} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
@@ -588,6 +588,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         <AccompaniedAdd
           open={addCompanion}
           onClose={() => {
+            Keyboard.dismiss();
             setAddCompanion(false);
           }}
           item={formState}
