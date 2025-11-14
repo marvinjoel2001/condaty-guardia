@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import IndividualQR from './IndividualQR';
 import GroupQR from './GroupQR';
@@ -6,13 +6,13 @@ import KeyQR from './KeyQR';
 import FrequentQR from './FrequentQR';
 import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
-import {getUTCNow} from '../../../../mk/utils/dates';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import { getUTCNow } from '../../../../mk/utils/dates';
+import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
-import {Text, View} from 'react-native';
+import { Text, View } from 'react-native';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconAlert, IconX} from '../../../icons/IconLibrary';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { IconAlert, IconX } from '../../../icons/IconLibrary';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 
 interface TypeProps {
   code: string;
@@ -21,20 +21,20 @@ interface TypeProps {
   reload: any;
 }
 
-const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
+const EntryQR = ({ code, open, onClose, reload }: TypeProps) => {
   const [formState, setFormState]: any = useState({});
   const [openSelected, setOpenSelected]: any = useState(false);
   const [errors, setErrors] = useState({});
   const [data, setData]: any = useState(null);
-  const {execute} = useApi();
+  const { execute } = useApi();
   const [tab, setTab] = useState('P');
-  const {showToast, waiting} = useAuth();
+  const { showToast, waiting } = useAuth();
   const [msgErrorQr, setMsgErrorQr] = useState('');
   const typeFromQr = code[2];
   const codeId: any = code[3];
 
   const handleChange = (key: string, value: any) => {
-    setFormState((prevState: any) => ({...prevState, [key]: value}));
+    setFormState((prevState: any) => ({ ...prevState, [key]: value }));
   };
 
   useEffect(() => {
@@ -46,11 +46,11 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
         codeId.indexOf(ltime) > -1
           ? 'A'
           : codeId.indexOf(ltime - 4) > -1
-          ? 'A'
-          : 'X';
+            ? 'A'
+            : 'X';
       let id = codeId.replace(ltime, '');
       id = id.replace(ltime - 4, '');
-      const {data: QR} = await execute(
+      const { data: QR } = await execute(
         '/owners',
         'GET',
         {
@@ -75,7 +75,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
     };
 
     const getInvitation = async () => {
-      const {data: invitation} = await execute(
+      const { data: invitation } = await execute(
         '/invitations',
         'GET',
         {
@@ -133,14 +133,13 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
   }, [data]);
 
   const onOut = async () => {
-    const {data: In} = await execute('/accesses/exit', 'POST', {
+    const { data: In } = await execute('/accesses/exit', 'POST', {
       id: formState.access_id,
       obs_out: formState.obs_out,
     });
     if (In?.success) {
       if (reload) reload();
       onClose();
-      showToast('El visitante salió', 'success');
     } else {
       showToast(In.message || 'Error al registrar la salida.', 'error');
     }
@@ -260,17 +259,13 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
       };
     }
 
-    const {data: In, error} = await execute(
+    const { data: In, error } = await execute(
       '/accesses/enterqr',
       'POST',
       params,
     );
     if (In?.success) {
       if (reload) reload();
-      showToast(
-        'Visita registrada y notificación enviada con éxito',
-        'success',
-      );
       setFormState({});
       onClose();
     } else {
@@ -408,10 +403,10 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
             ? 'Dejar ingresar'
             : ''
           : isExit()
-          ? 'Registrar salida'
-          : msgErrorQr
-          ? ''
-          : 'Dejar ingresar'
+            ? 'Registrar salida'
+            : msgErrorQr
+              ? ''
+              : 'Dejar ingresar'
       }>
       {msgErrorQr ? <RenderErrorMsg /> : renderContent()}
     </ModalFull>
