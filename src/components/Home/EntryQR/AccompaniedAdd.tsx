@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import Input from '../../../../mk/components/forms/Input/Input';
 import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
 type TypeProps = {
   open: boolean;
   onClose: () => void;
@@ -22,8 +22,8 @@ export const AccompaniedAdd = ({
 }: TypeProps) => {
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors]: any = useState({});
-  const {execute} = useApi();
-  const {showToast} = useAuth();
+  const { execute } = useApi();
+  const { showToast } = useAuth();
 
   useEffect(() => {
     if (open && editItem) {
@@ -41,7 +41,7 @@ export const AccompaniedAdd = ({
   }, [open, editItem]);
 
   const handleChange = (key: string, value: any) => {
-    setFormState((prevState: any) => ({...prevState, [key]: value}));
+    setFormState((prevState: any) => ({ ...prevState, [key]: value }));
   };
   const onExist = async () => {
     if (formState?.ci === item.ci) {
@@ -59,7 +59,7 @@ export const AccompaniedAdd = ({
       });
       return;
     }
-    const {data: exist} = await execute('/visits', 'GET', {
+    const { data: exist } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       // searchBy: formState?.ci,
@@ -132,18 +132,17 @@ export const AccompaniedAdd = ({
       acompanantes = acompanantes.map((acompanante: any) =>
         acompanante.ci === editItem.ci
           ? {
-              ci: formState.ci,
-              name: formState.name,
-              middle_name: formState.middle_name,
-              last_name: formState.last_name,
-              mother_last_name: formState.mother_last_name,
-            }
+            ci: formState.ci,
+            name: formState.name,
+            middle_name: formState.middle_name,
+            last_name: formState.last_name,
+            mother_last_name: formState.mother_last_name,
+          }
           : acompanante,
       );
-      setItem({...item, acompanantes});
+      setItem({ ...item, acompanantes });
       _onClose();
       setFormState({});
-      showToast('Acompañante editado');
       return;
     }
     if (acompanantes?.length > 0) {
@@ -174,10 +173,9 @@ export const AccompaniedAdd = ({
       // nameDisabled: formState.nameDisabled,
     });
 
-    setItem({...item, acompanantes});
+    setItem({ ...item, acompanantes });
     _onClose();
     setFormState({});
-    showToast('Acompañante agregado');
   };
 
   const _onClose = () => {
