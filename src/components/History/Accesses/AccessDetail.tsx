@@ -405,10 +405,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             <ItemList
               title={getFullName(resident)}
               subtitle2={
-                'Unidad: ' +
+                (resident?.dpto?.[0]?.type?.name || 'Unidad') +
+                ': ' +
                 resident?.dpto?.[0]?.nro +
                 ', ' +
-                resident?.dpto?.[0]?.description
+                (resident?.dpto?.[0]?.description || '')
               }
               left={
                 <Avatar
@@ -644,7 +645,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           <ItemList
             title={getFullName(resident)}
             subtitle={
-              'Unidad: ' +
+              (resident?.dpto?.[0]?.type?.name || 'Unidad') +
+              ': ' +
               resident?.dpto?.[0]?.nro +
               ', ' +
               (resident?.dpto?.[0]?.description || '')
@@ -709,10 +711,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     style={{marginBottom: 12}}
                     title={getFullName(modalPersonData.person)}
                     subtitle={
-                      'Unidad: ' +
+                      (modalPersonData.person?.dpto?.[0]?.type?.name ||
+                        'Unidad') +
+                      ': ' +
                       modalPersonData.person?.dpto?.[0]?.nro +
                       ', ' +
-                      modalPersonData.person?.dpto?.[0]?.description
+                      (modalPersonData.person?.dpto?.[0]?.description || '')
                     }
                     left={
                       <Avatar
