@@ -272,10 +272,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     if (data?.success === true) {
       onClose();
       reload();
-      showToast(
-        dataOwner ? 'Visita registrada' : 'Notificación enviada',
-        'success',
-      );
     } else {
       setSaving(false);
       showToast(data?.message, 'error');
