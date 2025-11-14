@@ -41,7 +41,7 @@ const DetailRow = ({
   }
 
   return (
-    <View style={styles.detailRow}>
+    <View style={styles.detailRow} pointerEvents="none" onStartShouldSetResponder={() => false}>
       <Text style={styles.detailLabel}>{label}</Text>
       {typeof value === 'string' ? (
         <Text style={[styles.detailValue, valueStyle]}>{value}</Text>
@@ -284,11 +284,18 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
     if (item.type === 'F') {
       return (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
+          nestedScrollEnabled
+          showsVerticalScrollIndicator
+          style={{flex: 1}}
+          onStartShouldSetResponder={() => true}>
           <View style={styles.mainCard}>
-            <Text style={styles.sectionTitleNoBorder}>
-              Resumen de la visita
-            </Text>
+            <View pointerEvents="none">
+              <Text style={styles.sectionTitleNoBorder}>Resumen de la visita</Text>
+            </View>
             <ItemList
               title={mainUserFullName}
               subtitle={
@@ -337,9 +344,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow label="Observación de salida" value={item.obs_out} />
               {companions && companions.length > 0 && (
                 <View style={styles.sectionContainer}>
-                  <Text style={styles.sectionTitle}>
-                    Acompañante{companions.length > 1 ? 's' : ''}
-                  </Text>
+                  <View pointerEvents="none">
+                    <Text style={styles.sectionTitle}>
+                      Acompañante{companions.length > 1 ? 's' : ''}
+                    </Text>
+                  </View>
                   {companions.map((companionAccess: any, index: number) => (
                     <View
                       key={`companion-wrapper-${companionAccess.id || index}`}
@@ -362,7 +371,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               )}
               {driver && (
                 <View style={styles.sectionContainer}>
-                  <Text style={styles.sectionTitle}>Taxista</Text>
+                  <View pointerEvents="none">
+                    <Text style={styles.sectionTitle}>Taxista</Text>
+                  </View>
                   <ItemList
                     title={getFullName(driver)}
                     subtitle={
@@ -404,7 +415,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             </View>
           </View>
           <View style={styles.mainCardR}>
-            <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+            <View pointerEvents="none">
+              <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+            </View>
             <ItemList
               title={getFullName(resident)}
               subtitle2={
@@ -443,7 +456,13 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       );
     }
     return (
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled
+        showsVerticalScrollIndicator
+        style={{flex: 1}}
+        onStartShouldSetResponder={() => true}>
         <View style={styles.mainCard}>
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>
@@ -560,7 +579,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                         paddingHorizontal: 8,
                         paddingVertical: 4,
                         borderRadius: 999,
-                      }}>
+                      }}
+                      pointerEvents="none">
                       <Text
                         style={{
                           color:
@@ -690,7 +710,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     );
   };
   return (
-    <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose}>
+    <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose} scrollViewHide disableFormPress>
       {renderBody()}
       {isPersonDetailModalVisible && modalPersonData && (
         <Modal
