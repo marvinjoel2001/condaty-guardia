@@ -143,6 +143,10 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
           console.log('====================================');
           return currentUser;
         }
+        if (!isInternetReachable && !isConnecting) {
+          showToast('No hay conexión a internet', 'error');
+          return currentUser;
+        }
         try {
           await AsyncStorage.removeItem(configApp.APP_AUTH_IAM + 'token');
           setUser(false);
