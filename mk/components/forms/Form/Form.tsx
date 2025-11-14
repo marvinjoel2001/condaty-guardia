@@ -14,20 +14,35 @@ interface FormProps {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   offset?: number;
+  pressable?: boolean;
 }
 
-const Form = ({children, style, offset = 0}: FormProps) => {
+const Form = ({children, style, offset = 0, pressable = true}: FormProps) => {
   const dismissKeyboard = useCallback(() => Keyboard.dismiss(), []);
 
+  if (pressable) {
+    return (
+      <Pressable
+        style={{flex: 1}}
+        onPress={dismissKeyboard}
+        android_disableSound>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={isAndroid() ? offset : 60}
+          style={[{flex: 1}, style]}>
+          <View style={{flex: 1}}>{children}</View>
+        </KeyboardAvoidingView>
+      </Pressable>
+    );
+  }
+
   return (
-    <Pressable style={{flex: 1}} onPress={dismissKeyboard} android_disableSound>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={isAndroid() ? offset : 60}
-        style={[{flex: 1}, style]}>
-        <View style={{flex: 1}}>{children}</View>
-      </KeyboardAvoidingView>
-    </Pressable>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={isAndroid() ? offset : 60}
+      style={[{flex: 1}, style]}>
+      <View style={{flex: 1}}>{children}</View>
+    </KeyboardAvoidingView>
   );
 };
 

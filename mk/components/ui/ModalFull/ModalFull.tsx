@@ -45,6 +45,7 @@ type PropsType = {
   scrollViewHide?: boolean;
   onBack?: () => void;
   headerHide?: boolean;
+  disableFormPress?: boolean;
 };
 
 const ModalFull = memo(
@@ -69,6 +70,7 @@ const ModalFull = memo(
     onShow,
     right,
     onBack,
+    disableFormPress = false,
   }: PropsType) => {
     const {toast, showToast}: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
@@ -148,7 +150,7 @@ const ModalFull = memo(
           <SafeAreaViewAndroid
             style={{flex: 1, backgroundColor: cssVar.cBlack}}>
             <SafeAreaView style={{flex: 1}}>
-              <Form>
+              <Form pressable={!disableFormPress}>
                 <View style={theme.container}>
                   {!headerHide && (
                     <HeadTitle
