@@ -87,6 +87,10 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
       token = null;
     }
     currentUser = user || token?.user;
+    if (!isInternetReachable) {
+      showToast('No hay conexión a internet', 'error');
+      return currentUser;
+    }
     const credentials: any = {};
     if (client_id) credentials.client_id = client_id;
     credentials.os = Platform.OS;
@@ -143,7 +147,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
           console.log('====================================');
           return currentUser;
         }
-        if (!isInternetReachable && !isConnecting) {
+        if (!isInternetReachable) {
           showToast('No hay conexión a internet', 'error');
           return currentUser;
         }
@@ -193,6 +197,19 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
     }
   };
   const login = async (credentials: any) => {
+    if (!isInternetReachable) {
+      let currentUser: any = false;
+      let token: any = null;
+      try {
+        token = await AsyncStorage.getItem(configApp.APP_AUTH_IAM + 'token');
+        token = token != null ? JSON.parse(token) : null;
+      } catch (e) {
+        token = null;
+      }
+      currentUser = user || token?.user;
+      showToast('No hay conexión a internet', 'error');
+      return currentUser;
+    }
     setSplash(true);
     setWaiting(1, 'login');
     setUser(false);
