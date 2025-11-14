@@ -31,15 +31,20 @@ const DetailRow = ({
   value: any;
   valueStyle?: object;
 }) => {
-  let displayValue = value;
-  if (value === undefined || value === null || value === '') {
-    displayValue = '-/-';
+  if (
+    value === undefined ||
+    value === null ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (typeof value === 'string' && value.trim().toLowerCase() === 'n/a')
+  ) {
+    return null;
   }
+
   return (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
-      {typeof displayValue === 'string' ? (
-        <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
+      {typeof value === 'string' ? (
+        <Text style={[styles.detailValue, valueStyle]}>{value}</Text>
       ) : (
         value
       )}
@@ -114,8 +119,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         setAccessData(apiResponse.data?.[0] || null);
       }
     } catch (error) {
-      console.error('Failed to fetch access details:', error);
-
       setAccessData(null);
     }
   };
@@ -439,7 +442,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         </ScrollView>
       );
     }
-    console.log(item);
     return (
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.mainCard}>
@@ -450,7 +452,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             {mainVisitor ? (
               <ItemList
                 title={mainUserFullName}
-                // subtitle={(mainUserCi ? `C.I. ${mainUserCi}` : '')}
                 subtitle={`C.I. ${
                   (item?.type == 'O' ? item?.owner?.ci : item?.visit?.ci) ||
                   '-/-'
@@ -498,14 +499,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow
                 label="Guardia de ingreso"
                 value={
-                  statusText === 'Rechazado' ? '-/-' : getFullName(item.guardia)
+                  statusText === 'Rechazado' ? null : getFullName(item.guardia)
                 }
               />
               <DetailRow
                 label="Guardia de salida"
                 value={
                   statusText === 'Rechazado'
-                    ? '-/-'
+                    ? null
                     : getFullName(item.out_guard)
                 }
               />
