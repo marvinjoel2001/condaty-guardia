@@ -23,8 +23,8 @@ export const validPassword: ValidFunctionType = (value, param) => {
 
 export const validCi: ValidFunctionType = (value, param) => {
   let [min, max]: any = param;
-  if (!min) min = 7;
-  if (!max) max = 10;
+  if (!min) min = 5;
+  if (!max) max = 13;
   const error = 'El CI debe tener entre ' + min + ' y ' + max + ' numeros';
   return value.length < min || value.length > max || isNaN(value) ? error : '';
 };
