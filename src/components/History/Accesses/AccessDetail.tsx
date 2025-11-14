@@ -31,15 +31,20 @@ const DetailRow = ({
   value: any;
   valueStyle?: object;
 }) => {
-  let displayValue = value;
-  if (value === undefined || value === null || value === '') {
-    displayValue = '-/-';
+  if (
+    value === undefined ||
+    value === null ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (typeof value === 'string' && value.trim().toLowerCase() === 'n/a')
+  ) {
+    return null;
   }
+
   return (
     <View style={styles.detailRow} pointerEvents="none" onStartShouldSetResponder={() => false}>
       <Text style={styles.detailLabel}>{label}</Text>
-      {typeof displayValue === 'string' ? (
-        <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
+      {typeof value === 'string' ? (
+        <Text style={[styles.detailValue, valueStyle]}>{value}</Text>
       ) : (
         value
       )}
@@ -114,7 +119,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         setAccessData(apiResponse.data?.[0] || null);
       }
     } catch (error) {
-      
       setAccessData(null);
     }
   };
@@ -451,7 +455,6 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         </ScrollView>
       );
     }
-    
     return (
       <ScrollView contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="always"
@@ -515,14 +518,14 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow
                 label="Guardia de ingreso"
                 value={
-                  statusText === 'Rechazado' ? '-/-' : getFullName(item.guardia)
+                  statusText === 'Rechazado' ? null : getFullName(item.guardia)
                 }
               />
               <DetailRow
                 label="Guardia de salida"
                 value={
                   statusText === 'Rechazado'
-                    ? '-/-'
+                    ? null
                     : getFullName(item.out_guard)
                 }
               />
