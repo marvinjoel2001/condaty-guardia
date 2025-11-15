@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
@@ -18,8 +18,9 @@ const paramsInitial = {
 };
 const Accesses = () => {
   const [search, setSearch] = useState('');
-  const [openDetail, setOpenDetail] = useState({open: false, id: null});
+  const [openDetail, setOpenDetail] = useState({ open: false, id: null });
   const [params, setParams] = useState(paramsInitial);
+  const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
   // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
   // const removeAccents = (str: string) => {
   //   return str
@@ -27,11 +28,21 @@ const Accesses = () => {
   //     ?.replace(/[\u0300-\u036f]/g, '')
   //     ?.toLowerCase();
   // };
-  const {data, reload, loaded} = useApi('/accesses', 'GET', params);
+  const { data, reload, loaded } = useApi('/accesses', 'GET', params);
 
   useEffect(() => {
     reload(params);
   }, [params]);
+
+  useEffect(() => {
+    if (data?.data) {
+      if (params.page === 1) {
+        setAccumulatedData(data.data);
+      } else {
+        setAccumulatedData(prev => [...prev, ...data.data]);
+      }
+    }
+  }, [data]);
   const getAccessSubtitle = (item: any): string => {
     const groupTitle = item.invitation?.title || item.access?.invitation?.title;
 
@@ -72,8 +83,8 @@ const Accesses = () => {
             src={
               !item?.visit
                 ? getUrlImages(
-                    '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
-                  )
+                  '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
+                )
                 : ''
             }
           />
@@ -84,36 +95,43 @@ const Accesses = () => {
   };
   const onSearch = (value: string) => {
     setSearch(value);
+    setAccumulatedData([]);
     if (value == '') {
       setParams(paramsInitial);
       return;
     }
     setParams({
       ...params,
-      perPage: -1,
+      page: 1,
+      perPage: 10,
       searchBy: value,
     });
   };
   const handleReload = () => {
     setParams(paramsInitial);
+    setAccumulatedData([]);
   };
 
   const onPagination = () => {
-    const total = data?.message?.total || 0;
-    const currentLength = data?.data?.length || 0;
-    const maxPage = Math.ceil(total / params.perPage);
+    if (!loaded) {
+      return;
+    }
 
-    if (currentLength >= total || params.page >= maxPage || !loaded) {
+    const total = data?.message?.total || 0;
+    const currentLength = accumulatedData?.length || 0;
+
+    // Si ya tenemos todos los datos, no paginar más
+    if (currentLength >= total) {
       return;
     }
 
     setParams(prev => ({
       ...prev,
-      perPage: prev.perPage + 20,
+      page: prev.page + 1,
     }));
   };
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           flexDirection: 'row',
@@ -125,23 +143,23 @@ const Accesses = () => {
           setSearch={(value: string) => onSearch(value)}
           name="accesses"
           value={search}
-          style={{flex: 1}}
+          style={{ flex: 1 }}
         />
       </View>
       <ListFlat
-        data={data?.data}
+        data={accumulatedData}
         renderItem={renderItem}
-        refreshing={!loaded && params.perPage === -1}
+        refreshing={!loaded && params.page === 1}
         emptyLabel="No hay datos"
         onRefresh={handleReload}
-        loading={!loaded && params.perPage > -1}
+        loading={!loaded && params.page > 1}
         onPagination={onPagination}
         total={data?.message?.total || 0}
       />
       {openDetail?.open && (
         <AccessDetail
           open={openDetail?.open}
-          onClose={() => setOpenDetail({open: false, id: null})}
+          onClose={() => setOpenDetail({ open: false, id: null })}
           id={openDetail?.id}
         />
       )}

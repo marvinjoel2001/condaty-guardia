@@ -1,15 +1,15 @@
 import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconArrowLeft, IconArrowRight} from '../../../icons/IconLibrary';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {getDateTimeStrMes} from '../../../../mk/utils/dates';
+import { IconArrowLeft, IconArrowRight } from '../../../icons/IconLibrary';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { getDateTimeStrMes } from '../../../../mk/utils/dates';
 
 type Props = {
   access: any;
 };
 
-const DateAccess = ({access}: Props) => {
+const DateAccess = ({ access }: Props) => {
   let invitationIsPast = false;
 
   if (
@@ -32,7 +32,7 @@ const DateAccess = ({access}: Props) => {
           }
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (invitationIsPast && !access?.in_at) {
@@ -68,7 +68,7 @@ const DateAccess = ({access}: Props) => {
     </View>
   );
 };
-
+export default DateAccess;
 const styles = StyleSheet.create({
   statusContainer: {
     marginTop: 4,
@@ -104,4 +104,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DateAccess;
+
