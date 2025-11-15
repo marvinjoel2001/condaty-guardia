@@ -1,12 +1,12 @@
-import {createContext, useEffect, useRef, useState} from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import Login from '../../src/components/auth/Login';
 import useApi from '../hooks/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Toast, {TIME_TOAST} from '../components/ui/Toast/Toast';
+import Toast, { TIME_TOAST } from '../components/ui/Toast/Toast';
 import configApp from '../../src/config/config';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import React from 'react';
-import {useNetwork} from './NetworkContext';
+import { useNetwork } from './NetworkContext';
 
 interface AuthProviderProps {
   children: any;
@@ -33,9 +33,9 @@ export interface AuthContextType {
   setUser: Function;
 }
 export const AuthContext = createContext({} as AuthContextType);
-const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
-  const {data, error, loaded, execute, waiting, setWaiting} = useApi();
-  const {isInternetReachable, isConnecting, type} = useNetwork();
+const AuthProvider = ({ children, noAuth = false }: AuthProviderProps) => {
+  const { data, error, loaded, execute, waiting, setWaiting } = useApi();
+  const { isInternetReachable, isConnecting, type } = useNetwork();
   const [user, setUser] = useState<any>(null);
   const [store, setStore] = useState<any>(null);
   const storeRef = useRef<any>(null);
@@ -49,8 +49,8 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
 
   const _setStore = async (newStore: object) => {
     await setStore((old: any) => {
-      if (typeof newStore == 'function') return {...newStore(old)};
-      return {...old, ...newStore};
+      if (typeof newStore == 'function') return { ...newStore(old) };
+      return { ...old, ...newStore };
     });
   };
   const showToast = (
@@ -58,7 +58,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
     type: 'success' | 'error' | 'warning' | 'info' = 'success',
     time: number = TIME_TOAST,
   ) => {
-    setToast({msg: message, type, time});
+    setToast({ msg: message, type, time });
   };
   const getConfig = async () => {
     setWaiting(1, 'getConfig');
@@ -87,10 +87,6 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
       token = null;
     }
     currentUser = user || token?.user;
-    if (!isInternetReachable) {
-      showToast('No hay conexión a internet', 'error');
-      return currentUser;
-    }
     const credentials: any = {};
     if (client_id) credentials.client_id = client_id;
     credentials.os = Platform.OS;
@@ -103,7 +99,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
     }
 
     if (currentUser) {
-      const {data, error}: any = await execute(
+      const { data, error }: any = await execute(
         configApp.APP_AUTH_IAM,
         'POST',
         credentials,
@@ -113,12 +109,12 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
       if (data?.success && !error) {
         currentUser = data?.data?.user;
         // console.log('iam success', data?.data?.user);
-        if (currentUser) currentUser = {...currentUser, token: token?.token};
+        if (currentUser) currentUser = { ...currentUser, token: token?.token };
         await setUser(currentUser);
         try {
           await AsyncStorage.setItem(
             configApp.APP_AUTH_IAM + 'token',
-            JSON.stringify({token: token.token, user: data?.data?.user}),
+            JSON.stringify({ token: token.token, user: data?.data?.user }),
           );
         } catch (error) {
           console.log('====================================');
@@ -147,7 +143,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
           console.log('====================================');
           return currentUser;
         }
-        if (!isInternetReachable) {
+        if (!isInternetReachable && !isConnecting) {
           showToast('No hay conexión a internet', 'error');
           return currentUser;
         }
@@ -164,7 +160,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
         }
       }
     }
-    if (currentUser) currentUser = {...currentUser, token: token?.token};
+    if (currentUser) currentUser = { ...currentUser, token: token?.token };
     await setUser(currentUser);
     setWaiting(-1, '-getUser2');
     setSplash(false);
@@ -182,10 +178,10 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
     try {
       await AsyncStorage.setItem(
         configApp.APP_AUTH_IAM + 'token',
-        JSON.stringify({token: data?.data?.token, user: data?.data?.user}),
+        JSON.stringify({ token: data?.data?.token, user: data?.data?.user }),
       );
       setWaiting(-1, '-login');
-      return {user: data?.data?.user};
+      return { user: data?.data?.user };
     } catch (error) {
       console.log('====================================');
       console.log(
@@ -197,23 +193,10 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
     }
   };
   const login = async (credentials: any) => {
-    if (!isInternetReachable) {
-      let currentUser: any = false;
-      let token: any = null;
-      try {
-        token = await AsyncStorage.getItem(configApp.APP_AUTH_IAM + 'token');
-        token = token != null ? JSON.parse(token) : null;
-      } catch (e) {
-        token = null;
-      }
-      currentUser = user || token?.user;
-      showToast('No hay conexión a internet', 'error');
-      return currentUser;
-    }
     setSplash(true);
     setWaiting(1, 'login');
     setUser(false);
-    const {data, error}: any = await execute(
+    const { data, error }: any = await execute(
       configApp.APP_AUTH_LOGIN,
       'POST',
       credentials,
@@ -223,21 +206,21 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
     if (data?.success && !error) {
       console.log(
         'User Logueado:',
-        JSON.stringify({id: data.data.user.id, name: data.data.user.name}),
+        JSON.stringify({ id: data.data.user.id, name: data.data.user.name }),
       );
       try {
         await AsyncStorage.setItem(
           configApp.APP_AUTH_IAM + 'token',
-          JSON.stringify({token: data?.data?.token, user: data?.data?.user}),
+          JSON.stringify({ token: data?.data?.token, user: data?.data?.user }),
         );
         const apiToken = await AsyncStorage.getItem(
           configApp.APP_AUTH_IAM + 'token',
         );
         // console.log('apiToken New Grabado', apiToken);
-        await setUser({...data?.data?.user, token: data?.data?.token});
+        await setUser({ ...data?.data?.user, token: data?.data?.token });
         setWaiting(-1, '-login');
         setSplash(false);
-        return {user: {...data?.data?.user, token: data?.data?.token}};
+        return { user: { ...data?.data?.user, token: data?.data?.token } };
       } catch (error) {
         setSplash(false);
         console.log('====================================');
@@ -251,13 +234,13 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
       console.log('====================================');
       setWaiting(-1, '-loginError');
       setSplash(false);
-      return {user: false, errors: data?.errors || data?.message || error};
+      return { user: false, errors: data?.errors || data?.message || error };
     }
   };
   const logout = async () => {
     try {
       setWaiting(1, 'logout');
-      const {data, error}: any = await execute(
+      const { data, error }: any = await execute(
         configApp.APP_AUTH_LOGOUT,
         'POST',
       );
@@ -272,7 +255,7 @@ const AuthProvider = ({children, noAuth = false}: AuthProviderProps) => {
         console.log('Logout Error', data);
         console.log('====================================');
         setWaiting(-1, '-logoutError');
-        return {user, errors: data?.errors || data?.message || error};
+        return { user, errors: data?.errors || data?.message || error };
       }
     } catch (error) {
       await AsyncStorage.removeItem(configApp.APP_AUTH_IAM + 'token');
