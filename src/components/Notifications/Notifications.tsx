@@ -1,8 +1,8 @@
-import React, {useState, useEffect, useCallback, useRef} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import useApi from '../../../mk/hooks/useApi';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-import {cssVar} from '../../../mk/styles/themes';
+import { cssVar } from '../../../mk/styles/themes';
 import {
   IconAlertNotification,
   IconAmbulance,
@@ -15,12 +15,12 @@ import {
   IconVehicle,
   IconVisit,
 } from '../../icons/IconLibrary';
-import {Text} from 'react-native';
+import { Text } from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import ItemList from '../../../mk/components/ui/ItemList/ItemList';
-import {getDateTimeAgo} from '../../../mk/utils/dates';
-import {useEvent} from '../../../mk/hooks/useEvent';
-import {useFocusEffect, useRoute} from '@react-navigation/native';
+import { getDateTimeAgo } from '../../../mk/utils/dates';
+import { useEvent } from '../../../mk/hooks/useEvent';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';
 import DetAccesses from '../Home/Accesses/DetAccesses';
 import AlertDetail from '../Alerts/AlertDetail';
@@ -54,11 +54,11 @@ const Notifications = () => {
     if (!executedFromPushRef.current && params?.fromPush && params?.pushData) {
       executedFromPushRef.current = true;
       // Adaptamos pushData al formato esperado por goNotif
-      goNotif({info: params.pushData});
+      goNotif({ info: params.pushData });
     }
   }, [(route as any)?.params]);
 
-  const {dispatch}: any = useEvent('onResetNotif');
+  const { dispatch }: any = useEvent('onResetNotif');
   useFocusEffect(
     React.useCallback(() => {
       reload();
@@ -68,7 +68,7 @@ const Notifications = () => {
 
   const goNotif = (data: any) => {
     if (data.info?.act == 'in-pedido') {
-      setFormState({id: data.info?.pedido_id});
+      setFormState({ id: data.info?.pedido_id });
       setOpenDetail(data.info?.pedido_id ? 'Pedidos' : '');
     }
     if (
@@ -76,16 +76,16 @@ const Notifications = () => {
       data.info?.act == 'confirm' ||
       data.info?.act == 'new-visit' //no deberia recibir
     ) {
-      setFormState({id: data.info?.id});
+      setFormState({ id: data.info?.id });
       setOpenDetail(data.info?.id ? 'Access' : '');
     }
     if (data.info?.act == 'in-visit') {
       //no deberia recibir
-      setFormState({id: data.info?.access_id});
+      setFormState({ id: data.info?.access_id });
       setOpenDetail(data.info?.access_id ? 'Access' : '');
     }
     if (data.info?.act == 'alerts') {
-      setFormState({id: data.info?.id});
+      setFormState({ id: data.info?.id });
       setOpenDetail(data.info?.id ? 'Alerts' : '');
     }
   };
@@ -160,8 +160,8 @@ const Notifications = () => {
               data.info?.ped_type == 1
                 ? IconDelivery
                 : data.info?.ped_type == 2
-                ? IconTaxi
-                : IconOther
+                  ? IconTaxi
+                  : IconOther
             }
           />
         );
@@ -214,7 +214,7 @@ const Notifications = () => {
               borderRadius: 50,
               padding: 8,
               backgroundColor: cssVar.cWhite,
-              transform: [{rotateY: '180deg'}],
+              transform: [{ rotateY: '180deg' }],
             }}
             color={cssVar.cSuccess}
             name={IconVisit}
@@ -323,7 +323,7 @@ const Notifications = () => {
 
     setParams(prev => ({
       ...prev,
-      perPage: prev.perPage + 20,
+      page: prev.page + 1,
     }));
   };
   return (
