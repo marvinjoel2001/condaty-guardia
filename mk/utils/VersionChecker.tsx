@@ -14,7 +14,7 @@ const VersionChecker = ({ children }: { children: React.ReactNode }) => {
   const [updateUrl, setUpdateUrl] = useState('');
   const [shouldFetch, setShouldFetch] = useState(false);
 
-  const { data } = useApi('/app-version', 'GET', {}, 0, shouldFetch);
+  const { data, execute, reload } = useApi('/app-version', 'GET', {}, 0, shouldFetch);
 
   const images = {
     ios: require('../../src/images/condy-app-store.png'),
@@ -41,10 +41,8 @@ const VersionChecker = ({ children }: { children: React.ReactNode }) => {
         return true;
       }
 
-      // console.log(`Version check skipped. Last check: ${lastCheckDate.toLocaleString()}. Next check in: ${Math.ceil((ONE_HOUR_IN_MS - timeDifference) / 60000)} minutes`);
       return false;
     } catch (error) {
-      // console.log('Error checking last version check time:', error);
       return true; // En caso de error, hacer la consulta
     }
   };
@@ -54,9 +52,7 @@ const VersionChecker = ({ children }: { children: React.ReactNode }) => {
     try {
       const currentTime = new Date().toISOString();
       await AsyncStorage.setItem(VERSION_CHECK_KEY, currentTime);
-      // console.log(`Version check time saved: ${currentTime}`);
     } catch (error) {
-      // console.log('Error saving version check time:', error);
     }
   };
 
@@ -71,7 +67,6 @@ const VersionChecker = ({ children }: { children: React.ReactNode }) => {
         currentVersion,
         latestVersion: minVersion,
       });
-      // console.log('needsUpdate', currentVersion, minVersion);
       if ((await needsUpdate)?.isNeeded) {
         setUpdateUrl(
           data.guard?.update_url?.[platform] ||
@@ -86,14 +81,16 @@ const VersionChecker = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const initializeVersionCheck = async () => {
-      // Verificar si debe hacer la consulta al backend
       const shouldCheck = await shouldCheckVersion();
 
       if (shouldCheck) {
-        // console.log('Checking for app updates...');
         setShouldFetch(true);
+        try {
+          if (reload) await reload({ prevent: false });
+          else if (execute) await execute();
+        } catch (err) {
+        }
       } else {
-        // console.log('Skipping version check (less than 1 hour since last check)');
       }
     };
 
