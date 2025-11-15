@@ -20,10 +20,21 @@ const WithoutQR = () => {
   const [search, setSearch] = useState('');
   const [openDetail, setOpenDetail] = useState({ open: false, id: null });
   const [params, setParams] = useState(paramsInitial);
+  const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
   const { data, reload, loaded } = useApi('/accesses', 'GET', params, 3);
   useEffect(() => {
     reload(params);
   }, [params]);
+
+  useEffect(() => {
+    if (data?.data) {
+      if (params.page === 1) {
+        setAccumulatedData(data.data);
+      } else {
+        setAccumulatedData(prev => [...prev, ...data.data]);
+      }
+    }
+  }, [data]);
 
   // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
   // const removeAccents = (str: string) => {
@@ -80,12 +91,14 @@ const WithoutQR = () => {
   };
   const onSearch = (value: string) => {
     setSearch(value);
+    setAccumulatedData([]);
     if (value == '') {
       setParams(paramsInitial);
       return;
     }
     setParams({
       ...params,
+      page: 1,
       perPage: 10,
       searchBy: value,
     });
@@ -93,13 +106,17 @@ const WithoutQR = () => {
 
   const handleReload = () => {
     setParams(paramsInitial);
+    setAccumulatedData([]);
   };
   const onPagination = () => {
-    const total = data?.message?.total || 0;
-    const currentLength = data?.data?.length || 0;
-    const maxPage = Math.ceil(total / params.perPage);
+    if (!loaded) {
+      return;
+    }
 
-    if (currentLength >= total || params.page >= maxPage || !loaded) {
+    const total = data?.message?.total || 0;
+    const currentLength = accumulatedData?.length || 0;
+
+    if (currentLength >= total) {
       return;
     }
 
@@ -126,12 +143,12 @@ const WithoutQR = () => {
       </View>
 
       <ListFlat
-        data={data?.data}
+        data={accumulatedData}
         renderItem={renderItem}
-        refreshing={!loaded && params.perPage === 10}
+        refreshing={!loaded && params.page === 1}
         emptyLabel="No hay datos"
         onRefresh={handleReload}
-        loading={!loaded && params.perPage > 10}
+        loading={!loaded && params.page > 1}
         onPagination={onPagination}
         total={data?.message?.total || 0}
       />
