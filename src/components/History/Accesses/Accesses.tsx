@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from './AccessDetail';
@@ -10,7 +10,7 @@ import useApi from '../../../../mk/hooks/useApi';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
 const paramsInitial = {
-  perPage: 10,
+  perPage: 30,
   page: 1,
   fullType: 'L',
   section: 'ACT',
@@ -18,7 +18,7 @@ const paramsInitial = {
 };
 const Accesses = () => {
   const [search, setSearch] = useState('');
-  const [openDetail, setOpenDetail] = useState({ open: false, id: null });
+  const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const [params, setParams] = useState(paramsInitial);
   const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
   // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
@@ -28,7 +28,7 @@ const Accesses = () => {
   //     ?.replace(/[\u0300-\u036f]/g, '')
   //     ?.toLowerCase();
   // };
-  const { data, reload, loaded } = useApi('/accesses', 'GET', params);
+  const {data, reload, loaded} = useApi('/accesses', 'GET', params);
 
   useEffect(() => {
     reload(params);
@@ -83,8 +83,8 @@ const Accesses = () => {
             src={
               !item?.visit
                 ? getUrlImages(
-                  '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
-                )
+                    '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
+                  )
                 : ''
             }
           />
@@ -103,7 +103,6 @@ const Accesses = () => {
     setParams({
       ...params,
       page: 1,
-      perPage: 10,
       searchBy: value,
     });
   };
@@ -116,22 +115,16 @@ const Accesses = () => {
     if (!loaded) {
       return;
     }
-
-    const total = data?.message?.total || 0;
-    const currentLength = accumulatedData?.length || 0;
-
-    // Si ya tenemos todos los datos, no paginar más
-    if (currentLength >= total) {
+    if (data?.message?.total == -1 && data?.data?.length < params.perPage) {
       return;
     }
-
     setParams(prev => ({
       ...prev,
       page: prev.page + 1,
     }));
   };
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -143,23 +136,22 @@ const Accesses = () => {
           setSearch={(value: string) => onSearch(value)}
           name="accesses"
           value={search}
-          style={{ flex: 1 }}
+          style={{flex: 1}}
         />
       </View>
       <ListFlat
         data={accumulatedData}
         renderItem={renderItem}
-        refreshing={!loaded && params.page === 1}
+        refreshing={params.page === 1 && !loaded}
         emptyLabel="No hay datos"
         onRefresh={handleReload}
-        loading={!loaded && params.page > 1}
+        loading={!loaded}
         onPagination={onPagination}
-        total={data?.message?.total || 0}
       />
       {openDetail?.open && (
         <AccessDetail
           open={openDetail?.open}
-          onClose={() => setOpenDetail({ open: false, id: null })}
+          onClose={() => setOpenDetail({open: false, id: null})}
           id={openDetail?.id}
         />
       )}

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -10,7 +10,7 @@ import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 
 const paramsInitial = {
-  perPage: 10,
+  perPage: 30,
   page: 1,
   fullType: 'WQ',
   section: 'ACT',
@@ -18,10 +18,10 @@ const paramsInitial = {
 };
 const WithoutQR = () => {
   const [search, setSearch] = useState('');
-  const [openDetail, setOpenDetail] = useState({ open: false, id: null });
+  const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const [params, setParams] = useState(paramsInitial);
   const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
-  const { data, reload, loaded } = useApi('/accesses', 'GET', params, 3);
+  const {data, reload, loaded} = useApi('/accesses', 'GET', params, 3);
   useEffect(() => {
     reload(params);
   }, [params]);
@@ -50,16 +50,16 @@ const WithoutQR = () => {
       item.type == 'O'
         ? 'Llave QR'
         : item.type == 'C'
-          ? 'Sin QR'
-          : item.type == 'I'
-            ? 'QR Individual'
-            : item.type == 'G'
-              ? 'QR Grupal'
-              : item.type == 'F'
-                ? 'QR Frecuente'
-                : item.type == 'P'
-                  ? 'Pedido'
-                  : '';
+        ? 'Sin QR'
+        : item.type == 'I'
+        ? 'QR Individual'
+        : item.type == 'G'
+        ? 'QR Grupal'
+        : item.type == 'F'
+        ? 'QR Frecuente'
+        : item.type == 'P'
+        ? 'Pedido'
+        : '';
 
     return (
       <ItemList
@@ -79,8 +79,8 @@ const WithoutQR = () => {
             src={
               !item?.visit
                 ? getUrlImages(
-                  '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
-                )
+                    '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
+                  )
                 : ''
             }
           />
@@ -99,7 +99,6 @@ const WithoutQR = () => {
     setParams({
       ...params,
       page: 1,
-      perPage: 10,
       searchBy: value,
     });
   };
@@ -112,11 +111,7 @@ const WithoutQR = () => {
     if (!loaded) {
       return;
     }
-
-    const total = data?.message?.total || 0;
-    const currentLength = accumulatedData?.length || 0;
-
-    if (currentLength >= total) {
+    if (data?.message?.total == -1 && data?.data?.length < params.perPage) {
       return;
     }
 
@@ -126,7 +121,7 @@ const WithoutQR = () => {
     }));
   };
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -138,24 +133,23 @@ const WithoutQR = () => {
           setSearch={(value: string) => onSearch(value)}
           name="without-qr"
           value={search}
-          style={{ flex: 1 }}
+          style={{flex: 1}}
         />
       </View>
 
       <ListFlat
         data={accumulatedData}
         renderItem={renderItem}
-        refreshing={!loaded && params.page === 1}
+        refreshing={params.page === 1 && !loaded}
         emptyLabel="No hay datos"
         onRefresh={handleReload}
-        loading={!loaded && params.page > 1}
+        loading={!loaded}
         onPagination={onPagination}
-        total={data?.message?.total || 0}
       />
       {openDetail?.open && (
         <AccessDetail
           open={openDetail?.open}
-          onClose={() => setOpenDetail({ open: false, id: null })}
+          onClose={() => setOpenDetail({open: false, id: null})}
           id={openDetail?.id}
         />
       )}

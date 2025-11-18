@@ -1,12 +1,5 @@
 import React, {memo, useCallback, useRef} from 'react';
-import {
-  FlatList,
-  RefreshControl,
-  View,
-  Text,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import {FlatList, RefreshControl, View, Text, StyleSheet} from 'react-native';
 import {cssVar, TypeStyles, FONTS} from '../../../styles/themes';
 import useAuth from '../../../hooks/useAuth';
 import Skeleton, {PropsTypeSkeleton} from '../Skeleton/Skeleton';
@@ -39,7 +32,7 @@ interface PropsType {
   onRefresh?: () => void;
   refreshing?: boolean;
   style?: TypeStyles;
-  emptyLabel?: React.ReactNode;
+  emptyLabel?: React.ReactNode | string;
   typeLoading?: 'loading' | 'skeleton';
   skeletonType?: PropsTypeSkeleton['type'];
   onPagination?: () => void;
@@ -49,10 +42,11 @@ interface PropsType {
   windowSize?: number;
   initialNumToRender?: number;
   maxToRenderPerBatch?: number;
-  getItemLayout?: (
-    item: any,
-    index: number,
-  ) => {length: number; offset: number; index: number};
+  iconEmpty?: React.ReactNode;
+  // getItemLayout?: (
+  //   item: any,
+  //   index: number,
+  // ) => {length: number; offset: number; index: number};
 }
 
 const ListFlat = memo((props: PropsType) => {
@@ -65,14 +59,15 @@ const ListFlat = memo((props: PropsType) => {
     refreshing = false,
     style,
     skeletonType = 'list',
-    emptyLabel,
+    emptyLabel = 'No hay datos',
     onPagination,
     loading = false,
-    removeClippedSubviews = true,
-    initialNumToRender = 30,
-    windowSize = 20,
-    maxToRenderPerBatch = 50,
-    getItemLayout,
+    removeClippedSubviews = false,
+    initialNumToRender = 10,
+    windowSize = 5,
+    maxToRenderPerBatch = 10,
+    iconEmpty,
+    // getItemLayout,
   } = props;
 
   const {setStore} = useAuth();
@@ -128,56 +123,8 @@ const ListFlat = memo((props: PropsType) => {
     [refreshing, onRefresh],
   );
 
-  // Estados de carga inicial
-  if (refreshing && (!data || data.length === 0)) {
-    return (
-      <View style={{paddingTop: 4}}>
-        <Skeleton type={skeletonType} />
-      </View>
-    );
-  }
-
-  if (loading && (!data || data.length === 0)) {
-    return (
-      <View style={{paddingTop: 4}}>
-        <Skeleton type={skeletonType} />
-      </View>
-    );
-  }
-
-  const screen = Dimensions.get('window');
-
-  // If there's no data, render the emptyLabel similarly to List.tsx
-  if (!data || !data?.length || data.length === 0) {
-    return typeof emptyLabel === 'string' ? (
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: screen.height - 400,
-        }}>
-        <Text
-          style={{
-            color: cssVar.cWhiteV1,
-            fontFamily: FONTS.semiBold,
-            textAlign: 'left',
-            fontSize: cssVar.sM,
-          }}>
-          {emptyLabel}
-        </Text>
-      </View>
-    ) : (
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          height:
-            Platform.OS == 'ios' ? screen.height - 250 : screen.height - 170,
-        }}>
-        {emptyLabel}
-      </View>
-    );
-  }
+  const ListHeaderComponent =
+    loading && data?.length === 0 ? <Skeleton type={skeletonType} /> : null;
 
   // Permitir que el paddingBottom de style sobrescriba el valor por defecto
   const mergedContentContainerStyle = [
@@ -190,6 +137,7 @@ const ListFlat = memo((props: PropsType) => {
       testID="ListFlatlist"
       data={data}
       style={style as any}
+      ListHeaderComponent={ListHeaderComponent}
       contentContainerStyle={mergedContentContainerStyle}
       keyExtractor={getItemKey}
       renderItem={renderItemMemo}
@@ -200,30 +148,26 @@ const ListFlat = memo((props: PropsType) => {
       maxToRenderPerBatch={maxToRenderPerBatch}
       windowSize={windowSize}
       removeClippedSubviews={removeClippedSubviews}
-      updateCellsBatchingPeriod={50}
+      updateCellsBatchingPeriod={30}
       onEndReached={onPagination}
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={0.8}
       ListFooterComponent={
         <RenderFooterComponent loading={loading} skeletonType={skeletonType} />
       }
       refreshControl={onRefresh ? refreshControl() : undefined}
       ListEmptyComponent={() =>
-        emptyLabel ? (
-          <View style={{padding: 16, alignItems: 'center'}}>
-            {typeof emptyLabel === 'string' ? (
-              <Text style={{color: cssVar.cWhiteV1}}>{emptyLabel}</Text>
-            ) : (
-              emptyLabel
-            )}
+        data?.length === 0 ? (
+          <View style={styles.emptyLabelContainer}>
+            {iconEmpty && iconEmpty}
+            <Text style={styles.emptyLabelText}>{emptyLabel}</Text>
           </View>
         ) : null
       }
-      // getItemLayout={getItemLayout} // Añade esto si tus items tienen altura fija
-      getItemLayout={(_: any, index: any) => ({
-        length: 70,
-        offset: 70 * index,
-        index,
-      })}
+      // getItemLayout={(_: any, index: any) => ({
+      //   length: 70,
+      //   offset: 70 * index,
+      //   index,
+      // })}
     />
   );
 });
@@ -231,3 +175,18 @@ const ListFlat = memo((props: PropsType) => {
 ListFlat.displayName = 'ListFlat';
 
 export default ListFlat;
+
+const styles = StyleSheet.create({
+  emptyLabelContainer: {
+    paddingHorizontal: 16,
+    marginTop: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyLabelText: {
+    color: cssVar.cWhiteV1,
+    fontFamily: FONTS.regular,
+    textAlign: 'center',
+    fontSize: cssVar.sM,
+  },
+});

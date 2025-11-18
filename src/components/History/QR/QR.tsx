@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from '../Accesses/AccessDetail';
@@ -10,7 +10,7 @@ import DataSearch from '../../../../mk/components/ui/DataSearch';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
 const paramsInitial = {
-  perPage: 10,
+  perPage: 30,
   page: 1,
   fullType: 'Q',
   section: 'ACT',
@@ -19,12 +19,12 @@ const paramsInitial = {
 
 const QR = () => {
   const [search, setSearch] = useState('');
-  const [openDetail, setOpenDetail] = useState({ open: false, id: null });
+  const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const [params, setParams] = useState(paramsInitial);
   const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
-  const { data, reload, loaded } = useApi('/accesses', 'GET', params, 3);
+  const {data, reload, loaded} = useApi('/accesses', 'GET', params);
   useEffect(() => {
-    reload(params);
+    reload(params, 2);
   }, [params]);
 
   useEffect(() => {
@@ -50,16 +50,16 @@ const QR = () => {
       item.type == 'O'
         ? 'Llave QR'
         : item.type == 'C'
-          ? 'Sin QR'
-          : item.type == 'I'
-            ? 'QR Individual'
-            : item.type == 'G'
-              ? 'QR Grupal' + (groupTitle ? ' - ' + groupTitle : '')
-              : item.type == 'F'
-                ? 'QR Frecuente'
-                : item.type == 'P'
-                  ? 'Pedido'
-                  : '';
+        ? 'Sin QR'
+        : item.type == 'I'
+        ? 'QR Individual'
+        : item.type == 'G'
+        ? 'QR Grupal' + (groupTitle ? ' - ' + groupTitle : '')
+        : item.type == 'F'
+        ? 'QR Frecuente'
+        : item.type == 'P'
+        ? 'Pedido'
+        : '';
 
     return (
       <ItemList
@@ -79,8 +79,8 @@ const QR = () => {
             src={
               !item?.visit
                 ? getUrlImages(
-                  '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
-                )
+                    '/OWNER-' + user?.id + '.webp?d=' + user?.updated_at,
+                  )
                 : ''
             }
           />
@@ -100,7 +100,6 @@ const QR = () => {
     setParams({
       ...params,
       page: 1,
-      perPage: 10,
       searchBy: value,
     });
   };
@@ -114,10 +113,7 @@ const QR = () => {
       return;
     }
 
-    const total = data?.message?.total || 0;
-    const currentLength = accumulatedData?.length || 0;
-
-    if (currentLength >= total) {
+    if (data?.message?.total == -1 && data?.data?.length < params.perPage) {
       return;
     }
 
@@ -128,7 +124,7 @@ const QR = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -140,24 +136,24 @@ const QR = () => {
           setSearch={(value: string) => onSearch(value)}
           name="qr"
           value={search}
-          style={{ flex: 1 }}
+          style={{flex: 1}}
         />
       </View>
 
       <ListFlat
         data={accumulatedData}
         renderItem={renderItem}
-        refreshing={!loaded && params.page === 1}
-        emptyLabel="No hay datos en la bitácora"
+        refreshing={params.page === 1 && !loaded}
+        emptyLabel="No hay datos"
         onRefresh={handleReload}
-        loading={!loaded && params.page > 1}
+        loading={!loaded}
         onPagination={onPagination}
         total={data?.message?.total || 0}
       />
       {openDetail?.open && (
         <AccessDetail
           open={openDetail?.open}
-          onClose={() => setOpenDetail({ open: false, id: null })}
+          onClose={() => setOpenDetail({open: false, id: null})}
           id={openDetail?.id}
         />
       )}
