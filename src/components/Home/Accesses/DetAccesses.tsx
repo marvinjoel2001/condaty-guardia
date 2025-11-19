@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
-import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import useApi from '../../../../mk/hooks/useApi';
-import { getDateTimeStrMes } from '../../../../mk/utils/dates';
-import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
-import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
+import {getDateTimeStrMes} from '../../../../mk/utils/dates';
+import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
@@ -34,9 +34,9 @@ const typeInvitation: any = {
   P: 'Pedido',
   F: 'QR Frecuente',
 };
-const DetAccesses = ({ id, open, close, reload }: any) => {
-  const { showToast, waiting } = useAuth();
-  const { execute } = useApi();
+const DetAccesses = ({id, open, close, reload}: any) => {
+  const {showToast, waiting} = useAuth();
+  const {execute} = useApi();
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
@@ -52,20 +52,20 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
 
   const getData = async () => {
     try {
-      const { data } = await execute(
+      const {data} = await execute(
         '/accesses',
         'GET',
         {
           fullType: 'DET',
           searchBy: id,
         },
-        false
+        false,
       );
 
       if (data.success && data.data.length > 0) {
         const accessData = data.data[0];
         if (accessData.access_id) {
-          const { data: linkedData } = await execute('/accesses', 'GET', {
+          const {data: linkedData} = await execute('/accesses', 'GET', {
             fullType: 'DET',
             searchBy: accessData.access_id,
           });
@@ -81,7 +81,6 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
       showToast('Error al obtener los datos', 'error');
     }
   };
-
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
 
@@ -106,14 +105,15 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
   }, [id]);
 
   const saveEntry = async () => {
-    const { data: result } = await execute(
+    const {data: result} = await execute(
       '/accesses/enter',
       'POST',
       {
         id: data?.id,
         obs_in: formState?.obs_in || '',
       },
-      false);
+      false,
+    );
     if (result?.success) {
       if (reload) reload();
       close();
@@ -141,7 +141,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
       ids.push(data?.id);
     }
 
-    const { data: result } = await execute('/accesses/exit', 'POST', {
+    const {data: result} = await execute('/accesses/exit', 'POST', {
       ids,
       obs_out: formState?.obs_out || '',
     });
@@ -165,7 +165,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
   };
 
   const handleInputChange = (name: string, value: string) => {
-    setFormState({ ...formState, [name]: value });
+    setFormState({...formState, [name]: value});
   };
 
   const getButtonText = () => {
@@ -203,9 +203,9 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
             subtitle={
               data?.owner?.dpto?.length
                 ? 'Unidad: ' +
-                data?.owner?.dpto?.[0]?.nro +
-                ', ' +
-                data?.owner?.dpto?.[0]?.description
+                  data?.owner?.dpto?.[0]?.nro +
+                  ', ' +
+                  data?.owner?.dpto?.[0]?.description
                 : ''
             }
             left={
@@ -214,9 +214,9 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
                 name={getFullName(data?.owner)}
                 src={getUrlImages(
                   '/OWNER-' +
-                  data?.owner?.id +
-                  '.webp?d=' +
-                  data?.owner?.updated_at,
+                    data?.owner?.id +
+                    '.webp?d=' +
+                    data?.owner?.updated_at,
                 )}
               />
             }
@@ -229,7 +229,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
                     setOpenDet({
                       open: true,
                       id: data?.invitation_id,
-                      invitation: { ...data?.invitation, owner: data?.owner },
+                      invitation: {...data?.invitation, owner: data?.owner},
                       type: 'I',
                     })
                   }
@@ -239,7 +239,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
           />
           {data?.confirm == 'N' && data?.obs_confirm && (
             <KeyValue
-              style={{ marginTop: 12 }}
+              style={{marginTop: 12}}
               keys="Motivo del rechazo"
               value={data?.obs_confirm}
             />
@@ -258,9 +258,9 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
               subtitle={
                 data?.owner?.dpto?.length
                   ? 'Unidad: ' +
-                  data?.owner?.dpto?.[0]?.nro +
-                  ', ' +
-                  data?.owner?.dpto?.[0]?.description
+                    data?.owner?.dpto?.[0]?.nro +
+                    ', ' +
+                    data?.owner?.dpto?.[0]?.description
                   : ''
               }
               left={
@@ -269,9 +269,9 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
                   name={getFullName(data?.owner)}
                   src={getUrlImages(
                     '/OWNER-' +
-                    data?.owner?.id +
-                    '.webp?d=' +
-                    data?.owner?.updated_at,
+                      data?.owner?.id +
+                      '.webp?d=' +
+                      data?.owner?.updated_at,
                   )}
                 />
               }
@@ -284,7 +284,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
                       setOpenDet({
                         open: true,
                         id: data?.invitation_id,
-                        invitation: { ...data?.invitation, owner: data?.owner },
+                        invitation: {...data?.invitation, owner: data?.owner},
                         type: 'I',
                       })
                     }
@@ -362,8 +362,8 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
         item?.other?.other_type_id == 1
           ? IconDelivery
           : item?.other?.other_type_id == 2
-            ? IconTaxi
-            : IconOther;
+          ? IconTaxi
+          : IconOther;
       return (
         <View
           style={{
@@ -404,7 +404,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
                   toggleVisitSelection(data?.id);
                 }
               }}
-              style={{ marginBottom: 12 }}
+              style={{marginBottom: 12}}
               subtitle={
                 'C.I: ' +
                 visit?.ci +
@@ -610,7 +610,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
     if (!formState?.obs_confirm) {
       return;
     }
-    const { data: confirma } = await execute('/accesses/confirm', 'POST', {
+    const {data: confirma} = await execute('/accesses/confirm', 'POST', {
       confirm,
       id: data.id,
       obs_confirm: formState?.obs_confirm,
@@ -622,7 +622,6 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
       }
       setOpenDecline(null);
       close();
-
     } else {
       showToast('Ocurió un error', 'error');
     }
@@ -647,7 +646,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
               flexDirection: 'row',
               justifyContent: 'space-between',
             }}>
-            <View style={{ width: '35%' }}>
+            <View style={{width: '35%'}}>
               <Button
                 style={{}}
                 variant="secondary"
@@ -655,7 +654,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
                 Rechazar
               </Button>
             </View>
-            <View style={{ width: '62%' }}>
+            <View style={{width: '62%'}}>
               <Button
                 style={{
                   backgroundColor: cssVar.cAccent,
@@ -683,7 +682,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
           invitation={openDet.invitation}
           id={openDet.id}
           onClose={() =>
-            setOpenDet({ open: false, id: null, type: '', invitation: null })
+            setOpenDet({open: false, id: null, type: '', invitation: null})
           }
         />
       )}
@@ -695,7 +694,7 @@ const DetAccesses = ({ id, open, close, reload }: any) => {
           buttonText="Enviar"
           onSave={() => onGuardRespond(openDecline)}
           onClose={() => setOpenDecline(null)}>
-          <Text style={{ color: cssVar.cWhite, marginBottom: 12 }}>
+          <Text style={{color: cssVar.cWhite, marginBottom: 12}}>
             Por favor indica el motivo
           </Text>
           <TextArea

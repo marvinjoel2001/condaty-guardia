@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, Keyboard} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, Keyboard, View} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
@@ -20,6 +20,7 @@ import {getUTCNow} from '../../../../mk/utils/dates';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import KeyQR from '../EntryQR/KeyQR';
+import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage';
 
 interface CiNomModalProps {
   open: boolean;
@@ -68,7 +69,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       const newOwners = data.map((owner: any) => {
         let nro = '';
         if (owner?.dpto && owner?.dpto.length > 0) {
-          nro = owner.dpto[0].type.name + ' ' + owner.dpto[0].nro;
+          nro = owner.dpto[0]?.type?.name + ' ' + owner.dpto[0].nro;
         } else {
           nro = owner.type_name + ' ' + owner.dpto_nro;
         }
@@ -265,8 +266,9 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         ...formState,
       };
     }
-
     setSaving(true);
+    // console.log(params);
+    // return;
     const {data, error: err} = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
@@ -455,7 +457,31 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                 errors={errors}
               />
             )}
-
+            <View style={{flexDirection: 'row', gap: 12}}>
+              <UploadImage
+                variant="V2"
+                style={{
+                  marginBottom: 12,
+                  ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
+                }}
+                setFormState={setFormState}
+                formState={formState}
+                label="Adjuntar imagen"
+                name="avatar"
+                expandable
+              />
+              <UploadImage
+                variant="V2"
+                style={{
+                  marginBottom: 12,
+                  ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
+                }}
+                setFormState={setFormState}
+                formState={formState}
+                label="Adjuntar imagen"
+                name="avatar"
+              />
+            </View>
             {steps > 0 && (
               <>
                 <TabsButtons

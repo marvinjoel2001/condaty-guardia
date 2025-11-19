@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {cssVar, TypeStyles} from '../../../styles/themes';
 import Icon from '../../ui/Icon/Icon';
 import {IconGallery, IconX} from '../../../../src/icons/IconLibrary';
@@ -13,6 +13,7 @@ interface PropsType {
   name: string;
   style?: TypeStyles;
   expandable?: boolean;
+  variant?: 'V1' | 'V2';
 }
 
 const UploadImage = ({
@@ -22,25 +23,19 @@ const UploadImage = ({
   name,
   style,
   expandable = false,
+  variant = 'V1',
 }: PropsType) => {
   const {showToast} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
-  
-  const imageUri = formState?.[name] 
+
+  const imageUri = formState?.[name]
     ? 'data:image/jpg;base64,' + formState?.[name]
     : '';
 
   return (
     <View
       style={{
-        width: '100%',
-        height: 180,
-        backgroundColor: cssVar.cWhiteV2,
-        borderRadius: 12,
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 16,
+        ...styles['container' + variant],
         ...style,
       }}>
       {formState?.[name] ? (
@@ -90,7 +85,7 @@ const UploadImage = ({
           </Text>
         </>
       )}
-      
+
       {expandable && !!imageUri && (
         <ImageExpandableModal
           visible={modalVisible}
@@ -103,3 +98,26 @@ const UploadImage = ({
 };
 
 export default UploadImage;
+
+const styles: any = StyleSheet.create({
+  containerV1: {
+    width: '100%',
+    height: 180,
+    backgroundColor: cssVar.cWhiteV2,
+    borderRadius: 12,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  containerV2: {
+    borderWidth: 2,
+    borderColor: '#414141',
+    borderStyle: 'dashed',
+    height: 100,
+    borderRadius: 12,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
