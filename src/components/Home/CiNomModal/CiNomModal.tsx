@@ -462,24 +462,22 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                 variant="V2"
                 style={{
                   marginBottom: 12,
-                  ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
                 }}
                 setFormState={setFormState}
                 formState={formState}
-                label="Adjuntar imagen"
-                name="avatar"
+                label="Carnet anverso"
+                name="ci_anverso"
                 expandable
               />
               <UploadImage
                 variant="V2"
                 style={{
                   marginBottom: 12,
-                  ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
                 }}
                 setFormState={setFormState}
                 formState={formState}
-                label="Adjuntar imagen"
-                name="avatar"
+                label="Carnet reverso"
+                name="ci_reverso"
               />
             </View>
             {steps > 0 && (

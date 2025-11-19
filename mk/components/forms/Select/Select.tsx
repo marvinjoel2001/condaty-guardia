@@ -246,7 +246,7 @@ const Select = ({
         }}
         activeOpacity={0.7}
         style={{pointerEvents: disabled ? 'none' : 'auto'}}>
-        <View pointerEvents="box-none">
+        <View pointerEvents="none">
           <Input
             type={'text'}
             value={displayValue}

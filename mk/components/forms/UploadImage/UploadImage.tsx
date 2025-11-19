@@ -1,8 +1,12 @@
 import React, {useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {cssVar, TypeStyles} from '../../../styles/themes';
+import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
 import Icon from '../../ui/Icon/Icon';
-import {IconGallery, IconX} from '../../../../src/icons/IconLibrary';
+import {
+  IconCamera,
+  IconGallery,
+  IconX,
+} from '../../../../src/icons/IconLibrary';
 import {uploadImage} from '../../../utils/uploadFile';
 import useAuth from '../../../hooks/useAuth';
 import ImageExpandableModal from '../../ui/ImageExpandableModal/ImageExpandableModal';
@@ -33,7 +37,8 @@ const UploadImage = ({
     : '';
 
   return (
-    <View
+    <TouchableOpacity
+      onPress={() => uploadImage({formState, setFormState, showToast, name})}
       style={{
         ...styles['container' + variant],
         ...style,
@@ -69,18 +74,25 @@ const UploadImage = ({
         </>
       ) : (
         <>
-          <Icon
-            name={IconGallery}
-            fillStroke={cssVar.cWhite}
-            color={'transparent'}
-          />
+          {variant === 'V1' && (
+            <Icon
+              name={IconGallery}
+              fillStroke={cssVar.cWhite}
+              color={'transparent'}
+            />
+          )}
+          {variant === 'V2' && (
+            <Icon
+              name={IconCamera}
+              fillStroke={cssVar.cAccent}
+              color={'transparent'}
+            />
+          )}
           <Text
-            onPress={() => uploadImage({formState, setFormState, showToast})}
-            style={{
-              color: cssVar.cAccent,
-              textDecorationLine: 'underline',
-              fontSize: 12,
-            }}>
+            onPress={() =>
+              uploadImage({formState, setFormState, showToast, name})
+            }
+            style={styles['label' + variant]}>
             {label || 'Subir comprobante'}
           </Text>
         </>
@@ -93,7 +105,7 @@ const UploadImage = ({
           onClose={() => setModalVisible(false)}
         />
       )}
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -119,5 +131,16 @@ const styles: any = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  labelV1: {
+    color: cssVar.cAccent,
+    textDecorationLine: 'underline',
+    fontSize: 12,
+  },
+  labelV2: {
+    color: cssVar.cWhiteV1,
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    marginTop: 8,
   },
 });

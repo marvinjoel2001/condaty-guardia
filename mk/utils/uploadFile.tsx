@@ -7,6 +7,7 @@ interface PropsUploadImage {
   setFormState: any;
   // setImageData: any;
   formState: any;
+  name?: string;
   showToast: any;
 }
 interface PropsUploadDocument {
@@ -17,6 +18,7 @@ interface PropsUploadDocument {
 export const uploadImage = ({
   setFormState,
   // setImageData,
+  name = 'avatar',
   formState,
   showToast,
 }: PropsUploadImage) => {
@@ -41,7 +43,9 @@ export const uploadImage = ({
       }
 
       const fileName = result.assets[0].fileName || '';
-      const fileExt = fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2).toLowerCase();
+      const fileExt = fileName
+        .slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2)
+        .toLowerCase();
 
       if (!exts.includes(fileExt)) {
         showToast('Solo se permiten imágenes ' + exts.join(', '), 'error');
@@ -61,7 +65,7 @@ export const uploadImage = ({
 
       setFormState({
         ...formState,
-        avatar: resizedBase64,
+        [name]: resizedBase64,
       });
     } catch (error) {
       console.error('Error processing image:', error);
@@ -76,7 +80,8 @@ export const uploadImage = ({
           PermissionsAndroid.PERMISSIONS.CAMERA,
           {
             title: 'Permiso de cámara',
-            message: 'La aplicación necesita acceso a tu cámara para tomar fotos',
+            message:
+              'La aplicación necesita acceso a tu cámara para tomar fotos',
             buttonNeutral: 'Preguntar después',
             buttonNegative: 'Cancelar',
             buttonPositive: 'Aceptar',
@@ -93,7 +98,7 @@ export const uploadImage = ({
 
   const openCamera = async () => {
     const hasPermission = await requestCameraPermission();
-    
+
     if (!hasPermission) {
       showToast('Se necesita permiso de cámara', 'error');
       return;
@@ -110,7 +115,10 @@ export const uploadImage = ({
       await processImage(result);
     } catch (error) {
       console.error('Error launching camera:', error);
-      showToast('Error al abrir la cámara: ' + (error as any)?.message, 'error');
+      showToast(
+        'Error al abrir la cámara: ' + (error as any)?.message,
+        'error',
+      );
     }
   };
 
@@ -127,7 +135,10 @@ export const uploadImage = ({
       await processImage(result);
     } catch (error) {
       console.error('Error launching gallery:', error);
-      showToast('Error al abrir la galería: ' + (error as any)?.message, 'error');
+      showToast(
+        'Error al abrir la galería: ' + (error as any)?.message,
+        'error',
+      );
     }
   };
 
