@@ -54,7 +54,7 @@ const Home = () => {
               accesses: sortByUpdatedAt(
                 data?.accesses?.filter(
                   (item: any) => item?.id != dataSocket?.payload?.data?.id,
-                )
+                ),
               ),
             });
           } else {
@@ -66,7 +66,7 @@ const Home = () => {
                   item?.id == dataSocket?.payload?.data?.id
                     ? dataSocket?.payload?.data
                     : item,
-                )
+                ),
               ),
             });
           }
@@ -92,7 +92,7 @@ const Home = () => {
                 item?.id == dataSocket?.payload?.data?.id
                   ? dataSocket?.payload?.data
                   : item,
-              )
+              ),
             ),
           });
         } else {
@@ -106,8 +106,9 @@ const Home = () => {
               ...data,
               others: sortByUpdatedAt(
                 data?.others?.filter(
-                  (item: any) => item?.id != dataSocket?.payload?.data?.other_id,
-                )
+                  (item: any) =>
+                    item?.id != dataSocket?.payload?.data?.other_id,
+                ),
               ),
               accesses: sortByUpdatedAt([
                 dataSocket?.payload?.data,
@@ -165,12 +166,18 @@ const Home = () => {
   ) => {
     setData([]);
     setLoaded(true);
-    const {data} = await execute(endpoint, 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType,
-      searchBy: searchParam || '',
-    });
+    const {data} = await execute(
+      endpoint,
+      'GET',
+      {
+        perPage: -1,
+        page: 1,
+        fullType,
+        searchBy: searchParam || '',
+      },
+      true,
+      1,
+    );
     setLoaded(false);
 
     // Función de ordenamiento
