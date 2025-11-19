@@ -4,7 +4,6 @@ import {cssVar, TypeStyles, FONTS} from '../../../styles/themes';
 import useAuth from '../../../hooks/useAuth';
 import Skeleton, {PropsTypeSkeleton} from '../Skeleton/Skeleton';
 
-// Memoiza el footer para evitar re-renders innecesarios
 const RenderFooterComponent = memo(
   ({
     loading,
@@ -43,10 +42,9 @@ interface PropsType {
   initialNumToRender?: number;
   maxToRenderPerBatch?: number;
   iconEmpty?: React.ReactNode;
-  // getItemLayout?: (
-  //   item: any,
-  //   index: number,
-  // ) => {length: number; offset: number; index: number};
+  stopPagination?: boolean;
+  setParams?: (params: any) => void;
+  enablePagination?: boolean;
 }
 
 const ListFlat = memo((props: PropsType) => {
@@ -60,13 +58,16 @@ const ListFlat = memo((props: PropsType) => {
     style,
     skeletonType = 'list',
     emptyLabel = 'No hay datos',
-    onPagination,
+    // onPagination,
     loading = false,
     removeClippedSubviews = false,
     initialNumToRender = 10,
     windowSize = 5,
     maxToRenderPerBatch = 10,
     iconEmpty,
+    stopPagination = false,
+    setParams,
+    enablePagination = true,
     // getItemLayout,
   } = props;
 
@@ -131,7 +132,15 @@ const ListFlat = memo((props: PropsType) => {
     {paddingBottom: 24},
     style && (typeof style === 'object' ? style : {}),
   ];
-
+  const onPagination = () => {
+    if (loading || stopPagination) {
+      return;
+    }
+    setParams?.((prev: any) => ({
+      ...prev,
+      page: prev.page + 1,
+    }));
+  };
   return (
     <FlatList
       testID="ListFlatlist"
@@ -149,7 +158,7 @@ const ListFlat = memo((props: PropsType) => {
       windowSize={windowSize}
       removeClippedSubviews={removeClippedSubviews}
       updateCellsBatchingPeriod={30}
-      onEndReached={onPagination}
+      onEndReached={enablePagination ? onPagination : undefined}
       onEndReachedThreshold={0.8}
       ListFooterComponent={
         <RenderFooterComponent loading={loading} skeletonType={skeletonType} />
@@ -163,11 +172,6 @@ const ListFlat = memo((props: PropsType) => {
           </View>
         ) : null
       }
-      // getItemLayout={(_: any, index: any) => ({
-      //   length: 70,
-      //   offset: 70 * index,
-      //   index,
-      // })}
     />
   );
 });

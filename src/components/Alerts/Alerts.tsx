@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
 import DataSearch from '../../../mk/components/ui/DataSearch';
-import { Text, View } from 'react-native';
-import { cssVar, FONTS } from '../../../mk/styles/themes';
+import {Text, View} from 'react-native';
+import {cssVar, FONTS} from '../../../mk/styles/themes';
 import ListFlat from '../../../mk/components/ui/List/ListFlat';
 import useApi from '../../../mk/hooks/useApi';
-import { getFullName, getUrlImages } from '../../../mk/utils/strings';
+import {getFullName, getUrlImages} from '../../../mk/utils/strings';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import { getDateTimeAgo } from '../../../mk/utils/dates';
+import {getDateTimeAgo} from '../../../mk/utils/dates';
 import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import AlertAdd from './AlertAdd';
@@ -21,23 +21,45 @@ import {
 } from './alertConstants';
 
 const paramsInitial = {
-  perPage: -1,
+  perPage: 30,
   page: 1,
   fullType: 'L',
+  searchBy: '',
+  filterBy: 'ALL',
 };
 
 const Alerts = () => {
   const [search, setSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('T');
   const [openAdd, setOpenAdd] = useState(false);
-  const [openView, setOpenView] = useState({ open: false, id: null });
-  const [dataFilter, setDataFilter] = useState([]);
+  const [openView, setOpenView] = useState({open: false, id: null});
   const [params, setParams]: any = useState(paramsInitial);
+  const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
 
-  const { data: alertas, reload, loaded } = useApi('/alerts', 'GET', params);
+  const {data: alertas, reload, loaded} = useApi('/alerts', 'GET', params, 3);
 
-  const onSearch = (search: string) => {
-    setSearch(search);
+  useEffect(() => {
+    if (alertas?.data) {
+      if (params.page === 1) {
+        setAccumulatedData(alertas.data);
+      } else {
+        setAccumulatedData(prev => [...prev, ...alertas.data]);
+      }
+    }
+  }, [alertas?.data]);
+
+  const onSearch = (value: string) => {
+    setSearch(value);
+    setAccumulatedData([]);
+    if (value == '') {
+      setParams({...paramsInitial, filterBy: params.filterBy});
+      return;
+    }
+    setParams({
+      ...params,
+      page: 1,
+      searchBy: value,
+    });
   };
 
   const renderRight = (alerta: any) => {
@@ -82,14 +104,12 @@ const Alerts = () => {
   };
 
   const alertList = (alerta: any) => {
-    // Filtrado lo manejaremos antes de pasar los datos a la lista
-
     const user = alerta.level === 4 ? alerta.owner : alerta.guardia;
 
     return (
       <ItemList
         onPress={() => {
-          setOpenView({ open: true, id: alerta.id });
+          setOpenView({open: true, id: alerta.id});
         }}
         title={
           alerta.level === 4 ? alerta.descrip : getFullName(alerta.guardia)
@@ -112,9 +132,9 @@ const Alerts = () => {
               hasImage={alerta?.guardia?.has_image}
               src={getUrlImages(
                 '/GUARD-' +
-                alerta?.guard_id +
-                '.webp?d=' +
-                alerta?.guardia?.updated_at,
+                  alerta?.guard_id +
+                  '.webp?d=' +
+                  alerta?.guardia?.updated_at,
               )}
               name={getFullName(alerta.guardia)}
             />
@@ -139,34 +159,55 @@ const Alerts = () => {
   };
   useEffect(() => {
     if (typeSearch === 'T') {
-      setDataFilter(alertas?.data);
+      setAccumulatedData([]);
+      setParams({
+        ...params,
+        filterBy: 'ALL',
+        page: 1,
+      });
     }
     if (typeSearch === 'NA') {
-      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 3));
+      setAccumulatedData([]);
+      setParams({
+        ...params,
+        filterBy: '3',
+        page: 1,
+      });
     }
     if (typeSearch === 'NM') {
-      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 2));
+      setAccumulatedData([]);
+      setParams({
+        ...params,
+        filterBy: '2',
+        page: 1,
+      });
     }
     if (typeSearch === 'NB') {
-      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 1));
+      setAccumulatedData([]);
+      setParams({
+        ...params,
+        filterBy: '1',
+        page: 1,
+      });
     }
     if (typeSearch === 'P') {
-      setDataFilter(alertas?.data.filter((alerta: any) => alerta.level === 4));
+      setAccumulatedData([]);
+      setParams({
+        ...params,
+        filterBy: '4',
+        page: 1,
+      });
     }
-  }, [typeSearch, alertas?.data]);
+  }, [typeSearch]);
 
-  // Pre-filtra los datos según el texto de búsqueda para evitar renderItem null
-  const flatData = React.useMemo(() => {
-    const list = Array.isArray(dataFilter) ? dataFilter : [];
-    if (!search) return list;
-    const q = (search + '').toLowerCase();
-    return list.filter((alerta: any) => {
-      const d = (alerta.descrip + '').toLowerCase();
-      const g = (getFullName(alerta.guardia) + '').toLowerCase();
-      return d.indexOf(q) !== -1 || g.indexOf(q) !== -1;
-    });
-  }, [dataFilter, search]);
+  useEffect(() => {
+    reload(params);
+  }, [params]);
 
+  const handleReload = () => {
+    setParams({...paramsInitial, filterBy: params.filterBy});
+    setAccumulatedData([]);
+  };
   return (
     <>
       <Layout title="Alertas" refresh={() => reload()} scroll={false}>
@@ -174,23 +215,28 @@ const Alerts = () => {
           tabs={ALERT_TABS}
           sel={typeSearch}
           setSel={setTypeSearch}
-          style={{ marginVertical: 12 }}
+          style={{marginVertical: 12}}
         />
 
-        <View style={{ flex: 1 }}>
+        <View style={{flex: 1}}>
           <DataSearch
             setSearch={onSearch}
             name="Novedades"
             value={search}
-            style={{ marginBottom: 8 }}
+            style={{marginBottom: 8}}
           />
 
           <ListFlat
-            data={flatData}
+            data={accumulatedData}
             renderItem={alertList}
-            keyExtractor={(item: any, index: number) => `AL-${item.id}`}
-            refreshing={!loaded}
-            onRefresh={() => reload()}
+            onRefresh={handleReload}
+            refreshing={params.page === 1 && !loaded}
+            loading={!loaded}
+            setParams={setParams}
+            stopPagination={
+              alertas?.message?.total == -1 &&
+              alertas?.data?.length < params.perPage
+            }
             emptyLabel="No hay alertas"
           />
         </View>
@@ -205,7 +251,7 @@ const Alerts = () => {
         {openView.open && (
           <AlertDetail
             open={openView.open}
-            onClose={() => setOpenView({ open: false, id: null })}
+            onClose={() => setOpenView({open: false, id: null})}
             id={openView.id}
           />
         )}

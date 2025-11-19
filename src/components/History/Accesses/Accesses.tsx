@@ -111,18 +111,6 @@ const Accesses = () => {
     setAccumulatedData([]);
   };
 
-  const onPagination = () => {
-    if (!loaded) {
-      return;
-    }
-    if (data?.message?.total == -1 && data?.data?.length < params.perPage) {
-      return;
-    }
-    setParams(prev => ({
-      ...prev,
-      page: prev.page + 1,
-    }));
-  };
   return (
     <View style={{flex: 1}}>
       <View
@@ -146,7 +134,10 @@ const Accesses = () => {
         emptyLabel="No hay datos"
         onRefresh={handleReload}
         loading={!loaded}
-        onPagination={onPagination}
+        setParams={setParams}
+        stopPagination={
+          data?.message?.total == -1 && data?.data?.length < params.perPage
+        }
       />
       {openDetail?.open && (
         <AccessDetail

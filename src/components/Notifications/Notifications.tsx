@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import useApi from '../../../mk/hooks/useApi';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-import { cssVar } from '../../../mk/styles/themes';
+import {cssVar} from '../../../mk/styles/themes';
 import {
   IconAlertNotification,
   IconAmbulance,
@@ -15,19 +15,19 @@ import {
   IconVehicle,
   IconVisit,
 } from '../../icons/IconLibrary';
-import { Text } from 'react-native';
+import {Text} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import ItemList from '../../../mk/components/ui/ItemList/ItemList';
-import { getDateTimeAgo } from '../../../mk/utils/dates';
-import { useEvent } from '../../../mk/hooks/useEvent';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
+import {getDateTimeAgo} from '../../../mk/utils/dates';
+import {useEvent} from '../../../mk/hooks/useEvent';
+import {useFocusEffect, useRoute} from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';
 import DetAccesses from '../Home/Accesses/DetAccesses';
 import AlertDetail from '../Alerts/AlertDetail';
 import ListFlat from '../../../mk/components/ui/List/ListFlat';
 const paramsInitial = {
   fullType: 'L',
-  perPage: 20,
+  perPage: 30,
   page: 1,
 };
 const Notifications = () => {
@@ -35,30 +35,40 @@ const Notifications = () => {
   const [formState, setFormState]: any = useState({});
   const route = useRoute();
   const [params, setParams] = useState(paramsInitial);
+  const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
   const {
     data: notifs,
     loaded,
     reload,
   } = useApi('/notifications', 'GET', params);
+  useEffect(() => {
+    if (notifs?.data) {
+      if (params.page === 1) {
+        setAccumulatedData(notifs.data);
+      } else {
+        setAccumulatedData(prev => [...prev, ...notifs.data]);
+      }
+    }
+  }, [notifs?.data]);
   const executedFromPushRef = useRef(false);
 
-  useEffect(() => {
-    console.log(
-      '[Notificaciones] params recibidos desde push:',
-      (route as any)?.params,
-    );
-  }, [(route as any)?.params]);
+  // useEffect(() => {
+  //   console.log(
+  //     '[Notificaciones] params recibidos desde push:',
+  //     (route as any)?.params,
+  //   );
+  // }, [(route as any)?.params]);
 
   useEffect(() => {
     const params: any = (route as any)?.params;
     if (!executedFromPushRef.current && params?.fromPush && params?.pushData) {
       executedFromPushRef.current = true;
       // Adaptamos pushData al formato esperado por goNotif
-      goNotif({ info: params.pushData });
+      goNotif({info: params.pushData});
     }
   }, [(route as any)?.params]);
 
-  const { dispatch }: any = useEvent('onResetNotif');
+  const {dispatch}: any = useEvent('onResetNotif');
   useFocusEffect(
     React.useCallback(() => {
       reload();
@@ -68,7 +78,7 @@ const Notifications = () => {
 
   const goNotif = (data: any) => {
     if (data.info?.act == 'in-pedido') {
-      setFormState({ id: data.info?.pedido_id });
+      setFormState({id: data.info?.pedido_id});
       setOpenDetail(data.info?.pedido_id ? 'Pedidos' : '');
     }
     if (
@@ -76,16 +86,16 @@ const Notifications = () => {
       data.info?.act == 'confirm' ||
       data.info?.act == 'new-visit' //no deberia recibir
     ) {
-      setFormState({ id: data.info?.id });
+      setFormState({id: data.info?.id});
       setOpenDetail(data.info?.id ? 'Access' : '');
     }
     if (data.info?.act == 'in-visit') {
       //no deberia recibir
-      setFormState({ id: data.info?.access_id });
+      setFormState({id: data.info?.access_id});
       setOpenDetail(data.info?.access_id ? 'Access' : '');
     }
     if (data.info?.act == 'alerts') {
-      setFormState({ id: data.info?.id });
+      setFormState({id: data.info?.id});
       setOpenDetail(data.info?.id ? 'Alerts' : '');
     }
   };
@@ -160,8 +170,8 @@ const Notifications = () => {
               data.info?.ped_type == 1
                 ? IconDelivery
                 : data.info?.ped_type == 2
-                  ? IconTaxi
-                  : IconOther
+                ? IconTaxi
+                : IconOther
             }
           />
         );
@@ -214,7 +224,7 @@ const Notifications = () => {
               borderRadius: 50,
               padding: 8,
               backgroundColor: cssVar.cWhite,
-              transform: [{ rotateY: '180deg' }],
+              transform: [{rotateY: '180deg'}],
             }}
             color={cssVar.cSuccess}
             name={IconVisit}
@@ -308,36 +318,24 @@ const Notifications = () => {
   };
   const handleReload = () => {
     setParams(paramsInitial);
+    setAccumulatedData([]);
   };
   useEffect(() => {
     reload(params);
   }, [params]);
-  const onPagination = () => {
-    const total = notifs?.message?.total || 0;
-    const currentLength = notifs?.data?.length || 0;
-    const maxPage = Math.ceil(total / params.perPage);
-
-    if (currentLength >= total || params.page >= maxPage || !loaded) {
-      return;
-    }
-
-    setParams(prev => ({
-      ...prev,
-      page: prev.page + 1,
-    }));
-  };
   return (
     <Layout title="Notificaciones" refresh={() => reload()} scroll={false}>
       <ListFlat
-        data={notifs?.data}
+        data={accumulatedData}
         renderItem={NotifisList}
-        // skeletonType="list"
-        refreshing={!loaded && params.perPage === -1}
+        refreshing={params.page === 1 && !loaded}
         emptyLabel="No hay datos"
         onRefresh={handleReload}
-        loading={!loaded && params.perPage > -1}
-        onPagination={onPagination}
-        total={notifs?.message?.total || 0}
+        loading={!loaded}
+        setParams={setParams}
+        stopPagination={
+          notifs?.message?.total == -1 && notifs?.data?.length < params.perPage
+        }
       />
 
       {openDetail == 'Pedidos' && (

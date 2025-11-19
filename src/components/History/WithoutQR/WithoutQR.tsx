@@ -21,7 +21,7 @@ const WithoutQR = () => {
   const [openDetail, setOpenDetail] = useState({open: false, id: null});
   const [params, setParams] = useState(paramsInitial);
   const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
-  const {data, reload, loaded} = useApi('/accesses', 'GET', params, 3);
+  const {data, reload, loaded} = useApi('/accesses', 'GET', params);
   useEffect(() => {
     reload(params);
   }, [params]);
@@ -107,19 +107,7 @@ const WithoutQR = () => {
     setParams(paramsInitial);
     setAccumulatedData([]);
   };
-  const onPagination = () => {
-    if (!loaded) {
-      return;
-    }
-    if (data?.message?.total == -1 && data?.data?.length < params.perPage) {
-      return;
-    }
 
-    setParams(prev => ({
-      ...prev,
-      page: prev.page + 1,
-    }));
-  };
   return (
     <View style={{flex: 1}}>
       <View
@@ -144,7 +132,10 @@ const WithoutQR = () => {
         emptyLabel="No hay datos"
         onRefresh={handleReload}
         loading={!loaded}
-        onPagination={onPagination}
+        setParams={setParams}
+        stopPagination={
+          data?.message?.total == -1 && data?.data?.length < params.perPage
+        }
       />
       {openDetail?.open && (
         <AccessDetail
