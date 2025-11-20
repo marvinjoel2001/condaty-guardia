@@ -18,6 +18,7 @@ interface PropsType {
   style?: TypeStyles;
   expandable?: boolean;
   variant?: 'V1' | 'V2';
+  formatted?: boolean;
 }
 
 const UploadImage = ({
@@ -28,17 +29,27 @@ const UploadImage = ({
   style,
   expandable = false,
   variant = 'V1',
+  formatted = false,
 }: PropsType) => {
   const {showToast} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const imageUri = formState?.[name]
-    ? 'data:image/jpg;base64,' + formState?.[name]
-    : '';
+  // const imageUri = formState?.[name]
+  //   ? 'data:image/jpg;base64,' + formState?.[name]
+  //   : '';
+
+  let imageUri = '';
+  if (formatted && formState?.[name]?.file) {
+    imageUri = 'data:image/jpg;base64,' + formState?.[name].file;
+  } else if (formState?.[name]) {
+    imageUri = 'data:image/jpg;base64,' + formState?.[name];
+  }
 
   return (
     <TouchableOpacity
-      onPress={() => uploadImage({formState, setFormState, showToast, name})}
+      onPress={() =>
+        uploadImage({formState, setFormState, showToast, name, formatted})
+      }
       style={{
         ...styles['container' + variant],
         ...style,
@@ -90,7 +101,7 @@ const UploadImage = ({
           )}
           <Text
             onPress={() =>
-              uploadImage({formState, setFormState, showToast, name})
+              uploadImage({formState, setFormState, showToast, name, formatted})
             }
             style={styles['label' + variant]}>
             {label || 'Subir comprobante'}

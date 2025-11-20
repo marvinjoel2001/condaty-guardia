@@ -436,50 +436,83 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
               search={true}
             />
             {visit && (
-              <ItemList
-                title={getFullName(visit)}
-                subtitle={`CI: ${visit?.ci}`}
-                left={
-                  <Avatar
-                    name={getFullName(visit)}
-                    hasImage={visit?.has_image}
+              <>
+                <ItemList
+                  title={getFullName(visit)}
+                  subtitle={`CI: ${visit?.ci}`}
+                  left={
+                    <Avatar
+                      name={getFullName(visit)}
+                      hasImage={visit?.has_image}
+                    />
+                  }
+                />
+                <View style={{flexDirection: 'row', gap: 12}}>
+                  <UploadImage
+                    variant="V2"
+                    style={{
+                      marginBottom: 12,
+                    }}
+                    setFormState={setFormState}
+                    formState={formState}
+                    label="Carnet anverso"
+                    name="ci_anverso"
+                    expandable
+                    formatted={true}
                   />
-                }
-              />
+                  <UploadImage
+                    variant="V2"
+                    style={{
+                      marginBottom: 12,
+                    }}
+                    setFormState={setFormState}
+                    formState={formState}
+                    label="Carnet reverso"
+                    name="ci_reverso"
+                    formatted={true}
+                  />
+                </View>
+              </>
             )}
 
             {steps === 1 && !visit && (
-              <InputNameCi
-                formStateName={formState}
-                formStateCi={formState?.ci}
-                disabledCi={true}
-                handleChangeInput={handleChangeInput}
-                errors={errors}
-              />
+              <>
+                <InputNameCi
+                  formStateName={formState}
+                  formStateCi={formState?.ci}
+                  disabledCi={true}
+                  handleChangeInput={handleChangeInput}
+                  errors={errors}
+                />
+
+                <View style={{flexDirection: 'row', gap: 12}}>
+                  <UploadImage
+                    variant="V2"
+                    style={{
+                      marginBottom: 12,
+                    }}
+                    setFormState={setFormState}
+                    formState={formState}
+                    label="Carnet anverso"
+                    name="ci_anverso"
+                    expandable
+                    formatted={true}
+                  />
+                  <UploadImage
+                    variant="V2"
+                    style={{
+                      marginBottom: 12,
+                    }}
+                    setFormState={setFormState}
+                    formState={formState}
+                    label="Carnet reverso"
+                    name="ci_reverso"
+                    formatted={true}
+                  />
+                </View>
+              </>
             )}
-            <View style={{flexDirection: 'row', gap: 12}}>
-              <UploadImage
-                variant="V2"
-                style={{
-                  marginBottom: 12,
-                }}
-                setFormState={setFormState}
-                formState={formState}
-                label="Carnet anverso"
-                name="ci_anverso"
-                expandable
-              />
-              <UploadImage
-                variant="V2"
-                style={{
-                  marginBottom: 12,
-                }}
-                setFormState={setFormState}
-                formState={formState}
-                label="Carnet reverso"
-                name="ci_reverso"
-              />
-            </View>
+
             {steps > 0 && (
               <>
                 <TabsButtons
@@ -492,18 +525,31 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                   setSel={setTypeSearch}
                 />
                 {typeSearch == 'V' && (
-                  <Input
-                    label="Placa"
-                    autoCapitalize="characters"
-                    type="text"
-                    name="plate"
-                    error={errors}
-                    required={typeSearch == 'V'}
-                    value={formState['plate']}
-                    onChange={(value: any) => {
-                      handleChangeInput('plate', value);
-                    }}
-                  />
+                  <>
+                    <Input
+                      label="Placa"
+                      autoCapitalize="characters"
+                      type="text"
+                      name="plate"
+                      error={errors}
+                      required={typeSearch == 'V'}
+                      value={formState['plate']}
+                      onChange={(value: any) => {
+                        handleChangeInput('plate', value);
+                      }}
+                    />
+                    <UploadImage
+                      variant="V2"
+                      style={{
+                        marginBottom: 12,
+                      }}
+                      setFormState={setFormState}
+                      formState={formState}
+                      label="Placa del vehículo"
+                      name="plate_vehicle"
+                      formatted={true}
+                    />
+                  </>
                 )}
                 {typeSearch == 'T' && (
                   <>
@@ -550,6 +596,43 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                         handleChangeInput('plate', value)
                       }
                     />
+                    <UploadImage
+                      variant="V2"
+                      style={{
+                        marginBottom: 12,
+                      }}
+                      setFormState={setFormState}
+                      formState={formState}
+                      label="Placa del taxi"
+                      name="plate_taxi"
+                      formatted={true}
+                    />
+
+                    <View style={{flexDirection: 'row', gap: 12}}>
+                      <UploadImage
+                        variant="V2"
+                        style={{
+                          marginBottom: 12,
+                        }}
+                        setFormState={setFormState}
+                        formState={formState}
+                        label="Carnet anverso taxi"
+                        name="ci_anverso_taxi"
+                        expandable
+                        formatted={true}
+                      />
+                      <UploadImage
+                        variant="V2"
+                        style={{
+                          marginBottom: 12,
+                        }}
+                        setFormState={setFormState}
+                        formState={formState}
+                        label="Carnet reverso taxi"
+                        name="ci_reverso_taxi"
+                        formatted={true}
+                      />
+                    </View>
                   </>
                 )}
               </>

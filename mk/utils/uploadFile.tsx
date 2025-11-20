@@ -9,6 +9,7 @@ interface PropsUploadImage {
   formState: any;
   name?: string;
   showToast: any;
+  formatted?: boolean;
 }
 interface PropsUploadDocument {
   setFormState: any;
@@ -19,6 +20,7 @@ export const uploadImage = ({
   setFormState,
   // setImageData,
   name = 'avatar',
+  formatted = false,
   formState,
   showToast,
 }: PropsUploadImage) => {
@@ -61,12 +63,21 @@ export const uploadImage = ({
         70,
       );
 
-      console.log('resized', resizedBase64.length);
-
-      setFormState({
-        ...formState,
-        [name]: resizedBase64,
-      });
+      // console.log('resized', resizedBase64.length);
+      if (!formatted) {
+        setFormState({
+          ...formState,
+          [name]: resizedBase64,
+        });
+      } else {
+        setFormState({
+          ...formState,
+          [name]: {
+            file: encodeURIComponent(resizedBase64),
+            ext: 'webp',
+          },
+        });
+      }
     } catch (error) {
       console.error('Error processing image:', error);
       showToast('Error al procesar la imagen', 'error');

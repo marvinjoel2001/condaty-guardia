@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
@@ -25,6 +25,7 @@ import ModalAccessExpand from './ModalAccessExpand';
 import Br from '../../Profile/Br';
 import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
+import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -49,7 +50,10 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     type: '',
     invitation: null,
   });
-
+  const [openExpandImg, setOpenExpandImg] = useState({
+    open: false,
+    imageUri: '',
+  });
   const getData = async () => {
     try {
       const {data} = await execute(
@@ -60,6 +64,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
           searchBy: id,
         },
         false,
+        2,
       );
 
       if (data.success && data.data.length > 0) {
@@ -484,7 +489,74 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             )}
           </>
         )}
-
+        <View style={{flexDirection: 'row'}}>
+          {data?.visit?.has_image_r == 1 && (
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: getUrlImages(
+                    `/VISITCIANVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
+                  ),
+                })
+              }>
+              <Image
+                source={{
+                  uri: getUrlImages(
+                    `/VISITCIANVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
+                  ),
+                }}
+                width={100}
+                height={100}
+                style={{width: 100, height: 100, borderRadius: 8}}
+              />
+            </TouchableOpacity>
+          )}
+          {data?.visit?.has_image_a == 1 && (
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: getUrlImages(
+                    `/VISITCIREVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
+                  ),
+                })
+              }>
+              <Image
+                source={{
+                  uri: getUrlImages(
+                    `/VISITCIREVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
+                  ),
+                }}
+                width={100}
+                height={100}
+                style={{width: 100, height: 100, borderRadius: 8}}
+              />
+            </TouchableOpacity>
+          )}
+          {data?.visit?.has_image_p == 1 && (
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: getUrlImages(
+                    `/VISITPLATE-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
+                  ),
+                })
+              }>
+              <Image
+                source={{
+                  uri: getUrlImages(
+                    `/VISITPLATE-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
+                  ),
+                }}
+                width={100}
+                height={100}
+                style={{width: 100, height: 100, borderRadius: 8}}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
         {acompData?.length > 0 && (
           <>
             {data?.type !== 'O' && <Br />}
@@ -708,6 +780,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             expandable={true}
           />
         </Modal>
+      )}
+      {openExpandImg.open && (
+        <ImageExpandableModal
+          visible={openExpandImg.open}
+          imageUri={openExpandImg.imageUri}
+          onClose={() => setOpenExpandImg({open: false, imageUri: ''})}
+        />
       )}
     </ModalFull>
   );
