@@ -37,12 +37,18 @@ const ModalAccessExpand = ({
   const {loaded, execute} = useApi();
 
   const getAccess = async () => {
-    const {data} = await execute('/accesses', 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType: 'DET',
-      searchBy: id,
-    });
+    const {data} = await execute(
+      '/accesses',
+      'GET',
+      {
+        perPage: -1,
+        page: 1,
+        fullType: 'DET',
+        searchBy: id,
+      },
+      false,
+      3,
+    );
     if (data?.success) {
       setData(data?.data?.[0]);
     }

@@ -56,16 +56,10 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   });
   const getData = async () => {
     try {
-      const {data} = await execute(
-        '/accesses',
-        'GET',
-        {
-          fullType: 'DET',
-          searchBy: id,
-        },
-        false,
-        2,
-      );
+      const {data} = await execute('/accesses', 'GET', {
+        fullType: 'DET',
+        searchBy: id,
+      });
 
       if (data.success && data.data.length > 0) {
         const accessData = data.data[0];
