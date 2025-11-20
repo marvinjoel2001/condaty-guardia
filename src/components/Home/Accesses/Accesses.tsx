@@ -77,7 +77,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
-  const {dataAccesses, dataOrders} = useMemo(() => {    
+  const {dataAccesses, dataOrders} = useMemo(() => {
     if (!data) return {dataAccesses: null, dataOrders: null};
 
     const filterByType = (items: any[], type: string) => {
@@ -225,7 +225,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
         />
       );
     }
-    
+
     // Quitando el avatar temporalmente por problemas de performance 07/11/2025
     // const avatarSrc = getUrlImages(
     //   item.visit
@@ -235,7 +235,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
 
     return (
       <Avatar
-        hasImage={0}  
+        hasImage={0}
         // Quitando el avatar temporalmente por problemas de performance 07/11/2025
         //hasImage={item?.visit?.has_image || item?.owner?.has_image}
         //src={avatarSrc}
@@ -340,7 +340,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   }, [dataOrders, search]);
 
   // Combinar ambos arreglos en uno solo para ListFlat
-  const combinedData = useMemo(() => {    
+  const combinedData = useMemo(() => {
     const accesses = (filteredAccesses || []).map((item: any) => ({
       ...item,
       itemType: 'access',
@@ -350,26 +350,22 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       itemType: 'order',
     }));
     const result = [...accesses, ...orders];
-        
+
     return result;
   }, [filteredAccesses, filteredOrders]);
 
   // Función de renderizado para ListFlat
-  const renderCombinedItem = useCallback(
-    (item: any) => {
-      let result;
-      
-      if (item.itemType === 'access') {
-        result = renderItemAccess(item);
-      } else {
-        result = renderItemOrder(item);
-      }
-      
-      
-      return result;
-    },
-    [],
-  );
+  const renderCombinedItem = useCallback((item: any) => {
+    let result;
+
+    if (item.itemType === 'access') {
+      result = renderItemAccess(item);
+    } else {
+      result = renderItemOrder(item);
+    }
+
+    return result;
+  }, []);
 
   return (
     <>
@@ -383,31 +379,26 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             value={search}
             style={{marginBottom: 8}}
           />
-
-          {(() => {
-            const list = (
-              <ListFlat
-                data={combinedData}
-                renderItem={renderCombinedItem}
-                style={{paddingBottom: 150}}
-                keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
-                onRefresh={reload}
-                refreshing={isLoading}
-                emptyLabel={
-                  <NoResults
-                    icon={search ? IconSearch : IconEmpty}
-                    text={
-                      search
-                        ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
-                        : 'No hay datos'
-                    }
-                  />
-                }
-              />
-            );
-            
-            return list;
-          })()}
+          <ListFlat
+            data={combinedData}
+            renderItem={renderCombinedItem}
+            // style={{paddingBottom: 150}}
+            keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
+            onRefresh={reload}
+            refreshing={isLoading}
+            iconEmpty={
+              search ? (
+                <Icon name={IconSearch} color={cssVar.cWhiteV1} size={60} />
+              ) : (
+                <Icon name={IconEmpty} color={cssVar.cWhiteV1} size={60} />
+              )
+            }
+            emptyLabel={
+              search
+                ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
+                : 'No hay datos'
+            }
+          />
         </>
       )}
 
@@ -437,8 +428,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    marginTop: 80,
+    // padding: 40,
+    // marginTop: 80,
   },
   noResultsText: {
     marginTop: 8,

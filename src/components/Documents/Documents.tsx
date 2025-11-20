@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
-import { View, StyleSheet } from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 
@@ -31,6 +31,7 @@ const Documents = () => {
     {
       perPage: -1,
       fullType: 'L',
+      page: 1,
     },
     3,
   );
@@ -80,6 +81,7 @@ const Documents = () => {
         data={documents?.data}
         renderItem={DocumentList}
         refreshing={!loaded}
+        enablePagination={false}
       />
 
       {openDeatil?.open && (
