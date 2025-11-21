@@ -8,7 +8,7 @@ import {
   Alert,
   Platform,
   PermissionsAndroid,
-  StyleSheet, // ← AÑADIDO
+  StyleSheet,
 } from 'react-native';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
@@ -21,6 +21,7 @@ import {
   IconDoc2 as IconFile,
 } from '../../../src/icons/IconLibrary';
 import { cssVar } from '../../styles/themes';
+import ImageExpandableModal from '../../components/ui/ImageExpandableModal/ImageExpandableModal'; // ← Ya lo tenías importado
 
 interface Props {
   value: string | string[];
@@ -50,6 +51,8 @@ const UploadFile: React.FC<Props> = ({
   style,
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImageUri, setSelectedImageUri] = useState<string>('');
 
   const currentValues = Array.isArray(value) ? value : value ? [value] : [];
   const isSingle = cant === 1;
@@ -143,175 +146,211 @@ const UploadFile: React.FC<Props> = ({
     onChange(isSingle ? '' : filtered);
   };
 
-  // MODO SINGLE (cant=1) → igual que UploadImage
+  // Abrir modal con la imagen
+  const openImageModal = (path: string) => {
+    setSelectedImageUri(storage.url(path));
+    setModalVisible(true);
+  };
+
+  // MODO SINGLE
   if (isSingle) {
     const imageUrl = value ? storage.url(value as string) : '';
 
     return (
-      <View
-        style={{
-          width: '100%',
-          height: 180,
-          backgroundColor: cssVar.cWhiteV2,
-          borderRadius: 12,
-          alignSelf: 'center',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginTop: 16,
-          position: 'relative',
-          overflow: 'hidden',
-          ...style,
-        }}
-      >
-        {value ? (
-          <>
-            <TouchableOpacity
-              onPress={() => remove(value as string)}
-              style={{
-                position: 'absolute',
-                zIndex: 10,
-                right: 8,
-                top: 8,
-                backgroundColor: cssVar.cBlackV1,
-                padding: 6,
-                borderRadius: 20,
-              }}
-            >
-              <Icon name={IconX} color={cssVar.cWhiteV1} size={16} />
-            </TouchableOpacity>
+      <>
+        <View
+          style={{
+            width: '100%',
+            height: 180,
+            backgroundColor: cssVar.cWhiteV2,
+            borderRadius: 12,
+            alignSelf: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 16,
+            position: 'relative',
+            overflow: 'hidden',
+            ...style,
+          }}
+        >
+          {value ? (
+            <>
+              <TouchableOpacity
+                onPress={() => remove(value as string)}
+                style={{
+                  position: 'absolute',
+                  zIndex: 10,
+                  right: 8,
+                  top: 8,
+                  backgroundColor: cssVar.cBlackV1,
+                  padding: 6,
+                  borderRadius: 20,
+                }}
+              >
+                <Icon name={IconX} color={cssVar.cWhiteV1} size={16} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.95}
-              onPress={pickFile}
-              style={{ width: '100%', height: '100%' }}
-              disabled={uploading}
-            >
-              <Image
-                source={{ uri: imageUrl }}
-                resizeMode="contain"
-                style={{ width: '100%', height: '100%', borderRadius: 12 }}
-              />
-            </TouchableOpacity>
+              {/* Tocamos la imagen → abre el modal con zoom */}
+              <TouchableOpacity
+                activeOpacity={0.95}
+                onPress={() => openImageModal(value as string)}
+                style={{ width: '100%', height: '100%' }}
+                disabled={uploading}
+              >
+                <Image
+                  source={{ uri: imageUrl }}
+                  resizeMode="contain"
+                  style={{ width: '100%', height: '100%', borderRadius: 12 }}
+                />
+              </TouchableOpacity>
 
-            {uploading && (
-              <View style={StyleSheet.absoluteFillObject}>
-                <View
-                  style={{
-                    ...StyleSheet.absoluteFillObject,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>Subiendo...</Text>
+              {uploading && (
+                <View style={StyleSheet.absoluteFillObject}>
+                  <View
+                    style={{
+                      ...StyleSheet.absoluteFillObject,
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontWeight: '600' }}>Subiendo...</Text>
+                  </View>
                 </View>
-              </View>
-            )}
-          </>
-        ) : (
-          <TouchableOpacity onPress={pickFile} disabled={uploading}>
-            <Icon name={IconGallery} color={cssVar.cAccent} size={40} />
-            <Text
-              style={{
-                color: cssVar.cAccent,
-                fontSize: 13,
-                marginTop: 8,
-                textDecorationLine: 'underline',
-              }}
-            >
-              {uploading ? 'Subiendo...' : label}
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
+              )}
+            </>
+          ) : (
+            <TouchableOpacity onPress={pickFile} disabled={uploading}>
+              <Icon name={IconGallery} color={cssVar.cAccent} size={40} />
+              <Text
+                style={{
+                  color: cssVar.cAccent,
+                  fontSize: 13,
+                  marginTop: 8,
+                  textDecorationLine: 'underline',
+                }}
+              >
+                {uploading ? 'Subiendo...' : label}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Modal expandible */}
+        <ImageExpandableModal
+          visible={modalVisible}
+          imageUri={selectedImageUri}
+          onClose={() => setModalVisible(false)}
+        />
+      </>
     );
   }
 
-  // MODO MÚLTIPLE → estilo galería (cuadraditos)
+  // MODO MÚLTIPLE
   return (
-    <View style={{ marginVertical: 12 }}>
-      {label && <Text style={{ marginBottom: 8, fontWeight: '600' }}>{label}</Text>}
+    <>
+      <View style={{ marginVertical: 12 }}>
+        {/* {label && <Text style={{ marginBottom: 8, fontWeight: '600' }}>{label}</Text>} */}
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-        {currentValues.map((path, i) => {
-          const url = storage.url(path);
-          const isImage = type === 'I';
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          {currentValues.map((path, i) => {
+            const url = storage.url(path);
+            const isImage = type === 'I';
 
-          return (
-            <View
-              key={i}
+            return (
+              <View
+                key={i}
+                style={{
+                  position: 'relative',
+                  width: 100,
+                  height: 100,
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  backgroundColor: '#f8f8f8',
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => remove(path)}
+                  style={{
+                    position: 'absolute',
+                    top: 4,
+                    right: 4,
+                    zIndex: 10,
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    borderRadius: 20,
+                    padding: 4,
+                  }}
+                >
+                  <Icon name={IconX} color="#fff" size={16} />
+                </TouchableOpacity>
+
+                {isImage ? (
+                  // Tocamos la miniatura → abre modal
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => openImageModal(path)}
+                    style={{ width: '100%', height: '100%' }}
+                  >
+                    <Image
+                      source={{ uri: url }}
+                      style={{ width: '100%', height: '100%' }}
+                      resizeMode="cover"
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 8 }}>
+                    <Icon name={IconFile} color={cssVar.cAccent} size={32} />
+                    <Text style={{ fontSize: 10, textAlign: 'center' }} numberOfLines={2}>
+                      {path.split('/').pop()}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+
+          {currentValues.length < cant && (
+            <TouchableOpacity
+              onPress={pickFile}
+              disabled={uploading}
               style={{
-                position: 'relative',
                 width: 100,
                 height: 100,
                 borderRadius: 8,
-                overflow: 'hidden',
-                backgroundColor: '#f8f8f8',
+                backgroundColor: cssVar.cWhiteV2,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 2,
+                borderColor: cssVar.cAccent,
+                borderStyle: 'dashed',
               }}
             >
-              <TouchableOpacity
-                onPress={() => remove(path)}
-                style={{
-                  position: 'absolute',
-                  top: 4,
-                  right: 4,
-                  zIndex: 10,
-                  backgroundColor: 'rgba(0,0,0,0.7)',
-                  borderRadius: 20,
-                  padding: 4,
-                }}
-              >
-                <Icon name={IconX} color="#fff" size={16} />
-              </TouchableOpacity>
-
-              {isImage ? (
-                <Image source={{ uri: url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+              {uploading ? (
+                <Text>Subiendo...</Text>
               ) : (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 8 }}>
-                  <Icon name={IconFile} color={cssVar.cAccent} size={32} />
-                  <Text style={{ fontSize: 10, textAlign: 'center' }} numberOfLines={2}>
-                    {path.split('/').pop()}
+                <>
+                  <Icon name={IconGallery} color={cssVar.cAccent} size={32} />
+                  <Text style={{ fontSize: 10, marginTop: 4, color: cssVar.cAccent }}>
+                    {label}
                   </Text>
-                </View>
+                </>
               )}
-            </View>
-          );
-        })}
+            </TouchableOpacity>
+          )}
+        </View>
 
-        {currentValues.length < cant && (
-          <TouchableOpacity
-            onPress={pickFile}
-            disabled={uploading}
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: 8,
-              backgroundColor: cssVar.cWhiteV2,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderWidth: 2,
-              borderColor: cssVar.cAccent,
-              borderStyle: 'dashed',
-            }}
-          >
-            {uploading ? (
-              <Text>Subiendo...</Text>
-            ) : (
-              <>
-                <Icon name={IconGallery} color={cssVar.cAccent} size={32} />
-                <Text style={{ fontSize: 10, marginTop: 4, color: cssVar.cAccent }}>
-                  {label}
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
+        {required && currentValues.length === 0 && (
+          <Text style={{ color: 'red', marginTop: 6 }}>Campo obligatorio</Text>
         )}
       </View>
 
-      {required && currentValues.length === 0 && (
-        <Text style={{ color: 'red', marginTop: 6 }}>Campo obligatorio</Text>
-      )}
-    </View>
+      {/* Modal expandible */}
+      <ImageExpandableModal
+        visible={modalVisible}
+        imageUri={selectedImageUri}
+        onClose={() => setModalVisible(false)}
+      />
+    </>
   );
 };
 
