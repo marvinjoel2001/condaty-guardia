@@ -24,8 +24,9 @@ import { cssVar } from '../../styles/themes';
 import ImageExpandableModal from '../../components/ui/ImageExpandableModal/ImageExpandableModal'; // ← Ya lo tenías importado
 
 interface Props {
-  value: string | string[];
-  onChange: (value: string | string[]) => void;
+  setFormState: (updater: any) => void;
+  formState: any;
+  name: string;
   label?: string;
   type?: 'I' | 'D';
   cant?: number;
@@ -38,8 +39,9 @@ interface Props {
 }
 
 const UploadFile: React.FC<Props> = ({
-  value,
-  onChange,
+  setFormState,
+  formState,
+  name,
   label = 'Subir archivo',
   type = 'I',
   cant = 1,
@@ -54,7 +56,7 @@ const UploadFile: React.FC<Props> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState<string>('');
 
-  const currentValues = Array.isArray(value) ? value : value ? [value] : [];
+  const currentValues = Array.isArray(formState[name]) ? formState[name] : formState[name] ? [formState[name]] : [];
   const isSingle = cant === 1;
   const allowedExts = (ext || (type === 'I' ? 'jpg,jpeg,png,webp' : 'pdf,doc,docx'))
     .toLowerCase()
@@ -136,14 +138,14 @@ const UploadFile: React.FC<Props> = ({
       }
     }
 
-    onChange(isSingle ? newValues[0] || '' : newValues);
+    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? newValues[0] || '' : newValues }));
     setUploading(false);
   };
 
   const remove = (path: string) => {
     storage.delete(path).catch(() => {});
-    const filtered = currentValues.filter(p => p !== path);
-    onChange(isSingle ? '' : filtered);
+    const filtered = currentValues.filter((p: string) => p !== path);
+    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? '' : filtered }));
   };
 
   // Abrir modal con la imagen
@@ -154,7 +156,7 @@ const UploadFile: React.FC<Props> = ({
 
   // MODO SINGLE
   if (isSingle) {
-    const imageUrl = value ? storage.url(value as string) : '';
+    const imageUrl = formState[name] ? storage.url(formState[name] as string) : '';
 
     return (
       <>
@@ -173,10 +175,10 @@ const UploadFile: React.FC<Props> = ({
             ...style,
           }}
         >
-          {value ? (
+          {formState[name] ? (
             <>
               <TouchableOpacity
-                onPress={() => remove(value as string)}
+                onPress={() => remove(formState[name] as string)}
                 style={{
                   position: 'absolute',
                   zIndex: 10,
@@ -193,7 +195,7 @@ const UploadFile: React.FC<Props> = ({
               {/* Tocamos la imagen → abre el modal con zoom */}
               <TouchableOpacity
                 activeOpacity={0.95}
-                onPress={() => openImageModal(value as string)}
+                onPress={() => openImageModal(formState[name] as string)}
                 style={{ width: '100%', height: '100%' }}
                 disabled={uploading}
               >
@@ -253,7 +255,7 @@ const UploadFile: React.FC<Props> = ({
         {/* {label && <Text style={{ marginBottom: 8, fontWeight: '600' }}>{label}</Text>} */}
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-          {currentValues.map((path, i) => {
+          {currentValues.map((path: string, i: number) => {
             const url = storage.url(path);
             const isImage = type === 'I';
 
