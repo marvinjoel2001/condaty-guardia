@@ -3,7 +3,6 @@ import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
 import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
 import useAuth from '../../../mk/hooks/useAuth';
 import useApi from '../../../mk/hooks/useApi';
-import UploadImage from '../../../mk/components/forms/UploadImage/UploadImage';
 import UploadFile from '../../../mk/components/forms/UploadFileV2';
 import { View } from 'react-native';
 type PropsType = {
@@ -18,7 +17,6 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
   // ← LA LÍNEA QUE ARREGLA TODO
   const [formState, setFormState]: any = useState({
     descrip: '',
-    avatar: '',
     image_path: '',   // ← ahora existe desde el inicio
   });
 
@@ -38,27 +36,11 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
       return;
     }
 
-    const hasImage =
-      typeof formState?.avatar === 'string' &&
-      formState.avatar.trim() !== '' &&
-      formState.avatar !== 'undefined';
-
-    const payload: any = {
-      descrip: formState.descrip,
-    };
-
-    if (hasImage) {
-      payload.imageNew = {
-        file: encodeURIComponent(formState.avatar),
-        ext: 'webp',
-      };
-    }
-
-    const {data: novedad} = await execute('/guardnews', 'POST', payload);
+    const {data: novedad} = await execute('/guardnews', 'POST', formState);
     if (novedad?.success) {
       onClose();
       reload();
-      setFormState({});
+      setFormState({ descrip: '', image_path: '' });
       showToast('Novedad agregada', 'success');
     } else {
       showToast('Ocurrió un error', 'error');
@@ -77,30 +59,16 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
     >
       <View style={{ flex: 1, padding: 12 }}>
         
-        {/* VIEJO - base64 */}
-        <UploadImage
-          style={{
-            marginBottom: 12,
-            ...(formState?.avatar ? { flex: 1 } : { maxHeight: 157 }),
-          }}
-          setFormState={setFormState}
-          formState={formState}
-          label="Adjuntar imagen (viejo)"
-          name="avatar"
-        />
-
         {/* NUEVO - Bunny.net */}
         <UploadFile
-          name="Bitacora"
-          label="Adjuntar imagen (nuevo - Bunny.net)"
+          setFormState={setFormState}
+          formState={formState}
+          name="image_path"
+          label="Adjuntar imagen"
           type="I"
-          cant={5}
-          clientId={clientId}  // ← luego cambias por el real
+          cant={1}
+          clientId={clientId}
           prefix="guards/novedades"
-          value={formState.image_path || ''}  // ← seguro aunque sea undefined
-          onChange={(path) => {
-            setFormState((prev: any) => ({ ...prev, image_path: path }));
-          }}
         />
 
         <TextArea
