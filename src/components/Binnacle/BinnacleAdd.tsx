@@ -3,7 +3,7 @@ import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
 import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
 import useAuth from '../../../mk/hooks/useAuth';
 import useApi from '../../../mk/hooks/useApi';
-import UploadFile from '../../../mk/components/forms/UploadFileV2';
+import UploadImage from '../../../mk/components/forms/UploadImage/UploadImage';
 import { View } from 'react-native';
 type PropsType = {
   open: boolean;
@@ -11,18 +11,12 @@ type PropsType = {
   reload: any;
 };
 
-const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
+const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   const [errors, setErrors]: any = useState({});
-  
-  // ← LA LÍNEA QUE ARREGLA TODO
-  const [formState, setFormState]: any = useState({
-    descrip: '',
-    image_path: '',   // ← ahora existe desde el inicio
-  });
+  const [formState, setFormState]: any = useState();
+  const {showToast} = useAuth();
+  const {execute} = useApi();
 
-  const { showToast, user } = useAuth();
-  const { execute } = useApi();
-  const clientId = user?.client_id || user?.clientId || 'unknown';
   const handleInputChange = (name: string, value: any) => {
     const v = value?.target?.value ? value.target.value : value;
     setFormState({
@@ -36,11 +30,27 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
       return;
     }
 
-    const {data: novedad} = await execute('/guardnews', 'POST', formState);
+    const hasImage =
+      typeof formState?.avatar === 'string' &&
+      formState.avatar.trim() !== '' &&
+      formState.avatar !== 'undefined';
+
+    const payload: any = {
+      descrip: formState.descrip,
+    };
+
+    if (hasImage) {
+      payload.imageNew = {
+        file: encodeURIComponent(formState.avatar),
+        ext: 'webp',
+      };
+    }
+
+    const {data: novedad} = await execute('/guardnews', 'POST', payload);
     if (novedad?.success) {
       onClose();
       reload();
-      setFormState({ descrip: '', image_path: '' });
+      setFormState({});
       showToast('Novedad agregada', 'success');
     } else {
       showToast('Ocurrió un error', 'error');
@@ -57,21 +67,17 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
       buttonCancel=""
       scrollViewHide={true}
     >
-      <View style={{ flex: 1, padding: 12 }}>
-        
-        <View style={{ marginBottom: 16, flex:  1, maxHeight: 200 }}>
-        <UploadFile
+      <View style={{flex: 1, padding: 12}}>
+        <UploadImage
+          style={{
+            marginBottom: 12,
+            ...(formState?.avatar ? {flex: 1} : {maxHeight: 157}),
+          }}
           setFormState={setFormState}
           formState={formState}
-          name="image_path"
           label="Adjuntar imagen"
-          type="I"
-          cant={1}
-          clientId={clientId}
-          prefix="guards/novedades"
-          variant='V2'
+          name="avatar"
         />
-        </View>
         <TextArea
           type="textArea"
           label="Escribir reporte..."
@@ -79,8 +85,8 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
           error={errors}
           maxLength={5000}
           required={false}
-          value={formState?.descrip || ''}
-          onChange={(value) => handleInputChange('descrip', value)}
+          value={formState?.descrip}
+          onChange={value => handleInputChange('descrip', value)}
           expandable={true}
         />
       </View>
