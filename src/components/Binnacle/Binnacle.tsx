@@ -14,13 +14,14 @@ const Binnacle = () => {
     fullType: 'L',
     perPage: 20,
     page: 1,
+    searchBy: '',
   };
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState({open: false, id: null});
   const [search, setSearch] = useState('');
   const [params, setParams] = useState(paramsInitial);
-
+  const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
   const {
     data: binnacleData,
     reload: reloadBinnacle,
@@ -28,34 +29,25 @@ const Binnacle = () => {
   } = useApi('/guardnews', 'GET', params, 3);
 
   useEffect(() => {
+    if (binnacleData?.data) {
+      if (params.page === 1) {
+        setAccumulatedData(binnacleData.data);
+      } else {
+        setAccumulatedData(prev => [...prev, ...binnacleData.data]);
+      }
+    }
+  }, [binnacleData?.data]);
+
+  useEffect(() => {
     reloadBinnacle(params);
   }, [params]);
 
-  const onPagination = () => {
-    const total = binnacleData?.message?.total || 0;
-    const currentLength = binnacleData?.data?.length || 0;
-    const maxPage = Math.ceil(total / params.perPage);
-
-    if (currentLength >= total || params.page >= maxPage || !loaded) {
-      return;
-    }
-
-    setParams(prev => ({
-      ...prev,
-      perPage: prev.perPage + 20,
-    }));
-  };
-
   const handleReload = () => {
     setParams(paramsInitial);
+    setAccumulatedData([]);
   };
 
   const novedadList = (novedad: any) => {
-    if (
-      search != '' &&
-      (novedad.descrip + '').toLowerCase().indexOf(search.toLowerCase()) == -1
-    )
-      return null;
     return (
       <ItemList
         onPress={() => setOpenView({open: true, id: novedad.id})}
@@ -65,10 +57,19 @@ const Binnacle = () => {
     );
   };
 
-  const onSearch = (search: string) => {
-    setSearch(search);
+  const onSearch = (value: string) => {
+    setSearch(value);
+    setAccumulatedData([]);
+    if (value == '') {
+      setParams(paramsInitial);
+      return;
+    }
+    setParams({
+      ...params,
+      page: 1,
+      searchBy: value,
+    });
   };
-
   return (
     <>
       <Layout title="Bitácora" scroll={false}>
@@ -83,15 +84,17 @@ const Binnacle = () => {
           value={search}
         />
         <ListFlat
-          data={binnacleData?.data}
+          data={accumulatedData}
           renderItem={novedadList}
-          // skeletonType="survey"
-          refreshing={!loaded && params.perPage === -1}
+          refreshing={params.page === 1 && !loaded}
           emptyLabel="No hay datos en la bitácora"
           onRefresh={handleReload}
-          loading={!loaded && params.perPage > -1}
-          onPagination={onPagination}
-          total={binnacleData?.message?.total || 0}
+          loading={!loaded}
+          setParams={setParams}
+          stopPagination={
+            binnacleData?.message?.total == -1 &&
+            binnacleData?.data?.length < params.perPage
+          }
         />
 
         {openAdd && (

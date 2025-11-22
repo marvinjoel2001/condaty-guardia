@@ -115,7 +115,11 @@ const ChooseClient = ({open, onClose}: PropsType) => {
   };
   return (
     <ModalFull title="Cambiar Condominio" open={open} onClose={onClose}>
-      <ListFlat data={getActiveClients()} renderItem={renderItemActive} />
+      <ListFlat
+        data={getActiveClients()}
+        renderItem={renderItemActive}
+        enablePagination={false}
+      />
       {getPendingClients().length > 0 && (
         <>
           <Text
@@ -128,7 +132,11 @@ const ChooseClient = ({open, onClose}: PropsType) => {
             Estos son los condominios que están pendientes de aprobación por el
             administrador y tambien los que fueron rechazados.
           </Text>
-          <ListFlat data={getPendingClients()} renderItem={renderItemPending} />
+          <ListFlat
+            data={getPendingClients()}
+            renderItem={renderItemPending}
+            enablePagination={false}
+          />
         </>
       )}
     </ModalFull>
