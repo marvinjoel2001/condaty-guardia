@@ -19,8 +19,9 @@ import {
   IconGallery,
   IconX,
   IconDoc2 as IconFile,
+  IconCamera,
 } from '../../../src/icons/IconLibrary';
-import { cssVar } from '../../styles/themes';
+import { cssVar, FONTS } from '../../styles/themes';
 import ImageExpandableModal from '../../components/ui/ImageExpandableModal/ImageExpandableModal'; // ← Ya lo tenías importado
 
 interface Props {
@@ -36,6 +37,7 @@ interface Props {
   global?: boolean;
   clientId?: string;
   style?: any;
+  variant?: 'V1' | 'V2';
 }
 
 const UploadFile: React.FC<Props> = ({
@@ -51,6 +53,7 @@ const UploadFile: React.FC<Props> = ({
   global = false,
   clientId,
   style,
+  variant = 'V1',
 }) => {
   const [uploading, setUploading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -157,42 +160,30 @@ const UploadFile: React.FC<Props> = ({
   // MODO SINGLE
   if (isSingle) {
     const imageUrl = formState[name] ? storage.url(formState[name] as string) : '';
+    const containerStyle = variant === 'V2' ? styles.containerV2 : styles.containerV1;
+    const labelStyle = variant === 'V2' ? styles.labelV2 : styles.labelV1;
 
     return (
       <>
-        <View
-          style={{
-            width: '100%',
-            height: 180,
-            backgroundColor: cssVar.cWhiteV2,
-            borderRadius: 12,
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: 16,
-            position: 'relative',
-            overflow: 'hidden',
-            ...style,
-          }}
-        >
+        <View style={{ ...containerStyle, ...style }}>
           {formState[name] ? (
             <>
               <TouchableOpacity
                 onPress={() => remove(formState[name] as string)}
+                activeOpacity={0.9}
                 style={{
                   position: 'absolute',
-                  zIndex: 10,
-                  right: 8,
-                  top: 8,
+                  zIndex: 2,
+                  right: 4,
+                  top: 2,
                   backgroundColor: cssVar.cBlackV1,
-                  padding: 6,
-                  borderRadius: 20,
+                  padding: 4,
+                  borderRadius: 8,
                 }}
               >
                 <Icon name={IconX} color={cssVar.cWhiteV1} size={16} />
               </TouchableOpacity>
 
-              {/* Tocamos la imagen → abre el modal con zoom */}
               <TouchableOpacity
                 activeOpacity={0.95}
                 onPress={() => openImageModal(formState[name] as string)}
@@ -222,18 +213,13 @@ const UploadFile: React.FC<Props> = ({
               )}
             </>
           ) : (
-            <TouchableOpacity onPress={pickFile} disabled={uploading}>
-              <Icon name={IconGallery} color={cssVar.cAccent} size={40} />
-              <Text
-                style={{
-                  color: cssVar.cAccent,
-                  fontSize: 13,
-                  marginTop: 8,
-                  textDecorationLine: 'underline',
-                }}
-              >
-                {uploading ? 'Subiendo...' : label}
-              </Text>
+            <TouchableOpacity onPress={pickFile} disabled={uploading} style={{ alignItems: 'center' }}>
+              {variant === 'V2' ? (
+                <Icon name={IconCamera} fillStroke={cssVar.cAccent} color={'transparent'} />
+              ) : (
+                <Icon name={IconGallery} fillStroke={cssVar.cWhite} color={'transparent'} />
+              )}
+              <Text style={labelStyle}>{uploading ? 'Subiendo...' : label}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -357,3 +343,38 @@ const UploadFile: React.FC<Props> = ({
 };
 
 export default React.memo(UploadFile);
+
+const styles: any = StyleSheet.create({
+  containerV1: {
+    width: '100%',
+    height: 180,
+    backgroundColor: cssVar.cWhiteV2,
+    borderRadius: 12,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  containerV2: {
+    borderWidth: 2,
+    borderColor: '#414141',
+    borderStyle: 'dashed',
+    height: 100,
+    borderRadius: 12,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  labelV1: {
+    color: cssVar.cAccent,
+    textDecorationLine: 'underline',
+    fontSize: 12,
+    marginTop: 8,
+  },
+  labelV2: {
+    color: cssVar.cWhiteV1,
+    fontSize: 14,
+    fontFamily: FONTS?.regular,
+    marginTop: 8,
+  },
+});
