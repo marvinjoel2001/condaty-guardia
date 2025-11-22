@@ -59,7 +59,7 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
     >
       <View style={{ flex: 1, padding: 12 }}>
         
-        {/* NUEVO - Bunny.net */}
+        <View style={{ marginBottom: 16, flex:  1, maxHeight: 200 }}>
         <UploadFile
           setFormState={setFormState}
           formState={formState}
@@ -69,8 +69,9 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
           cant={1}
           clientId={clientId}
           prefix="guards/novedades"
+          variant='V2'
         />
-
+        </View>
         <TextArea
           type="textArea"
           label="Escribir reporte..."
