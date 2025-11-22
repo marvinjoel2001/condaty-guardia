@@ -22,7 +22,7 @@ const getOrderTypeName = (typeId: number | string): string => {
 };
 
 const paramsInitial = {
-  perPage: 10,
+  perPage: 30,
   page: 1,
   fullType: 'L',
   section: 'ACT',
@@ -36,13 +36,21 @@ export const Orders = () => {
   });
   const [search, setSearch] = useState('');
   const [params, setParams] = useState(paramsInitial);
-
+  const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
   const {data, reload, loaded} = useApi('/others', 'GET', params, 3);
 
   useEffect(() => {
     reload(params);
   }, [params]);
-
+  useEffect(() => {
+    if (data?.data) {
+      if (params.page === 1) {
+        setAccumulatedData(data.data);
+      } else {
+        setAccumulatedData(prev => [...prev, ...data.data]);
+      }
+    }
+  }, [data]);
   // Dejamos esta funcion por si la volvemos a ocupar 07/11/2025
   // const removeAccents = (str: string) => {
   //   return str
@@ -80,32 +88,20 @@ export const Orders = () => {
 
   const onSearch = (value: string) => {
     setSearch(value);
+    setAccumulatedData([]);
     if (value == '') {
       setParams(paramsInitial);
       return;
     }
     setParams({
       ...params,
-      perPage: -1,
+      page: 1,
       searchBy: value,
     });
   };
   const handleReload = () => {
     setParams(paramsInitial);
-  };
-  const onPagination = () => {
-    const total = data?.message?.total || 0;
-    const currentLength = data?.data?.length || 0;
-    const maxPage = Math.ceil(total / params.perPage);
-
-    if (currentLength >= total || params.page >= maxPage || !loaded) {
-      return;
-    }
-
-    setParams(prev => ({
-      ...prev,
-      perPage: prev.perPage + 20,
-    }));
+    setAccumulatedData([]);
   };
   return (
     <View style={styles.pageContainer}>
@@ -116,14 +112,16 @@ export const Orders = () => {
         style={{marginBottom: 8}}
       />
       <ListFlat
-        data={data?.data}
+        data={accumulatedData}
         renderItem={renderItem}
-        refreshing={!loaded && params.perPage === -1}
+        refreshing={params.page === 1 && !loaded}
         emptyLabel="No hay datos"
         onRefresh={handleReload}
-        loading={!loaded && params.perPage > -1}
-        onPagination={onPagination}
-        total={data?.message?.total || 0}
+        loading={!loaded}
+        setParams={setParams}
+        stopPagination={
+          data?.message?.total == -1 && data?.data?.length < params.perPage
+        }
       />
       {openDetail.open && (
         <OrdersDetail
