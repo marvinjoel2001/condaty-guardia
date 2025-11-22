@@ -36,6 +36,12 @@ const configApp = {
     TEST: { username: 'condaty-test', password: 'c49983f2-08a0-49f4-8baba779927a-7bcc-441a', hostname: 'br.storage.bunnycdn.com', port: 21, connectionType: 'Passive' as const, storageZoneName: 'condaty-test', apiKey: 'c49983f2-08a0-49f4-8baba779927a-7bcc-441a', cdnUrl: 'https://condaty-test.bunnycdn.com' },
     DEMO: { username: 'condaty-demo', password: '02e6e362-57ed-4517-b695cad33f36-a9f1-4120', hostname: 'br.storage.bunnycdn.com', port: 21, connectionType: 'Passive' as const, storageZoneName: 'condaty-demo', apiKey: '02e6e362-57ed-4517-b695cad33f36-a9f1-4120', cdnUrl: 'https://condaty-demo.bunnycdn.com' },
   },
+  storageStrategy: 'bunny', // o 'cloudinary' según entorno
+  cloudinary: {
+    cloudName: 'tu-cloud-name',
+    uploadPreset: 'tu-upload-preset-unsigned',
+    folder: 'condaty-mobile',
+  },
 };
 configApp.API_URL = configApp.API_URL_TEST;
 
