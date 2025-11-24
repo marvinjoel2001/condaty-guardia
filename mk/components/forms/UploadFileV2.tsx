@@ -141,7 +141,7 @@ const UploadFile: React.FC<Props> = ({
       }
     }
 
-    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? newValues[0] || '' : newValues }));
+    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? [newValues[0] || ''] : newValues }));
     setUploading(false);
   };
 
