@@ -142,7 +142,7 @@ const UploadFile: React.FC<Props> = ({
       }
     }
 
-    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? (newValues[0] || '') : newValues }));
+    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? [newValues[0] || ''] : newValues }));
     setUploading(false);
   };
 
@@ -184,10 +184,11 @@ const UploadFile: React.FC<Props> = ({
 
   // MODO SINGLE
   if (isSingle) {
-    const imageUrl = formState[name]
-      ? (typeof formState[name] === 'string' && formState[name].startsWith('http')
-          ? formState[name]
-          : storage.url(formState[name] as string))
+    const singleValue = Array.isArray(formState[name]) ? formState[name][0] : formState[name];
+    const imageUrl = singleValue
+      ? (typeof singleValue === 'string' && singleValue.startsWith('http')
+          ? singleValue
+          : storage.url(singleValue as string))
       : '';
     const containerStyle = variant === 'V2' ? styles.containerV2 : styles.containerV1;
     const labelStyle = variant === 'V2' ? styles.labelV2 : styles.labelV1;
@@ -195,10 +196,10 @@ const UploadFile: React.FC<Props> = ({
     return (
       <>
         <View style={{ ...containerStyle, ...style }}>
-          {formState[name] ? (
+          {singleValue ? (
             <>
               <TouchableOpacity
-                onPress={() => remove(formState[name] as string)}
+                onPress={() => remove(singleValue as string)}
                 activeOpacity={0.9}
                 style={{
                   position: 'absolute',
@@ -215,7 +216,7 @@ const UploadFile: React.FC<Props> = ({
 
               <TouchableOpacity
                 activeOpacity={0.95}
-                onPress={() => openImageModal(formState[name] as string)}
+                onPress={() => openImageModal(singleValue as string)}
                 style={{ width: '100%', height: '100%' }}
                 disabled={uploading}
               >
