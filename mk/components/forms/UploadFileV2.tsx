@@ -12,8 +12,9 @@ import {
 } from 'react-native';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
-import { storage } from '../../services/storage/storage.service';
+import { storage } from '../../services/storage';
 import { uriToBlob } from '../../utils/file';
+import configApp from '../../../src/config/config';
 import Icon from '../../components/ui/Icon/Icon';
 import {
   IconGallery,
@@ -132,8 +133,13 @@ const UploadFile: React.FC<Props> = ({
       const path = getPath(filename);
 
       try {
-        const blob = await uriToBlob(asset.uri);
-        const uploaded = await storage.upload(blob, path);
+        // Para Cloudinary, pasamos el asset completo con URI
+        // Para Bunny, convertimos a Blob
+        const fileToUpload = (configApp as any).storageStrategy === 'cloudinary' 
+          ? { uri: asset.uri, type: asset.type || 'image/jpeg', name: filename }
+          : await uriToBlob(asset.uri);
+          
+        const uploaded = await storage.upload(fileToUpload, path);
         //newValues.push(uploaded.path); // Esta linea de codigo es para guardar la ruta relativa del archivo
         newValues.push(uploaded.url);
       } catch (e) {
