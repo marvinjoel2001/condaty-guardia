@@ -15,6 +15,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { storage } from '../../services/storage';
 import { uriToBlob } from '../../utils/file';
 import configApp from '../../../src/config/config';
+import useApi from '../../hooks/useApi';
 import Icon from '../../components/ui/Icon/Icon';
 import {
   IconGallery,
@@ -39,6 +40,7 @@ interface Props {
   clientId?: string;
   style?: any;
   variant?: 'V1' | 'V2';
+  onUploadStateChange?: (isUploading: boolean) => void;
 }
 
 const UploadFile: React.FC<Props> = ({
@@ -55,7 +57,9 @@ const UploadFile: React.FC<Props> = ({
   clientId,
   style,
   variant = 'V1',
+  onUploadStateChange,
 }) => {
+  const { setWaiting } = useApi();
   const [uploading, setUploading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState<string>('');
@@ -120,6 +124,8 @@ const UploadFile: React.FC<Props> = ({
     if (response.didCancel || !response.assets) return;
 
     setUploading(true);
+    onUploadStateChange?.(true);
+    setWaiting(1, 'upload-files');
     const newValues = [...currentValues];
 
     for (const asset of response.assets) {
@@ -150,6 +156,8 @@ const UploadFile: React.FC<Props> = ({
 
     setFormState((prev: any) => ({ ...prev, [name]: isSingle ? [newValues[0] || ''] : newValues }));
     setUploading(false);
+    onUploadStateChange?.(false);
+    setWaiting(-1, 'upload-files');
   };
 
   /* Funcion para remover en base a ruta relativa
