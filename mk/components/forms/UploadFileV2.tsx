@@ -134,7 +134,8 @@ const UploadFile: React.FC<Props> = ({
       try {
         const blob = await uriToBlob(asset.uri);
         const uploaded = await storage.upload(blob, path);
-        newValues.push(uploaded.path);
+        //newValues.push(uploaded.path); // Esta linea de codigo es para guardar la ruta relativa del archivo
+        newValues.push(uploaded.url);
       } catch (e) {
         console.error(e);
         Alert.alert('Error', 'No se pudo subir el archivo');
@@ -145,15 +146,36 @@ const UploadFile: React.FC<Props> = ({
     setUploading(false);
   };
 
+  /* Funcion para remover en base a ruta relativa
   const remove = (path: string) => {
     storage.delete(path).catch(() => {});
     const filtered = currentValues.filter((p: string) => p !== path);
     setFormState((prev: any) => ({ ...prev, [name]: isSingle ? '' : filtered }));
   };
+  */
+  
+  const remove = (fullUrl: string) => {
+  let path = fullUrl;
+  try {
+    const urlObj = new URL(fullUrl);
+    path = decodeURIComponent(urlObj.pathname.slice(1)); // quita el "/" inicial
+  } catch {
+    const parts = fullUrl.split('/');
+    path = parts.slice(3).join('/'); // asume formato https://dominio.com/path...
+  }
+
+  storage.delete(path).catch(() => {});
+  
+  const filtered = currentValues.filter((url: string) => url !== fullUrl);
+  setFormState((prev: any) => ({
+    ...prev,
+    [name]: isSingle ? '' : filtered,
+  }));
+};
 
   // Abrir modal con la imagen
-  const openImageModal = (path: string) => {
-    setSelectedImageUri(storage.url(path));
+  const openImageModal = (fullUrl: string) => {
+    setSelectedImageUri(fullUrl);
     setModalVisible(true);
   };
 
@@ -242,9 +264,7 @@ const UploadFile: React.FC<Props> = ({
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           {currentValues.map((path: string, i: number) => {
-            const url = storage.url(path);
             const isImage = type === 'I';
-
             return (
               <View
                 key={i}
@@ -280,7 +300,7 @@ const UploadFile: React.FC<Props> = ({
                     style={{ width: '100%', height: '100%' }}
                   >
                     <Image
-                      source={{ uri: url }}
+                      source={{ uri: path }}
                       style={{ width: '100%', height: '100%' }}
                       resizeMode="cover"
                     />
