@@ -142,7 +142,7 @@ const UploadFile: React.FC<Props> = ({
       }
     }
 
-    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? [newValues[0] || ''] : newValues }));
+    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? (newValues[0] || '') : newValues }));
     setUploading(false);
   };
 
@@ -155,17 +155,20 @@ const UploadFile: React.FC<Props> = ({
   */
   
   const remove = (fullUrl: string) => {
+  if (!fullUrl || typeof fullUrl !== 'string') return;
   let path = fullUrl;
   try {
     const urlObj = new URL(fullUrl);
     path = decodeURIComponent(urlObj.pathname.slice(1)); // quita el "/" inicial
   } catch {
-    const parts = fullUrl.split('/');
-    path = parts.slice(3).join('/'); // asume formato https://dominio.com/path...
+    if (typeof fullUrl === 'string' && fullUrl.includes('/')) {
+      const parts = fullUrl.split('/');
+      path = parts.slice(3).join('/'); // asume formato https://dominio.com/path...
+    }
   }
 
   storage.delete(path).catch(() => {});
-  
+
   const filtered = currentValues.filter((url: string) => url !== fullUrl);
   setFormState((prev: any) => ({
     ...prev,
@@ -181,7 +184,11 @@ const UploadFile: React.FC<Props> = ({
 
   // MODO SINGLE
   if (isSingle) {
-    const imageUrl = formState[name] ? storage.url(formState[name] as string) : '';
+    const imageUrl = formState[name]
+      ? (typeof formState[name] === 'string' && formState[name].startsWith('http')
+          ? formState[name]
+          : storage.url(formState[name] as string))
+      : '';
     const containerStyle = variant === 'V2' ? styles.containerV2 : styles.containerV1;
     const labelStyle = variant === 'V2' ? styles.labelV2 : styles.labelV1;
 
