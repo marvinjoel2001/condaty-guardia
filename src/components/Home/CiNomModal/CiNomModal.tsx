@@ -61,7 +61,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       const newOwners = data.map((owner: any) => {
         let nro = '';
         if (owner?.dpto && owner?.dpto.length > 0) {
-          nro = owner.dpto[0]?.type?.name + ' ' + owner.dpto[0].nro;
+          nro = owner.dpto[0]?.type_name + ' ' + owner.dpto[0].nro;
         } else {
           nro = owner.type_name + ' ' + owner.dpto_nro;
         }
