@@ -22,6 +22,8 @@ import InputFullName from '../../../../mk/components/forms/InputFullName/InputFu
 import KeyQR from '../EntryQR/KeyQR';
 import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage';
 import ExistVisitModal from './ExistVisitModal';
+import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
+import SectionIncomeType from './SectionIncomeType';
 
 interface CiNomModalProps {
   open: boolean;
@@ -32,7 +34,8 @@ interface CiNomModalProps {
 
 const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const {showToast} = useAuth();
-  const [visit, setVisit]: any = useState(null);
+  // const [visit, setVisit]: any = useState(null);
+  const [oldPlate, setOldPlate] = useState('');
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState(0);
@@ -96,7 +99,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       if (visitData?.data?.owner_exist) {
         setDataOwner({invitation: visitData?.data});
       } else {
-        setVisit(visitData?.data);
+        // setVisit(visitData?.data);
+        setOldPlate(visitData?.data?.plate);
         setFormState({
           ...formState,
           name: visitData?.data?.name,
@@ -105,6 +109,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
           mother_last_name: visitData?.data?.mother_last_name,
           ci: visitData?.data?.ci,
           plate: visitData?.data?.plate,
+          ci_anverso: visitData?.data?.url_image_a,
+          ci_reverso: visitData?.data?.url_image_r,
         });
         setSteps(2);
       }
@@ -130,34 +136,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         value: formState.owner_id,
         rules: ['required'],
         key: 'owner_id',
-        errors,
-      });
-    }
-
-    // Validar datos del visitante solo cuando no existe visit (steps === 1)
-    if (steps === 1 && !visit) {
-      errors = checkRules({
-        value: formState.name,
-        rules: ['required', 'alpha'],
-        key: 'name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.middle_name,
-        rules: ['alpha'],
-        key: 'middle_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.last_name,
-        rules: ['required', 'alpha'],
-        key: 'last_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.mother_last_name,
-        rules: ['alpha'],
-        key: 'mother_last_name',
         errors,
       });
     }
@@ -248,6 +226,9 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         last_name_taxi: formState?.last_name_taxi,
         mother_last_name_taxi: formState?.mother_last_name_taxi,
         visit_id: formState?.visit_id,
+        plate_vehicle: formState?.plate_vehicle,
+        ci_anverso_taxi: formState?.ci_anverso_taxi,
+        ci_reverso_taxi: formState?.ci_reverso_taxi,
       };
     } else {
       params = {
@@ -293,20 +274,20 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     if (typeSearch === 'V') {
       setFormState((prevState: any) => ({
         ...prevState,
-        tab: typeSearch,
         ci_taxi: '',
         name_taxi: '',
         middle_name_taxi: '',
         last_name_taxi: '',
         mother_last_name_taxi: '',
         disbledTaxi: false,
-        plate: prevState?.plate || visit?.plate || '',
+        plate: prevState?.plate || oldPlate || '',
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
     }
     if (typeSearch === 'P' || typeSearch == 'T') {
       setFormState((prevState: any) => ({
         ...prevState,
-        tab: typeSearch,
         ci_taxi: '',
         name_taxi: '',
         middle_name_taxi: '',
@@ -314,50 +295,16 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         mother_last_name_taxi: '',
         plate: '',
         disbledTaxi: false,
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
     }
   }, [typeSearch]);
 
-  const onExistTaxi = async () => {
-    if (formState?.ci_taxi == formState?.ci) {
-      return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
-    }
-    const {data: exist} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
-    setErrors({errors, ci_taxi: ''});
-    if (exist?.data) {
-      setFormState({
-        ...formState,
-        ci_taxi: exist?.data.ci,
-        name_taxi: exist?.data.name,
-        middle_name_taxi: exist?.data.middle_name,
-        last_name_taxi: exist?.data.last_name,
-        mother_last_name_taxi: exist?.data.mother_last_name,
-        plate: exist?.data.plate,
-        disbledTaxi: true,
-      });
-    } else {
-      setFormState({
-        ...formState,
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-    }
-  };
-
   const _onClose = () => {
     if (steps > 0) {
       setSteps(0);
-      setVisit(null);
+      setOldPlate('');
       setFormState({owner_id: formState?.owner_id, ci: formState?.ci});
       return;
     }
@@ -370,6 +317,17 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   };
 
   console.log('formState:', formState);
+  const getStatusTextPhoto = () => {
+    if (!formState?.ci_reverso || !formState?.ci_anverso) {
+      return '/ Foto pendiente';
+    }
+    return '';
+  };
+  useEffect(() => {
+    if (!formState.name && steps === 1) {
+      handleEdit();
+    }
+  }, [steps]);
 
   return (
     <ModalFull
@@ -399,6 +357,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
             errors={errors}
             setTab={setTypeSearch}
             tab={typeSearch}
+            setErrors={setErrors}
           />
         ) : (
           <>
@@ -434,7 +393,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
               }}>
               Visitante
             </Text>
-            {!visit && steps === 0 && (
+            {steps === 0 && (
               <Input
                 label="Carnet de identidad"
                 type="date"
@@ -447,15 +406,17 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
               />
             )}
 
-            {visit && (
+            {steps >= 1 && (
               <>
                 <ItemList
-                  title={getFullName(visit)}
-                  subtitle={`CI: ${visit?.ci}`}
+                  title={formState?.name ? getFullName(formState) : '-/-'}
+                  subtitle={`CI: ${
+                    formState?.ci || '-/-'
+                  } ${getStatusTextPhoto()}`}
                   left={
                     <Avatar
-                      name={getFullName(visit)}
-                      hasImage={visit?.has_image}
+                      name={formState?.name ? getFullName(formState) : '-/-'}
+                      hasImage={formState?.has_image}
                     />
                   }
                   right={
@@ -471,44 +432,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                     </TouchableOpacity>
                   }
                 />
-              </>
-            )}
-
-            {steps === 1 && !visit && (
-              <>
-                <InputNameCi
-                  formStateName={formState}
-                  formStateCi={formState?.ci}
-                  disabledCi={true}
-                  handleChangeInput={handleChangeInput}
-                  errors={errors}
-                />
-
-                <View style={{flexDirection: 'row', gap: 12}}>
-                  <UploadImage
-                    variant="V2"
-                    style={{
-                      marginBottom: 12,
-                    }}
-                    setFormState={setFormState}
-                    formState={formState}
-                    label="Carnet anverso"
-                    name="ci_anverso"
-                    expandable
-                    formatted={true}
-                  />
-                  <UploadImage
-                    variant="V2"
-                    style={{
-                      marginBottom: 12,
-                    }}
-                    setFormState={setFormState}
-                    formState={formState}
-                    label="Carnet reverso"
-                    name="ci_reverso"
-                    formatted={true}
-                  />
-                </View>
               </>
             )}
             {formState?.acompanantes?.length > 0 && (
@@ -548,135 +471,15 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
               </TouchableOpacity>
             )}
             {steps > 0 && (
-              <>
-                <Text
-                  style={{
-                    fontFamily: FONTS.bold,
-                    color: cssVar.cWhite,
-                  }}>
-                  Tipo de ingreso
-                </Text>
-                <TabsButtons
-                  tabs={[
-                    {value: 'P', text: 'A pie'},
-                    {value: 'V', text: 'En vehículo'},
-                    {value: 'T', text: 'En taxi'},
-                  ]}
-                  sel={typeSearch}
-                  setSel={setTypeSearch}
-                />
-                {typeSearch == 'V' && (
-                  <>
-                    <Input
-                      label="Placa"
-                      autoCapitalize="characters"
-                      type="text"
-                      name="plate"
-                      error={errors}
-                      required={typeSearch == 'V'}
-                      value={formState['plate']}
-                      onChange={(value: any) => {
-                        handleChangeInput('plate', value);
-                      }}
-                    />
-                    <UploadImage
-                      variant="V2"
-                      style={{
-                        marginBottom: 12,
-                      }}
-                      setFormState={setFormState}
-                      formState={formState}
-                      label="Placa del vehículo"
-                      name="plate_vehicle"
-                      formatted={true}
-                    />
-                  </>
-                )}
-                {typeSearch == 'T' && (
-                  <>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        marginBottom: 4,
-                        color: cssVar.cWhite,
-                        fontFamily: FONTS.medium,
-                      }}>
-                      Datos del conductor:
-                    </Text>
-                    <Input
-                      label="Carnet de identidad"
-                      type="date"
-                      name="ci_taxi"
-                      required
-                      maxLength={10}
-                      error={errors}
-                      value={formState['ci_taxi']}
-                      onBlur={() => onExistTaxi()}
-                      onChange={(value: any) =>
-                        handleChangeInput('ci_taxi', value)
-                      }
-                    />
-
-                    <View style={{flexDirection: 'row', gap: 12}}>
-                      <UploadImage
-                        variant="V2"
-                        style={{
-                          marginBottom: 12,
-                        }}
-                        setFormState={setFormState}
-                        formState={formState}
-                        label="Carnet anverso taxi"
-                        name="ci_anverso_taxi"
-                        expandable
-                        formatted={true}
-                      />
-                      <UploadImage
-                        variant="V2"
-                        style={{
-                          marginBottom: 12,
-                        }}
-                        setFormState={setFormState}
-                        formState={formState}
-                        label="Carnet reverso taxi"
-                        name="ci_reverso_taxi"
-                        formatted={true}
-                      />
-                    </View>
-                    <InputFullName
-                      formState={formState}
-                      errors={errors}
-                      handleChangeInput={handleChangeInput}
-                      disabled={formState?.disbledTaxi}
-                      prefijo={'_taxi'}
-                      inputGrid={true}
-                    />
-                    <Input
-                      label="Placa"
-                      autoCapitalize="characters"
-                      type="text"
-                      name="plate"
-                      error={errors}
-                      required={typeSearch == 'T'}
-                      value={formState['plate']}
-                      onChange={(value: any) =>
-                        handleChangeInput('plate', value)
-                      }
-                    />
-                    <UploadImage
-                      variant="V2"
-                      style={{
-                        marginBottom: 12,
-                      }}
-                      setFormState={setFormState}
-                      formState={formState}
-                      label="Placa del taxi"
-                      name="plate_taxi"
-                      formatted={true}
-                    />
-                  </>
-                )}
-              </>
+              <SectionIncomeType
+                setErrors={setErrors}
+                formState={formState}
+                handleChangeInput={handleChangeInput}
+                errors={errors}
+                tab={typeSearch}
+                setTab={setTypeSearch}
+                setFormState={setFormState}
+              />
             )}
 
             {steps > 0 && (

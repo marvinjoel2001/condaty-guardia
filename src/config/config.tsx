@@ -32,10 +32,46 @@ const configApp = {
   APP_INSTANTDB_APP_ID_DEMO: 'f0c317b9-4d4c-413d-b960-b4f922b43aff',
   APP_DEBUG: 0,
   BUNNY_STORAGE: {
-    PROD: { username: 'condaty-prod', password: 'f16d9823-0629-4763-b6c0f3d53015-8bd3-4e05', hostname: 'br.storage.bunnycdn.com', port: 21, connectionType: 'Passive' as const, storageZoneName: 'condaty-prod', apiKey: 'f16d9823-0629-4763-b6c0f3d53015-8bd3-4e05', cdnUrl: 'https://condaty-prod.bunnycdn.com' },
-    DEV:  { username: 'dev-condaty',  password: 'a6a983f7-ecc0-4f00-8c8de1ae77fb-4654-4816', hostname: 'br.storage.bunnycdn.com', port: 21, connectionType: 'Passive' as const, storageZoneName: 'dev-condaty',  apiKey: 'a6a983f7-ecc0-4f00-8c8de1ae77fb-4654-4816', cdnUrl: 'https://dev-condaty.b-cdn.net' },
-    TEST: { username: 'condaty-test', password: 'c49983f2-08a0-49f4-8baba779927a-7bcc-441a', hostname: 'br.storage.bunnycdn.com', port: 21, connectionType: 'Passive' as const, storageZoneName: 'condaty-test', apiKey: 'c49983f2-08a0-49f4-8baba779927a-7bcc-441a', cdnUrl: 'https://condaty-test.bunnycdn.com' },
-    DEMO: { username: 'condaty-demo', password: '02e6e362-57ed-4517-b695cad33f36-a9f1-4120', hostname: 'br.storage.bunnycdn.com', port: 21, connectionType: 'Passive' as const, storageZoneName: 'condaty-demo', apiKey: '02e6e362-57ed-4517-b695cad33f36-a9f1-4120', cdnUrl: 'https://condaty-demo.bunnycdn.com' },
+    PROD: {
+      username: 'condaty-prod',
+      password: 'f16d9823-0629-4763-b6c0f3d53015-8bd3-4e05',
+      hostname: 'br.storage.bunnycdn.com',
+      port: 21,
+      connectionType: 'Passive' as const,
+      storageZoneName: 'condaty-prod',
+      apiKey: 'f16d9823-0629-4763-b6c0f3d53015-8bd3-4e05',
+      cdnUrl: 'https://condaty-prod.bunnycdn.com',
+    },
+    DEV: {
+      username: 'dev-condaty',
+      password: 'a6a983f7-ecc0-4f00-8c8de1ae77fb-4654-4816',
+      hostname: 'br.storage.bunnycdn.com',
+      port: 21,
+      connectionType: 'Passive' as const,
+      storageZoneName: 'dev-condaty',
+      apiKey: 'a6a983f7-ecc0-4f00-8c8de1ae77fb-4654-4816',
+      cdnUrl: 'https://dev-condaty.b-cdn.net',
+    },
+    TEST: {
+      username: 'condaty-test',
+      password: 'c49983f2-08a0-49f4-8baba779927a-7bcc-441a',
+      hostname: 'br.storage.bunnycdn.com',
+      port: 21,
+      connectionType: 'Passive' as const,
+      storageZoneName: 'condaty-test',
+      apiKey: 'c49983f2-08a0-49f4-8baba779927a-7bcc-441a',
+      cdnUrl: 'https://condaty-test.bunnycdn.com',
+    },
+    DEMO: {
+      username: 'condaty-demo',
+      password: '02e6e362-57ed-4517-b695cad33f36-a9f1-4120',
+      hostname: 'br.storage.bunnycdn.com',
+      port: 21,
+      connectionType: 'Passive' as const,
+      storageZoneName: 'condaty-demo',
+      apiKey: '02e6e362-57ed-4517-b695cad33f36-a9f1-4120',
+      cdnUrl: 'https://condaty-demo.bunnycdn.com',
+    },
   },
   storageStrategy: 'cloudinary', // 'bunny' o 'cloudinary' según entorno
   cloudinary: {
@@ -49,7 +85,7 @@ configApp.API_URL = configApp.API_URL_TEST;
 if (process.env.NODE_ENV == 'development') {
   configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
   // configApp.API_URL = configApp.API_URL_DEMO;
-  configApp.API_URL = configApp.API_URL_FER;
+  // configApp.API_URL = configApp.API_URL_FER;
 }
 if (configApp.API_URL == configApp.API_URL_DEV) {
   configApp.APP_DEBUG = 0;
@@ -68,11 +104,15 @@ if (configApp.API_URL == configApp.API_URL_DEMO) {
 }
 
 // UNA SOLA LÍNEA MÁGICA (esto es todo lo nuevo que necesitas)
-(configApp as any).bunny = 
-  configApp.API_URL === configApp.API_URL_PROD ? configApp.BUNNY_STORAGE.PROD :
-  configApp.API_URL === configApp.API_URL_DEV  ? configApp.BUNNY_STORAGE.DEV :
-  configApp.API_URL === configApp.API_URL_TEST ? configApp.BUNNY_STORAGE.TEST :
-  configApp.API_URL === configApp.API_URL_DEMO ? configApp.BUNNY_STORAGE.DEMO :
-  configApp.BUNNY_STORAGE.DEV; // fallback
+(configApp as any).bunny =
+  configApp.API_URL === configApp.API_URL_PROD
+    ? configApp.BUNNY_STORAGE.PROD
+    : configApp.API_URL === configApp.API_URL_DEV
+    ? configApp.BUNNY_STORAGE.DEV
+    : configApp.API_URL === configApp.API_URL_TEST
+    ? configApp.BUNNY_STORAGE.TEST
+    : configApp.API_URL === configApp.API_URL_DEMO
+    ? configApp.BUNNY_STORAGE.DEMO
+    : configApp.BUNNY_STORAGE.DEV; // fallback
 
 export default configApp;

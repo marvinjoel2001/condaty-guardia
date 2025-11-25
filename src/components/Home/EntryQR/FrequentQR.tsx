@@ -18,6 +18,7 @@ import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Br from '../../Profile/Br';
 import useAuth from '../../../../mk/hooks/useAuth';
+import {AccompaniedAddV2} from './AccompaniedAddV2';
 
 type PropsType = {
   setFormState: any;
@@ -482,17 +483,18 @@ const FrequentQR = ({
           )}
         </View>
       )}
-
-      <AccompaniedAdd
-        open={openAcom}
-        onClose={() => {
-          setOpenAcom(false);
-          setEditAcom(null);
-        }}
-        item={formState}
-        setItem={setFormState}
-        editItem={editAcom}
-      />
+      {openAcom && (
+        <AccompaniedAddV2
+          open={openAcom}
+          onClose={() => {
+            setOpenAcom(false);
+            setEditAcom(null);
+          }}
+          item={formState}
+          setItem={setFormState}
+          editItem={editAcom}
+        />
+      )}
     </>
   );
 };

@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import {
   getDateStrMes,
@@ -15,6 +22,7 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconExpand} from '../../../icons/IconLibrary';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
+import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
 
 type Props = {
   open: boolean;
@@ -41,7 +49,10 @@ const DetailRow = ({
   }
 
   return (
-    <View style={styles.detailRow} pointerEvents="none" onStartShouldSetResponder={() => false}>
+    <View
+      style={styles.detailRow}
+      pointerEvents="none"
+      onStartShouldSetResponder={() => false}>
       <Text style={styles.detailLabel}>{label}</Text>
       {typeof value === 'string' ? (
         <Text style={[styles.detailValue, valueStyle]}>{value}</Text>
@@ -62,6 +73,7 @@ interface ModalPersonData {
   plate?: string | null;
   statusText?: string;
   statusColor?: string;
+  url_image_p?: string[] | any;
 }
 
 interface CompanionItemProps {
@@ -107,14 +119,24 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     useState<ModalPersonData | null>(null);
   const [isPersonDetailModalVisible, setIsPersonDetailModalVisible] =
     useState(false);
+  const [openExpandImg, setOpenExpandImg] = useState({
+    open: false,
+    imageUri: '',
+  });
 
   const getAccess = async () => {
     try {
-      const {data: apiResponse} = await execute('/accesses', 'GET', {
-        fullType: 'DET',
-        section: 'ACT',
-        searchBy: id,
-      });
+      const {data: apiResponse} = await execute(
+        '/accesses',
+        'GET',
+        {
+          fullType: 'DET',
+          section: 'ACT',
+          searchBy: id,
+        },
+        false,
+        3,
+      );
       if (apiResponse?.success) {
         setAccessData(apiResponse.data?.[0] || null);
       }
@@ -205,6 +227,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         plate: personToShow.plate,
         statusText: text,
         statusColor: color,
+        url_image_p: personToShow.url_image_p,
       };
     }
 
@@ -294,7 +317,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           onStartShouldSetResponder={() => true}>
           <View style={styles.mainCard}>
             <View pointerEvents="none">
-              <Text style={styles.sectionTitleNoBorder}>Resumen de la visita</Text>
+              <Text style={styles.sectionTitleNoBorder}>
+                Resumen de la visita
+              </Text>
             </View>
             <ItemList
               title={mainUserFullName}
@@ -416,7 +441,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           </View>
           <View style={styles.mainCardR}>
             <View pointerEvents="none">
-              <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+              <Text style={styles.sectionTitleNoBorder}>
+                Residente visitado
+              </Text>
             </View>
             <ItemList
               title={getFullName(resident)}
@@ -457,7 +484,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       );
     }
     return (
-      <ScrollView contentContainerStyle={styles.scrollContainer}
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag"
         nestedScrollEnabled
@@ -597,9 +625,70 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   }
                 />
               )}
-              {item?.rejected_guard_id !== null && (
-                <DetailRow label="" value={getFullName(item.guardia)} />
-              )}
+
+              <View style={{flexDirection: 'row', gap: 8, marginTop: 12}}>
+                {item?.url_image_p && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setOpenExpandImg({
+                        open: true,
+                        imageUri: item?.url_image_p[0],
+                      })
+                    }>
+                    <Image
+                      source={{
+                        uri: item?.url_image_p[0],
+                      }}
+                      width={100}
+                      height={100}
+                      style={{width: 100, height: 100, borderRadius: 8}}
+                    />
+                  </TouchableOpacity>
+                )}
+                {item?.visit?.url_image_a && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setOpenExpandImg({
+                        open: true,
+                        imageUri: item?.visit?.url_image_a[0],
+                      })
+                    }>
+                    <Image
+                      source={{
+                        uri: item?.visit?.url_image_a[0],
+                      }}
+                      width={100}
+                      height={100}
+                      style={{width: 100, height: 100, borderRadius: 8}}
+                    />
+                  </TouchableOpacity>
+                )}
+                {item?.visit?.url_image_r && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setOpenExpandImg({
+                        open: true,
+                        imageUri: item?.visit?.url_image_r[0],
+                      })
+                    }>
+                    <Image
+                      source={{
+                        uri: item?.visit?.url_image_r[0],
+                      }}
+                      width={100}
+                      height={100}
+                      style={{width: 100, height: 100, borderRadius: 8}}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* {item?.rejected_guard_id !== null && (
+                <DetailRow
+                  label="  Rechazado por: "
+                  value={getFullName(item.guardia)}
+                />
+              )} */}
             </View>
           </View>
 
@@ -712,7 +801,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     );
   };
   return (
-    <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose} scrollViewHide disableFormPress>
+    <ModalFull
+      title={'Detalle del acceso'}
+      open={open}
+      onClose={onClose}
+      scrollViewHide
+      disableFormPress>
       {renderBody()}
       {isPersonDetailModalVisible && modalPersonData && (
         <Modal
@@ -938,11 +1032,74 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       value={modalPersonData.accessObsOut}
                     />
                   </View>
+                  <View style={{flexDirection: 'row', gap: 8, marginTop: 12}}>
+                    {modalPersonData?.url_image_p && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenExpandImg({
+                            open: true,
+                            imageUri: modalPersonData?.url_image_p[0],
+                          })
+                        }>
+                        <Image
+                          source={{
+                            uri: modalPersonData?.url_image_p[0],
+                          }}
+                          width={100}
+                          height={100}
+                          style={{width: 100, height: 100, borderRadius: 8}}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {modalPersonData?.person?.url_image_a && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenExpandImg({
+                            open: true,
+                            imageUri: modalPersonData?.person?.url_image_a[0],
+                          })
+                        }>
+                        <Image
+                          source={{
+                            uri: modalPersonData?.person?.url_image_a[0],
+                          }}
+                          width={100}
+                          height={100}
+                          style={{width: 100, height: 100, borderRadius: 8}}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {modalPersonData?.person?.url_image_r && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenExpandImg({
+                            open: true,
+                            imageUri: modalPersonData?.person?.url_image_r[0],
+                          })
+                        }>
+                        <Image
+                          source={{
+                            uri: modalPersonData?.person?.url_image_r[0],
+                          }}
+                          width={100}
+                          height={100}
+                          style={{width: 100, height: 100, borderRadius: 8}}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </>
               )}
             </View>
           </ScrollView>
         </Modal>
+      )}
+      {openExpandImg.open && (
+        <ImageExpandableModal
+          visible={openExpandImg.open}
+          imageUri={openExpandImg.imageUri}
+          onClose={() => setOpenExpandImg({open: false, imageUri: ''})}
+        />
       )}
     </ModalFull>
   );

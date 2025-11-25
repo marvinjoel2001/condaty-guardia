@@ -104,15 +104,10 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   }, [id]);
 
   const saveEntry = async () => {
-    const {data: result} = await execute(
-      '/accesses/enter',
-      'POST',
-      {
-        id: data?.id,
-        obs_in: formState?.obs_in || '',
-      },
-      false,
-    );
+    const {data: result} = await execute('/accesses/enter', 'POST', {
+      id: data?.id,
+      obs_in: formState?.obs_in || '',
+    });
     if (result?.success) {
       if (reload) reload();
       close();
@@ -483,22 +478,18 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             )}
           </>
         )}
-        <View style={{flexDirection: 'row'}}>
-          {data?.visit?.has_image_r == 1 && (
+        <View style={{flexDirection: 'row', gap: 8}}>
+          {data?.url_image_p && (
             <TouchableOpacity
               onPress={() =>
                 setOpenExpandImg({
                   open: true,
-                  imageUri: getUrlImages(
-                    `/VISITCIANVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
-                  ),
+                  imageUri: data?.url_image_p[0],
                 })
               }>
               <Image
                 source={{
-                  uri: getUrlImages(
-                    `/VISITCIANVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
-                  ),
+                  uri: data?.url_image_p[0],
                 }}
                 width={100}
                 height={100}
@@ -506,21 +497,17 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               />
             </TouchableOpacity>
           )}
-          {data?.visit?.has_image_a == 1 && (
+          {data?.visit?.url_image_a && (
             <TouchableOpacity
               onPress={() =>
                 setOpenExpandImg({
                   open: true,
-                  imageUri: getUrlImages(
-                    `/VISITCIREVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
-                  ),
+                  imageUri: data?.visit?.url_image_a[0],
                 })
               }>
               <Image
                 source={{
-                  uri: getUrlImages(
-                    `/VISITCIREVERSO-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
-                  ),
+                  uri: data?.visit?.url_image_a[0],
                 }}
                 width={100}
                 height={100}
@@ -528,21 +515,17 @@ const DetAccesses = ({id, open, close, reload}: any) => {
               />
             </TouchableOpacity>
           )}
-          {data?.visit?.has_image_p == 1 && (
+          {data?.visit?.url_image_r && (
             <TouchableOpacity
               onPress={() =>
                 setOpenExpandImg({
                   open: true,
-                  imageUri: getUrlImages(
-                    `/VISITPLATE-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
-                  ),
+                  imageUri: data?.visit?.url_image_r[0],
                 })
               }>
               <Image
                 source={{
-                  uri: getUrlImages(
-                    `/VISITPLATE-${data?.visit?.id}.webp?d=${data?.visit?.updated_at}`,
-                  ),
+                  uri: data?.visit?.url_image_r[0],
                 }}
                 width={100}
                 height={100}
@@ -692,7 +675,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       showToast('Ocurió un error', 'error');
     }
   };
-
+  console.log(data);
   return (
     <ModalFull
       onClose={close}

@@ -118,7 +118,6 @@ const ItemList = (props: PropsType) => {
           </>
         )}
       </View>
-
     </TouchableOpacity>
   );
 };
