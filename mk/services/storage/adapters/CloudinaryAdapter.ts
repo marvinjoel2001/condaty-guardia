@@ -19,9 +19,15 @@ export class CloudinaryAdapter implements IStorageAdapter {
       
       // Si recibimos un objeto con uri (desde React Native image picker)
       if (file.uri) {
-        // Leer el archivo como base64 usando fetch + FileReader
-        const response = await fetch(file.uri);
-        const blob = await response.blob();
+        // Leer el archivo como blob usando XMLHttpRequest (más compatible con URIs locales)
+        const blob = await new Promise<Blob>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.onload = () => resolve(xhr.response);
+          xhr.onerror = () => reject(new TypeError('Error al leer el archivo local'));
+          xhr.responseType = 'blob';
+          xhr.open('GET', file.uri, true);
+          xhr.send(null);
+        });
         
         base64Data = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
