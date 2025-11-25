@@ -31,7 +31,7 @@ interface Props {
   formState: any;
   name: string;
   label?: string;
-  type?: 'I' | 'D';
+  type?: 'I' | 'D' | 'A';
   cant?: number;
   required?: boolean;
   ext?: string;
@@ -70,12 +70,20 @@ const UploadFile: React.FC<Props> = ({
     ? [formState[name]]
     : [];
   const isSingle = cant === 1;
-  const allowedExts = (
-    ext || (type === 'I' ? 'jpg,jpeg,png,webp' : 'pdf,doc,docx')
-  )
-    .toLowerCase()
-    .split(',')
-    .map(e => e.trim().replace('.', ''));
+  
+  // Determinar extensiones permitidas según el tipo
+  let defaultExts = '';
+  if (type === 'I') {
+    defaultExts = 'jpg,jpeg,png,webp';
+  } else if (type === 'D') {
+    defaultExts = 'pdf,doc,docx,xls,xlsx,csv,txt';
+  } else if (type === 'A') {
+    defaultExts = '*'; // Acepta todo
+  }
+  
+  const allowedExts = ext 
+    ? ext.toLowerCase().split(',').map(e => e.trim().replace('.', ''))
+    : (defaultExts === '*' ? ['*'] : defaultExts.split(',').map(e => e.trim().replace('.', '')));
 
   const folder = global ? 'global' : clientId || 'unknown';
   const pref = prefix ? `${prefix}/` : '';
@@ -96,9 +104,16 @@ const UploadFile: React.FC<Props> = ({
 
     if (type === 'I') {
       Alert.alert('Seleccionar imagen', '', [
-        {text: 'Cámara', onPress: openCamera},
-        {text: 'Galería', onPress: openGallery},
-        {text: 'Cancelar', style: 'cancel'},
+        { text: 'Cámara', onPress: openCamera },
+        { text: 'Galería', onPress: openGallery },
+        { text: 'Cancelar', style: 'cancel' },
+      ]);
+    } else if (type === 'A') {
+      Alert.alert('Seleccionar archivo', '', [
+        { text: 'Cámara', onPress: openCamera },
+        { text: 'Galería', onPress: openGallery },
+        { text: 'Documento', onPress: pickDocument },
+        { text: 'Cancelar', style: 'cancel' },
       ]);
     } else {
       pickDocument();
@@ -117,10 +132,7 @@ const UploadFile: React.FC<Props> = ({
 
   const openGallery = () => {
     launchImageLibrary(
-      {
-        mediaType: type === 'I' ? 'photo' : 'mixed',
-        selectionLimit: cant - currentValues.length,
-      },
+      { mediaType: (type === 'I' || type === 'A') ? 'photo' : 'mixed', selectionLimit: cant - currentValues.length },
       handleResponse,
     );
   };
@@ -147,7 +159,9 @@ const UploadFile: React.FC<Props> = ({
     for (const asset of response.assets) {
       const filename = asset.fileName || `file_${Date.now()}`;
       const fileExt = filename.split('.').pop()?.toLowerCase();
-      if (!fileExt || !allowedExts.includes(fileExt)) {
+      
+      // Si allowedExts incluye '*', acepta cualquier archivo
+      if (!allowedExts.includes('*') && (!fileExt || !allowedExts.includes(fileExt))) {
         Alert.alert('Error', `Formato no permitido: .${fileExt}`);
         continue;
       }
@@ -321,7 +335,10 @@ const UploadFile: React.FC<Props> = ({
 
         <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 12}}>
           {currentValues.map((path: string, i: number) => {
-            const isImage = type === 'I';
+            // Determinar si es imagen por extensión o tipo
+            const fileExt = path.split('.').pop()?.toLowerCase();
+            const imageExts = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
+            const isImage = type === 'I' || (type === 'A' && fileExt && imageExts.includes(fileExt));
             return (
               <View
                 key={i}
