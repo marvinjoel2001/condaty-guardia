@@ -1,12 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, ScrollView, Dimensions} from 'react-native';
 import {getUrlImages} from '../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
 import Card from '../../../mk/components/ui/Card/Card';
 import useApi from '../../../mk/hooks/useApi';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Br from '../Profile/Br';
+import { getDateTimeStrMes } from '../../../mk/utils/dates';
 
 type PropsType = {
   open: boolean;
@@ -43,7 +44,9 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
   };
 
   const renderImageSection = () => {
-    if (Number(details?.has_image) === 0) {
+    const urlFiles = details?.url_file;
+    
+    if (!urlFiles || !Array.isArray(urlFiles) || urlFiles.length === 0) {
       return (
         <View style={styles.noImageContainer}>
           <Text style={styles.noImageText}>Sin imagen</Text>
@@ -51,34 +54,41 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
       );
     }
 
-    if (imageError) {
-      return (
-        <View style={styles.noImageContainer}>
-          <Text style={styles.noImageText}>No se encontró la imagen</Text>
-        </View>
-      );
-    }
+    const screenWidth = Dimensions.get('window').width;
+    const imageWidth = urlFiles.length > 1 ? screenWidth * 0.7 : screenWidth * 0.85;
+    const imageHeight = 220;
 
     return (
       <>
-        <Text style={styles.text}>Imagen del reporte</Text>
-        <View style={styles.imageContainer}>
-          {Number(details?.has_image) === 0 ? null : (
-            <Avatar
-              hasImage={1}
-              expandable={true}
-              src={getUrlImages(
-                `/GNEW-${details?.id}.webp?d=${details?.updated_at}`,
-              )}
-              name="Imagen del reporte"
-              w={750}
-              h={180}
-              circle={false}
-              error={() => setImageError(true)}
-              style={styles.avatarImage}
-            />
-          )}
-        </View>
+        <Text style={styles.text}>
+          {urlFiles.length === 1 ? 'Imagen del reporte' : 'Imágenes del reporte'}
+        </Text>
+        <ScrollView 
+          horizontal={urlFiles.length > 1}
+          showsHorizontalScrollIndicator={urlFiles.length > 1}
+          contentContainerStyle={urlFiles.length > 1 ? styles.imagesScrollContainer : {}}>
+          {urlFiles.map((url: string, index: number) => (
+            <View
+              key={index}
+              style={[
+                styles.imageContainer,
+                {width: imageWidth, height: imageHeight},
+                urlFiles.length > 1 && index < urlFiles.length - 1 && styles.imageMarginRight
+              ]}>
+              <Avatar
+                hasImage={1}
+                expandable={true}
+                src={url}
+                name={`Imagen ${index + 1}`}
+                w={imageWidth}
+                h={imageHeight}
+                circle={false}
+                error={() => {}}
+                style={styles.avatarImage}
+              />
+            </View>
+          ))}
+        </ScrollView>
       </>
     );
   };
@@ -95,6 +105,7 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
     return (
       <Card>
         <Text style={styles.text}>Reporte</Text>
+        <Text style={{...styles.textV1}}>{getDateTimeStrMes(details?.created_at)}</Text>
         <Text style={{...styles.textV1}}>{details?.descrip}</Text>
         <Br />
         {renderImageSection()}
@@ -132,14 +143,18 @@ const styles = StyleSheet.create({
     marginTop: 16,
     borderRadius: 8,
     backgroundColor: cssVar.cWhiteV2,
-    height: 180,
-    width: '100%',
     overflow: 'hidden',
   },
   avatarImage: {
     width: '100%',
     height: '100%',
     borderRadius: 8,
+  },
+  imageMarginRight: {
+    marginRight: 12,
+  },
+  imagesScrollContainer: {
+    paddingRight: 16,
   },
   loadingContainer: {
     flex: 1,

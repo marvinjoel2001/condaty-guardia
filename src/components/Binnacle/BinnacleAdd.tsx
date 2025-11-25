@@ -14,7 +14,6 @@ type PropsType = {
 const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
   const [errors, setErrors]: any = useState({});
   
-  // ← LA LÍNEA QUE ARREGLA TODO
   const [formState, setFormState]: any = useState({
     descrip: ''  });
 
@@ -61,7 +60,7 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
         <UploadFile
           setFormState={setFormState}
           formState={formState}
-          name="images"
+          name="url_file"
           label="Adjuntar imagen"
           type="I"
           cant={5}
