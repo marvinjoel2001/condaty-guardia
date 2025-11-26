@@ -5,6 +5,7 @@ const configApp = {
   API_URL_TEST: 'https://phplaravel-1214481-5534746.cloudwaysapps.com/api',
   API_URL_DEMO: 'https://phplaravel-1383823-5546919.cloudwaysapps.com/api',
   API_URL_FER: 'https://unnotched-unabsorbingly-naomi.ngrok-free.dev/api',
+  API_URL_PRE: 'https://phplaravel-1214481-6017582.cloudwaysapps.com/api',
   APP_NAME: 'Condaty Guards',
   APP_DESCRIPTION: 'Guardias Control de Accesos',
   APP_LOGO: '/assets/images/logo/logo.svg',
@@ -30,6 +31,7 @@ const configApp = {
   APP_INSTANTDB_APP_ID_DEV: '8c5fd947-ecd0-4774-8d1a-1e503c1ec981',
   APP_INSTANTDB_APP_ID_TEST: 'd3a70e0a-21ae-449f-b153-37a05b6ec300',
   APP_INSTANTDB_APP_ID_DEMO: 'f0c317b9-4d4c-413d-b960-b4f922b43aff',
+  APP_INSTANTDB_APP_ID_PRE: '2a52bda1-77f8-4649-9f28-87bb86c08b5f',
   APP_DEBUG: 0,
   BUNNY_STORAGE: {
     PROD: {
@@ -80,10 +82,11 @@ const configApp = {
     folder: 'condaty-mobile',
   },
 };
-configApp.API_URL = configApp.API_URL_TEST;
+// configApp.API_URL = configApp.API_URL_TEST;
+configApp.API_URL = configApp.API_URL_PRE;
 
 if (process.env.NODE_ENV == 'development') {
-  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
+  // configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
   // configApp.API_URL = configApp.API_URL_DEMO;
   // configApp.API_URL = configApp.API_URL_FER;
 }
@@ -101,6 +104,12 @@ if (configApp.API_URL == configApp.API_URL_DEMO) {
   configApp.APP_DEBUG = 0;
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydemos';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEMO;
+}
+
+if (configApp.API_URL == configApp.API_URL_PRE) {
+  configApp.APP_DEBUG = 0;
+  configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatypre';
+  configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_PRE;
 }
 
 // UNA SOLA LÍNEA MÁGICA (esto es todo lo nuevo que necesitas)
