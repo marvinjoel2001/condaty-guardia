@@ -73,7 +73,7 @@ const DynamicModal = ({
                   color={cssVar.cWhite}
                 />
               </View>
-              <ScrollView style={{padding: 12}}>{children}</ScrollView>
+              <ScrollView style={{padding: 12, flex: 1 }}>{children}</ScrollView>
               <View style={{padding: 12, flexDirection: 'row', gap: 8}}>
                 {buttonCancelText && (
                   <Button onPress={onClose} variant="secondary">
