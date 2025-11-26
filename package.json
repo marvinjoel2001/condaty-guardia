@@ -8,10 +8,10 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "debugapk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "debugapk1": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "releaseapk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
     "apkandroid": "cd android && gradlew assembleRelease && cd ..",
-    "apkdebug": "cd android && ./gradlew assembleDebug && cd ..",
+    "debugapk2": "cd android && ./gradlew assembleDebug && cd ..",
     "abbstore": "cd android && npx react-native build-android --mode=release && cd ..",
     "demo": "node updateBuildInfo.js && npm run debugapk && rm -rf android/app/build/outputs/apk && cd android && ./gradlew clean && ./gradlew assembleDebug && cd ..",
     "demo-release": "node updateBuildInfo.js && npm run releaseapk && rm -rf android/app/build/outputs/apk && cd android && ./gradlew clean && ./gradlew assembleRelease && cd .."
