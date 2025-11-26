@@ -127,7 +127,10 @@ const Select = ({
   const handleSelectClickElement = useCallback(
     (element: any) => {
       setSelectValue(element);
-      setOpenOptions(false);
+      Keyboard.dismiss();
+      setTimeout(() => {
+        setOpenOptions(false);
+      }, 100);
       onChange({target: {name, value: element}});
     },
     [name, onChange],
