@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import Modal from '../../../../mk/components/ui/Modal/Modal';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import Input from '../../../../mk/components/forms/Input/Input';
+import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
 import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 import {View} from 'react-native';
-import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage';
-import DynamicModal from '../../../../mk/components/ui/DynamicModal/DynamicModal';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
 type TypeProps = {
   open: boolean;
@@ -13,28 +13,82 @@ type TypeProps = {
   item: any;
   setItem: any;
   editItem?: any;
-  formState: any;
-  setFormState: any;
-  disabledCi?: boolean;
 };
 
-export const AccompaniedAdd = ({
+export const AccompaniedAddV2 = ({
   open,
   onClose,
   item,
   setItem,
-  formState,
-  setFormState,
   editItem,
-  disabledCi = true,
 }: TypeProps) => {
+  const [formState, setFormState]: any = useState({});
   const [errors, setErrors]: any = useState({});
+  const {execute} = useApi();
   const {showToast} = useAuth();
+
+  useEffect(() => {
+    if (open && editItem) {
+      setFormState({
+        ci: editItem.ci,
+        name: editItem.name,
+        middle_name: editItem.middle_name,
+        last_name: editItem.last_name,
+        mother_last_name: editItem.mother_last_name,
+        ciDisabled: false,
+      });
+    } else if (open) {
+      setFormState({});
+    }
+  }, [open, editItem]);
 
   const handleChange = (key: string, value: any) => {
     setFormState((prevState: any) => ({...prevState, [key]: value}));
   };
-
+  const onExist = async () => {
+    if (formState?.ci === item.ci) {
+      showToast(
+        'El ci del acompañante no puede ser igual al ci del visitante',
+        'error',
+      );
+      setFormState({
+        ...formState,
+        ci: '',
+        name: '',
+        middle_name: '',
+        last_name: '',
+        mother_last_name: '',
+      });
+      return;
+    }
+    const {data: exist} = await execute('/visits', 'GET', {
+      perPage: 1,
+      page: 1,
+      // searchBy: formState?.ci,
+      exist: '1',
+      fullType: 'L',
+      ci_visit: formState?.ci,
+    });
+    if (exist?.data) {
+      setFormState({
+        ...formState,
+        name: exist?.data?.name,
+        middle_name: exist?.data?.middle_name,
+        last_name: exist?.data?.last_name,
+        mother_last_name: exist?.data?.mother_last_name,
+        ciDisabled: true,
+      });
+    } else {
+      setFormState({
+        ...formState,
+        name: editItem ? formState.name : '',
+        middle_name: editItem ? formState.middle_name : '',
+        last_name: editItem ? formState.last_name : '',
+        mother_last_name: editItem ? formState.mother_last_name : '',
+        ciDisabled: false,
+      });
+    }
+  };
   const validate = () => {
     let errors: any = {};
 
@@ -72,26 +126,27 @@ export const AccompaniedAdd = ({
     setErrors(errors);
     return errors;
   };
+  // console.log(formState,'fst aad')
+  // console.log(item,'item aad')
   const onSave = async () => {
+    let acompanantes = item?.acompanantes || [];
     if (editItem) {
-      if (hasErrors(validate())) {
-        return;
-      }
-      setItem({
-        ...item,
-        ci: formState.ci,
-        name: formState.name,
-        middle_name: formState.middle_name,
-        last_name: formState.last_name,
-        mother_last_name: formState.mother_last_name,
-        ci_anverso: formState.ci_anverso,
-        ci_reverso: formState.ci_reverso,
-      });
+      acompanantes = acompanantes.map((acompanante: any) =>
+        acompanante.ci === editItem.ci
+          ? {
+              ci: formState.ci,
+              name: formState.name,
+              middle_name: formState.middle_name,
+              last_name: formState.last_name,
+              mother_last_name: formState.mother_last_name,
+            }
+          : acompanante,
+      );
+      setItem({...item, acompanantes});
       _onClose();
+      setFormState({});
       return;
     }
-
-    let acompanantes = item?.acompanantes || [];
     if (acompanantes?.length > 0) {
       const exist = acompanantes.find(
         (acompanante: any) => acompanante.ci === formState.ci,
@@ -116,12 +171,13 @@ export const AccompaniedAdd = ({
       middle_name: formState.middle_name,
       last_name: formState.last_name,
       mother_last_name: formState.mother_last_name,
-      ci_anverso: formState.ci_anverso,
-      ci_reverso: formState.ci_reverso,
+      // obs_in: formState.obs_in,
+      // nameDisabled: formState.nameDisabled,
     });
 
     setItem({...item, acompanantes});
     _onClose();
+    setFormState({});
   };
 
   const _onClose = () => {
@@ -129,18 +185,14 @@ export const AccompaniedAdd = ({
     onClose();
   };
   return (
-    <DynamicModal
-      title={editItem ? 'Editar datos' : 'Persona no encontrada'}
+    <Modal
+      title={editItem ? 'Editar acompañante' : 'Agregar acompañante'}
       open={open}
       onClose={_onClose}
-      height={468}
-      styleHeader={{borderBottomWidth: 0}}
-      buttonText="Registrar"
-      subTitle="Agrega sus datos para registrarla"
-      variant="V2"
-      buttonCancelText=""
+      buttonText="Guardar"
+      disabled={!formState.ci}
       onSave={onSave}>
-      <View style={{flexDirection: 'row', gap: 12}}>
+      {/* <View style={{flexDirection: 'row', gap: 12}}>
         <UploadFileV2
           variant="V2"
           style={{
@@ -163,7 +215,7 @@ export const AccompaniedAdd = ({
           name="ci_reverso"
           global
         />
-      </View>
+      </View> */}
       <Input
         label="Carnet de identidad"
         keyboardType="numeric"
@@ -173,18 +225,17 @@ export const AccompaniedAdd = ({
         error={errors}
         required={true}
         onChange={(value: any) => handleChange('ci', value)}
-        disabled={disabledCi}
+        onBlur={() => onExist()}
+        disabled={formState?.ciDisabled}
       />
-
       <InputFullName
         formState={formState}
         errors={errors}
         // name_prefijo="_a"
-
         handleChangeInput={handleChange}
-        // disabled={editItem}
+        disabled={false}
         inputGrid={true}
       />
-    </DynamicModal>
+    </Modal>
   );
 };

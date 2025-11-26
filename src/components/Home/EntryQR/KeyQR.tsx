@@ -17,6 +17,8 @@ import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
+import ExistVisitModal from '../CiNomModal/ExistVisitModal';
+import SectionIncomeType from '../CiNomModal/SectionIncomeType';
 
 type PropsType = {
   formState: any;
@@ -25,6 +27,7 @@ type PropsType = {
   data: any;
   errors: any;
   setTab?: any;
+  setErrors: any;
   tab?: any;
 };
 const KeyQR = ({
@@ -34,14 +37,16 @@ const KeyQR = ({
   data,
   errors,
   setTab,
+  setErrors,
   tab,
 }: PropsType) => {
   const [details, setDetails] = useState<TypeDetails>({
     data: [],
   });
-  // const [tab, setTab] = useState('P');
+  const [formStateA, setFormStateA] = useState({});
   const {execute} = useApi();
   const [openAcom, setOpenAcom] = useState(false);
+  const [openExistVisit, setOpenExistVisit] = useState(false);
 
   const _onDetail = (item: any) => {
     const data: ItemInfoType[] = [];
@@ -93,6 +98,8 @@ const KeyQR = ({
         mother_last_name_taxi: '',
         plate: prevState.tab === 'T' ? '' : prevState.plate,
         disbledTaxi: false,
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
       return;
     }
@@ -113,6 +120,8 @@ const KeyQR = ({
         mother_last_name_taxi: existData.data.mother_last_name,
         plate: existData.data.plate || '',
         disbledTaxi: true,
+        ci_anverso_taxi: existData.data.url_image_a,
+        ci_reverso_taxi: existData.data.url_image_r,
       }));
     } else {
       setFormState((prevState: any) => ({
@@ -123,6 +132,8 @@ const KeyQR = ({
         mother_last_name_taxi: '',
         plate: prevState.tab === 'T' ? '' : prevState.plate,
         disbledTaxi: false,
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
     }
   };
@@ -146,19 +157,16 @@ const KeyQR = ({
         }
         left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
         right={
-          <Icon
-            name={IconX}
-            color={cssVar.cError}
-            size={20}
-            style={{
-              padding: 4,
-            }}
+          <Text
             onPress={() => onDelAcom(acompanante)}
-          />
+            style={{
+              color: cssVar.cAccent,
+              fontSize: 12,
+              fontFamily: FONTS.semiBold,
+            }}>
+            Eliminar
+          </Text>
         }
-        // onPress={() => {
-        //   setOpenAcom(true);
-        // }}
       />
     );
   };
@@ -191,6 +199,43 @@ const KeyQR = ({
           />
           <ItemInfo type="C" details={details} />
 
+          <TouchableOpacity
+            style={styles.boxAcompanante}
+            onPress={() => setOpenExistVisit(true)}>
+            <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+            <Text
+              style={{
+                color: cssVar.cAccent,
+                fontFamily: FONTS.semiBold,
+              }}>
+              Agregar acompañante
+            </Text>
+          </TouchableOpacity>
+          {(formState?.acompanantes?.length || 0) > 0 && (
+            <>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: FONTS.semiBold,
+                  marginVertical: 4,
+                  color: cssVar.cWhite,
+                }}>
+                Acompañantes:
+              </Text>
+              <List
+                style={{marginBottom: 12}}
+                data={formState?.acompanantes}
+                renderItem={acompanantesList}
+              />
+            </>
+          )}
+          {/* <Text
+            style={{
+              fontFamily: FONTS.bold,
+              color: cssVar.cWhite,
+            }}>
+            Tipo de ingreso
+          </Text>
           <TabsButtons
             tabs={[
               {value: 'P', text: 'A pie'},
@@ -251,45 +296,16 @@ const KeyQR = ({
                 />
               </>
             )}
-          </View>
-
-          <TouchableOpacity
-            style={{
-              alignSelf: 'flex-start',
-              marginBottom: 12,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-            onPress={() => setOpenAcom(true)}>
-            <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
-            <Text
-              style={{
-                color: cssVar.cAccent,
-                textDecorationLine: 'underline',
-                marginLeft: 4,
-              }}>
-              Agregar acompañante
-            </Text>
-          </TouchableOpacity>
-          {(formState?.acompanantes?.length || 0) > 0 && (
-            <>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: FONTS.semiBold,
-                  marginVertical: 4,
-                  color: cssVar.cWhite,
-                }}>
-                Acompañantes:
-              </Text>
-              <List
-                style={{marginBottom: 12}}
-                data={formState?.acompanantes}
-                renderItem={acompanantesList}
-              />
-            </>
-          )}
-
+          </View> */}
+          <SectionIncomeType
+            tab={tab}
+            handleChangeInput={handleChange}
+            setTab={setTab}
+            formState={formState}
+            errors={errors}
+            setErrors={setErrors}
+            setFormState={setFormState}
+          />
           {!data?.invitation?.access && (
             <TextArea
               label="Observaciones de entrada"
@@ -301,15 +317,29 @@ const KeyQR = ({
           )}
         </>
       )}
-
-      <AccompaniedAdd
-        open={openAcom}
-        onClose={() => {
-          setOpenAcom(false);
-        }}
-        item={formState}
-        setItem={setFormState}
-      />
+      {openExistVisit && (
+        <ExistVisitModal
+          open={openExistVisit}
+          formState={formStateA}
+          setFormState={setFormStateA}
+          item={formState}
+          setItem={setFormState}
+          onClose={() => setOpenExistVisit(false)}
+          setOpenNewAcomp={setOpenAcom}
+        />
+      )}
+      {openAcom && (
+        <AccompaniedAdd
+          open={openAcom}
+          onClose={() => {
+            setOpenAcom(false);
+          }}
+          item={formState}
+          setItem={setFormState}
+          formState={formStateA}
+          setFormState={setFormStateA}
+        />
+      )}
     </View>
   );
 };
@@ -322,5 +352,19 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.semiBold,
     color: cssVar.cWhite,
     marginBottom: 12,
+  },
+  boxAcompanante: {
+    marginBottom: cssVar.sS,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
   },
 });

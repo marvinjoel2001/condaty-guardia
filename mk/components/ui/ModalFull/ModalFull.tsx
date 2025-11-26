@@ -180,6 +180,7 @@ const ModalFull = memo(
                         ) : undefined
                       }
                       style={[theme.body, style]}
+                      contentContainerStyle={{paddingBottom: 20}}
                       keyboardShouldPersistTaps="handled">
                       {children}
                     </ScrollView>
@@ -192,7 +193,6 @@ const ModalFull = memo(
                           variant="primary"
                           disabled={disabled}
                           onPress={(e: any) => {
-                            e.stopPropagation();
                             onSave(id);
                           }}>
                           {buttonText}
@@ -202,7 +202,6 @@ const ModalFull = memo(
                         <Button
                           variant="secondary"
                           onPress={(e: any) => {
-                            e.stopPropagation();
                             onClose('cancel');
                           }}>
                           {buttonCancel}

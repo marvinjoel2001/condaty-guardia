@@ -1,5 +1,5 @@
 // mk/components/forms/UploadFile.tsx
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,10 @@ import {
   PermissionsAndroid,
   StyleSheet,
 } from 'react-native';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
-import { storage } from '../../services/storage';
-import { uriToBlob } from '../../utils/file';
+import {storage} from '../../services/storage';
+import {uriToBlob} from '../../utils/file';
 import configApp from '../../../src/config/config';
 import useApi from '../../hooks/useApi';
 import Icon from '../../components/ui/Icon/Icon';
@@ -23,7 +23,7 @@ import {
   IconDoc2 as IconFile,
   IconCamera,
 } from '../../../src/icons/IconLibrary';
-import { cssVar, FONTS } from '../../styles/themes';
+import {cssVar, FONTS} from '../../styles/themes';
 import ImageExpandableModal from '../../components/ui/ImageExpandableModal/ImageExpandableModal'; // ← Ya lo tenías importado
 
 interface Props {
@@ -59,12 +59,16 @@ const UploadFile: React.FC<Props> = ({
   variant = 'V1',
   onUploadStateChange,
 }) => {
-  const { setWaiting } = useApi();
+  const {setWaiting} = useApi();
   const [uploading, setUploading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState<string>('');
 
-  const currentValues = Array.isArray(formState[name]) ? formState[name] : formState[name] ? [formState[name]] : [];
+  const currentValues = Array.isArray(formState[name])
+    ? formState[name]
+    : formState[name]
+    ? [formState[name]]
+    : [];
   const isSingle = cant === 1;
   
   // Determinar extensiones permitidas según el tipo
@@ -84,10 +88,13 @@ const UploadFile: React.FC<Props> = ({
   const folder = global ? 'global' : clientId || 'unknown';
   const pref = prefix ? `${prefix}/` : '';
 
-  const getPath = useCallback((filename: string) => {
-    const clean = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
-    return `${folder}/${pref}${Date.now()}_${clean}`;
-  }, [folder, pref]);
+  const getPath = useCallback(
+    (filename: string) => {
+      const clean = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+      return `${folder}/${pref}${Date.now()}_${clean}`;
+    },
+    [folder, pref],
+  );
 
   const pickFile = useCallback(() => {
     if (currentValues.length >= cant) {
@@ -115,10 +122,12 @@ const UploadFile: React.FC<Props> = ({
 
   const openCamera = async () => {
     if (Platform.OS === 'android') {
-      const p = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+      const p = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
       if (p !== PermissionsAndroid.RESULTS.GRANTED) return;
     }
-    launchCamera({ mediaType: 'photo', quality: 0.8 }, handleResponse);
+    launchCamera({mediaType: 'photo', quality: 0.8}, handleResponse);
   };
 
   const openGallery = () => {
@@ -131,7 +140,9 @@ const UploadFile: React.FC<Props> = ({
   const pickDocument = async () => {
     try {
       const res = await DocumentPicker.pickSingle();
-      handleResponse({ assets: [{ uri: res.uri, fileName: res.name || 'documento' }] });
+      handleResponse({
+        assets: [{uri: res.uri, fileName: res.name || 'documento'}],
+      });
     } catch (err) {
       if (!DocumentPicker.isCancel(err)) console.error(err);
     }
@@ -160,10 +171,11 @@ const UploadFile: React.FC<Props> = ({
       try {
         // Para Cloudinary, pasamos el asset completo con URI
         // Para Bunny, convertimos a Blob
-        const fileToUpload = (configApp as any).storageStrategy === 'cloudinary' 
-          ? { uri: asset.uri, type: asset.type || 'image/jpeg', name: filename }
-          : await uriToBlob(asset.uri);
-          
+        const fileToUpload =
+          (configApp as any).storageStrategy === 'cloudinary'
+            ? {uri: asset.uri, type: asset.type || 'image/jpeg', name: filename}
+            : await uriToBlob(asset.uri);
+
         const uploaded = await storage.upload(fileToUpload, path);
         //newValues.push(uploaded.path); // Esta linea de codigo es para guardar la ruta relativa del archivo
         newValues.push(uploaded.url);
@@ -173,7 +185,10 @@ const UploadFile: React.FC<Props> = ({
       }
     }
 
-    setFormState((prev: any) => ({ ...prev, [name]: isSingle ? [newValues[0] || ''] : newValues }));
+    setFormState((prev: any) => ({
+      ...prev,
+      [name]: isSingle ? [newValues[0] || ''] : newValues,
+    }));
     setUploading(false);
     onUploadStateChange?.(false);
     setWaiting(-1, 'upload-files');
@@ -186,28 +201,28 @@ const UploadFile: React.FC<Props> = ({
     setFormState((prev: any) => ({ ...prev, [name]: isSingle ? '' : filtered }));
   };
   */
-  
+
   const remove = (fullUrl: string) => {
-  if (!fullUrl || typeof fullUrl !== 'string') return;
-  let path = fullUrl;
-  try {
-    const urlObj = new URL(fullUrl);
-    path = decodeURIComponent(urlObj.pathname.slice(1)); // quita el "/" inicial
-  } catch {
-    if (typeof fullUrl === 'string' && fullUrl.includes('/')) {
-      const parts = fullUrl.split('/');
-      path = parts.slice(3).join('/'); // asume formato https://dominio.com/path...
+    if (!fullUrl || typeof fullUrl !== 'string') return;
+    let path = fullUrl;
+    try {
+      const urlObj = new URL(fullUrl);
+      path = decodeURIComponent(urlObj.pathname.slice(1)); // quita el "/" inicial
+    } catch {
+      if (typeof fullUrl === 'string' && fullUrl.includes('/')) {
+        const parts = fullUrl.split('/');
+        path = parts.slice(3).join('/'); // asume formato https://dominio.com/path...
+      }
     }
-  }
 
-  storage.delete(path).catch(() => {});
+    storage.delete(path).catch(() => {});
 
-  const filtered = currentValues.filter((url: string) => url !== fullUrl);
-  setFormState((prev: any) => ({
-    ...prev,
-    [name]: isSingle ? '' : filtered,
-  }));
-};
+    const filtered = currentValues.filter((url: string) => url !== fullUrl);
+    setFormState((prev: any) => ({
+      ...prev,
+      [name]: isSingle ? '' : filtered,
+    }));
+  };
 
   // Abrir modal con la imagen
   const openImageModal = (fullUrl: string) => {
@@ -217,18 +232,21 @@ const UploadFile: React.FC<Props> = ({
 
   // MODO SINGLE
   if (isSingle) {
-    const singleValue = Array.isArray(formState[name]) ? formState[name][0] : formState[name];
+    const singleValue = Array.isArray(formState[name])
+      ? formState[name][0]
+      : formState[name];
     const imageUrl = singleValue
-      ? (typeof singleValue === 'string' && singleValue.startsWith('http')
-          ? singleValue
-          : storage.url(singleValue as string))
+      ? typeof singleValue === 'string' && singleValue.startsWith('http')
+        ? singleValue
+        : storage.url(singleValue as string)
       : '';
-    const containerStyle = variant === 'V2' ? styles.containerV2 : styles.containerV1;
+    const containerStyle =
+      variant === 'V2' ? styles.containerV2 : styles.containerV1;
     const labelStyle = variant === 'V2' ? styles.labelV2 : styles.labelV1;
 
     return (
       <>
-        <View style={{ ...containerStyle, ...style }}>
+        <View style={{...containerStyle, ...style}}>
           {singleValue ? (
             <>
               <TouchableOpacity
@@ -242,21 +260,19 @@ const UploadFile: React.FC<Props> = ({
                   backgroundColor: cssVar.cBlackV1,
                   padding: 4,
                   borderRadius: 8,
-                }}
-              >
+                }}>
                 <Icon name={IconX} color={cssVar.cWhiteV1} size={16} />
               </TouchableOpacity>
 
               <TouchableOpacity
                 activeOpacity={0.95}
                 onPress={() => openImageModal(singleValue as string)}
-                style={{ width: '100%', height: '100%' }}
-                disabled={uploading}
-              >
+                style={{width: '100%', height: '100%'}}
+                disabled={uploading}>
                 <Image
-                  source={{ uri: imageUrl }}
-                  resizeMode="contain"
-                  style={{ width: '100%', height: '100%', borderRadius: 12 }}
+                  source={{uri: imageUrl}}
+                  resizeMode="cover"
+                  style={{width: '100%', height: '100%', borderRadius: 12}}
                 />
               </TouchableOpacity>
 
@@ -268,21 +284,35 @@ const UploadFile: React.FC<Props> = ({
                       backgroundColor: 'rgba(0,0,0,0.5)',
                       justifyContent: 'center',
                       alignItems: 'center',
-                    }}
-                  >
-                    <Text style={{ color: '#fff', fontWeight: '600' }}>Subiendo...</Text>
+                    }}>
+                    <Text style={{color: '#fff', fontWeight: '600'}}>
+                      Subiendo...
+                    </Text>
                   </View>
                 </View>
               )}
             </>
           ) : (
-            <TouchableOpacity onPress={pickFile} disabled={uploading} style={{ alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={pickFile}
+              disabled={uploading}
+              style={{alignItems: 'center'}}>
               {variant === 'V2' ? (
-                <Icon name={IconCamera} fillStroke={cssVar.cAccent} color={'transparent'} />
+                <Icon
+                  name={IconCamera}
+                  fillStroke={cssVar.cAccent}
+                  color={'transparent'}
+                />
               ) : (
-                <Icon name={IconGallery} fillStroke={cssVar.cWhite} color={'transparent'} />
+                <Icon
+                  name={IconGallery}
+                  fillStroke={cssVar.cWhite}
+                  color={'transparent'}
+                />
               )}
-              <Text style={labelStyle}>{uploading ? 'Subiendo...' : label}</Text>
+              <Text style={labelStyle}>
+                {uploading ? 'Subiendo...' : label}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -300,10 +330,10 @@ const UploadFile: React.FC<Props> = ({
   // MODO MÚLTIPLE
   return (
     <>
-      <View style={{ marginVertical: 12 }}>
+      <View style={{marginVertical: 12}}>
         {/* {label && <Text style={{ marginBottom: 8, fontWeight: '600' }}>{label}</Text>} */}
 
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 12}}>
           {currentValues.map((path: string, i: number) => {
             // Determinar si es imagen por extensión o tipo
             const fileExt = path.split('.').pop()?.toLowerCase();
@@ -319,8 +349,7 @@ const UploadFile: React.FC<Props> = ({
                   borderRadius: 8,
                   overflow: 'hidden',
                   backgroundColor: '#f8f8f8',
-                }}
-              >
+                }}>
                 <TouchableOpacity
                   onPress={() => remove(path)}
                   style={{
@@ -331,8 +360,7 @@ const UploadFile: React.FC<Props> = ({
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     borderRadius: 20,
                     padding: 4,
-                  }}
-                >
+                  }}>
                   <Icon name={IconX} color="#fff" size={16} />
                 </TouchableOpacity>
 
@@ -341,18 +369,25 @@ const UploadFile: React.FC<Props> = ({
                   <TouchableOpacity
                     activeOpacity={0.9}
                     onPress={() => openImageModal(path)}
-                    style={{ width: '100%', height: '100%' }}
-                  >
+                    style={{width: '100%', height: '100%'}}>
                     <Image
-                      source={{ uri: path }}
-                      style={{ width: '100%', height: '100%' }}
+                      source={{uri: path}}
+                      style={{width: '100%', height: '100%'}}
                       resizeMode="cover"
                     />
                   </TouchableOpacity>
                 ) : (
-                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 8 }}>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      padding: 8,
+                    }}>
                     <Icon name={IconFile} color={cssVar.cAccent} size={32} />
-                    <Text style={{ fontSize: 10, textAlign: 'center' }} numberOfLines={2}>
+                    <Text
+                      style={{fontSize: 10, textAlign: 'center'}}
+                      numberOfLines={2}>
                       {path.split('/').pop()}
                     </Text>
                   </View>
@@ -375,14 +410,14 @@ const UploadFile: React.FC<Props> = ({
                 borderWidth: 2,
                 borderColor: cssVar.cAccent,
                 borderStyle: 'dashed',
-              }}
-            >
+              }}>
               {uploading ? (
                 <Text>Subiendo...</Text>
               ) : (
                 <>
                   <Icon name={IconGallery} color={cssVar.cAccent} size={32} />
-                  <Text style={{ fontSize: 10, marginTop: 4, color: cssVar.cAccent }}>
+                  <Text
+                    style={{fontSize: 10, marginTop: 4, color: cssVar.cAccent}}>
                     {label}
                   </Text>
                 </>
@@ -392,7 +427,7 @@ const UploadFile: React.FC<Props> = ({
         </View>
 
         {required && currentValues.length === 0 && (
-          <Text style={{ color: 'red', marginTop: 6 }}>Campo obligatorio</Text>
+          <Text style={{color: 'red', marginTop: 6}}>Campo obligatorio</Text>
         )}
       </View>
 

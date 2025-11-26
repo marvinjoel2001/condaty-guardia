@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, Keyboard} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, Keyboard, View} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
@@ -12,7 +12,7 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getFullName} from '../../../../mk/utils/strings';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
-import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
+import {IconSimpleAdd} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
@@ -20,6 +20,10 @@ import {getUTCNow} from '../../../../mk/utils/dates';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import KeyQR from '../EntryQR/KeyQR';
+import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage';
+import ExistVisitModal from './ExistVisitModal';
+import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
+import SectionIncomeType from './SectionIncomeType';
 
 interface CiNomModalProps {
   open: boolean;
@@ -30,14 +34,18 @@ interface CiNomModalProps {
 
 const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const {showToast} = useAuth();
-  const [visit, setVisit]: any = useState(null);
+  // const [visit, setVisit]: any = useState(null);
+  const [oldPlate, setOldPlate] = useState('');
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState(0);
   const [saving, setSaving] = useState(false);
   const [typeSearch, setTypeSearch] = useState('P');
   const [addCompanion, setAddCompanion] = useState(false);
+  const [openExistVisit, setOpenExistVisit] = useState(false);
   const [dataOwner, setDataOwner]: any = useState(null);
+  const [formStateA, setFormStateA] = useState({});
+  const [onEdit, setOnEdit] = useState(false);
 
   const handleDeleteAcompanante = (ci: any) => {
     const newAcompanante = formState.acompanantes.filter(
@@ -47,29 +55,13 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   };
   const [dataOwners, setDataOwners] = useState([]);
   const {execute} = useApi();
-  // const {
-  //   data: owners,
-  //   loaded,
-  //   execute,
-  // } = useApi(
-  //   '/owners',
-  //   'GET',
-  //   {
-  //     perPage: -1,
-  //     sortBy: 'name',
-  //     orderBy: 'asc',
-  //     searchBy: '',
-  //     fullType: 'SG',
-  //   },
-  //   3,
-  // );
-  console.log(data);
+
   useEffect(() => {
     if (data) {
       const newOwners = data.map((owner: any) => {
         let nro = '';
         if (owner?.dpto && owner?.dpto.length > 0) {
-          nro = owner.dpto[0].type_name + ' ' + owner.dpto[0].nro;
+          nro = owner.dpto[0]?.type_name + ' ' + owner.dpto[0].nro;
         } else {
           nro = owner.type_name + ' ' + owner.dpto_nro;
         }
@@ -107,7 +99,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       if (visitData?.data?.owner_exist) {
         setDataOwner({invitation: visitData?.data});
       } else {
-        setVisit(visitData?.data);
+        // setVisit(visitData?.data);
+        setOldPlate(visitData?.data?.plate);
         setFormState({
           ...formState,
           name: visitData?.data?.name,
@@ -116,6 +109,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
           mother_last_name: visitData?.data?.mother_last_name,
           ci: visitData?.data?.ci,
           plate: visitData?.data?.plate,
+          ci_anverso: visitData?.data?.url_image_a,
+          ci_reverso: visitData?.data?.url_image_r,
         });
         setSteps(2);
       }
@@ -141,34 +136,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         value: formState.owner_id,
         rules: ['required'],
         key: 'owner_id',
-        errors,
-      });
-    }
-
-    // Validar datos del visitante solo cuando no existe visit (steps === 1)
-    if (steps === 1 && !visit) {
-      errors = checkRules({
-        value: formState.name,
-        rules: ['required', 'alpha'],
-        key: 'name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.middle_name,
-        rules: ['alpha'],
-        key: 'middle_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.last_name,
-        rules: ['required', 'alpha'],
-        key: 'last_name',
-        errors,
-      });
-      errors = checkRules({
-        value: formState.mother_last_name,
-        rules: ['alpha'],
-        key: 'mother_last_name',
         errors,
       });
     }
@@ -259,6 +226,9 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         last_name_taxi: formState?.last_name_taxi,
         mother_last_name_taxi: formState?.mother_last_name_taxi,
         visit_id: formState?.visit_id,
+        plate_vehicle: formState?.plate_vehicle,
+        ci_anverso_taxi: formState?.ci_anverso_taxi,
+        ci_reverso_taxi: formState?.ci_reverso_taxi,
       };
     } else {
       params = {
@@ -266,8 +236,9 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         ...formState,
       };
     }
-
     setSaving(true);
+    // console.log(params);
+    // return;
     const {data, error: err} = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
@@ -286,16 +257,15 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         subtitle={`CI: ${item.ci}`}
         left={<Avatar name={getFullName(item)} hasImage={item?.has_image} />}
         right={
-          <Icon
-            name={IconX}
-            color={cssVar.cError}
-            size={20}
-            style={{
-              borderRadius: 20,
-              padding: 4,
-            }}
+          <Text
             onPress={() => handleDeleteAcompanante(item.ci)}
-          />
+            style={{
+              color: cssVar.cAccent,
+              fontSize: 12,
+              fontFamily: FONTS.semiBold,
+            }}>
+            Eliminar
+          </Text>
         }
       />
     );
@@ -304,20 +274,20 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     if (typeSearch === 'V') {
       setFormState((prevState: any) => ({
         ...prevState,
-        tab: typeSearch,
         ci_taxi: '',
         name_taxi: '',
         middle_name_taxi: '',
         last_name_taxi: '',
         mother_last_name_taxi: '',
         disbledTaxi: false,
-        plate: prevState?.plate || visit?.plate || '',
+        plate: prevState?.plate || oldPlate || '',
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
     }
     if (typeSearch === 'P' || typeSearch == 'T') {
       setFormState((prevState: any) => ({
         ...prevState,
-        tab: typeSearch,
         ci_taxi: '',
         name_taxi: '',
         middle_name_taxi: '',
@@ -325,55 +295,39 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
         mother_last_name_taxi: '',
         plate: '',
         disbledTaxi: false,
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
     }
   }, [typeSearch]);
 
-  const onExistTaxi = async () => {
-    if (formState?.ci_taxi == formState?.ci) {
-      return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
-    }
-    const {data: exist} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
-    setErrors({errors, ci_taxi: ''});
-    if (exist?.data) {
-      setFormState({
-        ...formState,
-        ci_taxi: exist?.data.ci,
-        name_taxi: exist?.data.name,
-        middle_name_taxi: exist?.data.middle_name,
-        last_name_taxi: exist?.data.last_name,
-        mother_last_name_taxi: exist?.data.mother_last_name,
-        plate: exist?.data.plate,
-        disbledTaxi: true,
-      });
-    } else {
-      setFormState({
-        ...formState,
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-    }
-  };
-
   const _onClose = () => {
     if (steps > 0) {
       setSteps(0);
-      setVisit(null);
+      setOldPlate('');
       setFormState({owner_id: formState?.owner_id, ci: formState?.ci});
       return;
     }
     onClose();
   };
+  const handleEdit = () => {
+    setFormStateA(formState);
+    setOnEdit(true);
+    setAddCompanion(true);
+  };
+
+  console.log('formState:', formState);
+  const getStatusTextPhoto = () => {
+    if (!formState?.ci_reverso || !formState?.ci_anverso) {
+      return '/ Foto pendiente';
+    }
+    return '';
+  };
+  useEffect(() => {
+    if (!formState.name && steps === 1) {
+      handleEdit();
+    }
+  }, [steps]);
 
   return (
     <ModalFull
@@ -403,21 +357,18 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
             errors={errors}
             setTab={setTypeSearch}
             tab={typeSearch}
+            setErrors={setErrors}
           />
         ) : (
           <>
-            {!visit && steps === 0 && (
-              <Input
-                label="Carnet de identidad"
-                type="date"
-                name="ci"
-                error={errors}
-                required={true}
-                value={formState['ci']}
-                maxLength={10}
-                onChange={(value: any) => handleChangeInput('ci', value)}
-              />
-            )}
+            <Text
+              style={{
+                marginBottom: 12,
+                fontFamily: FONTS.bold,
+                color: cssVar.cWhite,
+              }}>
+              ¿A quién visitas?
+            </Text>
             <Select
               filter
               label="¿A quién visita?"
@@ -434,101 +385,53 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
               height={300}
               search={true}
             />
-            {visit && (
-              <ItemList
-                title={getFullName(visit)}
-                subtitle={`CI: ${visit?.ci}`}
-                left={
-                  <Avatar
-                    name={getFullName(visit)}
-                    hasImage={visit?.has_image}
-                  />
-                }
+            <Text
+              style={{
+                marginBottom: 12,
+                fontFamily: FONTS.bold,
+                color: cssVar.cWhite,
+              }}>
+              Visitante
+            </Text>
+            {steps === 0 && (
+              <Input
+                label="Carnet de identidad"
+                type="date"
+                name="ci"
+                error={errors}
+                required={true}
+                value={formState['ci']}
+                maxLength={10}
+                onChange={(value: any) => handleChangeInput('ci', value)}
               />
             )}
 
-            {steps === 1 && !visit && (
-              <InputNameCi
-                formStateName={formState}
-                formStateCi={formState?.ci}
-                disabledCi={true}
-                handleChangeInput={handleChangeInput}
-                errors={errors}
-              />
-            )}
-
-            {steps > 0 && (
+            {steps >= 1 && (
               <>
-                <TabsButtons
-                  tabs={[
-                    {value: 'P', text: 'A pie'},
-                    {value: 'V', text: 'En vehículo'},
-                    {value: 'T', text: 'En taxi'},
-                  ]}
-                  sel={typeSearch}
-                  setSel={setTypeSearch}
+                <ItemList
+                  title={formState?.name ? getFullName(formState) : '-/-'}
+                  subtitle={`CI: ${
+                    formState?.ci || '-/-'
+                  } ${getStatusTextPhoto()}`}
+                  left={
+                    <Avatar
+                      name={formState?.name ? getFullName(formState) : '-/-'}
+                      hasImage={formState?.has_image}
+                    />
+                  }
+                  right={
+                    <TouchableOpacity onPress={handleEdit}>
+                      <Text
+                        style={{
+                          color: cssVar.cAccent,
+                          fontSize: 12,
+                          fontFamily: FONTS.semiBold,
+                        }}>
+                        Editar
+                      </Text>
+                    </TouchableOpacity>
+                  }
                 />
-                {typeSearch == 'V' && (
-                  <Input
-                    label="Placa"
-                    autoCapitalize="characters"
-                    type="text"
-                    name="plate"
-                    error={errors}
-                    required={typeSearch == 'V'}
-                    value={formState['plate']}
-                    onChange={(value: any) => {
-                      handleChangeInput('plate', value);
-                    }}
-                  />
-                )}
-                {typeSearch == 'T' && (
-                  <>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        marginBottom: 4,
-                        color: cssVar.cWhite,
-                        fontFamily: FONTS.medium,
-                      }}>
-                      Datos del conductor:
-                    </Text>
-                    <Input
-                      label="Carnet de identidad"
-                      type="date"
-                      name="ci_taxi"
-                      required
-                      maxLength={10}
-                      error={errors}
-                      value={formState['ci_taxi']}
-                      onBlur={() => onExistTaxi()}
-                      onChange={(value: any) =>
-                        handleChangeInput('ci_taxi', value)
-                      }
-                    />
-                    <InputFullName
-                      formState={formState}
-                      errors={errors}
-                      handleChangeInput={handleChangeInput}
-                      disabled={formState?.disbledTaxi}
-                      prefijo={'_taxi'}
-                      inputGrid={true}
-                    />
-                    <Input
-                      label="Placa"
-                      autoCapitalize="characters"
-                      type="text"
-                      name="plate"
-                      error={errors}
-                      required={typeSearch == 'T'}
-                      value={formState['plate']}
-                      onChange={(value: any) =>
-                        handleChangeInput('plate', value)
-                      }
-                    />
-                  </>
-                )}
               </>
             )}
             {formState?.acompanantes?.length > 0 && (
@@ -537,7 +440,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                   style={{
                     fontSize: 16,
                     fontFamily: FONTS.medium,
-                    marginBottom: 4,
+                    marginBottom: 10,
+                    marginTop: 16,
                     color: cssVar.cWhite,
                   }}>
                   {formState?.acompanantes?.length > 1
@@ -555,17 +459,29 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
             {steps > 0 && (
               <TouchableOpacity
                 style={styles.boxAcompanante}
-                onPress={() => setAddCompanion(true)}>
+                onPress={() => setOpenExistVisit(true)}>
                 <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
                 <Text
                   style={{
                     color: cssVar.cAccent,
-                    textDecorationLine: 'underline',
+                    fontFamily: FONTS.semiBold,
                   }}>
                   Agregar acompañante
                 </Text>
               </TouchableOpacity>
             )}
+            {steps > 0 && (
+              <SectionIncomeType
+                setErrors={setErrors}
+                formState={formState}
+                handleChangeInput={handleChangeInput}
+                errors={errors}
+                tab={typeSearch}
+                setTab={setTypeSearch}
+                setFormState={setFormState}
+              />
+            )}
+
             {steps > 0 && (
               <TextArea
                 label="Observaciones"
@@ -580,16 +496,30 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
           </>
         )}
       </>
-
+      {openExistVisit && (
+        <ExistVisitModal
+          open={openExistVisit}
+          formState={formStateA}
+          setFormState={setFormStateA}
+          item={formState}
+          setItem={setFormState}
+          onClose={() => setOpenExistVisit(false)}
+          setOpenNewAcomp={setAddCompanion}
+        />
+      )}
       {addCompanion && (
         <AccompaniedAdd
+          editItem={onEdit}
           open={addCompanion}
           onClose={() => {
             Keyboard.dismiss();
             setAddCompanion(false);
+            setOnEdit(false);
           }}
           item={formState}
           setItem={setFormState}
+          formState={formStateA}
+          setFormState={setFormStateA}
         />
       )}
     </ModalFull>
@@ -606,11 +536,18 @@ const styles = StyleSheet.create({
     color: cssVar.cWhite,
   },
   boxAcompanante: {
-    alignSelf: 'flex-start',
     marginBottom: cssVar.sS,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
   },
   modalAlert: {
     alignItems: 'center',

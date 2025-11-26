@@ -24,6 +24,8 @@ import Br from '../../Profile/Br';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import useAuth from '../../../../mk/hooks/useAuth';
+import ExistVisitModal from '../CiNomModal/ExistVisitModal';
+import SectionIncomeType from '../CiNomModal/SectionIncomeType';
 
 type PropsType = {
   setFormState: any;
@@ -45,63 +47,66 @@ const IndividualQR = ({
   const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
-  const [editAcom, setEditAcom] = useState(null);
+  const [editAcom, setEditAcom] = useState(false);
   const {showToast} = useAuth();
   const [visit, setVisit] = useState(data?.visit || {});
+  const [openExistVisit, setOpenExistVisit] = useState(false);
+  const [formStateA, setFormStateA] = useState({});
+  const [isMain, setIsMain] = useState(false);
   const owner = data?.owner;
   const access = data?.access;
 
-  useEffect(() => {
-    const currentVisit = data?.visit;
-    const currentAccess = data?.access;
-    if (data) {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        ci: currentVisit?.ci || prevState?.ci || '',
-        name: currentVisit?.name || prevState?.name || '',
-        middle_name: currentVisit?.middle_name || prevState?.middle_name || '',
-        last_name: currentVisit?.last_name || prevState?.last_name || '',
-        mother_last_name:
-          currentVisit?.mother_last_name || prevState?.mother_last_name || '',
-        access_id: currentAccess?.[0]?.id || prevState?.access_id || null,
-        obs_in: currentAccess?.[0]?.obs_in || prevState?.obs_in || '',
-        obs_out: currentAccess?.[0]?.obs_out || prevState?.obs_out || '',
-        // plate es manejado por el efecto de 'tab' y onExistTaxi
-      }));
-    }
-  }, [data, setFormState]);
+  // useEffect(() => {
+  //   const currentVisit = data?.visit;
+  //   const currentAccess = data?.access;
+  //   if (data) {
+  //     setFormState((prevState: any) => ({
+  //       ...prevState,
+  //       ci: currentVisit?.ci || prevState?.ci || '',
+  //       name: currentVisit?.name || prevState?.name || '',
+  //       middle_name: currentVisit?.middle_name || prevState?.middle_name || '',
+  //       last_name: currentVisit?.last_name || prevState?.last_name || '',
+  //       mother_last_name:
+  //         currentVisit?.mother_last_name || prevState?.mother_last_name || '',
+  //       access_id: currentAccess?.[0]?.id || prevState?.access_id || null,
+  //       obs_in: currentAccess?.[0]?.obs_in || prevState?.obs_in || '',
+  //       obs_out: currentAccess?.[0]?.obs_out || prevState?.obs_out || '',
+  //       // plate es manejado por el efecto de 'tab' y onExistTaxi
+  //     }));
+  //   }
+  // }, [data, setFormState]);
 
-  const onExistVisits = async () => {
-    if (!formState?.ci || formState.ci.length < 5) {
-      setErrors({...errors, ci: ''});
-      return;
-    }
-    const {data: existData} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci,
-    });
+  // const onExistVisits = async () => {
+  //   if (!formState?.ci || formState.ci.length < 5) {
+  //     setErrors({...errors, ci: ''});
+  //     return;
+  //   }
+  //   const {data: existData} = await execute('/visits', 'GET', {
+  //     perPage: 1,
+  //     page: 1,
+  //     exist: '1',
+  //     fullType: 'L',
+  //     ci_visit: formState?.ci,
+  //   });
 
-    if (existData?.data) {
-      setVisit(existData?.data || {});
-      setFormState({
-        ...formState,
-        name: existData?.data?.name || '',
-        middle_name: existData?.data?.middle_name || '',
-        last_name: existData?.data?.last_name || '',
-        mother_last_name: existData?.data?.mother_last_name || '',
-      });
-    } else {
-      setErrors({...errors, ci: ''});
-    }
-  };
+  //   if (existData?.data) {
+  //     setVisit(existData?.data || {});
+  //     setFormState({
+  //       ...formState,
+  //       name: existData?.data?.name || '',
+  //       middle_name: existData?.data?.middle_name || '',
+  //       last_name: existData?.data?.last_name || '',
+  //       mother_last_name: existData?.data?.mother_last_name || '',
+  //     });
+  //   } else {
+  //     setErrors({...errors, ci: ''});
+  //   }
+  // };
 
   useEffect(() => {
     if (tab === 'V') {
-      setFormState((prevState: any) => ({
-        ...prevState,
+      setFormState({
+        ...formState,
         tab: tab,
         ci_taxi: '',
         name_taxi: '',
@@ -109,12 +114,14 @@ const IndividualQR = ({
         last_name_taxi: '',
         mother_last_name_taxi: '',
         disbledTaxi: false,
-        plate: prevState?.plate || visit?.vehicle?.plate || '',
-      }));
+        plate: formState.plate || visit?.vehicle?.plate || '',
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
+      });
     }
     if (tab === 'P' || tab == 'T') {
-      setFormState((prevState: any) => ({
-        ...prevState,
+      setFormState({
+        ...formState,
         tab: tab,
         ci_taxi: '',
         name_taxi: '',
@@ -123,9 +130,11 @@ const IndividualQR = ({
         mother_last_name_taxi: '',
         plate: '',
         disbledTaxi: false,
-      }));
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
+      });
     }
-  }, [tab, setFormState]);
+  }, [tab]);
 
   const onDelAcom = (acom: {ci: string}) => {
     const acomps = formState?.acompanantes || [];
@@ -148,90 +157,91 @@ const IndividualQR = ({
         }
         left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
         right={
-          <Icon
-            name={IconX}
-            color={cssVar.cError}
-            size={20}
-            style={{
-              padding: 4,
-            }}
-            onPress={() => onDelAcom(acompanante)}
-          />
+          <TouchableOpacity onPress={() => onDelAcom(acompanante)}>
+            <Text
+              style={{
+                color: cssVar.cAccent,
+                fontSize: 12,
+                fontFamily: FONTS.semiBold,
+              }}>
+              Eliminar
+            </Text>
+          </TouchableOpacity>
         }
-        onPress={() => {
-          setEditAcom(acompanante);
-          setOpenAcom(true);
-        }}
+        // onPress={() => {
+        //   setEditAcom(acompanante);
+        //   setOpenAcom(true);
+        // }}
       />
     );
   };
 
-  const onExistTaxi = async () => {
-    if (formState?.ci_taxi === '') {
-      return;
-    }
-    if (formState?.ci_taxi == formState?.ci) {
-      showToast('El ci del visitante y el taxi son iguales', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-      return;
-    }
-    if (
-      formState?.acompanantes?.find(
-        (item: {ci: string}) => item.ci === formState?.ci_taxi,
-      )
-    ) {
-      showToast('El ci del taxi está registrado como acompanante', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-      return;
-    }
-    const {data: existData} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
-    if (existData?.data) {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        ci_taxi: existData.data.ci,
-        name_taxi: existData.data.name,
-        middle_name_taxi: existData.data.middle_name,
-        last_name_taxi: existData.data.last_name,
-        mother_last_name_taxi: existData.data.mother_last_name,
-        plate: existData.data.plate || '',
-        disbledTaxi: true,
-      }));
-    } else {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate,
-        disbledTaxi: false,
-      }));
-    }
-  };
+  // const onExistTaxi = async () => {
+  //   if (formState?.ci_taxi === '') {
+  //     return;
+  //   }
+  //   if (formState?.ci_taxi == formState?.ci) {
+  //     showToast('El ci del visitante y el taxi son iguales', 'error');
+  //     setFormState({
+  //       ...formState,
+  //       ci_taxi: '',
+  //       name_taxi: '',
+  //       last_name_taxi: '',
+  //       middle_name_taxi: '',
+  //       mother_last_name_taxi: '',
+  //       plate: '',
+  //       disbledTaxi: false,
+  //     });
+  //     return;
+  //   }
+  //   if (
+  //     formState?.acompanantes?.find(
+  //       (item: {ci: string}) => item.ci === formState?.ci_taxi,
+  //     )
+  //   ) {
+  //     showToast('El ci del taxi está registrado como acompanante', 'error');
+  //     setFormState({
+  //       ...formState,
+  //       ci_taxi: '',
+  //       name_taxi: '',
+  //       last_name_taxi: '',
+  //       middle_name_taxi: '',
+  //       mother_last_name_taxi: '',
+  //       plate: '',
+  //       disbledTaxi: false,
+  //     });
+  //     return;
+  //   }
+  //   const {data: existData} = await execute('/visits', 'GET', {
+  //     perPage: 1,
+  //     page: 1,
+  //     exist: '1',
+  //     fullType: 'L',
+  //     ci_visit: formState?.ci_taxi,
+  //   });
+  //   if (existData?.data) {
+  //     setFormState((prevState: any) => ({
+  //       ...prevState,
+  //       ci_taxi: existData.data.ci,
+  //       name_taxi: existData.data.name,
+  //       middle_name_taxi: existData.data.middle_name,
+  //       last_name_taxi: existData.data.last_name,
+  //       mother_last_name_taxi: existData.data.mother_last_name,
+  //       plate: existData.data.plate || '',
+  //       disbledTaxi: true,
+  //     }));
+  //   } else {
+  //     setFormState((prevState: any) => ({
+  //       ...prevState,
+  //       name_taxi: '',
+  //       last_name_taxi: '',
+  //       middle_name_taxi: '',
+  //       mother_last_name_taxi: '',
+  //       plate: prevState.tab === 'T' ? '' : prevState.plate,
+  //       disbledTaxi: false,
+  //     }));
+  //   }
+  // };
 
   const getUnitInfo = (ownerData: any) => {
     if (ownerData?.dpto && ownerData.dpto.length > 0) {
@@ -241,9 +251,31 @@ const IndividualQR = ({
     return 'No especificada';
   };
 
+  const handleEdit = (bandera: boolean) => {
+    setFormStateA(bandera ? formStateA : formState);
+    setEditAcom(true);
+    setOpenAcom(true);
+  };
+
+  useEffect(() => {
+    if (!visit?.ci) {
+      setFormStateA(formState);
+      setOpenExistVisit(true);
+      setIsMain(true);
+    }
+  }, [visit]);
+
+  const getStatusTextPhoto = () => {
+    if (!formState?.ci_reverso || !formState?.ci_anverso) {
+      return '/ Foto pendiente';
+    }
+    return '';
+  };
+
   if (!data) {
     return <Loading />;
   }
+
   return (
     <>
       <View>
@@ -267,18 +299,32 @@ const IndividualQR = ({
           <Br />
           <Text style={styles.sectionTitle}>Visitante</Text>
           <ItemList
-            title={getFullName(visit)}
-            subtitle={'C.I. ' + (visit?.ci || '-/-')}
+            title={getFullName(formState)}
+            subtitle={
+              'C.I. ' + (formState?.ci || '-/-') + ' ' + getStatusTextPhoto()
+            }
             left={
               <Avatar
                 hasImage={0}
                 src={getUrlImages(
-                  `/VISIT-${visit?.id}.webp?d=${visit?.updated_at}`,
+                  `/VISIT-${formState?.id}.webp?d=${formState?.updated_at}`,
                 )}
-                name={getFullName(visit)}
+                name={getFullName(formState)}
                 w={40}
                 h={40}
               />
+            }
+            right={
+              <TouchableOpacity onPress={() => handleEdit(false)}>
+                <Text
+                  style={{
+                    color: cssVar.cAccent,
+                    fontSize: 12,
+                    fontFamily: FONTS.semiBold,
+                  }}>
+                  Editar
+                </Text>
+              </TouchableOpacity>
             }
           />
           <KeyValue
@@ -287,7 +333,7 @@ const IndividualQR = ({
             value={data?.obs || '-/-'}
           />
         </Card>
-        {!visit?.ci && data?.status !== 'X' && (
+        {/* {!visit?.ci && data?.status !== 'X' && (
           <View style={{...styles.formSection, marginTop: cssVar.spM}}>
             <Input
               label="Carnet del visitante"
@@ -298,7 +344,7 @@ const IndividualQR = ({
               error={errors}
               required
               onChange={(value: string) => handleChange('ci', value)}
-              onBlur={onExistVisits}
+              // onBlur={onExistVisits}
             />
             <InputFullName
               formState={formState}
@@ -307,94 +353,21 @@ const IndividualQR = ({
               inputGrid={true}
             />
           </View>
-        )}
-
-        {!access?.[0]?.in_at && data?.status !== 'X' && (
-          <TabsButtons
-            style={{marginVertical: 0}}
-            tabs={[
-              {value: 'P', text: 'A pie'},
-              {value: 'V', text: 'En vehículo'},
-              {value: 'T', text: 'En taxi'},
-            ]}
-            sel={tab}
-            setSel={setTab}
-          />
-        )}
-
-        {/* CONDICIÓN RESTAURADA A LA DE LA "VERSIÓN ANTIGUA QUE SÍ FUNCIONABA" */}
+        )} */}
         {access?.length === 0 && data?.status !== 'X' && (
-          <View style={styles.formSection}>
-            {tab === 'V' && (
-              <Input
-                label="Placa del vehículo"
-                type="text"
-                name="plate"
-                error={errors}
-                required={tab === 'V'}
-                value={formState?.plate || ''}
-                onChange={(value: string) =>
-                  handleChange('plate', value.toUpperCase())
-                }
-                autoCapitalize="characters"
-              />
-            )}
-            {tab === 'T' && (
-              <>
-                <Text style={styles.subSectionTitle}>Datos del conductor</Text>
-                <Input
-                  label="Carnet de identidad"
-                  name="ci_taxi"
-                  keyboardType="numeric"
-                  maxLength={10}
-                  error={errors}
-                  required
-                  value={formState?.ci_taxi || ''}
-                  onBlur={onExistTaxi}
-                  onChange={(value: string) => handleChange('ci_taxi', value)}
-                />
-                <InputFullName
-                  formState={formState}
-                  errors={errors}
-                  disabled={formState?.disbledTaxi}
-                  prefijo="_taxi"
-                  handleChangeInput={handleChange}
-                  inputGrid={true}
-                />
-                <Input
-                  label="Placa del taxi"
-                  type="text"
-                  name="plate"
-                  error={errors}
-                  required={tab === 'T'}
-                  value={formState?.plate || ''}
-                  onChange={(value: string) =>
-                    handleChange('plate', value.toUpperCase())
-                  }
-                  autoCapitalize="characters"
-                />
-              </>
-            )}
-
+          <>
             <TouchableOpacity
-              style={{
-                alignSelf: 'flex-start',
-                marginBottom: 12,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-              onPress={() => setOpenAcom(true)}>
-              <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
+              style={styles.boxAcompanante}
+              onPress={() => setOpenExistVisit(true)}>
+              <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
               <Text
                 style={{
                   color: cssVar.cAccent,
-                  textDecorationLine: 'underline',
-                  marginLeft: 4,
+                  fontFamily: FONTS.semiBold,
                 }}>
                 Agregar acompañante
               </Text>
             </TouchableOpacity>
-
             {(formState?.acompanantes?.length || 0) > 0 && (
               <>
                 <Text
@@ -413,7 +386,19 @@ const IndividualQR = ({
                 />
               </>
             )}
-          </View>
+          </>
+        )}
+
+        {!access?.[0]?.in_at && data?.status !== 'X' && (
+          <SectionIncomeType
+            tab={tab}
+            setTab={setTab}
+            formState={formState}
+            setFormState={setFormState}
+            handleChangeInput={handleChange}
+            errors={errors}
+            setErrors={setErrors}
+          />
         )}
         {data?.status !== 'X' && (
           <View style={styles.formSection}>
@@ -437,17 +422,34 @@ const IndividualQR = ({
           </View>
         )}
       </View>
-
-      <AccompaniedAdd
-        open={openAcom}
-        onClose={() => {
-          setOpenAcom(false);
-          setEditAcom(null);
-        }}
-        item={formState}
-        setItem={setFormState}
-        editItem={editAcom}
-      />
+      {openExistVisit && (
+        <ExistVisitModal
+          open={openExistVisit}
+          formState={formStateA}
+          setFormState={setFormStateA}
+          item={formState}
+          setItem={setFormState}
+          onClose={() => setOpenExistVisit(false)}
+          setOpenNewAcomp={setOpenAcom}
+          isMain={isMain}
+          onDismiss={() => handleEdit(true)}
+        />
+      )}
+      {openAcom && (
+        <AccompaniedAdd
+          formState={formStateA}
+          setFormState={setFormStateA}
+          open={openAcom}
+          onClose={() => {
+            setOpenAcom(false);
+            setEditAcom(false);
+            setIsMain(false);
+          }}
+          item={formState}
+          setItem={setFormState}
+          editItem={editAcom}
+        />
+      )}
     </>
   );
 };
@@ -481,5 +483,19 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.semiBold,
     color: cssVar.cWhite,
     marginBottom: 12,
+  },
+  boxAcompanante: {
+    marginBottom: cssVar.sS,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
   },
 });

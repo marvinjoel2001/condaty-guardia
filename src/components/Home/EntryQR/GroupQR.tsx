@@ -12,11 +12,7 @@ import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import List from '../../../../mk/components/ui/List/List';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {
-  IconArrowLeft,
-  IconX,
-  IconSimpleAdd,
-} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
+import {IconArrowLeft, IconX, IconSimpleAdd} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
@@ -28,6 +24,7 @@ import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import {getDateStrMes} from '../../../../mk/utils/dates';
 import useAuth from '../../../../mk/hooks/useAuth';
+import {AccompaniedAddV2} from './AccompaniedAddV2';
 
 type PropsType = {
   setFormState: any;
@@ -541,10 +538,14 @@ const GroupQR = ({
 
               {!selectedVisit?.access?.in_at && data?.status !== 'X' && (
                 <TouchableOpacity
-                  style={styles.addCompanionLinkContainer}
+                  style={styles.boxAcompanante}
                   onPress={() => setOpenAcom(true)}>
-                  <Icon name={IconSimpleAdd} size={13} color={cssVar.cAccent} />
-                  <Text style={styles.addCompanionLinkText}>
+                  <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+                  <Text
+                    style={{
+                      color: cssVar.cAccent,
+                      fontFamily: FONTS.semiBold,
+                    }}>
                     Agregar acompañante
                   </Text>
                 </TouchableOpacity>
@@ -591,7 +592,7 @@ const GroupQR = ({
           )}
         </View>
       )}
-      <AccompaniedAdd
+      <AccompaniedAddV2
         open={openAcom}
         onClose={() => {
           setOpenAcom(false);
@@ -620,6 +621,20 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 12, // gap-3
     alignSelf: 'stretch',
+  },
+  boxAcompanante: {
+    marginBottom: cssVar.sS,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
   },
   detailRow: {
     flexDirection: 'row',

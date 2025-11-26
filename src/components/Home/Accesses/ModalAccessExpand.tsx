@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import useApi from '../../../../mk/hooks/useApi';
-import {Text, View} from 'react-native';
+import {Image, Text, View} from 'react-native';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -52,7 +52,7 @@ const ModalAccessExpand = ({
       getAccess();
     }
   }, []);
-
+  console.log(data);
   const rendeAccess = () => {
     return (
       <>
@@ -95,6 +95,38 @@ const ModalAccessExpand = ({
         )}
         <KeyValue keys="Observación de ingreso" value={data?.obs_in || '-/-'} />
         <KeyValue keys="Observación de salida" value={data?.obs_out || '-/-'} />
+        <View style={{flexDirection: 'row', gap: 10}}>
+          {data?.visit?.url_image_a && (
+            <Image
+              source={{
+                uri: data?.visit?.url_image_a[0],
+              }}
+              width={100}
+              height={100}
+              style={{width: 100, height: 100, borderRadius: 8}}
+            />
+          )}
+          {data?.visit?.url_image_r && (
+            <Image
+              source={{
+                uri: data?.visit?.url_image_r[0],
+              }}
+              width={100}
+              height={100}
+              style={{width: 100, height: 100, borderRadius: 8}}
+            />
+          )}
+          {data?.url_image_p && (
+            <Image
+              source={{
+                uri: data?.url_image_p[0],
+              }}
+              width={100}
+              height={100}
+              style={{width: 100, height: 100, borderRadius: 8}}
+            />
+          )}
+        </View>
       </>
     );
   };

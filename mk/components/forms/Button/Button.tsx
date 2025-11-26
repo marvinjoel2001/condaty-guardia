@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {TouchableOpacity, Text, View} from 'react-native';
+import {TouchableOpacity, Text, View, Keyboard} from 'react-native';
 import useApi from '../../../hooks/useApi';
 import {FONTS, ThemeType, TypeStyles, cssVar} from '../../../styles/themes';
 
@@ -64,7 +64,10 @@ const Button = ({
   const handlePress = (e: any) => {
     e.stopPropagation();
     if (!disabled && waiting <= 0) {
-      onPress(e);
+      Keyboard.dismiss();
+      setTimeout(() => {
+        onPress(e);
+      }, 100);
     }
   };
   return (
@@ -149,7 +152,7 @@ const theme: ThemeType = {
     borderColor: 'transparent',
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.4,
   },
   icon: {
     paddingHorizontal: cssVar.spS,
