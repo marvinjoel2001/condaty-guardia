@@ -10,6 +10,7 @@ import {
   Modal,
   Animated,
   FlatList,
+  Keyboard,
 } from 'react-native';
 import {
   IconArrowDown,
@@ -285,7 +286,12 @@ const Select = ({
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
-          onPress={() => setOpenOptions(false)}>
+          onPress={() => {
+                Keyboard.dismiss();
+          setTimeout(() => {
+            setOpenOptions(false);
+          }, 100);
+          }}>
           <Animated.View
             style={[
               styles.modalContent,

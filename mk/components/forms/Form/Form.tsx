@@ -27,7 +27,7 @@ const Form = ({children, style, offset = 0, pressable = true}: FormProps) => {
         onPress={dismissKeyboard}
         android_disableSound>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={isAndroid() ? offset : 60}
           style={[{flex: 1}, style]}>
           <View style={{flex: 1}}>{children}</View>
@@ -38,7 +38,7 @@ const Form = ({children, style, offset = 0, pressable = true}: FormProps) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={isAndroid() ? offset : 60}
       style={[{flex: 1}, style]}>
       <View style={{flex: 1}}>{children}</View>
