@@ -75,8 +75,8 @@ const configApp = {
   },
   storageStrategy: 'cloudinary', // 'bunny' o 'cloudinary' según entorno
   cloudinary: {
-    cloudName: 'dy6uygofk',
-    uploadPreset: 'condaty-mobile',
+    cloudName: 'djdo4zsfn',
+    uploadPreset: 'condatydev',
     folder: 'condaty-mobile',
   },
 };
