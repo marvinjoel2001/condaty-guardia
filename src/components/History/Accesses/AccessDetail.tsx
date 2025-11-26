@@ -826,14 +826,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                   <ItemList
                     style={{marginBottom: 12}}
                     title={getFullName(modalPersonData.person)}
-                    subtitle={
-                      (modalPersonData.person?.dpto?.[0]?.type?.name ||
-                        'Unidad') +
-                      ': ' +
-                      modalPersonData.person?.dpto?.[0]?.nro +
-                      ', ' +
-                      (modalPersonData.person?.dpto?.[0]?.description || '')
-                    }
+                    subtitle={[
+                      `${
+                        modalPersonData.person?.dpto?.[0]?.type?.name ||
+                        'Unidad'
+                      }: ${modalPersonData.person?.dpto?.[0]?.nro}`,
+                      modalPersonData.person?.dpto?.[0]?.description,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')}
                     left={
                       <Avatar
                         hasImage={modalPersonData.person?.has_image}
