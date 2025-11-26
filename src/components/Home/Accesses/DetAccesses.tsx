@@ -440,6 +440,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 />
               )
             )}
+            {data?.out_at && (
+              <KeyValue
+                keys={'Guardia de salida'}
+                value={getFullName(data?.out_guard || data?.guardia)}
+              />
+            )}
             {data?.in_at && (
               <KeyValue
                 keys="Observación de ingreso"

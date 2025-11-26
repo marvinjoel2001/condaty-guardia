@@ -80,15 +80,15 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
         });
       }
       data.push({
-        l: item?.access[0]?.out_guard
-          ? 'Guardia de entrada:'
-          : 'Guardia de entrada y salida:',
+        l: 'Guardia de entrada:',
         v: getFullName(item?.access[0]?.guardia),
       });
-      if (item?.access[0]?.out_guard) {
+      if (item?.access[0]?.out_at) {
         data.push({
           l: 'Guardia de salida:',
-          v: getFullName(item?.access[0]?.out_guard),
+          v: getFullName(
+            item?.access[0]?.out_guard || item?.access[0]?.guardia,
+          ),
         });
       }
       if (item?.access[0]?.obs_in) {
