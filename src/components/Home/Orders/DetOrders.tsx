@@ -22,6 +22,7 @@ import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Br from '../../Profile/Br';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import {AccompaniedAddV2} from '../EntryQR/AccompaniedAddV2';
+import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
 
 const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   const {execute} = useApi();
@@ -189,6 +190,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         ci: formState?.ci,
         obs_in: formState?.obs_in,
         acompanantes: formState?.acompanantes,
+        plate_vehicle: formState?.plate_vehicle,
       });
       if (result?.success) {
         if (reload) reload();
@@ -397,16 +399,31 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                 />
 
                 {tab === 'V' && (
-                  <Input
-                    label="Placa"
-                    type="text"
-                    required
-                    name="plate"
-                    error={errors}
-                    // disabled={formState?.disbled}
-                    value={formState['plate']}
-                    onChange={(value: any) => handleInputChange('plate', value)}
-                  />
+                  <>
+                    <Input
+                      label="Placa"
+                      type="text"
+                      required
+                      name="plate"
+                      error={errors}
+                      // disabled={formState?.disbled}
+                      value={formState['plate']}
+                      onChange={(value: any) =>
+                        handleInputChange('plate', value)
+                      }
+                    />
+                    <UploadFileV2
+                      variant="V2"
+                      style={{
+                        marginBottom: 12,
+                      }}
+                      setFormState={setFormState}
+                      formState={formState}
+                      label="Placa del vehículo"
+                      name="plate_vehicle"
+                      global
+                    />
+                  </>
                 )}
                 {tab === 'T' && (
                   <>
