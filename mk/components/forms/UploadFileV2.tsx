@@ -9,6 +9,7 @@ import {
   Platform,
   PermissionsAndroid,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
@@ -60,6 +61,7 @@ const UploadFile: React.FC<Props> = ({
   onUploadStateChange,
 }) => {
   const { setWaiting } = useApi();
+  const { width: screenWidth } = useWindowDimensions();
   const [uploading, setUploading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState<string>('');
@@ -301,12 +303,19 @@ const UploadFile: React.FC<Props> = ({
   }
 
   // MODO MÚLTIPLE
+  // Calculamos el tamaño de cada item basado en el ancho de pantalla
+  const GAP = 12;
+  const ITEMS_PER_ROW = 3;
+  const CONTAINER_PADDING = 32; // Padding horizontal del contenedor padre (16 * 2)
+  const containerWidth = screenWidth - CONTAINER_PADDING;
+  const ITEM_SIZE = (containerWidth - (GAP * (ITEMS_PER_ROW - 1))) / ITEMS_PER_ROW;
+  
   return (
     <>
       <View style={{ marginVertical: 12 }}>
         {/* {label && <Text style={{ marginBottom: 8, fontWeight: '600' }}>{label}</Text>} */}
 
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: GAP }}>
           {currentValues.map((path: string, i: number) => {
             // Determinar si es imagen por extensión o tipo
             const fileExt = path.split('.').pop()?.toLowerCase();
@@ -317,8 +326,8 @@ const UploadFile: React.FC<Props> = ({
                 key={i}
                 style={{
                   position: 'relative',
-                  width: 100,
-                  height: 100,
+                  width: ITEM_SIZE,
+                  height: ITEM_SIZE,
                   borderRadius: 8,
                   overflow: 'hidden',
                   backgroundColor: '#f8f8f8',
@@ -369,8 +378,8 @@ const UploadFile: React.FC<Props> = ({
               onPress={pickFile}
               disabled={uploading}
               style={{
-                width: 100,
-                height: 100,
+                width: ITEM_SIZE,
+                height: ITEM_SIZE,
                 borderRadius: 8,
                 backgroundColor: cssVar.cWhiteV2,
                 justifyContent: 'center',
