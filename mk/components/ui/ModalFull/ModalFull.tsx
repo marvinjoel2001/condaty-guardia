@@ -161,8 +161,7 @@ const ModalFull = memo(
                       iconClose={iconClose}
                       modalLayout
                     />
-                  )}
-
+                  )} 
                   {scrollViewHide ? (
                     children
                   ) : (
