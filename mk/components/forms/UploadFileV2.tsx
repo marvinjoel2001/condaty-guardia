@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
-import { storage, StorageFile } from '../../services/storage';
+import { storage } from '../../services/storage';
 import { uriToBlob } from '../../utils/file';
 import configApp from '../../../src/config/config';
 import useApi from '../../hooks/useApi';
@@ -165,8 +165,8 @@ const UploadFile: React.FC<Props> = ({
           : await uriToBlob(asset.uri);
 
         const uploaded = await storage.upload(fileToUpload, path);
-        // Guardamos el objeto StorageFile completo para poder eliminar correctamente
-        newValues.push(uploaded);
+        // Guardamos solo la URL para compatibilidad con el backend
+        newValues.push(uploaded.url);
       } catch (e) {
         console.error(e);
         Alert.alert('Error', 'No se pudo subir el archivo');
@@ -179,9 +179,33 @@ const UploadFile: React.FC<Props> = ({
     setWaiting(-1, 'upload-files');
   };
 
-  const remove = (file: StorageFile) => {
-    storage.delete(file).catch(() => { });
-    const filtered = currentValues.filter((f: StorageFile) => f.url !== file.url);
+  const remove = (fullUrl: string) => {
+    if (!fullUrl || typeof fullUrl !== 'string') return;
+    let path = fullUrl;
+    
+    // Para URLs de Cloudinary, extraer el public_id correctamente
+    // Formato: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{ext}
+    if (fullUrl.includes('cloudinary.com')) {
+      const match = fullUrl.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.[^.]+)?$/);
+      if (match && match[1]) {
+        path = match[1]; // Esto extrae el public_id sin la extensión
+      }
+    } else {
+      // Para otras URLs (Bunny, etc.)
+      try {
+        const urlObj = new URL(fullUrl);
+        path = decodeURIComponent(urlObj.pathname.slice(1));
+      } catch {
+        if (fullUrl.includes('/')) {
+          const parts = fullUrl.split('/');
+          path = parts.slice(3).join('/');
+        }
+      }
+    }
+
+    storage.delete({ path, url: fullUrl, name: '' }).catch(() => { });
+
+    const filtered = currentValues.filter((url: string) => url !== fullUrl);
     setFormState((prev: any) => ({
       ...prev,
       [name]: isSingle ? '' : filtered,
@@ -196,11 +220,11 @@ const UploadFile: React.FC<Props> = ({
 
   // MODO SINGLE
   if (isSingle) {
-    const singleValue: StorageFile | null = Array.isArray(formState[name]) ? formState[name][0] : formState[name];
+    const singleValue = Array.isArray(formState[name]) ? formState[name][0] : formState[name];
     const imageUrl = singleValue
-      ? (singleValue.url.startsWith('http')
-        ? singleValue.url
-        : storage.url(singleValue.path))
+      ? (typeof singleValue === 'string' && singleValue.startsWith('http')
+        ? singleValue
+        : storage.url(singleValue as string))
       : '';
     const containerStyle = variant === 'V2' ? styles.containerV2 : styles.containerV1;
     const labelStyle = variant === 'V2' ? styles.labelV2 : styles.labelV1;
@@ -211,7 +235,7 @@ const UploadFile: React.FC<Props> = ({
           {singleValue ? (
             <>
               <TouchableOpacity
-                onPress={() => remove(singleValue)}
+                onPress={() => remove(singleValue as string)}
                 activeOpacity={0.9}
                 style={{
                   position: 'absolute',
@@ -228,7 +252,7 @@ const UploadFile: React.FC<Props> = ({
 
               <TouchableOpacity
                 activeOpacity={0.95}
-                onPress={() => openImageModal(singleValue.url)}
+                onPress={() => openImageModal(singleValue as string)}
                 style={{ width: '100%', height: '100%' }}
                 disabled={uploading}
               >
@@ -283,9 +307,9 @@ const UploadFile: React.FC<Props> = ({
         {/* {label && <Text style={{ marginBottom: 8, fontWeight: '600' }}>{label}</Text>} */}
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-          {currentValues.map((file: StorageFile, i: number) => {
+          {currentValues.map((path: string, i: number) => {
             // Determinar si es imagen por extensión o tipo
-            const fileExt = file.url.split('.').pop()?.toLowerCase();
+            const fileExt = path.split('.').pop()?.toLowerCase();
             const imageExts = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
             const isImage = type === 'I' || (type === 'A' && fileExt && imageExts.includes(fileExt));
             return (
@@ -301,7 +325,7 @@ const UploadFile: React.FC<Props> = ({
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => remove(file)}
+                  onPress={() => remove(path)}
                   style={{
                     position: 'absolute',
                     top: 4,
@@ -319,11 +343,11 @@ const UploadFile: React.FC<Props> = ({
                   // Tocamos la miniatura → abre modal
                   <TouchableOpacity
                     activeOpacity={0.9}
-                    onPress={() => openImageModal(file.url)}
+                    onPress={() => openImageModal(path)}
                     style={{ width: '100%', height: '100%' }}
                   >
                     <Image
-                      source={{ uri: file.url }}
+                      source={{ uri: path }}
                       style={{ width: '100%', height: '100%' }}
                       resizeMode="cover"
                     />
@@ -332,7 +356,7 @@ const UploadFile: React.FC<Props> = ({
                   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 8 }}>
                     <Icon name={IconFile} color={cssVar.cAccent} size={32} />
                     <Text style={{ fontSize: 10, textAlign: 'center' }} numberOfLines={2}>
-                      {file.name}
+                      {path.split('/').pop()}
                     </Text>
                   </View>
                 )}
