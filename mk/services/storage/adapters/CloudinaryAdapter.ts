@@ -1,7 +1,6 @@
 // mk/services/storage/adapters/CloudinaryAdapter.ts
 import { IStorageAdapter, StorageFile } from '../types';
 import configApp from '../../../../src/config/config';
-import { Platform } from 'react-native';
 
 const cloudinary = (configApp as any).cloudinary;
 
@@ -82,7 +81,7 @@ export class CloudinaryAdapter implements IStorageAdapter {
 
       // Retornamos el formato esperado
       return {
-        path: data.public_id + (data.format ? '.' + data.format : ''),
+        path: data.public_id,
         url: data.secure_url,
         name: data.original_filename || filename,
       };
@@ -92,31 +91,22 @@ export class CloudinaryAdapter implements IStorageAdapter {
     }
   }
 
-  async delete(pathOrUrl: string): Promise<void> {
+  async delete(file: StorageFile): Promise<void> {
     try {
-      // Extraer public_id desde la URL completa o path relativo
-      let publicId = pathOrUrl;
-      
-      // Si es una URL completa de Cloudinary
-      if (pathOrUrl.includes('cloudinary.com')) {
-        const urlParts = pathOrUrl.split('/upload/');
-        if (urlParts.length > 1) {
-          publicId = urlParts[1].replace(/\.[^/.]+$/, ''); // quitar extensión
-        }
-      } else {
-        // Si ya es un path relativo, quitar extensión
-        publicId = pathOrUrl.replace(/\.[^/.]+$/, '');
-      }
+      // El path ya contiene el public_id de Cloudinary
+      const publicId = file.path;
 
-      // Llamar al backend para borrar (más seguro)
-      const response = await fetch(`${configApp.API_URL}/cloudinary-delete`, {
-        method: 'POST',
+      console.log('🗑️ Eliminando de Cloudinary:', publicId);
+
+      // Llamar al endpoint de Next.js para borrar
+      const response = await fetch(`${configApp.NEXT_API_BASE_URL}/api/cloudinary-upload`, {
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ public_id: publicId }),
       });
 
       if (!response.ok) {
-        console.warn('No se pudo eliminar de Cloudinary:', publicId);
+        console.warn('No se pudo eliminar de Cloudinary a través de Next.js:', publicId);
       }
     } catch (error) {
       console.error('CloudinaryAdapter delete error:', error);

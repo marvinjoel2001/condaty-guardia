@@ -6,6 +6,6 @@ export type StorageFile = {
 
 export interface IStorageAdapter {
   upload(file: Blob | File | any, path: string): Promise<StorageFile>;
-  delete(path: string): Promise<void>;
+  delete(file: StorageFile): Promise<void>;
   url(path: string): string;
 }
