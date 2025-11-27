@@ -83,7 +83,6 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
         </View>
       );
     }
-    console.log(details);
     return (
       <View style={styles.mainCard}>
         {details?.level == 4 ? (
@@ -152,19 +151,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
             />
             <View style={styles.divider} />
 
-            {!details?.date_at ? (
-              <View style={styles.pendingContainer}>
-                <View style={{padding: 8}}>
-                  <Icon
-                    name={IconClock}
-                    size={40}
-                    color={cssVar.cError}
-                    viewBox="0 0 32 32"
-                  />
-                </View>
-                <Text style={styles.pendingText}>Pendiente de atención</Text>
-              </View>
-            ) : (
+            {details?.date_at ? (
               <View style={styles.attendedContainer}>
                 <Text style={styles.sectionTitle}>Atendida por</Text>
                 <ItemList
@@ -223,6 +210,18 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                     </Text>
                   }
                 />
+              </View>
+            ) : (
+              <View style={styles.pendingContainer}>
+                <View style={{padding: 8}}>
+                  <Icon
+                    name={IconClock}
+                    size={40}
+                    color={cssVar.cError}
+                    viewBox="0 0 32 32"
+                  />
+                </View>
+                <Text style={styles.pendingText}>Pendiente de atención</Text>
               </View>
             )}
           </>
