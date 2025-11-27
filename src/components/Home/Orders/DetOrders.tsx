@@ -205,13 +205,12 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         <Text style={styles.labelAccess}>Notificado Por</Text>
         <ItemList
           title={getFullName(data?.owner)}
-          // subtitle={'C.I.' + data?.owner?.ci}
-          subtitle={
-            'Unidad: ' +
-            data?.owner?.dpto?.[0]?.nro +
-            ', ' +
-            data?.owner?.dpto?.[0]?.description
-          }
+          subtitle={[
+            `Unidad: ${data?.owner?.dpto?.[0]?.nro || ''}`,
+            data?.owner?.dpto?.[0]?.description,
+          ]
+            .filter(Boolean)
+            .join(', ')}
           left={
             <Avatar
               hasImage={data?.owner?.has_image}
