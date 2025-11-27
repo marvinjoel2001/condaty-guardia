@@ -12,14 +12,12 @@ import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import List from '../../../../mk/components/ui/List/List';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import {IconX, IconAddMore, IconSimpleAdd} from '../../../icons/IconLibrary';
+import {IconX, IconSimpleAdd} from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
 import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
 import ItemListDate from '../Accesses/shares/ItemListDate';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
-import Br from '../../Profile/Br';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import {AccompaniedAddV2} from '../EntryQR/AccompaniedAddV2';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
@@ -320,7 +318,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
     <ModalFull
       onClose={close}
       open={open}
-      title={'Pedido' + '/' + data?.other_type?.name}
+      title={!data ? 'Cargando...' : 'Pedido' + '/' + data?.other_type?.name}
       onSave={handleSave}
       buttonText={getButtonText()}>
       {!data ? (
@@ -490,12 +488,14 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
           </View>
         </>
       )}
-      <AccompaniedAddV2
-        open={openAcom}
-        onClose={() => setOpenAcom(false)}
-        item={formState}
-        setItem={setFormState}
-      />
+      {openAcom && (
+        <AccompaniedAddV2
+          open={openAcom}
+          onClose={() => setOpenAcom(false)}
+          item={formState}
+          setItem={setFormState}
+        />
+      )}
     </ModalFull>
   );
 };
