@@ -81,7 +81,16 @@ const configApp = {
     uploadPreset: 'condatyprod',
     folder: 'condaty-mobile',
   },
+  NEXT_API_URL: {
+    PROD: 'https://admin.condaty.com',
+    PRE: 'https://condaty-pre.vercel.app',
+    TEST: 'https://condaty2025test.vercel.app',
+    DEV: 'https://condatydev.vercel.app',
+    DEMO: 'https://condaty-demo.vercel.app', // Agregado DEMO
+  },
+  NEXT_API_BASE_URL: '', // Se inicializa vacío y se asigna dinámicamente
 };
+
 // configApp.API_URL = configApp.API_URL_TEST;
 configApp.API_URL = configApp.API_URL_PRE;
 
@@ -95,18 +104,21 @@ if (configApp.API_URL == configApp.API_URL_DEV) {
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydev';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEV;
   configApp.cloudinary.uploadPreset = 'condatydev';
+  configApp.NEXT_API_BASE_URL = configApp.NEXT_API_URL.DEV;
 }
 if (configApp.API_URL == configApp.API_URL_TEST) {
   configApp.APP_DEBUG = 0;
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatytest';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_TEST;
   configApp.cloudinary.uploadPreset = 'condatytest';
+  configApp.NEXT_API_BASE_URL = configApp.NEXT_API_URL.TEST;
 }
 if (configApp.API_URL == configApp.API_URL_DEMO) {
   configApp.APP_DEBUG = 0;
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydemos';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEMO;
   configApp.cloudinary.uploadPreset = 'condatydemo';
+  configApp.NEXT_API_BASE_URL = configApp.NEXT_API_URL.DEMO;
 }
 
 if (configApp.API_URL == configApp.API_URL_PRE) {
@@ -114,6 +126,11 @@ if (configApp.API_URL == configApp.API_URL_PRE) {
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatypre';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_PRE;
   configApp.cloudinary.uploadPreset = 'condatypre';
+  configApp.NEXT_API_BASE_URL = configApp.NEXT_API_URL.PRE;
+}
+
+if (configApp.API_URL == configApp.API_URL_PROD) {
+  configApp.NEXT_API_BASE_URL = configApp.NEXT_API_URL.PROD;
 }
 
 // UNA SOLA LÍNEA MÁGICA (esto es todo lo nuevo que necesitas)
