@@ -33,9 +33,9 @@ const Home = () => {
       if (dataSocket?.event == 'accessTrans') {
         // Función de ordenamiento por updated_at descendente
         const sortByUpdatedAt = (items: any[]) => {
-          return items.sort((a: any, b: any) => {
-            const fechaA = new Date(a.updated_at).getTime();
-            const fechaB = new Date(b.updated_at).getTime();
+          return [...items]?.sort((a: any, b: any) => {
+            const fechaA = new Date(a?.updated_at).getTime();
+            const fechaB = new Date(b?.updated_at).getTime();
             return fechaB - fechaA;
           });
         };
