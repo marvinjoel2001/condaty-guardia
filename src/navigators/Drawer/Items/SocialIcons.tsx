@@ -17,11 +17,11 @@ type Props = {
 };
 
 const defaultIcons: SocialIcon[] = [
-  {icon: IconFacebook, link: 'https://www.facebook.com/CondatyApp'},
-  {icon: IconInstagram, link: 'https://www.instagram.com/condatyapp/'},
-  {icon: IconLinkedin, link: 'https://www.linkedin.com/company/condatyapp/'},
-  {icon: IconYoutube, link: 'https://www.youtube.com/@CondatyApp'},
-  {icon: IconTikTok, link: 'https://www.tiktok.com/@condatyapp'},
+  {icon: IconFacebook, link: 'https://facebook.com/condaty.bo'},
+  {icon: IconInstagram, link: 'https://instagram.com/condaty.bo'},
+  {icon: IconLinkedin, link: 'https://linkedin.com/in/condaty-by-fos-54a58627a/'},
+  {icon: IconYoutube, link: 'https://youtube.com/@CondatybyFos'},
+  {icon: IconTikTok, link: 'https://tiktok.com/@condaty.bo'},
 ];
 
 export const SocialIcons: React.FC<Props> = ({icons = defaultIcons}) => {

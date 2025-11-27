@@ -33,8 +33,8 @@ export class BunnyAdapter implements IStorageAdapter {
     };
   }
 
-  async delete(path: string): Promise<void> {
-    const url = `https://${this.hostname}/${this.zone}/${path}`;
+  async delete(file: StorageFile): Promise<void> {
+    const url = `https://${this.hostname}/${this.zone}/${file.path}`;
     await fetch(url, { method: 'DELETE', headers: { AccessKey: this.apiKey } });
   }
 
