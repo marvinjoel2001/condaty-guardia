@@ -30,7 +30,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     const {data} = await execute('/alerts', 'GET', {
       fullType: 'DET',
       searchBy: id,
-    });
+    },true, 3);
     if (data?.success) {
       setDetails(data?.data?.data);
     }
@@ -83,7 +83,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
         </View>
       );
     }
-    console.log(details);
+    
     return (
       <View style={styles.mainCard}>
         {details?.level == 4 ? (
@@ -98,9 +98,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
               <ItemList
                 title={getFullName(details?.owner)}
                 subtitle={
-                  details?.owner?.dpto?.[0]?.nro +
-                  ', ' +
-                  details?.owner?.dpto?.[0]?.description
+                  details?.owner?.dpto?.[0]?.type?.name + ' ' + details?.owner?.dpto?.[0]?.nro
                 }
                 left={
                   <Avatar
