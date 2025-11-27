@@ -30,7 +30,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
     const {data} = await execute('/alerts', 'GET', {
       fullType: 'DET',
       searchBy: id,
-    },true, 3);
+    });
     if (data?.success) {
       setDetails(data?.data?.data);
     }
