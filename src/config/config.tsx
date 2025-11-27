@@ -78,7 +78,7 @@ const configApp = {
   storageStrategy: 'cloudinary', // 'bunny' o 'cloudinary' según entorno
   cloudinary: {
     cloudName: 'djdo4zsfn',
-    uploadPreset: 'condatydev',
+    uploadPreset: 'condatyprod',
     folder: 'condaty-mobile',
   },
 };
@@ -94,22 +94,26 @@ if (configApp.API_URL == configApp.API_URL_DEV) {
   configApp.APP_DEBUG = 0;
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydev';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEV;
+  configApp.cloudinary.uploadPreset = 'condatydev';
 }
 if (configApp.API_URL == configApp.API_URL_TEST) {
   configApp.APP_DEBUG = 0;
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatytest';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_TEST;
+  configApp.cloudinary.uploadPreset = 'condatytest';
 }
 if (configApp.API_URL == configApp.API_URL_DEMO) {
   configApp.APP_DEBUG = 0;
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatydemos';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_DEMO;
+  configApp.cloudinary.uploadPreset = 'condatydemo';
 }
 
 if (configApp.API_URL == configApp.API_URL_PRE) {
   configApp.APP_DEBUG = 0;
   configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX = 'condatypre';
   configApp.APP_INSTANTDB_APP_ID = configApp.APP_INSTANTDB_APP_ID_PRE;
+  configApp.cloudinary.uploadPreset = 'condatypre';
 }
 
 // UNA SOLA LÍNEA MÁGICA (esto es todo lo nuevo que necesitas)
