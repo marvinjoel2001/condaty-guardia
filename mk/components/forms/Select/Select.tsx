@@ -130,7 +130,7 @@ const Select = ({
       Keyboard.dismiss();
       setTimeout(() => {
         setOpenOptions(false);
-      }, 100);
+      }, 50);
       onChange({target: {name, value: element}});
     },
     [name, onChange],
@@ -293,7 +293,7 @@ const Select = ({
                 Keyboard.dismiss();
           setTimeout(() => {
             setOpenOptions(false);
-          }, 100);
+          }, 50);
           }}>
           <Animated.View
             style={[

@@ -1,48 +1,57 @@
-import React, {ReactNode, useCallback} from 'react';
+// Form.tsx
+import React, { ReactNode, useCallback } from 'react';
 import {
   View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  Pressable,
   StyleProp,
   ViewStyle,
-  Pressable,
-  Keyboard,
-  Platform,
 } from 'react-native';
-import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
-import {isAndroid} from '../../../utils/utils';
 
 interface FormProps {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
-  offset?: number;
   pressable?: boolean;
 }
 
-const Form = ({children, style, offset = 0, pressable = true}: FormProps) => {
+const Form = ({
+  children,
+  style,
+  pressable = true,
+}: FormProps) => {
   const dismissKeyboard = useCallback(() => Keyboard.dismiss(), []);
 
-  if (pressable) {
-    return (
-      <Pressable
-        style={{flex: 1}}
-        onPress={dismissKeyboard}
-        android_disableSound>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={isAndroid() ? offset : 60}
-          style={[{flex: 1}, style]}>
-          <View style={{flex: 1}}>{children}</View>
-        </KeyboardAvoidingView>
-      </Pressable>
-    );
-  }
+  const isKeyboardVisible = Keyboard.isVisible();
+  const baseOffset = Platform.OS === 'ios' ? 60 : 44;
 
-  return (
+  const content = (
     <KeyboardAvoidingView
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={isAndroid() ? offset : 60}
-      style={[{flex: 1}, style]}>
-      <View style={{flex: 1}}>{children}</View>
+      keyboardVerticalOffset={Platform.OS === 'ios'? baseOffset :isKeyboardVisible ? 44 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={{ flex: 1 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={[{ flex: 1, justifyContent: 'space-between' }, style]}>
+          {children}
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
+  );
+
+  return pressable ? (
+    <Pressable style={{ flex: 1 }} onPress={dismissKeyboard}>
+      {content}
+    </Pressable>
+  ) : (
+    content
   );
 };
 
