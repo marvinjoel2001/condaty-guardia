@@ -363,7 +363,11 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
               <DetailRow
                 label="Guardia de salida"
-                value={getFullName(item.out_guard)}
+                value={
+                  item.out_at
+                    ? getFullName(item.out_guard || item.guardia)
+                    : null
+                }
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
@@ -555,7 +559,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 value={
                   statusText === 'Rechazado'
                     ? null
-                    : getFullName(item.out_guard)
+                    : item.out_at
+                    ? getFullName(item.out_guard || item.guardia)
+                    : null
                 }
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />

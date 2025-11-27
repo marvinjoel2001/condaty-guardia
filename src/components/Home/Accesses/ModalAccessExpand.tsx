@@ -79,18 +79,16 @@ const ModalAccessExpand = ({
           keys="Fecha y hora de salida"
           value={getDateTimeStrMes(data?.out_at, true)}
         />
-        <KeyValue
-          keys={
-            data?.out_guard || !data?.out_at
-              ? 'Guardia de ingreso'
-              : 'Guardia de ingreso y salida'
-          }
-          value={getFullName(data?.guardia)}
-        />
-        {data?.out_guard && (
+        {data?.guardia && (
+          <KeyValue
+            keys="Guardia de ingreso"
+            value={getFullName(data?.guardia)}
+          />
+        )}
+        {data?.out_at && (
           <KeyValue
             keys="Guardia de salida"
-            value={getFullName(data?.out_guard)}
+            value={getFullName(data?.out_guard || data?.guardia)}
           />
         )}
         <KeyValue keys="Observación de ingreso" value={data?.obs_in || '-/-'} />
