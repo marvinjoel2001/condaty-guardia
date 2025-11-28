@@ -34,7 +34,6 @@ export const AccompaniedAdd = ({
   const handleChange = (key: string, value: any) => {
     setFormState((prevState: any) => ({...prevState, [key]: value}));
   };
-
   const validate = () => {
     let errors: any = {};
 
@@ -125,7 +124,18 @@ export const AccompaniedAdd = ({
   };
 
   const _onClose = () => {
-    setFormState({});
+    if (editItem) {
+      setItem({
+        ...item,
+        ci: formState.ci,
+        name: formState.name,
+        middle_name: formState.middle_name,
+        last_name: formState.last_name,
+        mother_last_name: formState.mother_last_name,
+        ci_anverso: formState.ci_anverso,
+        ci_reverso: formState.ci_reverso,
+      });
+    }
     onClose();
   };
   return (
