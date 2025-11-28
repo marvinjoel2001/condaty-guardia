@@ -333,9 +333,11 @@ const IndividualQR = ({
           setFormState={setFormStateA}
           item={formState}
           setItem={setFormState}
+          extraOnClose={() => {
+            onClose();
+          }}
           onClose={() => {
             setOpenExistVisit(false);
-            onClose();
           }}
           setOpenNewAcomp={setOpenAcom}
           isMain={isMain}
