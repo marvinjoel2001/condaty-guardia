@@ -14,6 +14,7 @@ interface ExistVisitModalProps {
   setOpenNewAcomp: any;
   isMain?: boolean;
   onDismiss?: () => void;
+  extraOnClose?: () => void;
 }
 
 const ExistVisitModal = ({
@@ -25,6 +26,7 @@ const ExistVisitModal = ({
   setItem,
   item,
   isMain = false,
+  extraOnClose,
   onDismiss,
 }: ExistVisitModalProps) => {
   const {showToast} = useAuth();
@@ -121,6 +123,9 @@ const ExistVisitModal = ({
   const _onClose = () => {
     onClose();
     setFormState({});
+    if (isMain) {
+      extraOnClose?.();
+    }
   };
   return (
     <Modal
