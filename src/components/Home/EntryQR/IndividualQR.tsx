@@ -34,6 +34,7 @@ type PropsType = {
   data: any;
   errors: any;
   setErrors: any;
+  onClose: any;
 };
 
 const IndividualQR = ({
@@ -43,6 +44,7 @@ const IndividualQR = ({
   setErrors,
   data,
   handleChange,
+  onClose,
 }: PropsType) => {
   const {execute} = useApi();
   const [tab, setTab] = useState('P');
@@ -75,33 +77,6 @@ const IndividualQR = ({
   //     }));
   //   }
   // }, [data, setFormState]);
-
-  // const onExistVisits = async () => {
-  //   if (!formState?.ci || formState.ci.length < 5) {
-  //     setErrors({...errors, ci: ''});
-  //     return;
-  //   }
-  //   const {data: existData} = await execute('/visits', 'GET', {
-  //     perPage: 1,
-  //     page: 1,
-  //     exist: '1',
-  //     fullType: 'L',
-  //     ci_visit: formState?.ci,
-  //   });
-
-  //   if (existData?.data) {
-  //     setVisit(existData?.data || {});
-  //     setFormState({
-  //       ...formState,
-  //       name: existData?.data?.name || '',
-  //       middle_name: existData?.data?.middle_name || '',
-  //       last_name: existData?.data?.last_name || '',
-  //       mother_last_name: existData?.data?.mother_last_name || '',
-  //     });
-  //   } else {
-  //     setErrors({...errors, ci: ''});
-  //   }
-  // };
 
   useEffect(() => {
     if (tab === 'V') {
@@ -168,80 +143,9 @@ const IndividualQR = ({
             </Text>
           </TouchableOpacity>
         }
-        // onPress={() => {
-        //   setEditAcom(acompanante);
-        //   setOpenAcom(true);
-        // }}
       />
     );
   };
-
-  // const onExistTaxi = async () => {
-  //   if (formState?.ci_taxi === '') {
-  //     return;
-  //   }
-  //   if (formState?.ci_taxi == formState?.ci) {
-  //     showToast('El ci del visitante y el taxi son iguales', 'error');
-  //     setFormState({
-  //       ...formState,
-  //       ci_taxi: '',
-  //       name_taxi: '',
-  //       last_name_taxi: '',
-  //       middle_name_taxi: '',
-  //       mother_last_name_taxi: '',
-  //       plate: '',
-  //       disbledTaxi: false,
-  //     });
-  //     return;
-  //   }
-  //   if (
-  //     formState?.acompanantes?.find(
-  //       (item: {ci: string}) => item.ci === formState?.ci_taxi,
-  //     )
-  //   ) {
-  //     showToast('El ci del taxi está registrado como acompanante', 'error');
-  //     setFormState({
-  //       ...formState,
-  //       ci_taxi: '',
-  //       name_taxi: '',
-  //       last_name_taxi: '',
-  //       middle_name_taxi: '',
-  //       mother_last_name_taxi: '',
-  //       plate: '',
-  //       disbledTaxi: false,
-  //     });
-  //     return;
-  //   }
-  //   const {data: existData} = await execute('/visits', 'GET', {
-  //     perPage: 1,
-  //     page: 1,
-  //     exist: '1',
-  //     fullType: 'L',
-  //     ci_visit: formState?.ci_taxi,
-  //   });
-  //   if (existData?.data) {
-  //     setFormState((prevState: any) => ({
-  //       ...prevState,
-  //       ci_taxi: existData.data.ci,
-  //       name_taxi: existData.data.name,
-  //       middle_name_taxi: existData.data.middle_name,
-  //       last_name_taxi: existData.data.last_name,
-  //       mother_last_name_taxi: existData.data.mother_last_name,
-  //       plate: existData.data.plate || '',
-  //       disbledTaxi: true,
-  //     }));
-  //   } else {
-  //     setFormState((prevState: any) => ({
-  //       ...prevState,
-  //       name_taxi: '',
-  //       last_name_taxi: '',
-  //       middle_name_taxi: '',
-  //       mother_last_name_taxi: '',
-  //       plate: prevState.tab === 'T' ? '' : prevState.plate,
-  //       disbledTaxi: false,
-  //     }));
-  //   }
-  // };
 
   const getUnitInfo = (ownerData: any) => {
     if (ownerData?.dpto && ownerData.dpto.length > 0) {
@@ -429,7 +333,10 @@ const IndividualQR = ({
           setFormState={setFormStateA}
           item={formState}
           setItem={setFormState}
-          onClose={() => setOpenExistVisit(false)}
+          onClose={() => {
+            setOpenExistVisit(false);
+            onClose();
+          }}
           setOpenNewAcomp={setOpenAcom}
           isMain={isMain}
           onDismiss={() => handleEdit(true)}
