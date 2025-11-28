@@ -37,12 +37,18 @@ const ModalAccessExpand = ({
   const {loaded, execute} = useApi();
 
   const getAccess = async () => {
-    const {data} = await execute('/accesses', 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType: 'DET',
-      searchBy: id,
-    });
+    const {data} = await execute(
+      '/accesses',
+      'GET',
+      {
+        perPage: -1,
+        page: 1,
+        fullType: 'DET',
+        searchBy: id,
+      },
+      false,
+      2,
+    );
     if (data?.success) {
       setData(data?.data?.[0]);
     }
@@ -52,7 +58,7 @@ const ModalAccessExpand = ({
       getAccess();
     }
   }, []);
-  console.log(data);
+
   const rendeAccess = () => {
     return (
       <>
@@ -146,12 +152,13 @@ const ModalAccessExpand = ({
       <>
         <ItemList
           title={getFullName(invitation?.owner)}
-          subtitle={
-            'Unidad: ' +
-            invitation?.owner?.dpto?.[0]?.nro +
-            ', ' +
-            invitation?.owner?.dpto?.[0]?.description
-          }
+          subtitle={[
+            `Unidad: ${invitation?.owner?.dpto?.[0]?.nro || ''} ${
+              invitation?.owner?.dpto?.[0]?.description
+            }`,
+          ]
+            .filter(Boolean)
+            .join(', ')}
           left={
             <Avatar
               hasImage={invitation?.owner?.has_image}
@@ -242,12 +249,13 @@ const ModalAccessExpand = ({
       <>
         <ItemList
           title={getFullName(invitation?.owner)}
-          subtitle={
-            'Unidad: ' +
-            invitation?.owner?.dpto?.nro +
-            ', ' +
-            invitation?.owner?.dpto?.description
-          }
+          subtitle={[
+            `Unidad: ${invitation?.owner?.dpto?.[0]?.nro || ''}, ${
+              invitation?.owner?.dpto?.[0]?.description
+            }`,
+          ]
+            .filter(Boolean)
+            .join(', ')}
           left={
             <Avatar
               hasImage={invitation?.owner?.has_image}
