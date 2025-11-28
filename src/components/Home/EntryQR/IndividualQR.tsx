@@ -46,11 +46,9 @@ const IndividualQR = ({
   handleChange,
   onClose,
 }: PropsType) => {
-  const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
   const [editAcom, setEditAcom] = useState(false);
-  const {showToast} = useAuth();
   const [visit, setVisit] = useState(data?.visit || {});
   const [openExistVisit, setOpenExistVisit] = useState(false);
   const [formStateA, setFormStateA] = useState({});

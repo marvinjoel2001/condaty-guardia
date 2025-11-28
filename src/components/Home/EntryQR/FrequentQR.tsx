@@ -7,8 +7,6 @@ import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Input from '../../../../mk/components/forms/Input/Input';
 import useApi from '../../../../mk/hooks/useApi';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
-import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
-import {AccompaniedAdd} from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
@@ -19,6 +17,8 @@ import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Br from '../../Profile/Br';
 import useAuth from '../../../../mk/hooks/useAuth';
 import {AccompaniedAddV2} from './AccompaniedAddV2';
+import SectionIncomeType from '../CiNomModal/SectionIncomeType';
+import ExistVisitModal from '../CiNomModal/ExistVisitModal';
 
 type PropsType = {
   setFormState: any;
@@ -27,6 +27,7 @@ type PropsType = {
   data: any;
   errors: any;
   setErrors: any;
+  onClose: any;
 };
 
 const FrequentQR = ({
@@ -35,17 +36,20 @@ const FrequentQR = ({
   errors,
   setErrors,
   data,
+  onClose,
   handleChange,
 }: PropsType) => {
   const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
-  const [editAcom, setEditAcom] = useState(null);
+  const [editAcom, setEditAcom] = useState(false);
   const meesageforUndefined = 'Indefinido';
   const {showToast} = useAuth();
-
+  const [openExistVisit, setOpenExistVisit] = useState(false);
+  const [formStateA, setFormStateA] = useState({});
   const invitation = data;
   const [visit, setVisit] = useState(invitation?.visit || {});
+  const [isMain, setIsMain] = useState(false);
   const owner = invitation?.owner;
   const access = invitation?.access;
 
@@ -276,6 +280,11 @@ const FrequentQR = ({
 
     return selectedDays.join(', ');
   };
+  const handleEdit = (bandera: boolean) => {
+    setFormStateA(bandera ? formStateA : formState);
+    setEditAcom(true);
+    setOpenAcom(true);
+  };
 
   if (!data) {
     return <Loading />;
@@ -380,74 +389,18 @@ const FrequentQR = ({
       )}
 
       {!isCurrentlyInside && data?.status !== 'X' && (
-        <TabsButtons
-          tabs={[
-            {value: 'P', text: 'A pie'},
-            {value: 'V', text: 'En vehículo'},
-            {value: 'T', text: 'En taxi'},
-          ]}
-          sel={tab}
-          setSel={setTab}
-        />
-      )}
-
-      {!isCurrentlyInside && data?.status !== 'X' && (
         <>
-          {tab === 'V' && (
-            <Input
-              label="Placa del vehículo"
-              type="text"
-              name="plate"
-              error={errors}
-              required={tab === 'V'}
-              value={formState?.plate || ''}
-              onChange={(value: string) =>
-                handleChange('plate', value.toUpperCase())
-              }
-              autoCapitalize="characters"
-            />
-          )}
-          {tab === 'T' && (
-            <View style={styles.taxiFormContainer}>
-              <Text style={{...styles.summaryTitle, marginBottom: 12}}>
-                Datos del conductor
-              </Text>
-              <Input
-                label="Carnet de identidad"
-                name="ci_taxi"
-                keyboardType="numeric"
-                maxLength={10}
-                error={errors}
-                required
-                value={formState?.ci_taxi || ''}
-                onBlur={onExistTaxi}
-                onChange={(value: string) => handleChange('ci_taxi', value)}
-              />
-              <InputFullName
-                formState={formState}
-                errors={errors}
-                handleChangeInput={handleChange}
-                disabled={formState?.disbledTaxi}
-                prefijo={'_taxi'}
-                inputGrid={true}
-              />
-              <Input
-                label="Placa"
-                type="text"
-                name="plate"
-                error={errors}
-                required={tab == 'T'}
-                value={formState['plate']}
-                onChange={(value: any) => handleChange('plate', value)}
-              />
-            </View>
-          )}
-
           <TouchableOpacity
-            style={styles.addCompanionButton}
+            style={styles.boxAcompanante}
             onPress={() => setOpenAcom(true)}>
-            <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
-            <Text style={styles.addCompanionText}>Agregar acompañante</Text>
+            <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+            <Text
+              style={{
+                color: cssVar.cAccent,
+                fontFamily: FONTS.semiBold,
+              }}>
+              Agregar acompañante
+            </Text>
           </TouchableOpacity>
 
           {(formState?.acompanantes?.length || 0) > 0 && (
@@ -460,6 +413,17 @@ const FrequentQR = ({
             </View>
           )}
         </>
+      )}
+      {!isCurrentlyInside && data?.status !== 'X' && (
+        <SectionIncomeType
+          errors={errors}
+          formState={formState}
+          handleChangeInput={handleChange}
+          setErrors={setErrors}
+          setFormState={setFormState}
+          setTab={setTab}
+          tab={tab}
+        />
       )}
 
       {data?.status !== 'X' && (
@@ -483,12 +447,30 @@ const FrequentQR = ({
           )}
         </View>
       )}
+      {openExistVisit && (
+        <ExistVisitModal
+          open={openExistVisit}
+          formState={formStateA}
+          setFormState={setFormStateA}
+          item={formState}
+          setItem={setFormState}
+          extraOnClose={() => {
+            onClose();
+          }}
+          onClose={() => {
+            setOpenExistVisit(false);
+          }}
+          setOpenNewAcomp={setOpenAcom}
+          isMain={isMain}
+          onDismiss={() => handleEdit(true)}
+        />
+      )}
       {openAcom && (
         <AccompaniedAddV2
           open={openAcom}
           onClose={() => {
             setOpenAcom(false);
-            setEditAcom(null);
+            setEditAcom(false);
           }}
           item={formState}
           setItem={setFormState}
@@ -539,10 +521,19 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   taxiFormContainer: {},
-  addCompanionButton: {
+  boxAcompanante: {
+    marginBottom: cssVar.sS,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
   },
   addCompanionText: {
     color: cssVar.cAccent,
