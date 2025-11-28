@@ -123,7 +123,9 @@ const ExistVisitModal = ({
   const _onClose = () => {
     onClose();
     setFormState({});
-    extraOnClose?.();
+    if (isMain) {
+      extraOnClose?.();
+    }
   };
   return (
     <Modal
