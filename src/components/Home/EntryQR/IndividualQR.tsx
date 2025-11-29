@@ -175,7 +175,6 @@ const IndividualQR = ({
     }
     return '';
   };
-  console.log('isMain', isMain);
 
   if (!data) {
     return <Loading />;
