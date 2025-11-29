@@ -104,10 +104,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   }, [id]);
 
   const saveEntry = async () => {
-    const {data: result} = await execute('/accesses/enter', 'POST', {
-      id: data?.id,
-      obs_in: formState?.obs_in || '',
-    });
+    const {data: result} = await execute(
+      '/accesses/enter',
+      'POST',
+      {
+        id: data?.id,
+        obs_in: formState?.obs_in || '',
+      },
+      false,
+      2,
+    );
     if (result?.success) {
       if (reload) reload();
       close();

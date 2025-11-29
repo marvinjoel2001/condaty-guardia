@@ -340,6 +340,7 @@ const IndividualQR = ({
             setOpenExistVisit(false);
           }}
           setOpenNewAcomp={setOpenAcom}
+          setIsMain={setIsMain}
           isMain={isMain}
           onDismiss={() => handleEdit(true)}
         />
@@ -357,6 +358,10 @@ const IndividualQR = ({
           item={formState}
           setItem={setFormState}
           editItem={editAcom}
+          isMain={isMain}
+          extraOnClose={() => {
+            onClose({});
+          }}
         />
       )}
     </>
