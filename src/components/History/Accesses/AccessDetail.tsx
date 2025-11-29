@@ -452,11 +452,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             <ItemList
               title={getFullName(resident)}
               subtitle2={
-                (resident?.dpto?.[0]?.type?.name || 'Unidad') +
-                ': ' +
-                resident?.dpto?.[0]?.nro +
-                ', ' +
-                (resident?.dpto?.[0]?.description || '')
+                [
+                  resident?.dpto?.[0]?.nro &&
+                    `${resident?.dpto?.[0]?.type?.name || 'Unidad'}: ${
+                      resident?.dpto?.[0]?.nro
+                    }`,
+
+                  resident?.dpto?.[0]?.description?.trim(),
+                ]
+                  .filter(Boolean)
+                  .join(', ') || 'Sin unidad asignada'
               }
               left={
                 <Avatar

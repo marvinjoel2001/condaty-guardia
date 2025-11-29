@@ -196,10 +196,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             title={getFullName(data?.owner)}
             subtitle={
               data?.owner?.dpto?.length
-                ? 'Unidad: ' +
-                  data?.owner?.dpto?.[0]?.nro +
-                  ', ' +
-                  data?.owner?.dpto?.[0]?.description
+                ? [
+                    data.owner.dpto[0].nro &&
+                      `Unidad: ${data.owner.dpto[0].nro}`,
+                    data.owner.dpto[0].description?.trim(),
+                  ]
+                    .filter(Boolean)
+                    .join(', ')
                 : ''
             }
             left={
@@ -249,14 +252,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             <Text style={styles.labelAccess}>{labelAccess()}</Text>
             <ItemList
               title={getFullName(data?.owner)}
-              subtitle={
-                data?.owner?.dpto?.length
-                  ? 'Unidad: ' +
-                    data?.owner?.dpto?.[0]?.nro +
-                    ', ' +
-                    data?.owner?.dpto?.[0]?.description
-                  : ''
-              }
+              subtitle={[
+                `Unidad: ${data?.owner?.dpto?.[0]?.nro || ''}`,
+                data?.owner?.dpto?.[0]?.description,
+              ]
+                .filter(Boolean)
+                .join(', ')}
               left={
                 <Avatar
                   hasImage={data?.owner?.has_image}
@@ -270,7 +271,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 />
               }
               right={
-                data?.type !== 'C' ? (
+                data?.type !== 'C' && data?.type !== 'P' ? (
                   <Icon
                     name={IconExpand}
                     color={cssVar.cWhiteV1}
