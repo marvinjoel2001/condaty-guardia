@@ -382,7 +382,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
           <ListFlat
             data={combinedData}
             renderItem={renderCombinedItem}
-            // style={{paddingBottom: 150}}
+            style={{paddingBottom: 120}}
             keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
             onRefresh={reload}
             refreshing={isLoading}
