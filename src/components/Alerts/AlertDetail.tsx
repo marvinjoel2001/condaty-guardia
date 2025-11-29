@@ -77,8 +77,6 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
 
   const renderContent = () => {
 
-    console.log('details', details);
-
     if (!loaded) {
       return (
         <View style={styles.loadingContainer}>
