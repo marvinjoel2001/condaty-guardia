@@ -15,7 +15,9 @@ type TypeProps = {
   editItem?: any;
   formState: any;
   setFormState: any;
+  isMain?: boolean;
   disabledCi?: boolean;
+  extraOnClose?: () => void;
 };
 
 export const AccompaniedAdd = ({
@@ -27,6 +29,8 @@ export const AccompaniedAdd = ({
   setFormState,
   editItem,
   disabledCi = true,
+  isMain = false,
+  extraOnClose = () => {},
 }: TypeProps) => {
   const [errors, setErrors]: any = useState({});
   const {showToast} = useAuth();
@@ -124,19 +128,23 @@ export const AccompaniedAdd = ({
   };
 
   const _onClose = () => {
-    if (editItem) {
-      setItem({
-        ...item,
-        ci: formState.ci,
-        name: formState.name,
-        middle_name: formState.middle_name,
-        last_name: formState.last_name,
-        mother_last_name: formState.mother_last_name,
-        ci_anverso: formState.ci_anverso,
-        ci_reverso: formState.ci_reverso,
-      });
-    }
+    // if (editItem) {
+    //   setItem({
+    //     ...item,
+    //     ci: formState.ci,
+    //     name: formState.name,
+    //     middle_name: formState.middle_name,
+    //     last_name: formState.last_name,
+    //     mother_last_name: formState.mother_last_name,
+    //     ci_anverso: formState.ci_anverso,
+    //     ci_reverso: formState.ci_reverso,
+    //   });
+    // }
     onClose();
+    setFormState({});
+    if (isMain) {
+      extraOnClose?.();
+    }
   };
   return (
     <DynamicModal

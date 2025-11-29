@@ -15,6 +15,7 @@ interface ExistVisitModalProps {
   isMain?: boolean;
   onDismiss?: () => void;
   extraOnClose?: () => void;
+  setIsMain?: (value: boolean) => void;
 }
 
 const ExistVisitModal = ({
@@ -28,6 +29,7 @@ const ExistVisitModal = ({
   isMain = false,
   extraOnClose,
   onDismiss,
+  setIsMain = () => {},
 }: ExistVisitModalProps) => {
   const {showToast} = useAuth();
   const {execute} = useApi();
@@ -91,6 +93,7 @@ const ExistVisitModal = ({
     if (exist?.data) {
       if (isMain) {
         setItem({...item, ...exist?.data});
+        setIsMain(false);
         onClose();
         return;
       }
