@@ -15,6 +15,7 @@ import {
   Animated,
   Easing,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import Button from '../../forms/Button/Button';
 import {AuthContext} from '../../../contexts/AuthContext';
@@ -161,7 +162,7 @@ const ModalFull = memo(
                       iconClose={iconClose}
                       modalLayout
                     />
-                  )} 
+                  )}
                   {scrollViewHide ? (
                     children
                   ) : (
@@ -181,7 +182,9 @@ const ModalFull = memo(
                       style={[theme.body, style]}
                       contentContainerStyle={{paddingBottom: 20}}
                       keyboardShouldPersistTaps="handled">
-                      {children}
+                      <TouchableOpacity activeOpacity={1} style={{flex: 1}}>
+                        {children}
+                      </TouchableOpacity>
                     </ScrollView>
                   )}
 
