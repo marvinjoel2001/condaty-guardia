@@ -672,12 +672,17 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (!formState?.obs_confirm) {
       return;
     }
-    const {data: confirma} = await execute('/accesses/confirm', 'POST', {
-      confirm,
-      id: data.id,
-      obs_confirm: formState?.obs_confirm,
-    });
-
+    const {data: confirma, error} = await execute(
+      '/accesses/confirm',
+      'POST',
+      {
+        confirm,
+        id: data.id,
+        obs_confirm: formState?.obs_confirm,
+      },
+      false,
+      3,
+    );
     if (confirma?.success === true) {
       if (reload) {
         reload();
@@ -685,10 +690,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       setOpenDecline(null);
       close();
     } else {
-      showToast('Ocurió un error', 'error');
+      showToast(error?.data?.message || 'Ocurió un error', 'error');
     }
   };
-  console.log(data);
   return (
     <ModalFull
       onClose={close}
