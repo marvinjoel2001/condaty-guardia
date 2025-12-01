@@ -7,7 +7,8 @@ import Card from '../../../mk/components/ui/Card/Card';
 import useApi from '../../../mk/hooks/useApi';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Br from '../Profile/Br';
-import { getDateTimeStrMes } from '../../../mk/utils/dates';
+import {getDateTimeStrMes} from '../../../mk/utils/dates';
+import ImageExpandableModal from '../../../mk/components/ui/ImageExpandableModal/ImageExpandableModal';
 
 type PropsType = {
   open: boolean;
@@ -18,6 +19,10 @@ type PropsType = {
 const BinnacleDetail = ({open, onClose, id}: PropsType) => {
   const [details, setDetails] = useState<any>({});
   const [imageError, setImageError] = useState(false);
+  const [openExpand, setOpenExpand] = useState<{open: boolean; index: number}>({
+    open: false,
+    index: 0,
+  });
 
   const {execute, loaded} = useApi();
 
@@ -41,11 +46,12 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
     onClose();
     setDetails({});
     setImageError(false);
+    setOpenExpand({open: false, index: 0});
   };
 
   const renderImageSection = () => {
     const urlFiles = details?.url_file;
-    
+
     if (!urlFiles || !Array.isArray(urlFiles) || urlFiles.length === 0) {
       return (
         <View style={styles.noImageContainer}>
@@ -55,29 +61,36 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
     }
 
     const screenWidth = Dimensions.get('window').width;
-    const imageWidth = urlFiles.length > 1 ? screenWidth * 0.7 : screenWidth * 0.85;
+    const imageWidth =
+      urlFiles.length > 1 ? screenWidth * 0.7 : screenWidth * 0.85;
     const imageHeight = 220;
 
     return (
       <>
         <Text style={styles.text}>
-          {urlFiles.length === 1 ? 'Imagen del reporte' : 'Imágenes del reporte'}
+          {urlFiles.length === 1
+            ? 'Imagen del reporte'
+            : 'Imágenes del reporte'}
         </Text>
-        <ScrollView 
+        <ScrollView
           horizontal={urlFiles.length > 1}
           showsHorizontalScrollIndicator={urlFiles.length > 1}
-          contentContainerStyle={urlFiles.length > 1 ? styles.imagesScrollContainer : {}}>
+          contentContainerStyle={
+            urlFiles.length > 1 ? styles.imagesScrollContainer : {}
+          }>
           {urlFiles.map((url: string, index: number) => (
             <View
               key={index}
               style={[
                 styles.imageContainer,
                 {width: imageWidth, height: imageHeight},
-                urlFiles.length > 1 && index < urlFiles.length - 1 && styles.imageMarginRight
+                urlFiles.length > 1 &&
+                  index < urlFiles.length - 1 &&
+                  styles.imageMarginRight,
               ]}>
               <Avatar
                 hasImage={1}
-                expandable={true}
+                expandable={false}
                 src={url}
                 name={`Imagen ${index + 1}`}
                 w={imageWidth}
@@ -85,6 +98,7 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
                 circle={false}
                 error={() => {}}
                 style={styles.avatarImage}
+                onClick={() => setOpenExpand({open: true, index})}
               />
             </View>
           ))}
@@ -105,7 +119,9 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
     return (
       <Card>
         <Text style={styles.text}>Reporte</Text>
-        <Text style={{...styles.textV1}}>{getDateTimeStrMes(details?.created_at)}</Text>
+        <Text style={{...styles.textV1}}>
+          {getDateTimeStrMes(details?.created_at)}
+        </Text>
         <Text style={{...styles.textV1}}>{details?.descrip}</Text>
         <Br />
         {renderImageSection()}
@@ -121,6 +137,16 @@ const BinnacleDetail = ({open, onClose, id}: PropsType) => {
       buttonCancel=""
       buttonText="">
       {renderContent()}
+      {openExpand.open &&
+        Array.isArray(details?.url_file) &&
+        details?.url_file?.length > 0 && (
+          <ImageExpandableModal
+            visible={openExpand.open}
+            images={details?.url_file}
+            initialIndex={openExpand.index}
+            onClose={() => setOpenExpand({open: false, index: 0})}
+          />
+        )}
     </ModalFull>
   );
 };
