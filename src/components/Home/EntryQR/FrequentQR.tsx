@@ -13,7 +13,6 @@ import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Br from '../../Profile/Br';
-import useAuth from '../../../../mk/hooks/useAuth';
 import SectionIncomeType from '../CiNomModal/SectionIncomeType';
 import ExistVisitModal from '../CiNomModal/ExistVisitModal';
 import {AccompaniedAdd} from './AccompaniedAdd';
@@ -55,51 +54,6 @@ const FrequentQR = ({
   const isCurrentlyInside =
     lastAccess && lastAccess.in_at && !lastAccess.out_at;
 
-  // useEffect(() => {
-  //   const currentVisit = data?.visit;
-  //   if (data) {
-  //     setFormState((prevState: any) => ({
-  //       ...prevState,
-  //       ci: currentVisit?.ci || '',
-  //       name: currentVisit?.name || '',
-  //       middle_name: currentVisit?.middle_name || '',
-  //       last_name: currentVisit?.last_name || '',
-  //       mother_last_name: currentVisit?.mother_last_name || '',
-  //       visit_id: currentVisit?.id || null,
-  //       access_id: isCurrentlyInside ? lastAccess?.id : null,
-  //       obs_in: isCurrentlyInside ? lastAccess?.obs_in : '',
-  //       obs_out: '',
-  //     }));
-  //   }
-  // }, [data, setFormState, isCurrentlyInside, lastAccess]);
-
-  // const onExistVisits = async () => {
-  //   if (!formState?.ci || formState.ci.length < 5) {
-  //     setErrors({...errors, ci: ''});
-  //     return;
-  //   }
-  //   const {data: existData} = await execute('/visits', 'GET', {
-  //     perPage: 1,
-  //     page: 1,
-  //     exist: '1',
-  //     fullType: 'L',
-  //     ci_visit: formState?.ci,
-  //   });
-
-  //   if (existData?.data) {
-  //     setVisit(existData?.data || {});
-  //     setFormState({
-  //       ...formState,
-  //       name: existData?.data?.name || '',
-  //       middle_name: existData?.data?.middle_name || '',
-  //       last_name: existData?.data?.last_name || '',
-  //       mother_last_name: existData?.data?.mother_last_name || '',
-  //     });
-  //   } else {
-  //     setErrors({...errors, ci: ''});
-  //   }
-  // };
-
   useEffect(() => {
     if (tab === 'V') {
       setFormState((prevState: any) => ({
@@ -128,73 +82,6 @@ const FrequentQR = ({
       }));
     }
   }, [tab]);
-
-  // const onExistTaxi = async () => {
-  //   if (formState?.ci_taxi === '') {
-  //     return;
-  //   }
-  //   if (formState?.ci_taxi == formState?.ci) {
-  //     showToast('El ci del visitante y el taxi son iguales', 'error');
-  //     setFormState({
-  //       ...formState,
-  //       ci_taxi: '',
-  //       name_taxi: '',
-  //       last_name_taxi: '',
-  //       middle_name_taxi: '',
-  //       mother_last_name_taxi: '',
-  //       plate: '',
-  //       disbledTaxi: false,
-  //     });
-  //     return;
-  //   }
-  //   if (
-  //     formState?.acompanantes?.find(
-  //       (item: {ci: string}) => item.ci === formState?.ci_taxi,
-  //     )
-  //   ) {
-  //     showToast('El ci del taxi está registrado como acompanante', 'error');
-  //     setFormState({
-  //       ...formState,
-  //       ci_taxi: '',
-  //       name_taxi: '',
-  //       last_name_taxi: '',
-  //       middle_name_taxi: '',
-  //       mother_last_name_taxi: '',
-  //       plate: '',
-  //       disbledTaxi: false,
-  //     });
-  //     return;
-  //   }
-  //   const {data: existData} = await execute('/visits', 'GET', {
-  //     perPage: 1,
-  //     page: 1,
-  //     exist: '1',
-  //     fullType: 'L',
-  //     ci_visit: formState?.ci_taxi,
-  //   });
-  //   if (existData?.data) {
-  //     setFormState((prevState: any) => ({
-  //       ...prevState,
-  //       ci_taxi: existData.data.ci,
-  //       name_taxi: existData.data.name,
-  //       middle_name_taxi: existData.data.middle_name,
-  //       last_name_taxi: existData.data.last_name,
-  //       mother_last_name_taxi: existData.data.mother_last_name,
-  //       plate: existData.data.plate || '',
-  //       disbledTaxi: true,
-  //     }));
-  //   } else {
-  //     setFormState((prevState: any) => ({
-  //       ...prevState,
-  //       name_taxi: '',
-  //       last_name_taxi: '',
-  //       middle_name_taxi: '',
-  //       mother_last_name_taxi: '',
-  //       plate: prevState.tab === 'T' ? '' : prevState.plate,
-  //       disbledTaxi: false,
-  //     }));
-  //   }
-  // };
 
   const onDelAcom = (acom: {ci: string}) => {
     const acomps = formState?.acompanantes || [];
@@ -296,7 +183,6 @@ const FrequentQR = ({
   if (!data) {
     return <Loading />;
   }
-  console.log(isMain);
 
   return (
     <>
@@ -488,26 +374,23 @@ const FrequentQR = ({
   );
 };
 
+export default FrequentQR;
+
 const styles = StyleSheet.create({
   scrollViewContainer: {
     flex: 1,
   },
-
   summaryCard: {
     backgroundColor: cssVar.cBlackV2,
     padding: 12,
     borderRadius: 12,
     gap: 16,
   },
-  summarySection: {
-    // gap: 12,
-  },
   summaryTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: cssVar.cWhite,
   },
-
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -549,5 +432,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-
-export default FrequentQR;
