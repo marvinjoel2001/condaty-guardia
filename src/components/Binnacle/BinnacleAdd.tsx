@@ -54,22 +54,8 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
       buttonCancel=""
       scrollViewHide={true}
     >
-      <View style={{ flex: 1, padding: 12, gap: 16 }}>
-        
-        <View style={{ marginBottom: 16, flex:  1, maxHeight: 200 }}>
-        <UploadFile
-          setFormState={setFormState}
-          formState={formState}
-          name="url_file"
-          label="Adjuntar imagen"
-          type="I"
-          cant={5}
-          clientId={clientId}
-          prefix="guards/novedades"
-          variant='V2'
-        />
-        </View>
-        <TextArea
+      <View style={{ flex: 1, padding: 12 }}>
+         <TextArea
           type="textArea"
           label="Escribir reporte..."
           name="descrip"
@@ -80,6 +66,20 @@ const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
           onChange={(value) => handleInputChange('descrip', value)}
           expandable={true}
         />
+        <View style={{ flex: 1 }}>
+          <UploadFile
+            setFormState={setFormState}
+            formState={formState}
+            name="url_file"
+            label="Adjuntar imagen"
+            type="I"
+            cant={6}
+            clientId={clientId}
+            prefix="guards/novedades"
+            variant='V2'
+          />
+        </View>
+       
       </View>
     </ModalFull>
   );
