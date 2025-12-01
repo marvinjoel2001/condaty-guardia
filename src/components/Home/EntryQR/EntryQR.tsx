@@ -328,6 +328,7 @@ const EntryQR = ({code, open, onClose, reload}: TypeProps) => {
             data={data}
             errors={errors}
             setErrors={setErrors}
+            onClose={onClose}
           />
         );
       case 'O':

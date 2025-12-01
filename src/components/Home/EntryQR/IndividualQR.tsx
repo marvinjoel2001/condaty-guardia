@@ -3,27 +3,21 @@ import {
   Text,
   TouchableOpacity,
   View,
-  StyleSheet,
-  ScrollView,
+  StyleSheet
 } from 'react-native';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import Input from '../../../../mk/components/forms/Input/Input';
-import useApi from '../../../../mk/hooks/useApi';
-import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
-import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import {AccompaniedAdd} from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary'; // IconAdd es usado en la nueva version del boton
+import {IconSimpleAdd} from '../../../icons/IconLibrary'; // IconAdd es usado en la nueva version del boton
 import List from '../../../../mk/components/ui/List/List';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Br from '../../Profile/Br';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
-import useAuth from '../../../../mk/hooks/useAuth';
 import ExistVisitModal from '../CiNomModal/ExistVisitModal';
 import SectionIncomeType from '../CiNomModal/SectionIncomeType';
 
@@ -46,37 +40,15 @@ const IndividualQR = ({
   handleChange,
   onClose,
 }: PropsType) => {
-  const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
   const [editAcom, setEditAcom] = useState(false);
-  const {showToast} = useAuth();
   const [visit, setVisit] = useState(data?.visit || {});
   const [openExistVisit, setOpenExistVisit] = useState(false);
   const [formStateA, setFormStateA] = useState({});
   const [isMain, setIsMain] = useState(false);
   const owner = data?.owner;
   const access = data?.access;
-
-  // useEffect(() => {
-  //   const currentVisit = data?.visit;
-  //   const currentAccess = data?.access;
-  //   if (data) {
-  //     setFormState((prevState: any) => ({
-  //       ...prevState,
-  //       ci: currentVisit?.ci || prevState?.ci || '',
-  //       name: currentVisit?.name || prevState?.name || '',
-  //       middle_name: currentVisit?.middle_name || prevState?.middle_name || '',
-  //       last_name: currentVisit?.last_name || prevState?.last_name || '',
-  //       mother_last_name:
-  //         currentVisit?.mother_last_name || prevState?.mother_last_name || '',
-  //       access_id: currentAccess?.[0]?.id || prevState?.access_id || null,
-  //       obs_in: currentAccess?.[0]?.obs_in || prevState?.obs_in || '',
-  //       obs_out: currentAccess?.[0]?.obs_out || prevState?.obs_out || '',
-  //       // plate es manejado por el efecto de 'tab' y onExistTaxi
-  //     }));
-  //   }
-  // }, [data, setFormState]);
 
   useEffect(() => {
     if (tab === 'V') {
@@ -237,27 +209,7 @@ const IndividualQR = ({
             value={data?.obs || '-/-'}
           />
         </Card>
-        {/* {!visit?.ci && data?.status !== 'X' && (
-          <View style={{...styles.formSection, marginTop: cssVar.spM}}>
-            <Input
-              label="Carnet del visitante"
-              name="ci"
-              maxLength={10}
-              keyboardType="numeric"
-              value={formState?.ci || ''}
-              error={errors}
-              required
-              onChange={(value: string) => handleChange('ci', value)}
-              // onBlur={onExistVisits}
-            />
-            <InputFullName
-              formState={formState}
-              errors={errors}
-              handleChangeInput={handleChange}
-              inputGrid={true}
-            />
-          </View>
-        )} */}
+        
         {access?.length === 0 && data?.status !== 'X' && (
           <>
             <TouchableOpacity

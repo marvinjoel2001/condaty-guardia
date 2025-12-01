@@ -4,21 +4,18 @@ import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import Input from '../../../../mk/components/forms/Input/Input';
 import useApi from '../../../../mk/hooks/useApi';
 import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
-import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
-import {AccompaniedAdd} from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
+import {IconSimpleAdd} from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
-import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Br from '../../Profile/Br';
-import useAuth from '../../../../mk/hooks/useAuth';
-import {AccompaniedAddV2} from './AccompaniedAddV2';
+import SectionIncomeType from '../CiNomModal/SectionIncomeType';
+import ExistVisitModal from '../CiNomModal/ExistVisitModal';
+import {AccompaniedAdd} from './AccompaniedAdd';
 
 type PropsType = {
   setFormState: any;
@@ -27,6 +24,7 @@ type PropsType = {
   data: any;
   errors: any;
   setErrors: any;
+  onClose: any;
 };
 
 const FrequentQR = ({
@@ -35,17 +33,19 @@ const FrequentQR = ({
   errors,
   setErrors,
   data,
+  onClose,
   handleChange,
 }: PropsType) => {
   const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [openAcom, setOpenAcom] = useState(false);
-  const [editAcom, setEditAcom] = useState(null);
+  const [editAcom, setEditAcom] = useState(false);
   const meesageforUndefined = 'Indefinido';
-  const {showToast} = useAuth();
-
+  const [openExistVisit, setOpenExistVisit] = useState(false);
+  const [formStateA, setFormStateA] = useState({});
   const invitation = data;
   const [visit, setVisit] = useState(invitation?.visit || {});
+  const [isMain, setIsMain] = useState(false);
   const owner = invitation?.owner;
   const access = invitation?.access;
 
@@ -53,51 +53,6 @@ const FrequentQR = ({
     access && access.length > 0 ? access[access.length - 1] : null;
   const isCurrentlyInside =
     lastAccess && lastAccess.in_at && !lastAccess.out_at;
-
-  useEffect(() => {
-    const currentVisit = data?.visit;
-    if (data) {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        ci: currentVisit?.ci || '',
-        name: currentVisit?.name || '',
-        middle_name: currentVisit?.middle_name || '',
-        last_name: currentVisit?.last_name || '',
-        mother_last_name: currentVisit?.mother_last_name || '',
-        visit_id: currentVisit?.id || null,
-        access_id: isCurrentlyInside ? lastAccess?.id : null,
-        obs_in: isCurrentlyInside ? lastAccess?.obs_in : '',
-        obs_out: '',
-      }));
-    }
-  }, [data, setFormState, isCurrentlyInside, lastAccess]);
-
-  const onExistVisits = async () => {
-    if (!formState?.ci || formState.ci.length < 5) {
-      setErrors({...errors, ci: ''});
-      return;
-    }
-    const {data: existData} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci,
-    });
-
-    if (existData?.data) {
-      setVisit(existData?.data || {});
-      setFormState({
-        ...formState,
-        name: existData?.data?.name || '',
-        middle_name: existData?.data?.middle_name || '',
-        last_name: existData?.data?.last_name || '',
-        mother_last_name: existData?.data?.mother_last_name || '',
-      });
-    } else {
-      setErrors({...errors, ci: ''});
-    }
-  };
 
   useEffect(() => {
     if (tab === 'V') {
@@ -126,74 +81,7 @@ const FrequentQR = ({
         disbledTaxi: false,
       }));
     }
-  }, [tab, setFormState]);
-
-  const onExistTaxi = async () => {
-    if (formState?.ci_taxi === '') {
-      return;
-    }
-    if (formState?.ci_taxi == formState?.ci) {
-      showToast('El ci del visitante y el taxi son iguales', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-      return;
-    }
-    if (
-      formState?.acompanantes?.find(
-        (item: {ci: string}) => item.ci === formState?.ci_taxi,
-      )
-    ) {
-      showToast('El ci del taxi está registrado como acompanante', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-      return;
-    }
-    const {data: existData} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
-    if (existData?.data) {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        ci_taxi: existData.data.ci,
-        name_taxi: existData.data.name,
-        middle_name_taxi: existData.data.middle_name,
-        last_name_taxi: existData.data.last_name,
-        mother_last_name_taxi: existData.data.mother_last_name,
-        plate: existData.data.plate || '',
-        disbledTaxi: true,
-      }));
-    } else {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate,
-        disbledTaxi: false,
-      }));
-    }
-  };
+  }, [tab]);
 
   const onDelAcom = (acom: {ci: string}) => {
     const acomps = formState?.acompanantes || [];
@@ -221,20 +109,17 @@ const FrequentQR = ({
           />
         }
         right={
-          <Icon
-            name={IconX}
-            color={cssVar.cError}
-            size={20}
-            style={{
-              padding: 4,
-            }}
-            onPress={() => onDelAcom(acompanante)}
-          />
+          <TouchableOpacity onPress={() => onDelAcom(acompanante)}>
+            <Text
+              style={{
+                color: cssVar.cAccent,
+                fontSize: 12,
+                fontFamily: FONTS.semiBold,
+              }}>
+              Eliminar
+            </Text>
+          </TouchableOpacity>
         }
-        onPress={() => {
-          setEditAcom(acompanante);
-          setOpenAcom(true);
-        }}
       />
     );
   };
@@ -275,6 +160,24 @@ const FrequentQR = ({
       .map(day => day.label);
 
     return selectedDays.join(', ');
+  };
+  const handleEdit = (bandera: boolean) => {
+    setFormStateA(bandera ? formStateA : formState);
+    setEditAcom(true);
+    setOpenAcom(true);
+  };
+  useEffect(() => {
+    if (!visit?.ci) {
+      setFormStateA(formState);
+      setOpenExistVisit(true);
+      setIsMain(true);
+    }
+  }, [visit]);
+  const getStatusTextPhoto = () => {
+    if (!formState?.ci_reverso || !formState?.ci_anverso) {
+      return '/ Foto pendiente';
+    }
+    return '';
   };
 
   if (!data) {
@@ -343,111 +246,46 @@ const FrequentQR = ({
         <Text style={styles.summaryTitle}>Invitado</Text>
         <ItemList
           style={{marginTop: 12}}
-          title={getFullName(visit)}
-          subtitle={'C.I. ' + (visit.ci || '-/-')}
+          title={getFullName(formState)}
+          subtitle={
+            'C.I. ' + (formState.ci || '-/-') + ' ' + getStatusTextPhoto()
+          }
           left={
             <Avatar
               hasImage={0}
               src={getUrlImages(
-                `/VISIT-${visit?.id}.png?d=${visit?.updated_at}`,
+                `/VISIT-${formState?.id}.png?d=${formState?.updated_at}`,
               )}
-              name={getFullName(visit)}
+              name={getFullName(formState)}
             />
+          }
+          right={
+            <TouchableOpacity onPress={() => handleEdit(false)}>
+              <Text
+                style={{
+                  color: cssVar.cAccent,
+                  fontSize: 12,
+                  fontFamily: FONTS.semiBold,
+                }}>
+                Editar
+              </Text>
+            </TouchableOpacity>
           }
         />
       </Card>
-
-      {!visit?.ci && data?.status !== 'X' && (
-        <>
-          <Input
-            label="Carnet del visitante"
-            name="ci"
-            maxLength={10}
-            keyboardType="numeric"
-            value={formState?.ci || ''}
-            error={errors}
-            required
-            onChange={(value: string) => handleChange('ci', value)}
-            onBlur={onExistVisits}
-          />
-          <InputFullName
-            formState={formState}
-            errors={errors}
-            handleChangeInput={handleChange}
-            inputGrid={true}
-          />
-        </>
-      )}
-
-      {!isCurrentlyInside && data?.status !== 'X' && (
-        <TabsButtons
-          tabs={[
-            {value: 'P', text: 'A pie'},
-            {value: 'V', text: 'En vehículo'},
-            {value: 'T', text: 'En taxi'},
-          ]}
-          sel={tab}
-          setSel={setTab}
-        />
-      )}
-
       {!isCurrentlyInside && data?.status !== 'X' && (
         <>
-          {tab === 'V' && (
-            <Input
-              label="Placa del vehículo"
-              type="text"
-              name="plate"
-              error={errors}
-              required={tab === 'V'}
-              value={formState?.plate || ''}
-              onChange={(value: string) =>
-                handleChange('plate', value.toUpperCase())
-              }
-              autoCapitalize="characters"
-            />
-          )}
-          {tab === 'T' && (
-            <View style={styles.taxiFormContainer}>
-              <Text style={{...styles.summaryTitle, marginBottom: 12}}>
-                Datos del conductor
-              </Text>
-              <Input
-                label="Carnet de identidad"
-                name="ci_taxi"
-                keyboardType="numeric"
-                maxLength={10}
-                error={errors}
-                required
-                value={formState?.ci_taxi || ''}
-                onBlur={onExistTaxi}
-                onChange={(value: string) => handleChange('ci_taxi', value)}
-              />
-              <InputFullName
-                formState={formState}
-                errors={errors}
-                handleChangeInput={handleChange}
-                disabled={formState?.disbledTaxi}
-                prefijo={'_taxi'}
-                inputGrid={true}
-              />
-              <Input
-                label="Placa"
-                type="text"
-                name="plate"
-                error={errors}
-                required={tab == 'T'}
-                value={formState['plate']}
-                onChange={(value: any) => handleChange('plate', value)}
-              />
-            </View>
-          )}
-
           <TouchableOpacity
-            style={styles.addCompanionButton}
-            onPress={() => setOpenAcom(true)}>
-            <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
-            <Text style={styles.addCompanionText}>Agregar acompañante</Text>
+            style={styles.boxAcompanante}
+            onPress={() => setOpenExistVisit(true)}>
+            <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+            <Text
+              style={{
+                color: cssVar.cAccent,
+                fontFamily: FONTS.semiBold,
+              }}>
+              Agregar acompañante
+            </Text>
           </TouchableOpacity>
 
           {(formState?.acompanantes?.length || 0) > 0 && (
@@ -460,6 +298,17 @@ const FrequentQR = ({
             </View>
           )}
         </>
+      )}
+      {!isCurrentlyInside && data?.status !== 'X' && (
+        <SectionIncomeType
+          errors={errors}
+          formState={formState}
+          handleChangeInput={handleChange}
+          setErrors={setErrors}
+          setFormState={setFormState}
+          setTab={setTab}
+          tab={tab}
+        />
       )}
 
       {data?.status !== 'X' && (
@@ -483,42 +332,65 @@ const FrequentQR = ({
           )}
         </View>
       )}
+      {openExistVisit && (
+        <ExistVisitModal
+          open={openExistVisit}
+          formState={formStateA}
+          setFormState={setFormStateA}
+          item={formState}
+          setItem={setFormState}
+          extraOnClose={() => {
+            onClose();
+          }}
+          onClose={() => {
+            setOpenExistVisit(false);
+          }}
+          setOpenNewAcomp={setOpenAcom}
+          setIsMain={setIsMain}
+          isMain={isMain}
+          onDismiss={() => handleEdit(true)}
+        />
+      )}
       {openAcom && (
-        <AccompaniedAddV2
+        <AccompaniedAdd
+          formState={formStateA}
+          setFormState={setFormStateA}
           open={openAcom}
           onClose={() => {
             setOpenAcom(false);
-            setEditAcom(null);
+            setEditAcom(false);
+            setIsMain(false);
           }}
           item={formState}
           setItem={setFormState}
           editItem={editAcom}
+          isMain={isMain}
+          extraOnClose={() => {
+            onClose({});
+          }}
         />
       )}
     </>
   );
 };
 
+export default FrequentQR;
+
 const styles = StyleSheet.create({
   scrollViewContainer: {
     flex: 1,
   },
-
   summaryCard: {
     backgroundColor: cssVar.cBlackV2,
     padding: 12,
     borderRadius: 12,
     gap: 16,
   },
-  summarySection: {
-    // gap: 12,
-  },
   summaryTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: cssVar.cWhite,
   },
-
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -539,10 +411,19 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   taxiFormContainer: {},
-  addCompanionButton: {
+  boxAcompanante: {
+    marginBottom: cssVar.sS,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
   },
   addCompanionText: {
     color: cssVar.cAccent,
@@ -551,5 +432,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-
-export default FrequentQR;
