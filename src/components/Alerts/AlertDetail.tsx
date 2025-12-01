@@ -76,6 +76,7 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
   };
 
   const renderContent = () => {
+
     if (!loaded) {
       return (
         <View style={styles.loadingContainer}>
@@ -200,11 +201,9 @@ const AlertDetail = ({id, open, onClose}: PropsType) => {
                         color: cssVar.cWhite,
                         fontFamily: FONTS.medium,
                       }}>
-                      {getDateTimeStrMes(
-                        details?.adm_attend?.updated_at ||
-                          details?.gua_attend?.updated_at ||
-                          details?.date_at,
-                        true,
+                      {getDateTimeStrMes(                     
+                        details?.date_at,
+                        true
                       )}
                     </Text>
                   }

@@ -93,6 +93,7 @@ export const convertirFechaUTCaLocal = (fechaUTCString: string | null) => {
 
 //   return `${diaSemana}, ${dia} ${mes} - ${horaStr}:${minutosStr}`;
 // };
+// Función para obtener la fecha y la hora en un formato específico
 export const getDateTimeStrMes = (
   dateStr: string | null = '',
   utc: boolean = false,
@@ -108,22 +109,18 @@ export const getDateTimeStrMes = (
     fechaLocal = new Date(dateStr.replace(' ', 'T'));
   }
 
-  const diaSemana = DAYS_SHORT[fechaLocal.getDay()];
-  const dia = fechaLocal.getDate();
-  const mes = MONTHS[fechaLocal.getMonth() + 1];
+  let ajustada = fechaLocal;
+  if (esFormatoISO8601(dateStr) || utc) {
+    ajustada = new Date(fechaLocal);
+    ajustada.setHours(ajustada.getHours() + 4);
+  }
 
-  // Ajuste para la hora
-  let hora;
-  if (esFormatoISO8601(dateStr)) {
-    hora = fechaLocal.getHours() - GMT;
-  } else {
-    hora = fechaLocal.getHours();
-  }
-  let minutos = fechaLocal.getMinutes();
-  if (hora === 24 && minutos === 0) {
-    hora = 23;
-    minutos = 59;
-  }
+  const diaSemana = DAYS_SHORT[ajustada.getDay()];
+  const dia = ajustada.getDate();
+  const mes = MONTHS[ajustada.getMonth() + 1];
+
+  const hora = ajustada.getHours();
+  const minutos = ajustada.getMinutes();
 
   // Convertimos la hora y los minutos a un formato de dos dígitos
   const horaStr = hora.toString().padStart(2, '0');
@@ -131,6 +128,7 @@ export const getDateTimeStrMes = (
 
   return `${diaSemana}, ${dia} ${mes} - ${horaStr}:${minutosStr}`;
 };
+
 
 export const formatDateToDDMMYY = (dateString: string): string => {
   const date = new Date(dateString);

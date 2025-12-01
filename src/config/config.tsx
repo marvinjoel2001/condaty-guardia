@@ -92,10 +92,11 @@ const configApp = {
 };
 
 // configApp.API_URL = configApp.API_URL_TEST;
-configApp.API_URL = configApp.API_URL_PRE;
+// configApp.API_URL = configApp.API_URL_PRE;
+configApp.API_URL = configApp.API_URL_PROD;
 
 if (process.env.NODE_ENV == 'development') {
- configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
+  //  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
   // configApp.API_URL = configApp.API_URL_DEMO;
   // configApp.API_URL = configApp.API_URL_FER;
 }
@@ -131,6 +132,7 @@ if (configApp.API_URL == configApp.API_URL_PRE) {
 
 if (configApp.API_URL == configApp.API_URL_PROD) {
   configApp.NEXT_API_BASE_URL = configApp.NEXT_API_URL.PROD;
+  configApp.APP_DEBUG = 3;
 }
 
 // UNA SOLA LÍNEA MÁGICA (esto es todo lo nuevo que necesitas)

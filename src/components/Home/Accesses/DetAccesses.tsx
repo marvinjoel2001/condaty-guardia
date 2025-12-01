@@ -104,10 +104,16 @@ const DetAccesses = ({id, open, close, reload}: any) => {
   }, [id]);
 
   const saveEntry = async () => {
-    const {data: result} = await execute('/accesses/enter', 'POST', {
-      id: data?.id,
-      obs_in: formState?.obs_in || '',
-    });
+    const {data: result} = await execute(
+      '/accesses/enter',
+      'POST',
+      {
+        id: data?.id,
+        obs_in: formState?.obs_in || '',
+      },
+      false,
+      2,
+    );
     if (result?.success) {
       if (reload) reload();
       close();
@@ -196,10 +202,13 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             title={getFullName(data?.owner)}
             subtitle={
               data?.owner?.dpto?.length
-                ? 'Unidad: ' +
-                  data?.owner?.dpto?.[0]?.nro +
-                  ', ' +
-                  data?.owner?.dpto?.[0]?.description
+                ? [
+                    data.owner.dpto[0].nro &&
+                      `Unidad: ${data.owner.dpto[0].nro}`,
+                    data.owner.dpto[0].description?.trim(),
+                  ]
+                    .filter(Boolean)
+                    .join(', ')
                 : ''
             }
             left={
@@ -249,14 +258,12 @@ const DetAccesses = ({id, open, close, reload}: any) => {
             <Text style={styles.labelAccess}>{labelAccess()}</Text>
             <ItemList
               title={getFullName(data?.owner)}
-              subtitle={
-                data?.owner?.dpto?.length
-                  ? 'Unidad: ' +
-                    data?.owner?.dpto?.[0]?.nro +
-                    ', ' +
-                    data?.owner?.dpto?.[0]?.description
-                  : ''
-              }
+              subtitle={[
+                `Unidad: ${data?.owner?.dpto?.[0]?.nro || ''}`,
+                data?.owner?.dpto?.[0]?.description,
+              ]
+                .filter(Boolean)
+                .join(', ')}
               left={
                 <Avatar
                   hasImage={data?.owner?.has_image}
@@ -270,7 +277,7 @@ const DetAccesses = ({id, open, close, reload}: any) => {
                 />
               }
               right={
-                data?.type !== 'C' ? (
+                data?.type !== 'C' && data?.type !== 'P' ? (
                   <Icon
                     name={IconExpand}
                     color={cssVar.cWhiteV1}
@@ -665,12 +672,17 @@ const DetAccesses = ({id, open, close, reload}: any) => {
     if (!formState?.obs_confirm) {
       return;
     }
-    const {data: confirma} = await execute('/accesses/confirm', 'POST', {
-      confirm,
-      id: data.id,
-      obs_confirm: formState?.obs_confirm,
-    });
-
+    const {data: confirma, error} = await execute(
+      '/accesses/confirm',
+      'POST',
+      {
+        confirm,
+        id: data.id,
+        obs_confirm: formState?.obs_confirm,
+      },
+      false,
+      3,
+    );
     if (confirma?.success === true) {
       if (reload) {
         reload();
@@ -678,10 +690,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
       setOpenDecline(null);
       close();
     } else {
-      showToast('Ocurió un error', 'error');
+      showToast(error?.data?.message || 'Ocurió un error', 'error');
     }
   };
-  console.log(data);
   return (
     <ModalFull
       onClose={close}

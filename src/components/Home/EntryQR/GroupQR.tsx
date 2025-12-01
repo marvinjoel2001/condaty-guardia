@@ -83,12 +83,14 @@ const OwnerInvitationInfoDisplay = ({
       <Text style={styles.sectionTitle}>Visita a:</Text>
       <ItemList
         title={getFullName(invitationData.owner)}
-        subtitle={
-          'Unidad: ' +
-          invitationData?.owner?.dpto?.[0]?.nro +
-          ', ' +
-          (invitationData?.owner?.dpto?.[0]?.description || '')
-        }
+        subtitle={[
+          invitationData?.owner?.dpto?.[0]?.nro &&
+            `Unidad: ${invitationData.owner.dpto[0].nro}`,
+
+          invitationData?.owner?.dpto?.[0]?.description?.trim(),
+        ]
+          .filter(Boolean)
+          .join(', ')}
         left={
           <Avatar
             hasImage={invitationData?.owner?.has_image}
