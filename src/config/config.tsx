@@ -91,12 +91,12 @@ const configApp = {
   NEXT_API_BASE_URL: '', // Se inicializa vacío y se asigna dinámicamente
 };
 
-// configApp.API_URL = configApp.API_URL_TEST;
+configApp.API_URL = configApp.API_URL_TEST;
 // configApp.API_URL = configApp.API_URL_PRE;
-configApp.API_URL = configApp.API_URL_PROD;
+// configApp.API_URL = configApp.API_URL_PROD;
 
 if (process.env.NODE_ENV == 'development') {
-  //  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
+  configApp.API_URL = configApp.API_URL_DEV; // Esto es para desarrollo en virtual
   // configApp.API_URL = configApp.API_URL_DEMO;
   // configApp.API_URL = configApp.API_URL_FER;
 }
