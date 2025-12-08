@@ -817,7 +817,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       title={'Detalle del acceso'}
       open={open}
       onClose={onClose}
-      scrollViewHide
+      // scrollViewHide
       disableFormPress>
       {renderBody()}
       {isPersonDetailModalVisible && modalPersonData && (

@@ -7,7 +7,6 @@ import React, {
   memo,
 } from 'react';
 import {
-  Modal as RNModal,
   View,
   ScrollView,
   SafeAreaView,
@@ -24,6 +23,7 @@ import {cssVar, TypeStyles} from '../../../styles/themes';
 import Form from '../../forms/Form/Form';
 import HeadTitle from '../../layout/HeadTitle';
 import {SafeAreaView as SafeAreaViewAndroid} from 'react-native-safe-area-context';
+import Modal from 'react-native-modal';
 
 type PropsType = {
   children: React.ReactNode;
@@ -134,91 +134,85 @@ const ModalFull = memo(
     if (!visible) return null;
 
     return (
-      <RNModal
-        animationType="none"
-        transparent
-        visible={visible}
-        presentationStyle="overFullScreen"
+      <Modal
+        style={{margin: 0}}
+        coverScreen
+        isVisible={visible}
+        onBackdropPress={() => !iconClose && onClose('x')}
+        onBackButtonPress={() => !iconClose && onClose('x')}
         onShow={onShow}
-        onRequestClose={() => !iconClose && onClose('x')}>
-        <Animated.View
-          style={{
-            flex: 1,
-            opacity,
-            transform: [{translateY}],
-            backgroundColor: cssVar.cBlack,
-          }}>
-          <SafeAreaViewAndroid
-            style={{flex: 1, backgroundColor: cssVar.cBlack}}>
-            <SafeAreaView style={{flex: 1}}>
-              <Form pressable={!disableFormPress}>
-                <View style={theme.container}>
-                  {!headerHide && (
-                    <HeadTitle
-                      title={title}
-                      onBack={onBack ?? (() => onClose('x'))}
-                      onlyBack={open}
-                      right={right}
-                      iconClose={iconClose}
-                      modalLayout
-                    />
-                  )}
-                  {scrollViewHide ? (
-                    children
-                  ) : (
-                    <ScrollView
-                      ref={scrollViewRef}
-                      refreshControl={
-                        reload ? (
-                          <RefreshControl
-                            progressBackgroundColor={cssVar.cBlack}
-                            colors={[cssVar.cAccent]}
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                            tintColor={cssVar.cAccent}
-                          />
-                        ) : undefined
-                      }
-                      style={[theme.body, style]}
-                      contentContainerStyle={{paddingBottom: 20}}
-                      keyboardShouldPersistTaps="handled">
-                      <TouchableOpacity activeOpacity={1} style={{flex: 1}}>
-                        {children}
-                      </TouchableOpacity>
-                    </ScrollView>
-                  )}
+        animationIn="fadeIn"
+        animationOut="fadeOut">
+        <SafeAreaViewAndroid style={{flex: 1}}>
+          <SafeAreaView style={{flex: 1}}>
+            <Form pressable={!disableFormPress}>
+              <View style={theme.container}>
+                {!headerHide && (
+                  <HeadTitle
+                    title={title}
+                    onBack={onBack ?? (() => onClose('x'))}
+                    onlyBack={open}
+                    right={right}
+                    iconClose={iconClose}
+                    modalLayout
+                  />
+                )}
+                {scrollViewHide ? (
+                  children
+                ) : (
+                  <ScrollView
+                    ref={scrollViewRef}
+                    refreshControl={
+                      reload ? (
+                        <RefreshControl
+                          progressBackgroundColor={cssVar.cBlack}
+                          colors={[cssVar.cAccent]}
+                          refreshing={refreshing}
+                          onRefresh={onRefresh}
+                          tintColor={cssVar.cAccent}
+                        />
+                      ) : undefined
+                    }
+                    style={[theme.body, style]}
+                    contentContainerStyle={{paddingBottom: 20}}
+                    keyboardShouldPersistTaps="handled">
+                    <TouchableOpacity activeOpacity={1} style={{flex: 1}}>
+                      {children}
+                    </TouchableOpacity>
+                  </ScrollView>
+                )}
 
-                  {(buttonText || buttonCancel || buttonExtra) && (
-                    <View style={[theme.footer, styleFooter]}>
-                      {buttonText && (
-                        <Button
-                          variant="primary"
-                          disabled={disabled}
-                          onPress={(e: any) => {
-                            onSave(id);
-                          }}>
-                          {buttonText}
-                        </Button>
-                      )}
-                      {buttonCancel && (
-                        <Button
-                          variant="secondary"
-                          onPress={(e: any) => {
-                            onClose('cancel');
-                          }}>
-                          {buttonCancel}
-                        </Button>
-                      )}
-                      {buttonExtra}
-                    </View>
-                  )}
-                </View>
-              </Form>
-              <Toast toast={toast} showToast={showToast} />
-            </SafeAreaView>
-          </SafeAreaViewAndroid>
-        </Animated.View>
-      </RNModal>
+                {(buttonText || buttonCancel || buttonExtra) && (
+                  <View style={[theme.footer, styleFooter]}>
+                    {buttonText && (
+                      <Button
+                        variant="primary"
+                        disabled={disabled}
+                        onPress={(e: any) => {
+                          onSave(id);
+                        }}>
+                        {buttonText}
+                      </Button>
+                    )}
+                    {buttonCancel && (
+                      <Button
+                        variant="secondary"
+                        onPress={(e: any) => {
+                          onClose('cancel');
+                        }}>
+                        {buttonCancel}
+                      </Button>
+                    )}
+                    {buttonExtra}
+                  </View>
+                )}
+              </View>
+            </Form>
+            <Toast toast={toast} showToast={showToast} />
+          </SafeAreaView>
+        </SafeAreaViewAndroid>
+        {/* </Animated.View> */}
+      </Modal>
     );
   },
 );

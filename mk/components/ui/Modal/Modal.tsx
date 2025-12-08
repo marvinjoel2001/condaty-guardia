@@ -1,15 +1,12 @@
-import {useCallback, useEffect, useRef, useState, useContext} from 'react';
+import {useEffect, useRef, useState, useContext} from 'react';
 import {
   View,
   Text,
   Dimensions,
   ScrollView,
   TouchableOpacity,
-  Modal as ModalRN,
   Animated,
-  BackHandler,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
 import Icon from '../Icon/Icon';
 import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
 import {AuthContext} from '../../../contexts/AuthContext';
@@ -18,6 +15,7 @@ import Toast from '../Toast/Toast';
 import Button from '../../forms/Button/Button';
 import Form from '../../forms/Form/Form';
 import React from 'react';
+import ModalRN from 'react-native-modal';
 type PropsType = {
   children: any;
   onClose: (e: any) => void;
@@ -49,7 +47,7 @@ const Modal = ({
   buttonCancel = '',
   buttonExtra = null,
   id = '',
-  fullScreen = false,
+  // fullScreen = false,
   iconClose = true,
   overlayClose = false,
   disabled = false,
@@ -60,24 +58,6 @@ const Modal = ({
   const {toast, showToast}: any = useContext(AuthContext);
   const [_open, setOpen] = useState(false);
   const fadeAnim = useRef(new Animated.Value(200)).current;
-
-  // BackHandler logic
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const onBackPress = () => {
-  //       if (open && fullScreen) {
-  //         _onClose('back');
-  //         return true; // Prevent default back behavior
-  //       }
-  //       return false; // Allow default back behavior if modal isn't open or fullscreen
-  //     };
-
-  //     BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-  //     return () =>
-  //       BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  //   }, [open, fullScreen]), // Dependencies ensure the effect is applied when these change
-  // );
 
   useEffect(() => {
     if (open) {
@@ -111,21 +91,25 @@ const Modal = ({
 
   return (
     <ModalRN
-      animationType="fade"
-      transparent={true}
-      visible={open}
-      onRequestClose={() => {}}>
+      style={{margin: 0}}
+      isVisible={open}
+      onBackdropPress={() => _onClose('overlay')}
+      onBackButtonPress={() => _onClose('x')}
+      hasBackdrop
+      customBackdrop={<View style={theme.overlay} />}
+      backdropOpacity={0}
+      animationIn="fadeIn"
+      animationOut="fadeOut">
       <Form>
         <TouchableOpacity
           activeOpacity={1}
           style={{...theme.overlay, opacity: fadeAnim}}
           onPress={_onOverlayPress}>
-          <Animated.View
+          <View
             style={{
               ...theme.container,
               ...containerStyles,
               width: screen.width - 12,
-              opacity: fadeAnim,
             }}>
             {(iconClose || title) && (
               <View style={{...theme.header, ...headerStyles}}>
@@ -181,7 +165,7 @@ const Modal = ({
                 )}
               </View>
             )}
-          </Animated.View>
+          </View>
         </TouchableOpacity>
         <Toast toast={toast} showToast={showToast} />
       </Form>
@@ -194,7 +178,7 @@ export default Modal;
 const theme: ThemeType = {
   overlay: {
     flex: 1,
-    backgroundColor: '#2E2E2ECC',
+    backgroundColor: '#161616E6',
     position: 'absolute',
     top: 0,
     left: 0,
