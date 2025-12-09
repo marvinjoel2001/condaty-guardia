@@ -56,29 +56,6 @@ const Modal = ({
 }: PropsType) => {
   const screen = Dimensions.get('window');
   const {toast, showToast}: any = useContext(AuthContext);
-  const [_open, setOpen] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(200)).current;
-
-  useEffect(() => {
-    if (open) {
-      fadeAnim.setValue(0);
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: false,
-      }).start();
-    } else {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 1000,
-        useNativeDriver: false,
-      }).start();
-    }
-  }, [open, fadeAnim]);
-
-  useEffect(() => {
-    setOpen(open);
-  }, [open]);
 
   const _onClose = (e: any) => {
     onClose(e);
@@ -103,7 +80,7 @@ const Modal = ({
       <Form>
         <TouchableOpacity
           activeOpacity={1}
-          style={{...theme.overlay, opacity: fadeAnim}}
+          style={{...theme.overlay}}
           onPress={_onOverlayPress}>
           <View
             style={{

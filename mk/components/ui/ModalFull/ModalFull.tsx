@@ -11,8 +11,6 @@ import {
   ScrollView,
   SafeAreaView,
   RefreshControl,
-  Animated,
-  Easing,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
@@ -76,44 +74,6 @@ const ModalFull = memo(
     const {toast, showToast}: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [refreshing, setRefreshing] = useState(false);
-    const [visible, setVisible] = useState(open);
-    const opacity = useRef(new Animated.Value(0)).current;
-    const translateY = useRef(new Animated.Value(20)).current;
-
-    useEffect(() => {
-      if (open) {
-        setVisible(true);
-        Animated.parallel([
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: 250,
-            easing: Easing.out(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.spring(translateY, {
-            toValue: 0,
-            damping: 20,
-            stiffness: 150,
-            mass: 0.7,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      } else {
-        Animated.parallel([
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: 200,
-            easing: Easing.in(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(translateY, {
-            toValue: 20,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start(() => setVisible(false));
-      }
-    }, [open]);
 
     useEffect(() => {
       if (open && enScroll) {
@@ -131,13 +91,13 @@ const ModalFull = memo(
       setRefreshing(false);
     }, [reload]);
 
-    if (!visible) return null;
+    if (!open) return null;
 
     return (
       <Modal
         style={{margin: 0}}
         coverScreen
-        isVisible={visible}
+        isVisible={open}
         onBackdropPress={() => !iconClose && onClose('x')}
         onBackButtonPress={() => !iconClose && onClose('x')}
         onShow={onShow}
