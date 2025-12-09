@@ -35,7 +35,6 @@ interface CiNomModalProps {
 
 const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const {showToast} = useAuth();
-  // const [visit, setVisit]: any = useState(null);
   const [oldPlate, setOldPlate] = useState('');
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
@@ -101,7 +100,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       if (visitData?.data?.owner_exist) {
         setDataOwner({invitation: visitData?.data});
       } else {
-        // setVisit(visitData?.data);
         setOldPlate(visitData?.data?.plate);
         setFormState({
           ...formState,
@@ -242,8 +240,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     const {data, error: err} = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
-      // onClose();
-      // reload();
       setOpenDetail({open: true, id: data?.data});
     } else {
       setSaving(false);
@@ -451,7 +447,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                   <List
                     data={formState.acompanantes}
                     renderItem={acompanantesList}
-                    // refreshing={!loaded}
                   />
                 </>
               )}
