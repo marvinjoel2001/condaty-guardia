@@ -35,7 +35,13 @@ const typeInvitation: any = {
   P: 'Pedido',
   F: 'QR Frecuente',
 };
-const DetAccesses = ({id, open, close, reload}: any) => {
+interface DetAccessesProps {
+  id: number | null;
+  open: boolean;
+  close: () => void;
+  reload?: () => void;
+}
+const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
   const {showToast, waiting} = useAuth();
   const {execute} = useApi();
   const [data, setData]: any = useState(null);
@@ -688,7 +694,9 @@ const DetAccesses = ({id, open, close, reload}: any) => {
         reload();
       }
       setOpenDecline(null);
-      close();
+      setTimeout(() => {
+        close();
+      }, 1000);
     } else {
       showToast(error?.data?.message || 'Ocurió un error', 'error');
     }

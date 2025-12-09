@@ -7,13 +7,10 @@ import React, {
   memo,
 } from 'react';
 import {
-  Modal as RNModal,
   View,
   ScrollView,
   SafeAreaView,
   RefreshControl,
-  Animated,
-  Easing,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
@@ -24,6 +21,7 @@ import {cssVar, TypeStyles} from '../../../styles/themes';
 import Form from '../../forms/Form/Form';
 import HeadTitle from '../../layout/HeadTitle';
 import {SafeAreaView as SafeAreaViewAndroid} from 'react-native-safe-area-context';
+import Modal from 'react-native-modal';
 
 type PropsType = {
   children: React.ReactNode;
@@ -76,44 +74,6 @@ const ModalFull = memo(
     const {toast, showToast}: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [refreshing, setRefreshing] = useState(false);
-    const [visible, setVisible] = useState(open);
-    const opacity = useRef(new Animated.Value(0)).current;
-    const translateY = useRef(new Animated.Value(20)).current;
-
-    useEffect(() => {
-      if (open) {
-        setVisible(true);
-        Animated.parallel([
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: 250,
-            easing: Easing.out(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.spring(translateY, {
-            toValue: 0,
-            damping: 20,
-            stiffness: 150,
-            mass: 0.7,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      } else {
-        Animated.parallel([
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: 200,
-            easing: Easing.in(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(translateY, {
-            toValue: 20,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start(() => setVisible(false));
-      }
-    }, [open]);
 
     useEffect(() => {
       if (open && enScroll) {
@@ -131,94 +91,88 @@ const ModalFull = memo(
       setRefreshing(false);
     }, [reload]);
 
-    if (!visible) return null;
+    if (!open) return null;
 
     return (
-      <RNModal
-        animationType="none"
-        transparent
-        visible={visible}
-        presentationStyle="overFullScreen"
+      <Modal
+        style={{margin: 0}}
+        coverScreen
+        isVisible={open}
+        onBackdropPress={() => !iconClose && onClose('x')}
+        onBackButtonPress={() => !iconClose && onClose('x')}
         onShow={onShow}
-        onRequestClose={() => !iconClose && onClose('x')}>
-        <Animated.View
-          style={{
-            flex: 1,
-            opacity,
-            transform: [{translateY}],
-            backgroundColor: cssVar.cBlack,
-          }}>
-          <SafeAreaViewAndroid
-            style={{flex: 1, backgroundColor: cssVar.cBlack}}>
-            <SafeAreaView style={{flex: 1}}>
-              <Form pressable={!disableFormPress}>
-                <View style={theme.container}>
-                  {!headerHide && (
-                    <HeadTitle
-                      title={title}
-                      onBack={onBack ?? (() => onClose('x'))}
-                      onlyBack={open}
-                      right={right}
-                      iconClose={iconClose}
-                      modalLayout
-                    />
-                  )}
-                  {scrollViewHide ? (
-                    children
-                  ) : (
-                    <ScrollView
-                      ref={scrollViewRef}
-                      refreshControl={
-                        reload ? (
-                          <RefreshControl
-                            progressBackgroundColor={cssVar.cBlack}
-                            colors={[cssVar.cAccent]}
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                            tintColor={cssVar.cAccent}
-                          />
-                        ) : undefined
-                      }
-                      style={[theme.body, style]}
-                      contentContainerStyle={{paddingBottom: 20}}
-                      keyboardShouldPersistTaps="handled">
-                      <TouchableOpacity activeOpacity={1} style={{flex: 1}}>
-                        {children}
-                      </TouchableOpacity>
-                    </ScrollView>
-                  )}
+        animationIn="fadeIn"
+        animationOut="fadeOut">
+        <SafeAreaViewAndroid style={{flex: 1}}>
+          <SafeAreaView style={{flex: 1}}>
+            <Form pressable={!disableFormPress}>
+              <View style={theme.container}>
+                {!headerHide && (
+                  <HeadTitle
+                    title={title}
+                    onBack={onBack ?? (() => onClose('x'))}
+                    onlyBack={open}
+                    right={right}
+                    iconClose={iconClose}
+                    modalLayout
+                  />
+                )}
+                {scrollViewHide ? (
+                  children
+                ) : (
+                  <ScrollView
+                    ref={scrollViewRef}
+                    refreshControl={
+                      reload ? (
+                        <RefreshControl
+                          progressBackgroundColor={cssVar.cBlack}
+                          colors={[cssVar.cAccent]}
+                          refreshing={refreshing}
+                          onRefresh={onRefresh}
+                          tintColor={cssVar.cAccent}
+                        />
+                      ) : undefined
+                    }
+                    style={[theme.body, style]}
+                    contentContainerStyle={{paddingBottom: 20}}
+                    keyboardShouldPersistTaps="handled">
+                    <TouchableOpacity activeOpacity={1} style={{flex: 1}}>
+                      {children}
+                    </TouchableOpacity>
+                  </ScrollView>
+                )}
 
-                  {(buttonText || buttonCancel || buttonExtra) && (
-                    <View style={[theme.footer, styleFooter]}>
-                      {buttonText && (
-                        <Button
-                          variant="primary"
-                          disabled={disabled}
-                          onPress={(e: any) => {
-                            onSave(id);
-                          }}>
-                          {buttonText}
-                        </Button>
-                      )}
-                      {buttonCancel && (
-                        <Button
-                          variant="secondary"
-                          onPress={(e: any) => {
-                            onClose('cancel');
-                          }}>
-                          {buttonCancel}
-                        </Button>
-                      )}
-                      {buttonExtra}
-                    </View>
-                  )}
-                </View>
-              </Form>
-              <Toast toast={toast} showToast={showToast} />
-            </SafeAreaView>
-          </SafeAreaViewAndroid>
-        </Animated.View>
-      </RNModal>
+                {(buttonText || buttonCancel || buttonExtra) && (
+                  <View style={[theme.footer, styleFooter]}>
+                    {buttonText && (
+                      <Button
+                        variant="primary"
+                        disabled={disabled}
+                        onPress={(e: any) => {
+                          onSave(id);
+                        }}>
+                        {buttonText}
+                      </Button>
+                    )}
+                    {buttonCancel && (
+                      <Button
+                        variant="secondary"
+                        onPress={(e: any) => {
+                          onClose('cancel');
+                        }}>
+                        {buttonCancel}
+                      </Button>
+                    )}
+                    {buttonExtra}
+                  </View>
+                )}
+              </View>
+            </Form>
+            <Toast toast={toast} showToast={showToast} />
+          </SafeAreaView>
+        </SafeAreaViewAndroid>
+        {/* </Animated.View> */}
+      </Modal>
     );
   },
 );

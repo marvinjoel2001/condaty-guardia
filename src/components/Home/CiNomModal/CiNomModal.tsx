@@ -24,6 +24,7 @@ import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage
 import ExistVisitModal from './ExistVisitModal';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
 import SectionIncomeType from './SectionIncomeType';
+import DetAccesses from '../Accesses/DetAccesses';
 
 interface CiNomModalProps {
   open: boolean;
@@ -34,7 +35,6 @@ interface CiNomModalProps {
 
 const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const {showToast} = useAuth();
-  // const [visit, setVisit]: any = useState(null);
   const [oldPlate, setOldPlate] = useState('');
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
@@ -46,6 +46,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const [dataOwner, setDataOwner]: any = useState(null);
   const [formStateA, setFormStateA] = useState({});
   const [onEdit, setOnEdit] = useState(false);
+  const [openDetail, setOpenDetail] = useState({open: false, id: null});
 
   const handleDeleteAcompanante = (ci: any) => {
     const newAcompanante = formState.acompanantes.filter(
@@ -99,7 +100,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       if (visitData?.data?.owner_exist) {
         setDataOwner({invitation: visitData?.data});
       } else {
-        // setVisit(visitData?.data);
         setOldPlate(visitData?.data?.plate);
         setFormState({
           ...formState,
@@ -237,13 +237,10 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       };
     }
     setSaving(true);
-    // console.log(params);
-    // return;
     const {data, error: err} = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
-      onClose();
-      reload();
+      setOpenDetail({open: true, id: data?.data});
     } else {
       setSaving(false);
       showToast(data?.message, 'error');
@@ -315,8 +312,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     setOnEdit(true);
     setAddCompanion(true);
   };
-
-  console.log('formState:', formState);
   const getStatusTextPhoto = () => {
     if (!formState?.ci_reverso || !formState?.ci_anverso) {
       return '/ Foto pendiente';
@@ -330,199 +325,211 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   }, [steps]);
 
   return (
-    <ModalFull
-      open={open}
-      onClose={_onClose}
-      title={'Visitante sin QR'}
-      buttonText={
-        saving
-          ? 'Procesando...'
-          : steps > 0
-          ? 'Notificar al residente'
-          : steps <= 0
-          ? dataOwner
-            ? 'Dejar ingresar'
-            : 'Buscar'
-          : ''
-      }
-      disabled={saving}
-      onSave={onSave}>
-      <>
-        {dataOwner ? (
-          <KeyQR
-            data={dataOwner}
-            formState={formState}
-            setFormState={setFormState}
-            handleChange={handleChangeInput}
-            errors={errors}
-            setTab={setTypeSearch}
-            tab={typeSearch}
-            setErrors={setErrors}
-          />
-        ) : (
-          <>
-            <Text
-              style={{
-                marginBottom: 12,
-                fontFamily: FONTS.bold,
-                color: cssVar.cWhite,
-              }}>
-              ¿A quién visitas?
-            </Text>
-            <Select
-              filter
-              label="¿A quién visita?"
-              name="owner_id"
-              required={true}
-              options={dataOwners || []}
-              value={formState?.owner_id || ''}
-              onChange={value =>
-                handleChangeInput('owner_id', value?.target.value)
-              }
-              optionValue="id"
-              error={errors}
-              optionLabel="name"
-              height={300}
-              search={true}
+    open && (
+      <ModalFull
+        open={open}
+        onClose={_onClose}
+        title={'Visitante sin QR'}
+        buttonText={
+          saving
+            ? 'Procesando...'
+            : steps > 0
+            ? 'Notificar al residente'
+            : steps <= 0
+            ? dataOwner
+              ? 'Dejar ingresar'
+              : 'Buscar'
+            : ''
+        }
+        disabled={saving}
+        onSave={onSave}>
+        <>
+          {dataOwner ? (
+            <KeyQR
+              data={dataOwner}
+              formState={formState}
+              setFormState={setFormState}
+              handleChange={handleChangeInput}
+              errors={errors}
+              setTab={setTypeSearch}
+              tab={typeSearch}
+              setErrors={setErrors}
             />
-            <Text
-              style={{
-                marginBottom: 12,
-                fontFamily: FONTS.bold,
-                color: cssVar.cWhite,
-              }}>
-              Visitante
-            </Text>
-            {steps === 0 && (
-              <Input
-                label="Carnet de identidad"
-                type="date"
-                name="ci"
-                error={errors}
+          ) : (
+            <>
+              <Text
+                style={{
+                  marginBottom: 12,
+                  fontFamily: FONTS.bold,
+                  color: cssVar.cWhite,
+                }}>
+                ¿A quién visitas?
+              </Text>
+              <Select
+                filter
+                label="¿A quién visita?"
+                name="owner_id"
                 required={true}
-                value={formState['ci']}
-                maxLength={10}
-                onChange={(value: any) => handleChangeInput('ci', value)}
+                options={dataOwners || []}
+                value={formState?.owner_id || ''}
+                onChange={value =>
+                  handleChangeInput('owner_id', value?.target.value)
+                }
+                optionValue="id"
+                error={errors}
+                optionLabel="name"
+                height={300}
+                search={true}
               />
-            )}
-
-            {steps >= 1 && (
-              <>
-                <ItemList
-                  title={formState?.name ? getFullName(formState) : '-/-'}
-                  subtitle={`CI: ${
-                    formState?.ci || '-/-'
-                  } ${getStatusTextPhoto()}`}
-                  left={
-                    <Avatar
-                      name={formState?.name ? getFullName(formState) : '-/-'}
-                      hasImage={formState?.has_image}
-                    />
-                  }
-                  right={
-                    <TouchableOpacity onPress={handleEdit}>
-                      <Text
-                        style={{
-                          color: cssVar.cAccent,
-                          fontSize: 12,
-                          fontFamily: FONTS.semiBold,
-                        }}>
-                        Editar
-                      </Text>
-                    </TouchableOpacity>
-                  }
+              <Text
+                style={{
+                  marginBottom: 12,
+                  fontFamily: FONTS.bold,
+                  color: cssVar.cWhite,
+                }}>
+                Visitante
+              </Text>
+              {steps === 0 && (
+                <Input
+                  label="Carnet de identidad"
+                  type="date"
+                  name="ci"
+                  error={errors}
+                  required={true}
+                  value={formState['ci']}
+                  maxLength={10}
+                  onChange={(value: any) => handleChangeInput('ci', value)}
                 />
-              </>
-            )}
-            {formState?.acompanantes?.length > 0 && (
-              <>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontFamily: FONTS.medium,
-                    marginBottom: 10,
-                    marginTop: 16,
-                    color: cssVar.cWhite,
-                  }}>
-                  {formState?.acompanantes?.length > 1
-                    ? 'Acompañantes:'
-                    : 'Acompañante:'}
-                </Text>
-                <List
-                  data={formState.acompanantes}
-                  renderItem={acompanantesList}
-                  // refreshing={!loaded}
+              )}
+
+              {steps >= 1 && (
+                <>
+                  <ItemList
+                    title={formState?.name ? getFullName(formState) : '-/-'}
+                    subtitle={`CI: ${
+                      formState?.ci || '-/-'
+                    } ${getStatusTextPhoto()}`}
+                    left={
+                      <Avatar
+                        name={formState?.name ? getFullName(formState) : '-/-'}
+                        hasImage={formState?.has_image}
+                      />
+                    }
+                    right={
+                      <TouchableOpacity onPress={handleEdit}>
+                        <Text
+                          style={{
+                            color: cssVar.cAccent,
+                            fontSize: 12,
+                            fontFamily: FONTS.semiBold,
+                          }}>
+                          Editar
+                        </Text>
+                      </TouchableOpacity>
+                    }
+                  />
+                </>
+              )}
+              {formState?.acompanantes?.length > 0 && (
+                <>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: FONTS.medium,
+                      marginBottom: 10,
+                      marginTop: 16,
+                      color: cssVar.cWhite,
+                    }}>
+                    {formState?.acompanantes?.length > 1
+                      ? 'Acompañantes:'
+                      : 'Acompañante:'}
+                  </Text>
+                  <List
+                    data={formState.acompanantes}
+                    renderItem={acompanantesList}
+                  />
+                </>
+              )}
+
+              {steps > 0 && (
+                <TouchableOpacity
+                  style={styles.boxAcompanante}
+                  onPress={() => setOpenExistVisit(true)}>
+                  <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+                  <Text
+                    style={{
+                      color: cssVar.cAccent,
+                      fontFamily: FONTS.semiBold,
+                    }}>
+                    Agregar acompañante
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {steps > 0 && (
+                <SectionIncomeType
+                  setErrors={setErrors}
+                  formState={formState}
+                  handleChangeInput={handleChangeInput}
+                  errors={errors}
+                  tab={typeSearch}
+                  setTab={setTypeSearch}
+                  setFormState={setFormState}
                 />
-              </>
-            )}
+              )}
 
-            {steps > 0 && (
-              <TouchableOpacity
-                style={styles.boxAcompanante}
-                onPress={() => setOpenExistVisit(true)}>
-                <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
-                <Text
-                  style={{
-                    color: cssVar.cAccent,
-                    fontFamily: FONTS.semiBold,
-                  }}>
-                  Agregar acompañante
-                </Text>
-              </TouchableOpacity>
-            )}
-            {steps > 0 && (
-              <SectionIncomeType
-                setErrors={setErrors}
-                formState={formState}
-                handleChangeInput={handleChangeInput}
-                errors={errors}
-                tab={typeSearch}
-                setTab={setTypeSearch}
-                setFormState={setFormState}
-              />
-            )}
-
-            {steps > 0 && (
-              <TextArea
-                label="Observaciones"
-                name="obs_in"
-                placeholder="Ej: El visitante está ingresando con 2 mascotas"
-                value={formState?.obs_in}
-                onChange={(e: any) => handleChangeInput('obs_in', e)}
-                maxAutoHeightRatio={0.3}
-                expandable={true}
-              />
-            )}
-          </>
+              {steps > 0 && (
+                <TextArea
+                  label="Observaciones"
+                  name="obs_in"
+                  placeholder="Ej: El visitante está ingresando con 2 mascotas"
+                  value={formState?.obs_in}
+                  onChange={(e: any) => handleChangeInput('obs_in', e)}
+                  maxAutoHeightRatio={0.3}
+                  expandable={true}
+                />
+              )}
+            </>
+          )}
+        </>
+        {openExistVisit && (
+          <ExistVisitModal
+            open={openExistVisit}
+            formState={formStateA}
+            setFormState={setFormStateA}
+            item={formState}
+            setItem={setFormState}
+            onClose={() => setOpenExistVisit(false)}
+            setOpenNewAcomp={setAddCompanion}
+          />
         )}
-      </>
-      {openExistVisit && (
-        <ExistVisitModal
-          open={openExistVisit}
-          formState={formStateA}
-          setFormState={setFormStateA}
-          item={formState}
-          setItem={setFormState}
-          onClose={() => setOpenExistVisit(false)}
-          setOpenNewAcomp={setAddCompanion}
-        />
-      )}
-      {addCompanion && (
-        <AccompaniedAdd
-          editItem={onEdit}
-          open={addCompanion}
-          onClose={() => {
-            Keyboard.dismiss();
-            setAddCompanion(false);
-            setOnEdit(false);
-          }}
-          item={formState}
-          setItem={setFormState}
-          formState={formStateA}
-          setFormState={setFormStateA}
-        />
-      )}
-    </ModalFull>
+        {addCompanion && (
+          <AccompaniedAdd
+            editItem={onEdit}
+            open={addCompanion}
+            onClose={() => {
+              Keyboard.dismiss();
+              setAddCompanion(false);
+              setOnEdit(false);
+            }}
+            item={formState}
+            setItem={setFormState}
+            formState={formStateA}
+            setFormState={setFormStateA}
+          />
+        )}
+        {openDetail.open && (
+          <DetAccesses
+            open={openDetail.open}
+            id={openDetail.id}
+            close={() => {
+              setOpenDetail({open: false, id: null});
+              onClose();
+            }}
+            reload={reload}
+          />
+        )}
+      </ModalFull>
+    )
   );
 };
 
