@@ -1,31 +1,58 @@
-import {NavigationContainer} from '@react-navigation/native';
+import { NewAppScreen } from '@react-native/new-app-screen';
+import {
+  StatusBar,
+  StyleSheet,
+  useColorScheme,
+  View,
+  Text,
+} from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+
+import { NavigationContainer } from '@react-navigation/native';
 import AxiosProvider from './mk/contexts/AxiosContext';
 import axiosInterceptors from './mk/interceptors/axiosInterceptors';
 import AuthProvider from './mk/contexts/AuthContext';
 import OneSignalContextProvider from './mk/contexts/OneSignalContext';
 import InitProject from './src/config/InitProject';
 import MyDrawer from './src/navigators/Drawer/Drawer';
-import {StatusBar, Text} from 'react-native';
-import {cssVar} from './mk/styles/themes';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { cssVar } from './mk/styles/themes';
+// import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import ActiveNotificationDB from './mk/hooks/ActiveNotificationDB';
-import {navigationRef} from './src/navigators/navigationRef';
-import {KeyboardProvider} from 'react-native-keyboard-controller';
-import {NetworkProvider} from './mk/contexts/NetworkContext';
+import { navigationRef } from './src/navigators/navigationRef';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { NetworkProvider } from './mk/contexts/NetworkContext';
 
 function App() {
   (Text as any).defaultProps = (Text as any).defaultProps || {};
   (Text as any).defaultProps.allowFontScaling = false;
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
+    <SafeAreaProvider>
+      <StatusBar backgroundColor={cssVar.cBlack} barStyle={'light-content'} />
+      <AppContent />
+    </SafeAreaProvider>
+  );
+}
+function AppContent() {
+  const safeAreaInsets = useSafeAreaInsets();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <NewAppScreen
+        templateFileName="App.tsx"
+        safeAreaInsets={safeAreaInsets}
+      />
+      {/* <GestureHandlerRootView style={{flex: 1}}> */}
       <NetworkProvider>
         <AxiosProvider interceptors={axiosInterceptors}>
           <KeyboardProvider>
-            <StatusBar
+            {/* <StatusBar
               animated={true}
               backgroundColor={cssVar.cBlack}
               barStyle={'light-content'}
-            />
+            /> */}
             <NavigationContainer ref={navigationRef}>
               <AuthProvider>
                 <ActiveNotificationDB />
@@ -38,7 +65,8 @@ function App() {
           </KeyboardProvider>
         </AxiosProvider>
       </NetworkProvider>
-    </GestureHandlerRootView>
+      {/* </GestureHandlerRootView> */}
+    </View>
   );
 }
 
