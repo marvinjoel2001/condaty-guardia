@@ -40,10 +40,10 @@ function AppContent() {
 
   return (
     <View style={{ flex: 1 }}>
-      <NewAppScreen
+      {/* <NewAppScreen
         templateFileName="App.tsx"
         safeAreaInsets={safeAreaInsets}
-      />
+      /> */}
       {/* <GestureHandlerRootView style={{flex: 1}}> */}
       <NetworkProvider>
         <AxiosProvider interceptors={axiosInterceptors}>
