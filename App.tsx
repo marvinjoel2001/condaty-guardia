@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {
   SafeAreaProvider,
+  SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
@@ -39,7 +40,7 @@ function AppContent() {
   const safeAreaInsets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       {/* <NewAppScreen
         templateFileName="App.tsx"
         safeAreaInsets={safeAreaInsets}
@@ -66,7 +67,7 @@ function AppContent() {
         </AxiosProvider>
       </NetworkProvider>
       {/* </GestureHandlerRootView> */}
-    </View>
+    </SafeAreaView>
   );
 }
 

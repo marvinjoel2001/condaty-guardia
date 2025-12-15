@@ -1,33 +1,33 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ImageBackground,
   Linking,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Button from '../../../mk/components/forms/Button/Button';
-import {cssVar, FONTS, ThemeType} from '../../../mk/styles/themes';
+import { cssVar, FONTS, ThemeType } from '../../../mk/styles/themes';
 import Form from '../../../mk/components/forms/Form/Form';
 import configApp from '../../config/config';
 import Icon from '../../../mk/components/ui/Icon/Icon';
-import {IconEye, IconEyeOff} from '../../icons/IconLibrary';
-import {OneSignal} from 'react-native-onesignal';
+import { IconEye, IconEyeOff } from '../../icons/IconLibrary';
+import { OneSignal } from 'react-native-onesignal';
 import useAuth from '../../../mk/hooks/useAuth';
-import {checkCI, checkPasswords} from '../../../mk/utils/validations';
+import { checkCI, checkPasswords } from '../../../mk/utils/validations';
 import Input from '../../../mk/components/forms/Input/Input';
 import ForgotPass from './ForgotPass';
 import Splash from '../Splash/Splash';
-import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
+import { checkRules, hasErrors } from '../../../mk/utils/validate/Rules';
 import VersionChecker from '../../../mk/utils/VersionChecker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Login = () => {
   const [formState, setFormState]: any = useState({});
   const [onRegister, setOnRegister] = useState(false);
   const [onForgotPass, setOnForgotPass] = useState(false);
   const [errors, setErrors] = useState({});
-  const {login, user, waiting, splash, setSplash} = useAuth();
+  const { login, user, waiting, splash, setSplash } = useAuth();
   const [showPassword, setShowPassword] = useState(true);
   const [load, setLoad] = useState(true);
 
@@ -53,7 +53,7 @@ const Login = () => {
   const signalInit = async () => {
     try {
       await OneSignal.initialize(configApp.APP_SIGNAL_KEY);
-      OneSignal.User.addTags({client_id: '', user_id: ''});
+      OneSignal.User.addTags({ client_id: '', user_id: '' });
       OneSignal.logout();
       console.log('One signal initiate login:');
     } catch (error) {
@@ -100,7 +100,7 @@ const Login = () => {
           } else {
             setErrors(
               data?.errors == 'Acceso incorrecto'
-                ? {password: 'Credenciales incorrectas'}
+                ? { password: 'Credenciales incorrectas' }
                 : data?.errors,
             );
             console.log('entre!', data?.errors?.status);
@@ -160,7 +160,7 @@ const Login = () => {
                 keyboardType="numeric"
                 value={formState['email']}
                 onBlur={() => {
-                  setErrors({...errors, email: checkCI(formState.email)});
+                  setErrors({ ...errors, email: checkCI(formState.email) });
                 }}
                 error={errors}
                 onChange={(value: any) => handleInputChange('email', value)}
@@ -184,7 +184,8 @@ const Login = () => {
 
               <Button
                 onPress={handleSubmit}
-                disabled={!formState.email || !formState.password}>
+                disabled={!formState.email || !formState.password}
+              >
                 Iniciar sesión
               </Button>
               <Text
@@ -198,7 +199,8 @@ const Login = () => {
                   textAlign: 'center',
                   color: cssVar.cWhite,
                   textDecorationLine: 'underline',
-                }}>
+                }}
+              >
                 Olvidé mi contraseña
               </Text>
               <View
@@ -206,20 +208,23 @@ const Login = () => {
                   flexDirection: 'row',
                   justifyContent: 'center',
                   flexWrap: 'wrap',
-                }}>
+                }}
+              >
                 <Text
                   style={{
                     color: cssVar.cWhite,
                     fontSize: 10,
-                  }}>
+                  }}
+                >
                   Al iniciar sesión aceptas los
                 </Text>
-                <TouchableOpacity onPress={goTerminos} style={{height: 48}}>
+                <TouchableOpacity onPress={goTerminos} style={{ height: 48 }}>
                   <Text
                     style={{
                       color: cssVar.cAccent,
                       fontSize: 10,
-                    }}>
+                    }}
+                  >
                     {' Términos y Condiciones '}
                   </Text>
                 </TouchableOpacity>
@@ -228,10 +233,11 @@ const Login = () => {
                   style={{
                     color: cssVar.cWhite,
                     fontSize: 10,
-                  }}>
+                  }}
+                >
                   y nuestras
                 </Text>
-                <TouchableOpacity onPress={goPoliticas} style={{height: 20}}>
+                <TouchableOpacity onPress={goPoliticas} style={{ height: 20 }}>
                   <Text
                     style={{
                       color: cssVar.cAccent,
@@ -239,7 +245,8 @@ const Login = () => {
                       marginBottom: 0,
                       top: -30,
                       fontFamily: 'Poppins Regular',
-                    }}>
+                    }}
+                  >
                     Políticas de Privacidad
                   </Text>
                 </TouchableOpacity>

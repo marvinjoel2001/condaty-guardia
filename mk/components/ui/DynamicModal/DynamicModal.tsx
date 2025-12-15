@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-  Modal,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from '../Icon/Icon';
-import {IconX} from '../../../../src/icons/IconLibrary';
-import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
+import { IconX } from '../../../../src/icons/IconLibrary';
+import { cssVar, FONTS, TypeStyles } from '../../../styles/themes';
 import Button from '../../forms/Button/Button';
 import Form from '../../forms/Form/Form';
 
@@ -47,8 +40,9 @@ const DynamicModal = ({
       visible={open}
       transparent={true}
       animationType="slide"
-      onRequestClose={onClose}>
-      <SafeAreaView style={{flex: 1}}>
+      onRequestClose={onClose}
+    >
+      <View style={{ flex: 1 }}>
         <Form>
           <View style={styles.overlay}>
             <View
@@ -56,12 +50,14 @@ const DynamicModal = ({
                 ...styles[`content${variant}`],
                 height: height,
                 ...style,
-              }}>
+              }}
+            >
               <View
                 style={{
                   ...styles.header,
                   ...styleHeader,
-                }}>
+                }}
+              >
                 <View>
                   <Text style={styles.title}>{title}</Text>
                   {subTitle && <Text style={styles.subTitle}>{subTitle}</Text>}
@@ -73,8 +69,10 @@ const DynamicModal = ({
                   color={cssVar.cWhite}
                 />
               </View>
-              <ScrollView style={{padding: 12, flex: 1 }}>{children}</ScrollView>
-              <View style={{padding: 12, flexDirection: 'row', gap: 8}}>
+              <ScrollView style={{ padding: 12, flex: 1 }}>
+                {children}
+              </ScrollView>
+              <View style={{ padding: 12, flexDirection: 'row', gap: 8 }}>
                 {buttonCancelText && (
                   <Button onPress={onClose} variant="secondary">
                     {buttonCancelText}
@@ -89,7 +87,7 @@ const DynamicModal = ({
             </View>
           </View>
         </Form>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 };
