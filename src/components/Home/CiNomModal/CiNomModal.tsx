@@ -248,7 +248,6 @@ const CiNomModal = ({ open, onClose, reload, data }: CiNomModalProps) => {
     const { data, error: err } = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
-      console.log('onsave', data.data.info);
       if (data.data?.info) {
         sendNotif(data.data.info);
       }

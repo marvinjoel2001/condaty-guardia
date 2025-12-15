@@ -26,6 +26,7 @@ import Br from '../../Profile/Br';
 import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
+import { useEvent } from '../../../../mk/hooks/useEvent';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -44,6 +45,7 @@ interface DetAccessesProps {
 const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
   const { showToast, waiting } = useAuth();
   const { execute } = useApi();
+  const { dispatch: sendNotif } = useEvent('sendNotif');
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
@@ -121,6 +123,9 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
       2,
     );
     if (result?.success) {
+      if (result.data?.info) {
+        sendNotif(result.data.info);
+      }
       if (reload) reload();
       close();
     } else {
@@ -152,6 +157,9 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
       obs_out: formState?.obs_out || '',
     });
     if (result?.success) {
+      if (result.data?.info) {
+        sendNotif(result.data.info);
+      }
       if (reload) reload();
       close();
     } else {
@@ -697,6 +705,9 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
       3,
     );
     if (confirma?.success === true) {
+      if (confirma.data?.info) {
+        sendNotif(confirma.data.info);
+      }
       if (reload) {
         reload();
       }

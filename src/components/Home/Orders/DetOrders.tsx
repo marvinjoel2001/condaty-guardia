@@ -167,6 +167,9 @@ const DetOrders = ({ id, open, close, reload, handleChange }: any) => {
         obs_out: formState?.obs_out || '',
       });
       if (result?.success) {
+        if (result.data?.info) {
+          sendNotif(result.data.info);
+        }
         if (reload) reload();
         close();
       } else {
@@ -192,11 +195,10 @@ const DetOrders = ({ id, open, close, reload, handleChange }: any) => {
         plate_vehicle: formState?.plate_vehicle,
       });
       if (result?.success) {
-        if (reload) reload();
-        console.log('reslt', result.data.info);
         if (result.data?.info) {
           sendNotif(result.data.info);
         }
+        if (reload) reload();
         close();
       } else {
         console.log('Error al dejar entrar:', error);
