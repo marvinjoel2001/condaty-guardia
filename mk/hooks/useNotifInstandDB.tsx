@@ -45,7 +45,7 @@ const useNotifInstandDB = (channels: { channel: string }[] = []): NotifType => {
   const [lastNotif, setLastNotif] = useState<number | null>(null);
 
   const onSendNotif = useCallback((data: any) => {
-    console.log('onSendNotif', data);
+    // console.log('onSendNotif', data);
     if (data && data.length) {
       data.forEach((item: any) => {
         if (item.to && item.act) sendNotif(item.to, item.act, item);
@@ -126,7 +126,7 @@ const useNotifInstandDB = (channels: { channel: string }[] = []): NotifType => {
   }, [data?.notif]);
 
   const sendNotif = async (channel: string, event: string, payload: any) => {
-    console.log('sendNotif2', channel, event, payload);
+    // console.log('sendNotif2', channel, event, payload);
     const channelSend = channelGral + user?.client_id + '-' + channel;
     await db.transact(
       db.tx.notif[id()].update({

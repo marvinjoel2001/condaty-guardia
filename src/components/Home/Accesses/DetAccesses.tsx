@@ -62,32 +62,7 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
     open: false,
     imageUri: '',
   });
-  const getData = async () => {
-    try {
-      const { data } = await execute('/accesses', 'GET', {
-        fullType: 'DET',
-        searchBy: id,
-      });
 
-      if (data.success && data.data.length > 0) {
-        const accessData = data.data[0];
-        if (accessData.access_id) {
-          const { data: linkedData } = await execute('/accesses', 'GET', {
-            fullType: 'DET',
-            searchBy: accessData.access_id,
-          });
-
-          if (linkedData.success && linkedData.data.length > 0) {
-            setData(linkedData.data[0]);
-          }
-        } else {
-          setData(accessData);
-        }
-      }
-    } catch (error) {
-      showToast('Error al obtener los datos', 'error');
-    }
-  };
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
 
@@ -106,6 +81,33 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
 
   const status = getStatus();
   useEffect(() => {
+    const getData = async () => {
+      try {
+        const { data } = await execute('/accesses', 'GET', {
+          fullType: 'DET',
+          searchBy: id,
+        });
+        console.log('getData1', data);
+        if (data.success && data.data.length > 0) {
+          const accessData = data.data[0];
+          if (accessData.access_id) {
+            const { data: linkedData } = await execute('/accesses', 'GET', {
+              fullType: 'DET',
+              searchBy: accessData.access_id,
+            });
+
+            if (linkedData.success && linkedData.data.length > 0) {
+              setData(linkedData.data[0]);
+            }
+          } else {
+            setData(accessData);
+          }
+        }
+      } catch (error) {
+        showToast('Error al obtener los datos', 'error');
+      }
+    };
+    console.log('getData', id);
     if (id) {
       getData();
     }

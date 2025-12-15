@@ -251,7 +251,7 @@ const CiNomModal = ({ open, onClose, reload, data }: CiNomModalProps) => {
       if (data.data?.info) {
         sendNotif(data.data.info);
       }
-      setOpenDetail({ open: true, id: data?.data });
+      setOpenDetail({ open: true, id: data?.data?.id });
     } else {
       setSaving(false);
       showToast(data?.message, 'error');
