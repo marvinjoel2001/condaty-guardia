@@ -56,10 +56,10 @@ function AppContent() {
             /> */}
             <NavigationContainer ref={navigationRef}>
               <AuthProvider>
-                <ActiveNotificationDB />
                 <OneSignalContextProvider>
                   <InitProject />
                   <MyDrawer />
+                  <ActiveNotificationDB />
                 </OneSignalContextProvider>
               </AuthProvider>
             </NavigationContainer>

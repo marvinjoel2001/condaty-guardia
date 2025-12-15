@@ -1,22 +1,28 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, Keyboard, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Keyboard,
+  View,
+} from 'react-native';
 import List from '../../../../mk/components/ui/List/List';
 import useAuth from '../../../../mk/hooks/useAuth';
 import useApi from '../../../../mk/hooks/useApi';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Select from '../../../../mk/components/forms/Select/Select';
 import Input from '../../../../mk/components/forms/Input/Input';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import {getFullName} from '../../../../mk/utils/strings';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
+import { getFullName } from '../../../../mk/utils/strings';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import InputNameCi from './shared/InputNameCi';
-import {IconSimpleAdd} from '../../../icons/IconLibrary';
+import { IconSimpleAdd } from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
-import {getUTCNow} from '../../../../mk/utils/dates';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { AccompaniedAdd } from '../EntryQR/AccompaniedAdd';
+import { getUTCNow } from '../../../../mk/utils/dates';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import KeyQR from '../EntryQR/KeyQR';
@@ -25,6 +31,7 @@ import ExistVisitModal from './ExistVisitModal';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
 import SectionIncomeType from './SectionIncomeType';
 import DetAccesses from '../Accesses/DetAccesses';
+import { useEvent } from '../../../../mk/hooks/useEvent';
 
 interface CiNomModalProps {
   open: boolean;
@@ -33,8 +40,8 @@ interface CiNomModalProps {
   data: any;
 }
 
-const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
-  const {showToast} = useAuth();
+const CiNomModal = ({ open, onClose, reload, data }: CiNomModalProps) => {
+  const { showToast } = useAuth();
   const [oldPlate, setOldPlate] = useState('');
   const [formState, setFormState]: any = useState({});
   const [errors, setErrors] = useState({});
@@ -46,16 +53,17 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const [dataOwner, setDataOwner]: any = useState(null);
   const [formStateA, setFormStateA] = useState({});
   const [onEdit, setOnEdit] = useState(false);
-  const [openDetail, setOpenDetail] = useState({open: false, id: null});
+  const [openDetail, setOpenDetail] = useState({ open: false, id: null });
+  const { dispatch: sendNotif } = useEvent('sendNotif');
 
   const handleDeleteAcompanante = (ci: any) => {
     const newAcompanante = formState.acompanantes.filter(
       (acomDelete: any) => acomDelete.ci !== ci,
     );
-    setFormState((old: any) => ({...old, acompanantes: newAcompanante}));
+    setFormState((old: any) => ({ ...old, acompanantes: newAcompanante }));
   };
   const [dataOwners, setDataOwners] = useState([]);
-  const {execute} = useApi();
+  const { execute } = useApi();
 
   useEffect(() => {
     if (data) {
@@ -84,7 +92,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   };
 
   const visitExist = async () => {
-    const {data: visitData} = await execute(
+    const { data: visitData } = await execute(
       '/visit-exist',
       'GET',
       {
@@ -98,7 +106,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     );
     if (visitData?.success) {
       if (visitData?.data?.owner_exist) {
-        setDataOwner({invitation: visitData?.data});
+        setDataOwner({ invitation: visitData?.data });
       } else {
         setOldPlate(visitData?.data?.plate);
         setFormState({
@@ -192,7 +200,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const onSave = async () => {
     if (saving) return;
     if (formState?.ci_taxi == formState?.ci) {
-      return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
+      return setErrors({ errors, ci_taxi: 'El ci ya fue añadido' });
     }
 
     if (hasErrors(validate())) {
@@ -237,10 +245,14 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       };
     }
     setSaving(true);
-    const {data, error: err} = await execute(url, method, params, false, 3);
+    const { data, error: err } = await execute(url, method, params, false, 3);
 
     if (data?.success === true) {
-      setOpenDetail({open: true, id: data?.data});
+      console.log('onsave', data.data.info);
+      if (data.data?.info) {
+        sendNotif(data.data.info);
+      }
+      setOpenDetail({ open: true, id: data?.data });
     } else {
       setSaving(false);
       showToast(data?.message, 'error');
@@ -260,7 +272,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
               color: cssVar.cAccent,
               fontSize: 12,
               fontFamily: FONTS.semiBold,
-            }}>
+            }}
+          >
             Eliminar
           </Text>
         }
@@ -302,7 +315,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
     if (steps > 0) {
       setSteps(0);
       setOldPlate('');
-      setFormState({owner_id: formState?.owner_id, ci: formState?.ci});
+      setFormState({ owner_id: formState?.owner_id, ci: formState?.ci });
       return;
     }
     onClose();
@@ -342,7 +355,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
             : ''
         }
         disabled={saving}
-        onSave={onSave}>
+        onSave={onSave}
+      >
         <>
           {dataOwner ? (
             <KeyQR
@@ -362,7 +376,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                   marginBottom: 12,
                   fontFamily: FONTS.bold,
                   color: cssVar.cWhite,
-                }}>
+                }}
+              >
                 ¿A quién visitas?
               </Text>
               <Select
@@ -386,7 +401,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                   marginBottom: 12,
                   fontFamily: FONTS.bold,
                   color: cssVar.cWhite,
-                }}>
+                }}
+              >
                 Visitante
               </Text>
               {steps === 0 && (
@@ -422,7 +438,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                             color: cssVar.cAccent,
                             fontSize: 12,
                             fontFamily: FONTS.semiBold,
-                          }}>
+                          }}
+                        >
                           Editar
                         </Text>
                       </TouchableOpacity>
@@ -439,7 +456,8 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
                       marginBottom: 10,
                       marginTop: 16,
                       color: cssVar.cWhite,
-                    }}>
+                    }}
+                  >
                     {formState?.acompanantes?.length > 1
                       ? 'Acompañantes:'
                       : 'Acompañante:'}
@@ -454,13 +472,15 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
               {steps > 0 && (
                 <TouchableOpacity
                   style={styles.boxAcompanante}
-                  onPress={() => setOpenExistVisit(true)}>
+                  onPress={() => setOpenExistVisit(true)}
+                >
                   <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
                   <Text
                     style={{
                       color: cssVar.cAccent,
                       fontFamily: FONTS.semiBold,
-                    }}>
+                    }}
+                  >
                     Agregar acompañante
                   </Text>
                 </TouchableOpacity>
@@ -522,7 +542,7 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
             open={openDetail.open}
             id={openDetail.id}
             close={() => {
-              setOpenDetail({open: false, id: null});
+              setOpenDetail({ open: false, id: null });
               onClose();
             }}
             reload={reload}
