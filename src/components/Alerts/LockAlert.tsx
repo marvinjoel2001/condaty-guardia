@@ -21,6 +21,8 @@ const LockAlert = ({open, onClose, data}: any) => {
 
   useEffect(() => {
     if (open) {
+      Sound.setCategory('Playback');
+      
       const alertSound = new Sound(
         'sound_alert.mp3',
         Sound.MAIN_BUNDLE,
@@ -34,12 +36,14 @@ const LockAlert = ({open, onClose, data}: any) => {
             if (!success) {
               console.log('Error al reproducir el sonido');
             }
+            // Release after playing
+            alertSound.release();
           });
         },
       );
 
       return () => {
-        alertSound.release();
+        alertSound.stop(() => alertSound.release());
       };
     }
   }, [open]);
