@@ -19,7 +19,11 @@ import Toast from '../Toast/Toast';
 import { cssVar, TypeStyles } from '../../../styles/themes';
 import Form from '../../forms/Form/Form';
 import HeadTitle from '../../layout/HeadTitle';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
 
 type PropsType = {
@@ -73,7 +77,7 @@ const ModalFull = memo(
     const { toast, showToast }: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [refreshing, setRefreshing] = useState(false);
-
+    const insets = useSafeAreaInsets();
     useEffect(() => {
       if (open && enScroll) {
         const timeout = setTimeout(() => {
@@ -103,7 +107,13 @@ const ModalFull = memo(
         animationIn="fadeIn"
         animationOut="fadeOut"
       >
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaProvider
+          style={{
+            flex: 1,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          }}
+        >
           <Form pressable={!disableFormPress}>
             <View style={theme.container}>
               {!headerHide && (
@@ -171,7 +181,7 @@ const ModalFull = memo(
             </View>
           </Form>
           <Toast toast={toast} showToast={showToast} />
-        </SafeAreaView>
+        </SafeAreaProvider>
         {/* </Animated.View> */}
       </Modal>
     );
