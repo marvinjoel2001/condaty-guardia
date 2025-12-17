@@ -12,6 +12,8 @@ import {
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
+  AccessibilityInfo,
+  InteractionManager,
 } from 'react-native';
 import Button from '../../forms/Button/Button';
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -19,11 +21,7 @@ import Toast from '../Toast/Toast';
 import { cssVar, TypeStyles } from '../../../styles/themes';
 import Form from '../../forms/Form/Form';
 import HeadTitle from '../../layout/HeadTitle';
-import {
-  SafeAreaProvider,
-  SafeAreaView,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
 
 type PropsType = {
@@ -48,6 +46,8 @@ type PropsType = {
   onBack?: () => void;
   headerHide?: boolean;
   disableFormPress?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 };
 
 const ModalFull = memo(
@@ -73,11 +73,14 @@ const ModalFull = memo(
     right,
     onBack,
     disableFormPress = false,
+    accessibilityLabel,
+    accessibilityHint,
   }: PropsType) => {
     const { toast, showToast }: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [refreshing, setRefreshing] = useState(false);
-    const insets = useSafeAreaInsets();
+    const [focusTrapActive, setFocusTrapActive] = useState(false);
+
     useEffect(() => {
       if (open && enScroll) {
         const timeout = setTimeout(() => {
@@ -86,6 +89,27 @@ const ModalFull = memo(
         return () => clearTimeout(timeout);
       }
     }, [open, children, enScroll]);
+
+    // Accessibility features
+    useEffect(() => {
+      if (open) {
+        // Announce modal to screen readers
+        setTimeout(() => {
+          AccessibilityInfo.announceForAccessibility(
+            `Full screen modal opened: ${
+              accessibilityLabel || title || 'Dialog'
+            }`,
+          );
+        }, 100);
+
+        // Focus trap management
+        InteractionManager.runAfterInteractions(() => {
+          setFocusTrapActive(true);
+        });
+      } else {
+        setFocusTrapActive(false);
+      }
+    }, [open, accessibilityLabel, title]);
 
     const onRefresh = useCallback(async () => {
       if (!reload) return;
@@ -106,6 +130,17 @@ const ModalFull = memo(
         onShow={onShow}
         animationIn="fadeIn"
         animationOut="fadeOut"
+        useNativeDriver={true}
+        hideModalContentWhileAnimating={true}
+        supportedOrientations={['portrait', 'landscape']}
+        statusBarTranslucent
+        accessibilityViewIsModal
+        accessibilityLabel={accessibilityLabel || title || 'Full screen modal'}
+        accessibilityHint={
+          accessibilityHint || 'Full screen dialog with content'
+        }
+        onModalShow={() => setFocusTrapActive(true)}
+        onModalHide={() => setFocusTrapActive(false)}
       >
         <SafeAreaProvider
           style={{
@@ -116,7 +151,12 @@ const ModalFull = memo(
         >
           <SafeAreaView style={{ flex: 1 }}>
             <Form pressable={!disableFormPress}>
-              <View style={theme.container}>
+              <View
+                style={theme.container}
+                accessibilityLabel={
+                  accessibilityLabel || title || 'Full screen modal content'
+                }
+              >
                 {!headerHide && (
                   <HeadTitle
                     title={title}
@@ -146,8 +186,15 @@ const ModalFull = memo(
                     style={[theme.body, style]}
                     contentContainerStyle={{ paddingBottom: 20 }}
                     keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode="interactive"
+                    showsVerticalScrollIndicator={false}
+                    scrollEventThrottle={16}
                   >
-                    <TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      style={{ flex: 1 }}
+                      accessible={false}
+                    >
                       {children}
                     </TouchableOpacity>
                   </ScrollView>
