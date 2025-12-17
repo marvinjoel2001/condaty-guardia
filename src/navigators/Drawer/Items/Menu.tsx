@@ -1,12 +1,21 @@
 import React from 'react';
-import {ScrollView, View} from 'react-native';
-import {ThemeType} from '../../../../mk/styles/themes';
-import {IconDepartments} from '../../../icons/IconLibrary';
+import { ScrollView, View } from 'react-native';
+import { ThemeType } from '../../../../mk/styles/themes';
+import { IconDepartments } from '../../../icons/IconLibrary';
 
 import ItemMenu from './ItemMenu';
 import { MenuProps } from '../../../types/menu-types';
 
-const Menu: React.FC<MenuProps> = ({menuItems, activeItem, user, store, setStore}) => {
+const Menu: React.FC<MenuProps> = ({
+  menuItems,
+  activeItem,
+  user,
+  store,
+  setStore,
+}) => {
+  if (activeItem === 'FooterTab') {
+    activeItem = 'Home';
+  }
   return (
     <View style={theme.content}>
       <ScrollView>
@@ -28,7 +37,7 @@ const Menu: React.FC<MenuProps> = ({menuItems, activeItem, user, store, setStore
           <ItemMenu
             text="Cambiar Condominio"
             icon={IconDepartments}
-            onPress={() => setStore({...store, openClient: true})}
+            onPress={() => setStore({ ...store, openClient: true })}
           />
         )}
       </ScrollView>

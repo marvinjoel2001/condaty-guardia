@@ -8,23 +8,33 @@ import Binnacle from '../components/Binnacle/Binnacle';
 import Documents from '../components/Documents/Documents';
 import Notifications from '../components/Notifications/Notifications';
 import History from '../components/History/History';
+import BottomTabs from './BottomTabs/BottomTabs';
 
 const Stack = createNativeStackNavigator();
 
 const Navigate = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName="FooterTab"
       screenOptions={{ animation: 'none' }}
     >
       <Stack.Screen
         options={{
           headerShown: false,
         }}
+        name="FooterTab"
+        component={BottomTabs}
+        // getComponent={() => require('../components/Home/Home').default}
+      />
+
+      {/* <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
         name="Home"
         component={Home}
         // getComponent={() => require('../components/Home/Home').default}
-      />
+      /> */}
       <Stack.Screen
         name="Profile"
         component={Profile}
