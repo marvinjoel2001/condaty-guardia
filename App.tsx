@@ -27,6 +27,9 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { NetworkProvider } from './mk/contexts/NetworkContext';
 import { PerformanceProvider } from './mk/contexts/PerformanceContext';
 
+// Set app start time for performance monitoring
+(global as any).__START_TIME__ = Date.now();
+
 function App() {
   (Text as any).defaultProps = (Text as any).defaultProps || {};
   (Text as any).defaultProps.allowFontScaling = false;
