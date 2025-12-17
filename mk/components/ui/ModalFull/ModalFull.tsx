@@ -110,77 +110,79 @@ const ModalFull = memo(
         <SafeAreaProvider
           style={{
             flex: 1,
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom,
+            // paddingTop: insets.top,
+            // paddingBottom: insets.bottom,
           }}
         >
-          <Form pressable={!disableFormPress}>
-            <View style={theme.container}>
-              {!headerHide && (
-                <HeadTitle
-                  title={title}
-                  onBack={onBack ?? (() => onClose('x'))}
-                  onlyBack={open}
-                  right={right}
-                  iconClose={iconClose}
-                  modalLayout
-                />
-              )}
-              {scrollViewHide ? (
-                children
-              ) : (
-                <ScrollView
-                  ref={scrollViewRef}
-                  refreshControl={
-                    reload ? (
-                      <RefreshControl
-                        progressBackgroundColor={cssVar.cBlack}
-                        colors={[cssVar.cAccent]}
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        tintColor={cssVar.cAccent}
-                      />
-                    ) : undefined
-                  }
-                  style={[theme.body, style]}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                  keyboardShouldPersistTaps="handled"
-                >
-                  <TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
-                    {children}
-                  </TouchableOpacity>
-                </ScrollView>
-              )}
+          <SafeAreaView style={{ flex: 1 }}>
+            <Form pressable={!disableFormPress}>
+              <View style={theme.container}>
+                {!headerHide && (
+                  <HeadTitle
+                    title={title}
+                    onBack={onBack ?? (() => onClose('x'))}
+                    onlyBack={open}
+                    right={right}
+                    iconClose={iconClose}
+                    modalLayout
+                  />
+                )}
+                {scrollViewHide ? (
+                  children
+                ) : (
+                  <ScrollView
+                    ref={scrollViewRef}
+                    refreshControl={
+                      reload ? (
+                        <RefreshControl
+                          progressBackgroundColor={cssVar.cBlack}
+                          colors={[cssVar.cAccent]}
+                          refreshing={refreshing}
+                          onRefresh={onRefresh}
+                          tintColor={cssVar.cAccent}
+                        />
+                      ) : undefined
+                    }
+                    style={[theme.body, style]}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    keyboardShouldPersistTaps="handled"
+                  >
+                    <TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
+                      {children}
+                    </TouchableOpacity>
+                  </ScrollView>
+                )}
 
-              {(buttonText || buttonCancel || buttonExtra) && (
-                <View style={[theme.footer, styleFooter]}>
-                  {buttonText && (
-                    <Button
-                      variant="primary"
-                      disabled={disabled}
-                      onPress={(e: any) => {
-                        onSave(id);
-                      }}
-                    >
-                      {buttonText}
-                    </Button>
-                  )}
-                  {buttonCancel && (
-                    <Button
-                      variant="secondary"
-                      onPress={(e: any) => {
-                        onClose('cancel');
-                      }}
-                    >
-                      {buttonCancel}
-                    </Button>
-                  )}
-                  {buttonExtra}
-                </View>
-              )}
-            </View>
-          </Form>
-          <Toast toast={toast} showToast={showToast} />
+                {(buttonText || buttonCancel || buttonExtra) && (
+                  <View style={[theme.footer, styleFooter]}>
+                    {buttonText && (
+                      <Button
+                        variant="primary"
+                        disabled={disabled}
+                        onPress={(e: any) => {
+                          onSave(id);
+                        }}
+                      >
+                        {buttonText}
+                      </Button>
+                    )}
+                    {buttonCancel && (
+                      <Button
+                        variant="secondary"
+                        onPress={(e: any) => {
+                          onClose('cancel');
+                        }}
+                      >
+                        {buttonCancel}
+                      </Button>
+                    )}
+                    {buttonExtra}
+                  </View>
+                )}
+              </View>
+            </Form>
+            <Toast toast={toast} showToast={showToast} />
+          </SafeAreaView>
         </SafeAreaProvider>
         {/* </Animated.View> */}
       </Modal>
