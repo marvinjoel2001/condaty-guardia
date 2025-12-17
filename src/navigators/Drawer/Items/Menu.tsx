@@ -1,10 +1,11 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { ThemeType } from '../../../../mk/styles/themes';
-import { IconDepartments } from '../../../icons/IconLibrary';
+import { IconAlert, IconDepartments } from '../../../icons/IconLibrary';
 
 import ItemMenu from './ItemMenu';
 import { MenuProps } from '../../../types/menu-types';
+import configApp from '../../../config/config';
 
 const Menu: React.FC<MenuProps> = ({
   menuItems,
@@ -38,6 +39,13 @@ const Menu: React.FC<MenuProps> = ({
             text="Cambiar Condominio"
             icon={IconDepartments}
             onPress={() => setStore({ ...store, openClient: true })}
+          />
+        )}
+        {configApp.API_URL == configApp.API_URL_DEV && (
+          <ItemMenu
+            text="Performance Dashboard"
+            icon={IconAlert}
+            screen={'Performance'}
           />
         )}
       </ScrollView>

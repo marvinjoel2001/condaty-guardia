@@ -1,4 +1,4 @@
-import {cssVar} from '../../../../mk/styles/themes';
+import { cssVar } from '../../../../mk/styles/themes';
 import {
   IconAlertNotification,
   IconDocs,
@@ -9,13 +9,15 @@ import {
   IconBitacora,
   IconUser,
 } from '../../../icons/IconLibrary';
-import {ItemMenuProps} from '../../../types/menu-item-types';
+import { ItemMenuProps } from '../../../types/menu-item-types';
 
 type GetMenuItemsOptions = {
   onLogout: () => void;
 };
 
-export const getMenuItems = ({onLogout}: GetMenuItemsOptions): ItemMenuProps[] => {
+export const getMenuItems = ({
+  onLogout,
+}: GetMenuItemsOptions): ItemMenuProps[] => {
   return [
     {
       screen: 'Home',

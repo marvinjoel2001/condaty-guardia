@@ -9,6 +9,7 @@ import Documents from '../components/Documents/Documents';
 import Notifications from '../components/Notifications/Notifications';
 import History from '../components/History/History';
 import BottomTabs from './BottomTabs/BottomTabs';
+import PerformanceDashboard from '../components/PerformanceDashboard/PerformanceDashboard';
 
 const Stack = createNativeStackNavigator();
 
@@ -90,6 +91,15 @@ const Navigate = () => {
         // getComponent={() => require('../components/History/History').default}
         options={{
           headerShown: false,
+        }}
+      />
+      {}
+      <Stack.Screen
+        name="Performance"
+        component={PerformanceDashboard}
+        // getComponent={() => require('../components/History/History').default}
+        options={{
+          headerShown: true,
         }}
       />
       {/* <Stack.Screen
