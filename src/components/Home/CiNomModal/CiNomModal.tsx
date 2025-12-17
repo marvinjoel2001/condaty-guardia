@@ -122,7 +122,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
   const validate = () => {
     let errors: any = {};
 
-    // Validar CI siempre
     errors = checkRules({
       value: formState.ci,
       rules: ['required', 'ci'],
@@ -130,7 +129,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       errors,
     });
 
-    // Validar owner_id siempre que no sea paso 0
     if (steps > 0) {
       errors = checkRules({
         value: formState.owner_id,
@@ -140,7 +138,6 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
       });
     }
 
-    // Validar vehículo/taxi (aplica para steps > 0)
     if (steps >= 0 && (typeSearch === 'V' || typeSearch === 'T')) {
       if (steps > 0) {
         errors = checkRules({
@@ -197,6 +194,17 @@ const CiNomModal = ({open, onClose, reload, data}: CiNomModalProps) => {
 
     if (hasErrors(validate())) {
       return;
+    }
+
+    if (steps > 0) {
+      if (!formState?.name || !formState?.last_name) {
+        showToast(
+          'Por favor completa los datos del visitante para continuar',
+          'warning',
+        );
+        handleEdit();
+        return;
+      }
     }
 
     if (steps === 0 && !dataOwner) {
