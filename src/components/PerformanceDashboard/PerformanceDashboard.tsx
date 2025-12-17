@@ -12,7 +12,7 @@ import Card from '../../../mk/components/ui/Card/Card';
 import ProgressBar from '../../../mk/components/ui/ProgressBar/ProgressBar';
 import { cssVar } from '../../../mk/styles/themes';
 
-const PerformanceDashboard: React.FC = () => {
+const PerformanceDashboard = () => {
   const {
     isEnabled,
     aggregatedData,
@@ -389,7 +389,7 @@ const styles = {
   sectionTitle: {
     fontSize: cssVar.sM,
     fontWeight: 'bold' as const,
-    color: cssVar.cBlack,
+    color: cssVar.cWhite,
     marginBottom: cssVar.spM,
   },
   alertText: {
@@ -407,12 +407,12 @@ const styles = {
   },
   metricLabel: {
     fontSize: cssVar.sM,
-    color: cssVar.cBlack,
+    color: cssVar.cWhite,
   },
   metricValue: {
     fontSize: cssVar.sM,
     fontWeight: 'bold' as const,
-    color: cssVar.cPrimary,
+    color: cssVar.cAccent,
   },
   metricTarget: {
     fontSize: cssVar.sS,

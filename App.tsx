@@ -25,6 +25,7 @@ import ActiveNotificationDB from './mk/hooks/ActiveNotificationDB';
 import { navigationRef } from './src/navigators/navigationRef';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { NetworkProvider } from './mk/contexts/NetworkContext';
+import { PerformanceProvider } from './mk/contexts/PerformanceContext';
 
 function App() {
   (Text as any).defaultProps = (Text as any).defaultProps || {};
@@ -46,26 +47,28 @@ function AppContent() {
         safeAreaInsets={safeAreaInsets}
       /> */}
       {/* <GestureHandlerRootView style={{flex: 1}}> */}
-      <NetworkProvider>
-        <AxiosProvider interceptors={axiosInterceptors}>
-          <KeyboardProvider>
-            {/* <StatusBar
+      <PerformanceProvider>
+        <NetworkProvider>
+          <AxiosProvider interceptors={axiosInterceptors}>
+            <KeyboardProvider>
+              {/* <StatusBar
               animated={true}
               backgroundColor={cssVar.cBlack}
               barStyle={'light-content'}
             /> */}
-            <NavigationContainer ref={navigationRef}>
-              <AuthProvider>
-                <OneSignalContextProvider>
-                  <InitProject />
-                  <MyDrawer />
-                  <ActiveNotificationDB />
-                </OneSignalContextProvider>
-              </AuthProvider>
-            </NavigationContainer>
-          </KeyboardProvider>
-        </AxiosProvider>
-      </NetworkProvider>
+              <NavigationContainer ref={navigationRef}>
+                <AuthProvider>
+                  <OneSignalContextProvider>
+                    <InitProject />
+                    <MyDrawer />
+                    <ActiveNotificationDB />
+                  </OneSignalContextProvider>
+                </AuthProvider>
+              </NavigationContainer>
+            </KeyboardProvider>
+          </AxiosProvider>
+        </NetworkProvider>
+      </PerformanceProvider>
       {/* </GestureHandlerRootView> */}
     </SafeAreaView>
   );

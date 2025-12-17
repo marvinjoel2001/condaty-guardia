@@ -1,6 +1,5 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Home from '../components/Home/Home';
 import Profile from '../components/Profile/Profile';
 import Alerts from '../components/Alerts/Alerts';
 import Login from '../components/auth/Login';
@@ -95,7 +94,7 @@ const Navigate = () => {
       />
       {}
       <Stack.Screen
-        name="Performance"
+        name="PerformanceDashboard"
         component={PerformanceDashboard}
         // getComponent={() => require('../components/History/History').default}
         options={{

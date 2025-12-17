@@ -45,7 +45,7 @@ const Menu: React.FC<MenuProps> = ({
           <ItemMenu
             text="Performance Dashboard"
             icon={IconAlert}
-            screen={'Performance'}
+            screen={'PerformanceDashboard'}
           />
         )}
       </ScrollView>
