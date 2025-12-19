@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
 import { cssVar, FONTS } from '../../../../mk/styles/themes';
@@ -17,6 +17,7 @@ import {
   IconExpand,
   IconOther,
   IconTaxi,
+  IconWhatssapp,
 } from '../../../icons/IconLibrary';
 import useAuth from '../../../../mk/hooks/useAuth';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
@@ -240,20 +241,53 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
               />
             }
             right={
-              data?.type !== 'C' ? (
-                <Icon
-                  name={IconExpand}
-                  color={cssVar.cWhiteV1}
-                  onPress={() =>
-                    setOpenDet({
-                      open: true,
-                      id: data?.invitation_id,
-                      invitation: { ...data?.invitation, owner: data?.owner },
-                      type: 'I',
-                    })
-                  }
-                />
-              ) : null
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+              >
+                {data?.owner?.phone && (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#25D366',
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      borderRadius: 20,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 5,
+                    }}
+                    onPress={() =>
+                      Linking.openURL(
+                        `whatsapp://send?phone=${data?.owner?.phone}`,
+                      )
+                    }
+                  >
+                    <Icon name={IconWhatssapp} size={16} color="#fff" />
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontFamily: FONTS.medium,
+                        fontSize: 12,
+                      }}
+                    >
+                      Whatsapp
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                {data?.type !== 'C' && (
+                  <Icon
+                    name={IconExpand}
+                    color={cssVar.cWhiteV1}
+                    onPress={() =>
+                      setOpenDet({
+                        open: true,
+                        id: data?.invitation_id,
+                        invitation: { ...data?.invitation, owner: data?.owner },
+                        type: 'I',
+                      })
+                    }
+                  />
+                )}
+              </View>
             }
           />
           {data?.confirm == 'N' && data?.obs_confirm && (
@@ -293,20 +327,53 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
                 />
               }
               right={
-                data?.type !== 'C' && data?.type !== 'P' ? (
-                  <Icon
-                    name={IconExpand}
-                    color={cssVar.cWhiteV1}
-                    onPress={() =>
-                      setOpenDet({
-                        open: true,
-                        id: data?.invitation_id,
-                        invitation: { ...data?.invitation, owner: data?.owner },
-                        type: 'I',
-                      })
-                    }
-                  />
-                ) : null
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+                >
+                  {data?.owner?.phone && (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#25D366',
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 20,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 5,
+                      }}
+                      onPress={() =>
+                        Linking.openURL(
+                          `whatsapp://send?phone=${data?.owner?.phone}`,
+                        )
+                      }
+                    >
+                      <Icon name={IconWhatssapp} size={16} color="#fff" />
+                      <Text
+                        style={{
+                          color: '#fff',
+                          fontFamily: FONTS.medium,
+                          fontSize: 12,
+                        }}
+                      >
+                        Whatsapp
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  {data?.type !== 'C' && data?.type !== 'P' && (
+                    <Icon
+                      name={IconExpand}
+                      color={cssVar.cWhiteV1}
+                      onPress={() =>
+                        setOpenDet({
+                          open: true,
+                          id: data?.invitation_id,
+                          invitation: { ...data?.invitation, owner: data?.owner },
+                          type: 'I',
+                        })
+                      }
+                    />
+                  )}
+                </View>
               }
             />
           </Card>
