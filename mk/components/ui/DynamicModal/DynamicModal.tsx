@@ -5,6 +5,8 @@ import { IconX } from '../../../../src/icons/IconLibrary';
 import { cssVar, FONTS, TypeStyles } from '../../../styles/themes';
 import Button from '../../forms/Button/Button';
 import Form from '../../forms/Form/Form';
+import useAuth from '../../../hooks/useAuth';
+import Toast from '../Toast/Toast';
 
 interface DynamicModalProps {
   open: boolean;
@@ -35,6 +37,7 @@ const DynamicModal = ({
   onSave,
   variant = 'V1',
 }: DynamicModalProps) => {
+  const {toast, showToast}: any = useAuth();
   return (
     <Modal
       visible={open}
@@ -69,10 +72,8 @@ const DynamicModal = ({
                   color={cssVar.cWhite}
                 />
               </View>
-              <ScrollView style={{ padding: 12, flex: 1 }}>
-                {children}
-              </ScrollView>
-              <View style={{ padding: 12, flexDirection: 'row', gap: 8 }}>
+              <ScrollView style={{padding: 12, flex: 1}}>{children}</ScrollView>
+              <View style={{padding: 12, flexDirection: 'row', gap: 8}}>
                 {buttonCancelText && (
                   <Button onPress={onClose} variant="secondary">
                     {buttonCancelText}
@@ -86,6 +87,7 @@ const DynamicModal = ({
               </View>
             </View>
           </View>
+          <Toast toast={toast} showToast={showToast} />
         </Form>
       </View>
     </Modal>

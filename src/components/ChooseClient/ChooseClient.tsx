@@ -7,7 +7,7 @@ import {getUrlImages} from '../../../mk/utils/strings';
 import {Text} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
 import {useNavigation} from '@react-navigation/native';
-import ListFlat from '../../../mk/components/ui/List/ListFlat';
+import List from '../../../mk/components/ui/List/List';
 interface PropsType {
   open: boolean;
   onClose: () => void;
@@ -115,11 +115,7 @@ const ChooseClient = ({open, onClose}: PropsType) => {
   };
   return (
     <ModalFull title="Cambiar Condominio" open={open} onClose={onClose}>
-      <ListFlat
-        data={getActiveClients()}
-        renderItem={renderItemActive}
-        enablePagination={false}
-      />
+      <List data={getActiveClients()} renderItem={renderItemActive} />
       {getPendingClients().length > 0 && (
         <>
           <Text
@@ -132,11 +128,7 @@ const ChooseClient = ({open, onClose}: PropsType) => {
             Estos son los condominios que están pendientes de aprobación por el
             administrador y tambien los que fueron rechazados.
           </Text>
-          <ListFlat
-            data={getPendingClients()}
-            renderItem={renderItemPending}
-            enablePagination={false}
-          />
+          <List data={getPendingClients()} renderItem={renderItemPending} />
         </>
       )}
     </ModalFull>

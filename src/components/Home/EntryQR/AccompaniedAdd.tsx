@@ -75,9 +75,9 @@ export const AccompaniedAdd = ({
     setErrors(errors);
     return errors;
   };
-  const onSave = async () => {
+  const onSave = async (force: boolean = false) => {
     if (editItem) {
-      if (hasErrors(validate())) {
+      if (!force && hasErrors(validate())) {
         return;
       }
       setItem({
@@ -109,7 +109,7 @@ export const AccompaniedAdd = ({
       return;
     }
 
-    if (hasErrors(validate())) {
+    if (!force && hasErrors(validate())) {
       return;
     }
 
@@ -140,18 +140,33 @@ export const AccompaniedAdd = ({
       extraOnClose?.();
     }
   };
+
+  const handleClose = () => {
+    const hasData =
+      formState?.name ||
+      formState?.last_name ||
+      formState?.middle_name ||
+      formState?.mother_last_name;
+
+    if (hasData) {
+      onSave(true);
+    } else {
+      _onClose();
+    }
+  };
+
   return (
     <DynamicModal
       title={editItem ? 'Editar datos' : 'Persona no encontrada'}
       open={open}
-      onClose={_onClose}
+      onClose={handleClose}
       height={468}
       styleHeader={{borderBottomWidth: 0}}
       buttonText="Registrar"
       subTitle="Agrega sus datos para registrarla"
       variant="V2"
       buttonCancelText=""
-      onSave={onSave}>
+      onSave={() => onSave(false)}>
       <View style={{flexDirection: 'row', gap: 12}}>
         <UploadFileV2
           variant="V2"
@@ -191,10 +206,7 @@ export const AccompaniedAdd = ({
       <InputFullName
         formState={formState}
         errors={errors}
-        // name_prefijo="_a"
-
         handleChangeInput={handleChange}
-        // disabled={editItem}
         inputGrid={true}
       />
     </DynamicModal>
