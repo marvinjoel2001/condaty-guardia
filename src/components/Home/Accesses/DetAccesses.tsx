@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
 import { cssVar, FONTS } from '../../../../mk/styles/themes';
@@ -37,6 +44,9 @@ const typeInvitation: any = {
   P: 'Pedido',
   F: 'QR Frecuente',
 };
+
+const contactedViaWhatsAppMap: Record<number, boolean> = {};
+
 interface DetAccessesProps {
   id: number | null;
   open: boolean;
@@ -121,6 +131,7 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
       {
         id: data?.id,
         obs_in: formState?.obs_in || '',
+        hasContactedViaWhatsApp: contactedViaWhatsAppMap[data?.id] || false,
       },
       false,
       2,
@@ -328,7 +339,11 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
               }
               right={
                 <View
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}
                 >
                   {data?.owner?.phone && (
                     <TouchableOpacity
@@ -367,7 +382,10 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
                         setOpenDet({
                           open: true,
                           id: data?.invitation_id,
-                          invitation: { ...data?.invitation, owner: data?.owner },
+                          invitation: {
+                            ...data?.invitation,
+                            owner: data?.owner,
+                          },
                           type: 'I',
                         })
                       }
@@ -769,6 +787,7 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
         confirm,
         id: data.id,
         obs_confirm: formState?.obs_confirm,
+        hasContactedViaWhatsApp: contactedViaWhatsAppMap[data?.id] || false,
       },
       false,
       3,
