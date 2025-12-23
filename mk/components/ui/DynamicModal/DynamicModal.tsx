@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-  Modal,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from '../Icon/Icon';
-import {IconX} from '../../../../src/icons/IconLibrary';
-import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
+import { IconX } from '../../../../src/icons/IconLibrary';
+import { cssVar, FONTS, TypeStyles } from '../../../styles/themes';
 import Button from '../../forms/Button/Button';
 import Form from '../../forms/Form/Form';
 import useAuth from '../../../hooks/useAuth';
@@ -50,8 +43,9 @@ const DynamicModal = ({
       visible={open}
       transparent={true}
       animationType="slide"
-      onRequestClose={onClose}>
-      <SafeAreaView style={{flex: 1}}>
+      onRequestClose={onClose}
+    >
+      <View style={{ flex: 1 }}>
         <Form>
           <View style={styles.overlay}>
             <View
@@ -59,12 +53,14 @@ const DynamicModal = ({
                 ...styles[`content${variant}`],
                 height: height,
                 ...style,
-              }}>
+              }}
+            >
               <View
                 style={{
                   ...styles.header,
                   ...styleHeader,
-                }}>
+                }}
+              >
                 <View>
                   <Text style={styles.title}>{title}</Text>
                   {subTitle && <Text style={styles.subTitle}>{subTitle}</Text>}
@@ -93,7 +89,7 @@ const DynamicModal = ({
           </View>
           <Toast toast={toast} showToast={showToast} />
         </Form>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 };

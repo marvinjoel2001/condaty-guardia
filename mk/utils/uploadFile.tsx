@@ -1,8 +1,8 @@
-import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
-import DocumentPicker from 'react-native-document-picker';
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+import { pick } from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
-import {Platform, Alert, PermissionsAndroid} from 'react-native';
-import {resizeImageToWebP} from './images';
+import { Platform, Alert, PermissionsAndroid } from 'react-native';
+import { resizeImageToWebP } from './images';
 interface PropsUploadImage {
   setFormState: any;
   // setImageData: any;
@@ -185,16 +185,19 @@ export const uploadDocument = async ({
 }: PropsUploadDocument) => {
   const exts = ['pdf', 'doc'];
   try {
-    const pickedFile: any = await DocumentPicker.pickSingle({
-      type: [DocumentPicker.types.allFiles],
-    });
-    if (
-      !exts.includes(
-        pickedFile.name.slice(
-          ((pickedFile.name.lastIndexOf('.') - 1) >>> 0) + 2,
-        ),
-      )
-    ) {
+    const [pickedFile] = await pick();
+
+    if (!pickedFile) {
+      showToast('Ningún documento seleccionado', 'info');
+      return;
+    }
+
+    const fileExt =
+      pickedFile.name?.slice(
+        ((pickedFile.name.lastIndexOf('.') - 1) >>> 0) + 2,
+      ) || '';
+
+    if (!exts.includes(fileExt)) {
       showToast('Solo se permiten archivos ' + exts.join(', '), 'error');
       return;
     }
@@ -203,18 +206,16 @@ export const uploadDocument = async ({
       setFormState({
         ...formState,
         file: data,
-        ext: pickedFile.name.slice(
-          ((pickedFile.name.lastIndexOf('.') - 1) >>> 0) + 2,
-        ),
+        ext: fileExt,
       });
     });
-  } catch (err) {
-    if (DocumentPicker.isCancel(err)) {
+  } catch (err: any) {
+    if (err.code === 'DOCUMENT_PICKER_CANCELED') {
       showToast('Ningún documento seleccionado', 'info');
-    } else {
-      showToast('Ocurrió un error', 'error');
-      console.log(err);
-      throw err;
+      return;
     }
+    showToast('Ocurrió un error', 'error');
+    console.log(err);
+    throw err;
   }
 };

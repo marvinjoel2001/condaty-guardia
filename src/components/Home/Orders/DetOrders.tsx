@@ -1,39 +1,40 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import useApi from '../../../../mk/hooks/useApi';
-import {getDateTimeStrMes, getUTCNow} from '../../../../mk/utils/dates';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
+import { getDateTimeStrMes, getUTCNow } from '../../../../mk/utils/dates';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import List from '../../../../mk/components/ui/List/List';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import {IconX, IconSimpleAdd} from '../../../icons/IconLibrary';
+import { IconX, IconSimpleAdd } from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
 import ItemListDate from '../Accesses/shares/ItemListDate';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
-import {AccompaniedAddV2} from '../EntryQR/AccompaniedAddV2';
+import { AccompaniedAddV2 } from '../EntryQR/AccompaniedAddV2';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
+import { useEvent } from '../../../../mk/hooks/useEvent';
 
-const DetOrders = ({id, open, close, reload, handleChange}: any) => {
-  const {execute} = useApi();
+const DetOrders = ({ id, open, close, reload, handleChange }: any) => {
+  const { execute } = useApi();
   const [data, setData]: any = useState(null);
   const [formState, setFormState]: any = useState({});
   const [openAcom, setOpenAcom] = useState(false);
   const [errors, setErrors] = useState({});
   const [tab, setTab] = useState('P');
   const [visit, setVisit]: any = useState({});
-
+  const { dispatch: sendNotif } = useEvent('sendNotif');
   useEffect(() => {
     const getData = async (id: number) => {
-      const {data} = await execute('/others', 'GET', {
+      const { data } = await execute('/others', 'GET', {
         fullType: 'DET',
         searchBy: id,
         section: 'HOME',
@@ -78,7 +79,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
       }));
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', {
+    const { data: existData } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -109,7 +110,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
     }
   };
   const handleInputChange = (name: string, value: string) => {
-    setFormState((prevState: any) => ({...prevState, [name]: value}));
+    setFormState((prevState: any) => ({ ...prevState, [name]: value }));
   };
 
   const validate = () => {
@@ -161,11 +162,14 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   const handleSave = async () => {
     const status = getStatus();
     if (status === 'I') {
-      const {data: result, error} = await execute('/accesses/exit', 'POST', {
+      const { data: result, error } = await execute('/accesses/exit', 'POST', {
         ids: [data?.access_id],
         obs_out: formState?.obs_out || '',
       });
       if (result?.success) {
+        if (result.data?.info) {
+          sendNotif(result.data.info);
+        }
         if (reload) reload();
         close();
       } else {
@@ -176,7 +180,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         return;
       }
       // Acción: Dejar entrar
-      const {data: result, error} = await execute('/accesses', 'POST', {
+      const { data: result, error } = await execute('/accesses', 'POST', {
         begin_at: formState?.begin_at || getUTCNow(),
         pedido_id: data?.id,
         type: 'P',
@@ -191,6 +195,9 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         plate_vehicle: formState?.plate_vehicle,
       });
       if (result?.success) {
+        if (result.data?.info) {
+          sendNotif(result.data.info);
+        }
         if (reload) reload();
         close();
       } else {
@@ -234,7 +241,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   };
 
   const onExist = async () => {
-    const {data: exist} = await execute('/visits', 'GET', {
+    const { data: exist } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -270,7 +277,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   const onDelAcom = (acom: any) => {
     const acomps = formState?.acompanantes;
     const newAcomps = acomps.filter((item: any) => item.ci !== acom.ci);
-    setFormState({...formState, acompanantes: newAcomps});
+    setFormState({ ...formState, acompanantes: newAcomps });
   };
   const acompanantesList = (acompanante: any) => {
     return (
@@ -319,13 +326,14 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
       open={open}
       title={!data ? 'Cargando...' : 'Pedido' + '/' + data?.other_type?.name}
       onSave={handleSave}
-      buttonText={getButtonText()}>
+      buttonText={getButtonText()}
+    >
       {!data ? (
         <Loading />
       ) : (
         <>
           {renderDetails()}
-          <View style={{marginTop: 12}}>
+          <View style={{ marginTop: 12 }}>
             {getStatus() === 'C' && (
               <>
                 <ItemList
@@ -336,7 +344,8 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                       name={getFullName(data?.access?.visit)}
                       hasImage={0}
                     />
-                  }>
+                  }
+                >
                   <ItemListDate
                     inDate={data?.access?.in_at}
                     outDate={data?.access?.out_at}
@@ -367,13 +376,15 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
 
                 <TouchableOpacity
                   style={styles.boxAcompanante}
-                  onPress={() => setOpenAcom(true)}>
+                  onPress={() => setOpenAcom(true)}
+                >
                   <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
                   <Text
                     style={{
                       color: cssVar.cAccent,
                       fontFamily: FONTS.semiBold,
-                    }}>
+                    }}
+                  >
                     Agregar acompañante
                   </Text>
                 </TouchableOpacity>
@@ -387,8 +398,8 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                 )}
                 <TabsButtons
                   tabs={[
-                    {value: 'P', text: 'A pie'},
-                    {value: 'V', text: 'En vehículo'},
+                    { value: 'P', text: 'A pie' },
+                    { value: 'V', text: 'En vehículo' },
                     // {value: 'T', text: 'En Taxi'},
                   ]}
                   sel={tab}

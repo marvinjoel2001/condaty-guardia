@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState, useContext} from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
   Animated,
+  InteractionManager,
 } from 'react-native';
 import Icon from '../Icon/Icon';
-import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
-import {AuthContext} from '../../../contexts/AuthContext';
-import {IconX} from '../../../../src/icons/IconLibrary';
+import { cssVar, FONTS, ThemeType, TypeStyles } from '../../../styles/themes';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { IconX } from '../../../../src/icons/IconLibrary';
 import Toast from '../Toast/Toast';
 import Button from '../../forms/Button/Button';
 import Form from '../../forms/Form/Form';
@@ -55,7 +56,20 @@ const Modal = ({
   containerStyles = {},
 }: PropsType) => {
   const screen = Dimensions.get('window');
-  const {toast, showToast}: any = useContext(AuthContext);
+  const { toast, showToast }: any = useContext(AuthContext);
+  const [focusTrapActive, setFocusTrapActive] = useState(false);
+
+  // Modal open/close animations
+  useEffect(() => {
+    if (open) {
+      // Focus trap management
+      InteractionManager.runAfterInteractions(() => {
+        setFocusTrapActive(true);
+      });
+    } else {
+      setFocusTrapActive(false);
+    }
+  }, [open]);
 
   const _onClose = (e: any) => {
     onClose(e);
@@ -68,7 +82,7 @@ const Modal = ({
 
   return (
     <ModalRN
-      style={{margin: 0}}
+      style={{ margin: 0 }}
       isVisible={open}
       onBackdropPress={() => _onClose('overlay')}
       onBackButtonPress={() => _onClose('x')}
@@ -76,27 +90,32 @@ const Modal = ({
       customBackdrop={<View style={theme.overlay} />}
       backdropOpacity={0}
       animationIn="fadeIn"
-      animationOut="fadeOut">
+      animationOut="fadeOut"
+      onModalShow={() => setFocusTrapActive(true)}
+      onModalHide={() => setFocusTrapActive(false)}
+    >
       <Form>
         <TouchableOpacity
           activeOpacity={1}
-          style={{...theme.overlay}}
-          onPress={_onOverlayPress}>
+          style={{ ...theme.overlay }}
+          onPress={_onOverlayPress}
+        >
           <View
             style={{
               ...theme.container,
               ...containerStyles,
               width: screen.width - 12,
-            }}>
+            }}
+          >
             {(iconClose || title) && (
-              <View style={{...theme.header, ...headerStyles}}>
+              <View style={{ ...theme.header, ...headerStyles }}>
                 {title && (
-                  <Text style={{...theme.headerText, ...headerStyles}}>
+                  <Text style={{ ...theme.headerText, ...headerStyles }}>
                     {title}
                   </Text>
                 )}
                 {iconClose && (
-                  <View style={{alignItems: 'flex-end'}}>
+                  <View style={{ alignItems: 'flex-end' }}>
                     <TouchableOpacity onPress={() => _onClose('x')}>
                       <Icon name={IconX} color={cssVar.cWhite} />
                     </TouchableOpacity>
@@ -113,7 +132,12 @@ const Modal = ({
               keyboardDismissMode="interactive"
               canCancelContentTouches
               disableIntervalMomentum={true}
-              style={theme.body}>
+              style={theme.body}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              scrollEventThrottle={16}
+              accessible={false}
+            >
               {children}
             </ScrollView>
             {(buttonText || buttonCancel || buttonExtra) && (
@@ -123,7 +147,8 @@ const Modal = ({
                   <Button
                     variant="primary"
                     disabled={disabled}
-                    onPress={() => onSave(id)}>
+                    onPress={() => onSave(id)}
+                  >
                     {buttonText}
                   </Button>
                   // </View>
@@ -132,13 +157,14 @@ const Modal = ({
                   // <View style={{flexGrow: 1, flexBasis: 0}}>
                   <Button
                     variant="secondary"
-                    onPress={() => _onClose('cancel')}>
+                    onPress={() => _onClose('cancel')}
+                  >
                     {buttonCancel}
                   </Button>
                   // </View>
                 )}
                 {buttonExtra && (
-                  <View style={{flexGrow: 1}}>{buttonExtra}</View>
+                  <View style={{ flexGrow: 1 }}>{buttonExtra}</View>
                 )}
               </View>
             )}
@@ -168,7 +194,7 @@ const theme: ThemeType = {
     justifyContent: 'space-between',
     backgroundColor: cssVar.cBlack,
     borderRadius: cssVar.bRadiusS,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 10,

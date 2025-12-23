@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import Card from '../../../../mk/components/ui/Card/Card';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import useApi from '../../../../mk/hooks/useApi';
-import {getDateTimeStrMes} from '../../../../mk/utils/dates';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
+import { getDateTimeStrMes } from '../../../../mk/utils/dates';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
@@ -17,6 +17,7 @@ import {
   IconExpand,
   IconOther,
   IconTaxi,
+  IconWhatssapp,
 } from '../../../icons/IconLibrary';
 import useAuth from '../../../../mk/hooks/useAuth';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
@@ -26,6 +27,7 @@ import Br from '../../Profile/Br';
 import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
+import { useEvent } from '../../../../mk/hooks/useEvent';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -41,9 +43,10 @@ interface DetAccessesProps {
   close: () => void;
   reload?: () => void;
 }
-const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
-  const {showToast, waiting} = useAuth();
-  const {execute} = useApi();
+const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
+  const { showToast, waiting } = useAuth();
+  const { execute } = useApi();
+  const { dispatch: sendNotif } = useEvent('sendNotif');
   const [data, setData]: any = useState(null);
   const [acompanSelect, setAcompSelect]: any = useState([]);
   const [formState, setFormState]: any = useState({});
@@ -60,32 +63,7 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
     open: false,
     imageUri: '',
   });
-  const getData = async () => {
-    try {
-      const {data} = await execute('/accesses', 'GET', {
-        fullType: 'DET',
-        searchBy: id,
-      });
 
-      if (data.success && data.data.length > 0) {
-        const accessData = data.data[0];
-        if (accessData.access_id) {
-          const {data: linkedData} = await execute('/accesses', 'GET', {
-            fullType: 'DET',
-            searchBy: accessData.access_id,
-          });
-
-          if (linkedData.success && linkedData.data.length > 0) {
-            setData(linkedData.data[0]);
-          }
-        } else {
-          setData(accessData);
-        }
-      }
-    } catch (error) {
-      showToast('Error al obtener los datos', 'error');
-    }
-  };
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
 
@@ -104,13 +82,40 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
 
   const status = getStatus();
   useEffect(() => {
+    const getData = async () => {
+      try {
+        const { data } = await execute('/accesses', 'GET', {
+          fullType: 'DET',
+          searchBy: id,
+        });
+        console.log('getData1', data);
+        if (data.success && data.data.length > 0) {
+          const accessData = data.data[0];
+          if (accessData.access_id) {
+            const { data: linkedData } = await execute('/accesses', 'GET', {
+              fullType: 'DET',
+              searchBy: accessData.access_id,
+            });
+
+            if (linkedData.success && linkedData.data.length > 0) {
+              setData(linkedData.data[0]);
+            }
+          } else {
+            setData(accessData);
+          }
+        }
+      } catch (error) {
+        showToast('Error al obtener los datos', 'error');
+      }
+    };
+    console.log('getData', id);
     if (id) {
       getData();
     }
   }, [id]);
 
   const saveEntry = async () => {
-    const {data: result} = await execute(
+    const { data: result } = await execute(
       '/accesses/enter',
       'POST',
       {
@@ -121,6 +126,9 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
       2,
     );
     if (result?.success) {
+      if (result.data?.info) {
+        sendNotif(result.data.info);
+      }
       if (reload) reload();
       close();
     } else {
@@ -147,11 +155,14 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
       ids.push(data?.id);
     }
 
-    const {data: result} = await execute('/accesses/exit', 'POST', {
+    const { data: result } = await execute('/accesses/exit', 'POST', {
       ids,
       obs_out: formState?.obs_out || '',
     });
     if (result?.success) {
+      if (result.data?.info) {
+        sendNotif(result.data.info);
+      }
       if (reload) reload();
       close();
     } else {
@@ -171,7 +182,7 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
   };
 
   const handleInputChange = (name: string, value: string) => {
-    setFormState({...formState, [name]: value});
+    setFormState({ ...formState, [name]: value });
   };
 
   const getButtonText = () => {
@@ -230,25 +241,58 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
               />
             }
             right={
-              data?.type !== 'C' ? (
-                <Icon
-                  name={IconExpand}
-                  color={cssVar.cWhiteV1}
-                  onPress={() =>
-                    setOpenDet({
-                      open: true,
-                      id: data?.invitation_id,
-                      invitation: {...data?.invitation, owner: data?.owner},
-                      type: 'I',
-                    })
-                  }
-                />
-              ) : null
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+              >
+                {data?.owner?.phone && (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#25D366',
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      borderRadius: 20,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 5,
+                    }}
+                    onPress={() =>
+                      Linking.openURL(
+                        `whatsapp://send?phone=${data?.owner?.phone}`,
+                      )
+                    }
+                  >
+                    <Icon name={IconWhatssapp} size={16} color="#fff" />
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontFamily: FONTS.medium,
+                        fontSize: 12,
+                      }}
+                    >
+                      Whatsapp
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                {data?.type !== 'C' && (
+                  <Icon
+                    name={IconExpand}
+                    color={cssVar.cWhiteV1}
+                    onPress={() =>
+                      setOpenDet({
+                        open: true,
+                        id: data?.invitation_id,
+                        invitation: { ...data?.invitation, owner: data?.owner },
+                        type: 'I',
+                      })
+                    }
+                  />
+                )}
+              </View>
             }
           />
           {data?.confirm == 'N' && data?.obs_confirm && (
             <KeyValue
-              style={{marginTop: 12}}
+              style={{ marginTop: 12 }}
               keys="Motivo del rechazo"
               value={data?.obs_confirm}
             />
@@ -283,20 +327,53 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                 />
               }
               right={
-                data?.type !== 'C' && data?.type !== 'P' ? (
-                  <Icon
-                    name={IconExpand}
-                    color={cssVar.cWhiteV1}
-                    onPress={() =>
-                      setOpenDet({
-                        open: true,
-                        id: data?.invitation_id,
-                        invitation: {...data?.invitation, owner: data?.owner},
-                        type: 'I',
-                      })
-                    }
-                  />
-                ) : null
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+                >
+                  {data?.owner?.phone && (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#25D366',
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 20,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 5,
+                      }}
+                      onPress={() =>
+                        Linking.openURL(
+                          `whatsapp://send?phone=${data?.owner?.phone}`,
+                        )
+                      }
+                    >
+                      <Icon name={IconWhatssapp} size={16} color="#fff" />
+                      <Text
+                        style={{
+                          color: '#fff',
+                          fontFamily: FONTS.medium,
+                          fontSize: 12,
+                        }}
+                      >
+                        Whatsapp
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  {data?.type !== 'C' && data?.type !== 'P' && (
+                    <Icon
+                      name={IconExpand}
+                      color={cssVar.cWhiteV1}
+                      onPress={() =>
+                        setOpenDet({
+                          open: true,
+                          id: data?.invitation_id,
+                          invitation: { ...data?.invitation, owner: data?.owner },
+                          type: 'I',
+                        })
+                      }
+                    />
+                  )}
+                </View>
               }
             />
           </Card>
@@ -306,7 +383,8 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                 color: cssVar.cWhite,
                 fontSize: 16,
                 fontFamily: FONTS.medium,
-              }}>
+              }}
+            >
               Selecciona al visitante que esté por salir
             </Text>
           )}
@@ -377,7 +455,8 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
             padding: 8,
             backgroundColor: cssVar.cWhiteV1,
             borderRadius: '50%',
-          }}>
+          }}
+        >
           <Icon name={icon} color={cssVar.cPrimary} />
         </View>
       );
@@ -411,7 +490,7 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                   toggleVisitSelection(data?.id);
                 }
               }}
-              style={{marginBottom: 12}}
+              style={{ marginBottom: 12 }}
               subtitle={
                 'C.I: ' +
                 visit?.ci +
@@ -478,7 +557,8 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                       paddingHorizontal: 8,
                       paddingVertical: 4,
                       borderRadius: 999,
-                    }}>
+                    }}
+                  >
                     <Text
                       style={{
                         color:
@@ -486,7 +566,8 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                             ? cssVar.cAlertMedio
                             : cssVar.cSuccess,
                         fontSize: 12,
-                      }}>
+                      }}
+                    >
                       {data?.rejected_guard_id !== null
                         ? 'Guardia'
                         : 'Residente'}
@@ -497,7 +578,7 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
             )}
           </>
         )}
-        <View style={{flexDirection: 'row', gap: 8}}>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
           {data?.url_image_p && (
             <TouchableOpacity
               onPress={() =>
@@ -505,14 +586,15 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                   open: true,
                   imageUri: data?.url_image_p[0],
                 })
-              }>
+              }
+            >
               <Image
                 source={{
                   uri: data?.url_image_p[0],
                 }}
                 width={100}
                 height={100}
-                style={{width: 100, height: 100, borderRadius: 8}}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
               />
             </TouchableOpacity>
           )}
@@ -523,14 +605,15 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                   open: true,
                   imageUri: data?.visit?.url_image_a[0],
                 })
-              }>
+              }
+            >
               <Image
                 source={{
                   uri: data?.visit?.url_image_a[0],
                 }}
                 width={100}
                 height={100}
-                style={{width: 100, height: 100, borderRadius: 8}}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
               />
             </TouchableOpacity>
           )}
@@ -541,14 +624,15 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
                   open: true,
                   imageUri: data?.visit?.url_image_r[0],
                 })
-              }>
+              }
+            >
               <Image
                 source={{
                   uri: data?.visit?.url_image_r[0],
                 }}
                 width={100}
                 height={100}
-                style={{width: 100, height: 100, borderRadius: 8}}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
               />
             </TouchableOpacity>
           )}
@@ -678,7 +762,7 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
     if (!formState?.obs_confirm) {
       return;
     }
-    const {data: confirma, error} = await execute(
+    const { data: confirma, error } = await execute(
       '/accesses/confirm',
       'POST',
       {
@@ -690,6 +774,9 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
       3,
     );
     if (confirma?.success === true) {
+      if (confirma.data?.info) {
+        sendNotif(confirma.data.info);
+      }
       if (reload) {
         reload();
       }
@@ -719,28 +806,32 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
               gap: '3%',
               flexDirection: 'row',
               justifyContent: 'space-between',
-            }}>
-            <View style={{width: '35%'}}>
+            }}
+          >
+            <View style={{ width: '35%' }}>
               <Button
                 style={{}}
                 variant="secondary"
-                onPress={() => setOpenDecline('N')}>
+                onPress={() => setOpenDecline('N')}
+              >
                 Rechazar
               </Button>
             </View>
-            <View style={{width: '62%'}}>
+            <View style={{ width: '62%' }}>
               <Button
                 style={{
                   backgroundColor: cssVar.cAccent,
                   borderColor: cssVar.cAccent,
                 }}
-                onPress={() => setOpenDecline('Y')}>
+                onPress={() => setOpenDecline('Y')}
+              >
                 Dejar ingresar
               </Button>
             </View>
           </View>
         )
-      }>
+      }
+    >
       {!data ? (
         <Loading />
       ) : (
@@ -756,7 +847,7 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
           invitation={openDet.invitation}
           id={openDet.id}
           onClose={() =>
-            setOpenDet({open: false, id: null, type: '', invitation: null})
+            setOpenDet({ open: false, id: null, type: '', invitation: null })
           }
         />
       )}
@@ -767,8 +858,9 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
           open={openDecline !== null}
           buttonText="Enviar"
           onSave={() => onGuardRespond(openDecline)}
-          onClose={() => setOpenDecline(null)}>
-          <Text style={{color: cssVar.cWhite, marginBottom: 12}}>
+          onClose={() => setOpenDecline(null)}
+        >
+          <Text style={{ color: cssVar.cWhite, marginBottom: 12 }}>
             Por favor indica el motivo
           </Text>
           <TextArea
@@ -787,7 +879,7 @@ const DetAccesses = ({id, open, close, reload}: DetAccessesProps) => {
         <ImageExpandableModal
           visible={openExpandImg.open}
           imageUri={openExpandImg.imageUri}
-          onClose={() => setOpenExpandImg({open: false, imageUri: ''})}
+          onClose={() => setOpenExpandImg({ open: false, imageUri: '' })}
         />
       )}
     </ModalFull>

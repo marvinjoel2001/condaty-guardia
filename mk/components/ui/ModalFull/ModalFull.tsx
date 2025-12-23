@@ -9,18 +9,19 @@ import React, {
 import {
   View,
   ScrollView,
-  SafeAreaView,
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
+  AccessibilityInfo,
+  InteractionManager,
 } from 'react-native';
 import Button from '../../forms/Button/Button';
-import {AuthContext} from '../../../contexts/AuthContext';
+import { AuthContext } from '../../../contexts/AuthContext';
 import Toast from '../Toast/Toast';
-import {cssVar, TypeStyles} from '../../../styles/themes';
+import { cssVar, TypeStyles } from '../../../styles/themes';
 import Form from '../../forms/Form/Form';
 import HeadTitle from '../../layout/HeadTitle';
-import {SafeAreaView as SafeAreaViewAndroid} from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
 
 type PropsType = {
@@ -45,6 +46,8 @@ type PropsType = {
   onBack?: () => void;
   headerHide?: boolean;
   disableFormPress?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 };
 
 const ModalFull = memo(
@@ -70,19 +73,43 @@ const ModalFull = memo(
     right,
     onBack,
     disableFormPress = false,
+    accessibilityLabel,
+    accessibilityHint,
   }: PropsType) => {
-    const {toast, showToast}: any = useContext(AuthContext);
+    const { toast, showToast }: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [refreshing, setRefreshing] = useState(false);
+    const [focusTrapActive, setFocusTrapActive] = useState(false);
 
     useEffect(() => {
       if (open && enScroll) {
         const timeout = setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({animated: false});
+          scrollViewRef.current?.scrollToEnd({ animated: false });
         }, 100);
         return () => clearTimeout(timeout);
       }
     }, [open, children, enScroll]);
+
+    // Accessibility features
+    useEffect(() => {
+      if (open) {
+        // Announce modal to screen readers
+        setTimeout(() => {
+          AccessibilityInfo.announceForAccessibility(
+            `Full screen modal opened: ${
+              accessibilityLabel || title || 'Dialog'
+            }`,
+          );
+        }, 100);
+
+        // Focus trap management
+        InteractionManager.runAfterInteractions(() => {
+          setFocusTrapActive(true);
+        });
+      } else {
+        setFocusTrapActive(false);
+      }
+    }, [open, accessibilityLabel, title]);
 
     const onRefresh = useCallback(async () => {
       if (!reload) return;
@@ -95,18 +122,41 @@ const ModalFull = memo(
 
     return (
       <Modal
-        style={{margin: 0}}
+        style={{ margin: 0 }}
         coverScreen
         isVisible={open}
         onBackdropPress={() => !iconClose && onClose('x')}
         onBackButtonPress={() => !iconClose && onClose('x')}
         onShow={onShow}
         animationIn="fadeIn"
-        animationOut="fadeOut">
-        <SafeAreaViewAndroid style={{flex: 1}}>
-          <SafeAreaView style={{flex: 1}}>
+        animationOut="fadeOut"
+        useNativeDriver={true}
+        hideModalContentWhileAnimating={true}
+        supportedOrientations={['portrait', 'landscape']}
+        statusBarTranslucent
+        accessibilityViewIsModal
+        accessibilityLabel={accessibilityLabel || title || 'Full screen modal'}
+        accessibilityHint={
+          accessibilityHint || 'Full screen dialog with content'
+        }
+        onModalShow={() => setFocusTrapActive(true)}
+        onModalHide={() => setFocusTrapActive(false)}
+      >
+        <SafeAreaProvider
+          style={{
+            flex: 1,
+            // paddingTop: insets.top,
+            // paddingBottom: insets.bottom,
+          }}
+        >
+          <SafeAreaView style={{ flex: 1 }}>
             <Form pressable={!disableFormPress}>
-              <View style={theme.container}>
+              <View
+                style={theme.container}
+                accessibilityLabel={
+                  accessibilityLabel || title || 'Full screen modal content'
+                }
+              >
                 {!headerHide && (
                   <HeadTitle
                     title={title}
@@ -134,9 +184,17 @@ const ModalFull = memo(
                       ) : undefined
                     }
                     style={[theme.body, style]}
-                    contentContainerStyle={{paddingBottom: 20}}
-                    keyboardShouldPersistTaps="handled">
-                    <TouchableOpacity activeOpacity={1} style={{flex: 1}}>
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode="interactive"
+                    showsVerticalScrollIndicator={false}
+                    scrollEventThrottle={16}
+                  >
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      style={{ flex: 1 }}
+                      accessible={false}
+                    >
                       {children}
                     </TouchableOpacity>
                   </ScrollView>
@@ -150,7 +208,8 @@ const ModalFull = memo(
                         disabled={disabled}
                         onPress={(e: any) => {
                           onSave(id);
-                        }}>
+                        }}
+                      >
                         {buttonText}
                       </Button>
                     )}
@@ -159,7 +218,8 @@ const ModalFull = memo(
                         variant="secondary"
                         onPress={(e: any) => {
                           onClose('cancel');
-                        }}>
+                        }}
+                      >
                         {buttonCancel}
                       </Button>
                     )}
@@ -170,7 +230,7 @@ const ModalFull = memo(
             </Form>
             <Toast toast={toast} showToast={showToast} />
           </SafeAreaView>
-        </SafeAreaViewAndroid>
+        </SafeAreaProvider>
         {/* </Animated.View> */}
       </Modal>
     );
