@@ -105,6 +105,10 @@ const CiNomModal = ({ open, onClose, reload, data }: CiNomModalProps) => {
       3,
     );
     if (visitData?.success) {
+      if (visitData?.data?.isInside) {
+        setOpenDetail({ open: true, id: visitData?.data?.access_id });
+        return;
+      }
       if (visitData?.data?.owner_exist) {
         setDataOwner({ invitation: visitData?.data });
       } else {
