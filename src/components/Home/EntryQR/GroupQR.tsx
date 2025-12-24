@@ -150,8 +150,8 @@ const GroupQR = ({
             obs_in: item.access?.obs_in || '',
             obs_out: item.access?.obs_out || '',
             plate: item.access?.plate || '',
-            ci_anverso: item.visit?.url_image_a[0] || '',
-            ci_reverso: item.visit?.url_image_r[0] || '',
+            ci_anverso: item.visit?.url_image_a?.[0] || '',
+            ci_reverso: item.visit?.url_image_r?.[0] || '',
           }));
           if (data?.status !== 'X' && !item.access?.out_at) {
             setOpenSelected(item);
