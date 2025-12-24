@@ -62,11 +62,25 @@ const EntryQR = ({ code, open, onClose, reload }: TypeProps) => {
         false,
         3,
       );
-      if (QR?.success && QR.data?.[0]) {
+
+      let ownerData = null;
+      let hasArrears = false;
+
+      if (QR?.success) {
+        if (Array.isArray(QR.data) && QR.data.length > 0) {
+          ownerData = QR.data[0];
+        } else if (QR.data?.owner) {
+          ownerData = QR.data.owner;
+          hasArrears = QR.data.hasArrears;
+        }
+      }
+
+      if (ownerData) {
         setData({
-          invitation: QR.data[0],
+          invitation: ownerData,
           type: 'O',
           status,
+          hasArrears,
         });
       } else if (QR?.success && (!QR.data || QR.data.length === 0)) {
         setMsgErrorQr('Llave QR no encontrada o no válida.');
