@@ -1,6 +1,12 @@
-import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react';
-import {View, Dimensions} from 'react-native';
-import {useIsFocused} from '@react-navigation/native';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
+import { View, Dimensions } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import {
   Camera,
   CodeScanner,
@@ -18,12 +24,12 @@ interface CameraQrProps {
   onMsg?: (title: string, msg: string, type: string) => void;
 }
 
-const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
-  const {height} = Dimensions.get('window');
+const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
+  const { height } = Dimensions.get('window');
   const isFocused = useIsFocused();
   const device = useCameraDevice('back');
-  const {hasPermission, requestPermission} = useCameraPermission();
-  const {showToast} = useAuth();
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const { showToast } = useAuth();
 
   const [codeQr, setCodeQr] = useState('');
   const [permissionRequested, setPermissionRequested] = useState(false);
@@ -123,8 +129,10 @@ const CameraQr = ({open, onClose, setCode, onMsg}: CameraQrProps) => {
     <ModalFull
       open={open && device && hasPermission}
       onClose={onClose}
-      title="Lector Qr">
-      <View style={{height: height - 100}}>
+      scrollViewHide={true}
+      title="Lector Qr"
+    >
+      <View style={{ height: height - 100, marginTop: 8 }}>
         <Camera
           ref={cameraRef}
           style={{

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -7,24 +7,24 @@ import {
   StyleSheet,
 } from 'react-native';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import List from '../../../../mk/components/ui/List/List';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconArrowLeft, IconX, IconSimpleAdd} from '../../../icons/IconLibrary'; // Assuming IconPlusCircle or similar exists
-import Input from '../../../../mk/components/forms/Input/Input';
-import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
-import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
-import {AccompaniedAdd} from './AccompaniedAdd';
-import useApi from '../../../../mk/hooks/useApi';
+import {
+  IconArrowLeft,
+  IconX,
+  IconSimpleAdd,
+} from '../../../icons/IconLibrary';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
-import {getDateStrMes} from '../../../../mk/utils/dates';
-import useAuth from '../../../../mk/hooks/useAuth';
-import {AccompaniedAddV2} from './AccompaniedAddV2';
+import { getDateStrMes } from '../../../../mk/utils/dates';
+import ExistVisitModal from '../CiNomModal/ExistVisitModal';
+import { AccompaniedAdd } from './AccompaniedAdd';
+import SectionIncomeType from '../CiNomModal/SectionIncomeType';
 
 type PropsType = {
   setFormState: any;
@@ -38,39 +38,20 @@ type PropsType = {
 };
 const Br = () => (
   <View
-    style={{height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 8}}
+    style={{ height: 0.5, backgroundColor: cssVar.cWhiteV1, marginVertical: 8 }}
   />
 );
 
 const colorStatus = {
-  C: {color: cssVar.cWhite, background: cssVar.cHoverCompl1},
-  I: {color: cssVar.cBlack, background: cssVar.cAccent},
-  O: {color: cssVar.cBlack, background: cssVar.cWarning},
+  C: { color: cssVar.cWhite, background: cssVar.cHoverCompl1 },
+  I: { color: cssVar.cBlack, background: cssVar.cAccent },
+  O: { color: cssVar.cBlack, background: cssVar.cWarning },
 };
 const statusText = {
   C: 'Completado',
   I: 'Dejar ingresar',
   O: 'Dejar salir',
 };
-
-// const formatDateForInvitation = (dateString: string | undefined) => {
-//   if (!dateString) return '';
-//   try {
-//     const date = new Date(dateString);
-//     if (isNaN(date.getTime())) return 'Fecha inválida';
-
-//     const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-//     const dayOfWeek = days[date.getUTCDay()];
-//     const day = String(date.getUTCDate()).padStart(2, '0');
-//     const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-//     const year = date.getUTCFullYear();
-//     const hours = String(date.getUTCHours()).padStart(2, '0');
-//     const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-//     return `${dayOfWeek}, ${day}/${month}/${year} - ${hours}:${minutes}`;
-//   } catch (e) {
-//     return 'Fecha inválida';
-//   }
-// };
 
 const OwnerInvitationInfoDisplay = ({
   invitationData,
@@ -133,12 +114,14 @@ const GroupQR = ({
   openSelected,
   setOpenSelected,
 }: PropsType) => {
-  const {execute} = useApi();
   const [tab, setTab] = useState('P');
   const [selectedVisit, setSelectedVisit]: any = useState(null);
   const [openAcom, setOpenAcom] = useState(false);
-  const [editAcom, setEditAcom] = useState(null);
-  const {showToast} = useAuth();
+  const [editAcom, setEditAcom] = useState(false);
+  const [openExistVisit, setOpenExistVisit] = useState(false);
+  const [isMain, setIsMain] = useState(false);
+  const [formStateA, setFormStateA] = useState({});
+
   const getStatus = (item: any) => {
     if (item?.access?.out_at) {
       return 'C';
@@ -167,6 +150,8 @@ const GroupQR = ({
             obs_in: item.access?.obs_in || '',
             obs_out: item.access?.obs_out || '',
             plate: item.access?.plate || '',
+            ci_anverso: item.visit?.url_image_a[0] || '',
+            ci_reverso: item.visit?.url_image_r[0] || '',
           }));
           if (data?.status !== 'X' && !item.access?.out_at) {
             setOpenSelected(item);
@@ -186,13 +171,15 @@ const GroupQR = ({
                 backgroundColor: colorStatus[getStatus(item)].background,
                 borderRadius: 100,
                 padding: 8,
-              }}>
+              }}
+            >
               <Text
                 style={{
                   color: colorStatus[getStatus(item)].color,
                   fontWeight: '500',
                   fontSize: 12,
-                }}>
+                }}
+              >
                 {statusText[getStatus(item)]}
               </Text>
             </View>
@@ -211,8 +198,8 @@ const GroupQR = ({
 
   useEffect(() => {
     if (tab === 'V') {
-      setFormState((prevState: any) => ({
-        ...prevState,
+      setFormState({
+        ...formState,
         tab: tab,
         ci_taxi: '',
         name_taxi: '',
@@ -220,12 +207,14 @@ const GroupQR = ({
         last_name_taxi: '',
         mother_last_name_taxi: '',
         disbledTaxi: false,
-        plate: prevState?.plate || selectedVisit?.visit?.vehicle?.plate || '',
-      }));
+        plate: formState?.plate || selectedVisit?.visit?.vehicle?.plate || '',
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
+      });
     }
     if (tab === 'P' || tab == 'T') {
-      setFormState((prevState: any) => ({
-        ...prevState,
+      setFormState({
+        ...formState,
         tab: tab,
         ci_taxi: '',
         name_taxi: '',
@@ -234,54 +223,16 @@ const GroupQR = ({
         mother_last_name_taxi: '',
         plate: '',
         disbledTaxi: false,
-      }));
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
+      });
     }
-  }, [tab, setFormState]);
+  }, [tab]);
 
   const onDelAcom = (acom: any) => {
     const acomps = formState?.acompanantes;
     const newAcomps = acomps.filter((item: any) => item.ci !== acom.ci);
-    setFormState({...formState, acompanantes: newAcomps});
-  };
-
-  const onExistVisits = async () => {
-    if (!formState?.ci || formState.ci.length < 5) {
-      setErrors({...errors, ci: ''});
-      return;
-    }
-    if (
-      data?.guests?.find(
-        (invitado: any) => invitado?.visit?.ci === formState?.ci,
-      )
-    ) {
-      showToast('El ci ya se encuentra en la lista de invitados', 'error');
-      setFormState({
-        ...formState,
-        ci: '',
-      });
-      return;
-    }
-    const {data: existData} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci,
-    });
-
-    if (existData?.data) {
-      setSelectedVisit({...selectedVisit, visit: existData?.data});
-
-      setFormState({
-        ...formState,
-        name: existData?.data?.name || '',
-        middle_name: existData?.data?.middle_name || '',
-        last_name: existData?.data?.last_name || '',
-        mother_last_name: existData?.data?.mother_last_name || '',
-      });
-    } else {
-      setErrors({...errors, ci: ''});
-    }
+    setFormState({ ...formState, acompanantes: newAcomps });
   };
 
   const acompanantesList = (acompanante: any) => {
@@ -315,73 +266,24 @@ const GroupQR = ({
     );
   };
 
-  const onExistTaxi = async () => {
-    if (formState?.ci_taxi === '') {
-      return;
+  useEffect(() => {
+    if (!selectedVisit?.visit?.ci && openSelected) {
+      setOpenExistVisit(true);
+      setIsMain(true);
     }
-    if (formState?.ci_taxi == formState?.ci) {
-      showToast('El ci del visitante y el taxi son iguales', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-      return;
+  }, [selectedVisit?.visit?.ci, openSelected]);
+  const getStatusTextPhoto = () => {
+    if (!formState?.ci_reverso || !formState?.ci_anverso) {
+      return '/ Foto pendiente';
     }
-    if (
-      formState?.acompanantes?.find(
-        (item: {ci: string}) => item.ci === formState?.ci_taxi,
-      )
-    ) {
-      showToast('El ci del taxi está registrado como acompanante', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-      return;
-    }
-    const {data: exist} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
-    if (exist?.data) {
-      setFormState({
-        ...formState,
-        ci_taxi: exist?.data.ci,
-        name_taxi: exist?.data.name,
-        middle_name_taxi: exist?.data.middle_name,
-        last_name_taxi: exist?.data.last_name,
-        mother_last_name_taxi: exist?.data.mother_last_name,
-        plate: exist?.data.plate || formState.plate,
-        disbledTaxi: true,
-      });
-    } else {
-      setFormState({
-        ...formState,
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disbledTaxi: false,
-      });
-    }
+    return '';
   };
 
+  const handleEdit = (bandera: boolean) => {
+    setFormStateA(bandera ? formStateA : formState);
+    setEditAcom(true);
+    setOpenAcom(true);
+  };
   return (
     <>
       {!data ? (
@@ -392,7 +294,7 @@ const GroupQR = ({
             <OwnerInvitationInfoDisplay invitationData={data} />
             <KeyValue keys="Descripción" value={data?.obs || '-/-'} />
             <Br />
-            <View style={{justifyContent: 'center'}}>
+            <View style={{ justifyContent: 'center' }}>
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
@@ -402,7 +304,8 @@ const GroupQR = ({
                 }}
                 onPress={() => {
                   setOpenSelected(false);
-                }}>
+                }}
+              >
                 {openSelected && (
                   <Icon name={IconArrowLeft} color={cssVar.cWhite} size={20} />
                 )}
@@ -412,7 +315,8 @@ const GroupQR = ({
                     fontWeight: '600',
                     fontFamily: FONTS.medium,
                     fontSize: 16,
-                  }}>
+                  }}
+                >
                   {openSelected
                     ? 'Invitados'
                     : 'Cantidad de invitados ingresados: ' +
@@ -424,17 +328,36 @@ const GroupQR = ({
             </View>
             {openSelected ? (
               <ItemList
-                title={getFullName(selectedVisit?.visit)}
+                title={getFullName(formState)}
                 subtitle={
-                  selectedVisit?.visit.ci
-                    ? 'C.I. ' + selectedVisit?.visit.ci
-                    : 'C.I. -/-'
+                  'C.I. ' +
+                  (formState?.ci || '-/-') +
+                  ' ' +
+                  getStatusTextPhoto()
                 }
                 left={
                   <Avatar
-                    name={getFullName(selectedVisit?.visit)}
                     hasImage={0}
+                    src={getUrlImages(
+                      `/VISIT-${formState?.id}.webp?d=${formState?.updated_at}`,
+                    )}
+                    name={getFullName(formState)}
+                    w={40}
+                    h={40}
                   />
+                }
+                right={
+                  <TouchableOpacity onPress={() => handleEdit(false)}>
+                    <Text
+                      style={{
+                        color: cssVar.cAccent,
+                        fontSize: 12,
+                        fontFamily: FONTS.semiBold,
+                      }}
+                    >
+                      Editar
+                    </Text>
+                  </TouchableOpacity>
                 }
               />
             ) : (
@@ -445,109 +368,18 @@ const GroupQR = ({
           </Card>
           {openSelected && (
             <>
-              {!selectedVisit?.visit?.ci && (
-                <>
-                  <Input
-                    label={'Carnet de identidad'}
-                    name={'ci'}
-                    maxLength={10}
-                    keyboardType="number-pad"
-                    value={formState.ci}
-                    required={true}
-                    error={errors}
-                    onChange={(value: any) => handleChange('ci', value)}
-                    onBlur={onExistVisits}
-                  />
-                  <InputFullName
-                    formState={formState}
-                    errors={errors}
-                    handleChangeInput={handleChange}
-                    inputGrid={true}
-                  />
-                </>
-              )}
-
-              <TabsButtons
-                tabs={[
-                  {value: 'P', text: 'A pie'},
-                  {value: 'V', text: 'En vehículo'},
-                  {value: 'T', text: 'En taxi'},
-                ]}
-                sel={tab}
-                setSel={setTab}
-              />
-
-              {tab == 'V' &&
-                !selectedVisit?.access?.in_at &&
-                data?.status !== 'X' && (
-                  <Input
-                    label="Placa"
-                    type="text"
-                    name="plate"
-                    error={errors}
-                    required={tab == 'V'}
-                    value={formState['plate']}
-                    onChange={(value: any) => {
-                      handleChange('plate', value);
-                    }}
-                  />
-                )}
-              {tab == 'T' &&
-                !selectedVisit?.access?.in_at &&
-                data?.status !== 'X' && (
-                  <>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        marginVertical: 8,
-                        color: cssVar.cWhite,
-                        fontFamily: FONTS.medium,
-                      }}>
-                      Datos del conductor:
-                    </Text>
-                    <Input
-                      label="Carnet de identidad"
-                      type="text"
-                      name="ci_taxi"
-                      required
-                      maxLength={10}
-                      keyboardType="number-pad"
-                      error={errors}
-                      value={formState['ci_taxi']}
-                      onBlur={() => onExistTaxi()}
-                      onChange={(value: any) => handleChange('ci_taxi', value)}
-                    />
-                    <InputFullName
-                      formState={formState}
-                      errors={errors}
-                      handleChangeInput={handleChange}
-                      disabled={formState?.disbledTaxi}
-                      prefijo={'_taxi'}
-                      inputGrid={true}
-                    />
-                    <Input
-                      label="Placa"
-                      type="text"
-                      name="plate"
-                      error={errors}
-                      required={tab == 'T'}
-                      value={formState['plate']}
-                      onChange={(value: any) => handleChange('plate', value)}
-                    />
-                  </>
-                )}
-
               {!selectedVisit?.access?.in_at && data?.status !== 'X' && (
                 <TouchableOpacity
                   style={styles.boxAcompanante}
-                  onPress={() => setOpenAcom(true)}>
+                  onPress={() => setOpenExistVisit(true)}
+                >
                   <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
                   <Text
                     style={{
                       color: cssVar.cAccent,
                       fontFamily: FONTS.semiBold,
-                    }}>
+                    }}
+                  >
                     Agregar acompañante
                   </Text>
                 </TouchableOpacity>
@@ -561,12 +393,26 @@ const GroupQR = ({
                       fontFamily: FONTS.semiBold,
                       marginVertical: 10,
                       color: cssVar.cWhite,
-                    }}>
+                    }}
+                  >
                     Acompañantes:
                   </Text>
                   <List
                     data={formState?.acompanantes}
                     renderItem={acompanantesList}
+                  />
+                </>
+              )}
+              {!selectedVisit?.access?.in_at && data?.status !== 'X' && (
+                <>
+                  <SectionIncomeType
+                    tab={tab}
+                    setTab={setTab}
+                    formState={formState}
+                    setFormState={setFormState}
+                    handleChangeInput={handleChange}
+                    errors={errors}
+                    setErrors={setErrors}
                   />
                 </>
               )}
@@ -594,16 +440,44 @@ const GroupQR = ({
           )}
         </View>
       )}
-      <AccompaniedAddV2
-        open={openAcom}
-        onClose={() => {
-          setOpenAcom(false);
-          setEditAcom(null);
-        }}
-        item={formState}
-        setItem={setFormState}
-        editItem={editAcom}
-      />
+      {openAcom && (
+        <AccompaniedAdd
+          formState={formStateA}
+          setFormState={setFormStateA}
+          open={openAcom}
+          onClose={() => {
+            setOpenAcom(false);
+            setEditAcom(false);
+            setIsMain(false);
+          }}
+          item={formState}
+          setItem={setFormState}
+          editItem={editAcom}
+          isMain={isMain}
+          extraOnClose={() => {
+            setOpenSelected(false);
+          }}
+        />
+      )}
+      {openExistVisit && (
+        <ExistVisitModal
+          open={openExistVisit}
+          formState={formStateA}
+          setFormState={setFormStateA}
+          item={formState}
+          setItem={setFormState}
+          extraOnClose={() => {
+            setOpenSelected(false);
+          }}
+          onClose={() => {
+            setOpenExistVisit(false);
+          }}
+          setOpenNewAcomp={setOpenAcom}
+          setIsMain={setIsMain}
+          isMain={isMain}
+          onDismiss={() => handleEdit(true)}
+        />
+      )}
     </>
   );
 };
@@ -617,7 +491,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
-    color: cssVar.cWhite, // neutral-50
+    color: cssVar.cWhite,
   },
   detailsGroup: {
     flexDirection: 'column',
@@ -652,13 +526,13 @@ const styles = StyleSheet.create({
   detailValueRight: {
     fontFamily: FONTS.medium,
     fontSize: 14,
-    color: cssVar.cWhite, // neutral-50
+    color: cssVar.cWhite,
     textAlign: 'right',
   },
   detailValueRightNormal: {
-    fontFamily: FONTS.regular, // HTML shows font-normal for these values
+    fontFamily: FONTS.regular,
     fontSize: 14,
-    color: cssVar.cWhite, // neutral-50
+    color: cssVar.cWhite,
     textAlign: 'right',
   },
   visitToSection: {
@@ -720,7 +594,6 @@ const styles = StyleSheet.create({
     borderColor: '#246950',
   },
   transportButtonActiveGeneral: {
-    // For Vehiculo and Taxi when active (using accent color)
     backgroundColor: cssVar.cAccent, // Or #00af90 if strictly following 'A pie' active style
     borderWidth: 0.5,
     borderColor: cssVar.cAccent, // Or #246950
@@ -732,7 +605,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     fontSize: 14,
     textAlign: 'center',
-    color: cssVar.cWhite, // neutral-50
+    color: cssVar.cWhite,
   },
   transportButtonTextInactive: {
     fontFamily: FONTS.regular,
