@@ -266,11 +266,12 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
                       alignItems: 'center',
                       gap: 5,
                     }}
-                    onPress={() =>
+                    onPress={() => {
+                      if (data?.id) contactedViaWhatsAppMap[data.id] = true;
                       Linking.openURL(
                         `whatsapp://send?phone=${data?.owner?.phone}`,
-                      )
-                    }
+                      );
+                    }}
                   >
                     <Icon name={IconWhatssapp} size={16} color="#fff" />
                     <Text
@@ -356,11 +357,18 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
                         alignItems: 'center',
                         gap: 5,
                       }}
-                      onPress={() =>
+                      onPress={() => {
+                        if (data?.id) {
+                          contactedViaWhatsAppMap[data.id] = true;
+                          showToast(
+                            'Marcado como contactado por WhatsApp: ' + data.id,
+                            'success',
+                          );
+                        }
                         Linking.openURL(
                           `whatsapp://send?phone=${data?.owner?.phone}`,
-                        )
-                      }
+                        );
+                      }}
                     >
                       <Icon name={IconWhatssapp} size={16} color="#fff" />
                       <Text
