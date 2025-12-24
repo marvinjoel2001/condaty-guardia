@@ -1,7 +1,7 @@
-import React, {useState, useCallback} from 'react';
-import {Text, View, Dimensions, StyleSheet} from 'react-native';
-import {PanGestureHandler} from 'react-native-gesture-handler';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import React, { useState, useCallback } from 'react';
+import { Text, View, Dimensions, StyleSheet } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {
   IconArrowDown,
@@ -9,7 +9,7 @@ import {
   IconGenericQr,
   IconNoQr,
 } from '../../../icons/IconLibrary';
-import {isIos} from '../../../../mk/utils/utils';
+import { isIos } from '../../../../mk/utils/utils';
 
 const CLOSED_HEIGHT = 0;
 const OPEN_HEIGHT = 204;
@@ -19,7 +19,7 @@ type PropsType = {
   onPressCiNom: () => void;
 };
 
-const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
+const DropdawnAccess = ({ onPressQr, onPressCiNom }: PropsType) => {
   const [openDrop, setOpenDrop] = useState(false);
   // El dropdown se abre/cierra instantáneamente, sin animación ni delay
   const height = openDrop ? OPEN_HEIGHT : CLOSED_HEIGHT;
@@ -32,7 +32,7 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
   }, []);
 
   const handlePanGesture = useCallback(
-    ({nativeEvent}: any) => {
+    ({ nativeEvent }: any) => {
       if (nativeEvent.translationY < -10 && !openDrop) {
         setOpenDrop(true);
       } else if (nativeEvent.translationY > 10 && openDrop) {
@@ -44,7 +44,18 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
 
   return (
     <PanGestureHandler onGestureEvent={handlePanGesture}>
-      <View style={[styles.container, animatedStyle]}>
+      <View
+        style={[
+          styles.container,
+          {
+            borderTopRightRadius: openDrop ? cssVar.bRadius : 0,
+            borderTopLeftRadius: openDrop ? cssVar.bRadius : 0,
+            borderWidth: openDrop ? 0.5 : 0,
+            borderBottomWidth: openDrop ? 0.5 : 0,
+          },
+          animatedStyle,
+        ]}
+      >
         <View
           onTouchEnd={toggleDropdown}
           style={{
@@ -63,9 +74,10 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
             position: 'absolute',
             top: -30,
             left: Dimensions.get('window').width / 2 - 47,
-          }}>
+          }}
+        >
           <Icon
-            style={{marginTop: 2}}
+            style={{ marginTop: 2 }}
             name={openDrop ? IconArrowDown : IconArrowUp}
             color={cssVar.cWhite}
           />
@@ -73,36 +85,37 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
 
         {openDrop && (
           <>
-            <Text style={{...styles.text, marginTop: 20}}>
+            <Text style={{ ...styles.text, marginTop: 20 }}>
               Permitir ingreso
             </Text>
             <View
               onTouchEnd={e => e.stopPropagation()}
-              style={styles.containerButtons}>
+              style={styles.containerButtons}
+            >
               <View onTouchEnd={onPressCiNom} style={styles.buttons}>
                 <Icon
                   size={50}
-                  style={{marginBottom: 8, marginTop: 2}}
+                  style={{ marginBottom: 8, marginTop: 2 }}
                   name={IconNoQr}
                   color={'transparent'}
                   fillStroke={cssVar.cWhite}
                 />
-                <Text style={{color: cssVar.cWhite}}>Sin QR</Text>
+                <Text style={{ color: cssVar.cWhite }}>Sin QR</Text>
               </View>
               <View onTouchEnd={onPressQr} style={styles.buttons}>
                 <Icon
                   size={50}
                   name={IconGenericQr}
                   color={cssVar.cWhite}
-                  style={{marginBottom: 8}}
+                  style={{ marginBottom: 8 }}
                 />
-                <Text style={{color: cssVar.cWhite}}>Leer QR</Text>
+                <Text style={{ color: cssVar.cWhite }}>Leer QR</Text>
               </View>
             </View>
           </>
         )}
       </View>
-  </PanGestureHandler>
+    </PanGestureHandler>
   );
 };
 
@@ -114,10 +127,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: cssVar.cBlack,
     bottom: isIos() ? 68.5 : 72.4,
-    borderTopRightRadius: cssVar.bRadius,
-    borderTopLeftRadius: cssVar.bRadius,
-    borderWidth: 0.5,
-    borderBottomWidth: 0,
+
     borderTopColor: cssVar.cWhiteV1,
   },
   text: {
