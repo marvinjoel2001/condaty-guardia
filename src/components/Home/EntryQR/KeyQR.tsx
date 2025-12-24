@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import ItemInfo, {
   ItemInfoType,
   TypeDetails,
 } from '../../../../mk/components/ui/ItemInfo/ItemInfo';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import useApi from '../../../../mk/hooks/useApi';
-import {AccompaniedAdd} from './AccompaniedAdd';
+import { AccompaniedAdd } from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
+import { IconSimpleAdd, IconX } from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import ExistVisitModal from '../CiNomModal/ExistVisitModal';
@@ -44,7 +44,7 @@ const KeyQR = ({
     data: [],
   });
   const [formStateA, setFormStateA] = useState({});
-  const {execute} = useApi();
+  const { execute } = useApi();
   const [openAcom, setOpenAcom] = useState(false);
   const [openExistVisit, setOpenExistVisit] = useState(false);
 
@@ -82,11 +82,11 @@ const KeyQR = ({
         });
     }
 
-    setDetails({data: data});
+    setDetails({ data: data });
   };
 
   useEffect(() => {
-    _onDetail({...data});
+    _onDetail({ ...data });
   }, [data]);
   const onExistTaxi = async () => {
     if (!formState?.ci_taxi || formState.ci_taxi.length < 5) {
@@ -103,7 +103,7 @@ const KeyQR = ({
       }));
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', {
+    const { data: existData } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -137,12 +137,12 @@ const KeyQR = ({
       }));
     }
   };
-  const onDelAcom = (acom: {ci: string}) => {
+  const onDelAcom = (acom: { ci: string }) => {
     const acomps = formState?.acompanantes || [];
     const newAcomps = acomps.filter(
-      (item: {ci: string}) => item.ci !== acom.ci,
+      (item: { ci: string }) => item.ci !== acom.ci,
     );
-    setFormState({...formState, acompanantes: newAcomps});
+    setFormState({ ...formState, acompanantes: newAcomps });
   };
   const acompanantesList = (acompanante: any) => {
     if (!acompanante) return null;
@@ -163,7 +163,8 @@ const KeyQR = ({
               color: cssVar.cAccent,
               fontSize: 12,
               fontFamily: FONTS.semiBold,
-            }}>
+            }}
+          >
             Eliminar
           </Text>
         }
@@ -171,7 +172,7 @@ const KeyQR = ({
     );
   };
   return (
-    <View style={{marginTop: 20}}>
+    <View style={{ marginTop: 20 }}>
       {!data?.invitation || Object.keys(data?.invitation).length === 0 ? (
         <Text
           style={{
@@ -179,7 +180,8 @@ const KeyQR = ({
             color: cssVar.cError,
             fontSize: 16,
             fontWeight: 'bold',
-          }}>
+          }}
+        >
           Llave QR no encontrada o no válida.
         </Text>
       ) : (
@@ -197,17 +199,66 @@ const KeyQR = ({
                 data?.invitation?.updated_at,
             )}
           />
+          {data?.hasArrears && (
+            <View
+              style={{
+                backgroundColor: '#3a1c1c',
+                borderRadius: 8,
+                padding: 12,
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 20,
+                marginBottom: 10,
+                width: '100%',
+              }}
+            >
+              <View
+                style={{
+                  width: 24,
+                  height: 24,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 12,
+                  borderWidth: 2,
+                  borderColor: cssVar.cError,
+                  marginRight: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    color: cssVar.cError,
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}
+                >
+                  !
+                </Text>
+              </View>
+              <Text
+                style={{
+                  color: '#ff6666',
+                  fontSize: 16,
+                  fontFamily: FONTS.regular,
+                }}
+              >
+                Residente con Mora
+              </Text>
+            </View>
+          )}
           <ItemInfo type="C" details={details} />
 
           <TouchableOpacity
             style={styles.boxAcompanante}
-            onPress={() => setOpenExistVisit(true)}>
+            onPress={() => setOpenExistVisit(true)}
+          >
             <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
             <Text
               style={{
                 color: cssVar.cAccent,
                 fontFamily: FONTS.semiBold,
-              }}>
+              }}
+            >
               Agregar acompañante
             </Text>
           </TouchableOpacity>
@@ -219,11 +270,12 @@ const KeyQR = ({
                   fontFamily: FONTS.semiBold,
                   marginVertical: 4,
                   color: cssVar.cWhite,
-                }}>
+                }}
+              >
                 Acompañantes:
               </Text>
               <List
-                style={{marginBottom: 12}}
+                style={{ marginBottom: 12 }}
                 data={formState?.acompanantes}
                 renderItem={acompanantesList}
               />
