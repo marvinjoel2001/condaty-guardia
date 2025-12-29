@@ -1,7 +1,7 @@
-import React, {useCallback} from 'react';
+import React, { useCallback } from 'react';
 import Input from '../Input/Input';
-import {StyleSheet, View} from 'react-native';
-import {TypeStyles} from '../../../styles/themes';
+import { StyleSheet, View } from 'react-native';
+import { TypeStyles } from '../../../styles/themes';
 
 type PropsType = {
   formState: any;
@@ -49,9 +49,16 @@ const InputFullName = ({
 
   const _onBlur = useCallback(
     (name: string) => {
-      onBlur(name + prefijo);
+      const key = name + prefijo;
+      const value = formState[key];
+
+      if (typeof value === 'string') {
+        handleChangeInput(key, value.trim());
+      }
+
+      onBlur(key);
     },
-    [onBlur, prefijo],
+    [onBlur, prefijo, formState, handleChangeInput],
   );
 
   const container = inputGrid ? styles.container : {};
