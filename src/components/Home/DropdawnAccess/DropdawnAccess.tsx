@@ -12,7 +12,7 @@ import {
 import { isIos } from '../../../../mk/utils/utils';
 
 const CLOSED_HEIGHT = 0;
-const OPEN_HEIGHT = 204;
+const OPEN_HEIGHT = 244;
 
 type PropsType = {
   onPressQr: () => void;
@@ -48,6 +48,7 @@ const DropdawnAccess = ({ onPressQr, onPressCiNom }: PropsType) => {
         style={[
           styles.container,
           {
+            bottom: openDrop ? 32.4 : 68.5,
             borderTopRightRadius: openDrop ? cssVar.bRadius : 0,
             borderTopLeftRadius: openDrop ? cssVar.bRadius : 0,
             borderWidth: openDrop ? 0.5 : 0,
@@ -126,8 +127,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    bottom: isIos() ? 68.5 : 72.4,
-
     borderTopColor: cssVar.cWhiteV1,
   },
   text: {

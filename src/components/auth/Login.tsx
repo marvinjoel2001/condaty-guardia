@@ -134,7 +134,7 @@ const Login = () => {
   }, [showPassword, togglePasswordVisibility]);
 
   return (
-    <SafeAreaView style={theme.safeAreaView}>
+    <View style={theme.safeAreaView}>
       {splash ? (
         <Splash />
       ) : (
@@ -262,7 +262,7 @@ const Login = () => {
         }}
         mod="guard"
       />
-    </SafeAreaView>
+    </View>
   );
 };
 const theme: ThemeType = {

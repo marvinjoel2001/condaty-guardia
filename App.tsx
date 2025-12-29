@@ -10,7 +10,7 @@ import MyDrawer from './src/navigators/Drawer/Drawer';
 import { cssVar } from './mk/styles/themes';
 import ActiveNotificationDB from './mk/hooks/ActiveNotificationDB';
 import { navigationRef } from './src/navigators/navigationRef';
-import { KeyboardProvider } from 'react-native-keyboard-controller';
+// import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { NetworkProvider } from './mk/contexts/NetworkContext';
 import { PerformanceProvider } from './mk/contexts/PerformanceContext';
 
@@ -22,7 +22,7 @@ function App() {
   (Text as any).defaultProps.allowFontScaling = false;
   return (
     <SafeAreaProvider>
-      <StatusBar backgroundColor={cssVar.cBlack} barStyle={'light-content'} />
+      {/* <StatusBar backgroundColor={cssVar.cBlack} barStyle={'light-content'} /> */}
       <AppContent />
     </SafeAreaProvider>
   );
@@ -30,34 +30,28 @@ function App() {
 function AppContent() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: cssVar.cBlack }}>
-      {/* <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      /> */}
-      {/* <GestureHandlerRootView style={{flex: 1}}> */}
       <PerformanceProvider>
         <NetworkProvider>
           <AxiosProvider interceptors={axiosInterceptors}>
-            <KeyboardProvider>
-              {/* <StatusBar
+            {/* <KeyboardProvider> */}
+            {/* <StatusBar
               animated={true}
               backgroundColor={cssVar.cBlack}
               barStyle={'light-content'}
             /> */}
-              <NavigationContainer ref={navigationRef}>
-                <AuthProvider>
-                  <OneSignalContextProvider>
-                    <InitProject />
-                    <MyDrawer />
-                    <ActiveNotificationDB />
-                  </OneSignalContextProvider>
-                </AuthProvider>
-              </NavigationContainer>
-            </KeyboardProvider>
+            <NavigationContainer ref={navigationRef}>
+              <AuthProvider>
+                <OneSignalContextProvider>
+                  <InitProject />
+                  <MyDrawer />
+                  <ActiveNotificationDB />
+                </OneSignalContextProvider>
+              </AuthProvider>
+            </NavigationContainer>
+            {/* </KeyboardProvider> */}
           </AxiosProvider>
         </NetworkProvider>
       </PerformanceProvider>
-      {/* </GestureHandlerRootView> */}
     </SafeAreaView>
   );
 }

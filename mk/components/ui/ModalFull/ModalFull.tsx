@@ -79,7 +79,6 @@ const ModalFull = memo(
     const { toast, showToast }: any = useContext(AuthContext);
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [refreshing, setRefreshing] = useState(false);
-    const [focusTrapActive, setFocusTrapActive] = useState(false);
 
     useEffect(() => {
       if (open && enScroll) {
@@ -89,27 +88,6 @@ const ModalFull = memo(
         return () => clearTimeout(timeout);
       }
     }, [open, children, enScroll]);
-
-    // Accessibility features
-    useEffect(() => {
-      if (open) {
-        // Announce modal to screen readers
-        setTimeout(() => {
-          AccessibilityInfo.announceForAccessibility(
-            `Full screen modal opened: ${
-              accessibilityLabel || title || 'Dialog'
-            }`,
-          );
-        }, 100);
-
-        // Focus trap management
-        InteractionManager.runAfterInteractions(() => {
-          setFocusTrapActive(true);
-        });
-      } else {
-        setFocusTrapActive(false);
-      }
-    }, [open, accessibilityLabel, title]);
 
     const onRefresh = useCallback(async () => {
       if (!reload) return;
@@ -132,21 +110,20 @@ const ModalFull = memo(
         animationOut="fadeOut"
         useNativeDriver={true}
         hideModalContentWhileAnimating={true}
-        supportedOrientations={['portrait', 'landscape']}
+        // supportedOrientations={['portrait', 'landscape']}
         statusBarTranslucent
         accessibilityViewIsModal
         accessibilityLabel={accessibilityLabel || title || 'Full screen modal'}
         accessibilityHint={
           accessibilityHint || 'Full screen dialog with content'
         }
-        onModalShow={() => setFocusTrapActive(true)}
-        onModalHide={() => setFocusTrapActive(false)}
+        // onModalShow={() => setFocusTrapActive(true)}
+        // onModalHide={() => setFocusTrapActive(false)}
       >
         <SafeAreaProvider
           style={{
             flex: 1,
-            // paddingTop: insets.top,
-            // paddingBottom: insets.bottom,
+            backgroundColor: cssVar.cBlack,
           }}
         >
           <SafeAreaView style={{ flex: 1 }}>
