@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from '../Icon/Icon';
 import { IconX } from '../../../../src/icons/IconLibrary';
 import { cssVar, FONTS, TypeStyles } from '../../../styles/themes';
@@ -7,10 +7,12 @@ import Button from '../../forms/Button/Button';
 import Form from '../../forms/Form/Form';
 import useAuth from '../../../hooks/useAuth';
 import Toast from '../Toast/Toast';
+import Modal from 'react-native-modal';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 interface DynamicModalProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (e: any) => void;
   children: React.ReactNode;
   title: string;
   height?: number;
@@ -37,17 +39,33 @@ const DynamicModal = ({
   onSave,
   variant = 'V1',
 }: DynamicModalProps) => {
-  const {toast, showToast}: any = useAuth();
+  const { toast, showToast }: any = useAuth();
   return (
     <Modal
-      visible={open}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={onClose}
+      isVisible={open}
+      onBackdropPress={() => onClose('x')}
+      onBackButtonPress={() => onClose('x')}
+      style={{ margin: 0 }}
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      backdropTransitionOutTiming={0}
+      customBackdrop={<View style={styles.overlay} />}
+      backdropOpacity={1}
+      useNativeDriver
+      hideModalContentWhileAnimating
     >
-      <View style={{ flex: 1 }}>
-        <Form>
-          <View style={styles.overlay}>
+      <SafeAreaProvider
+        style={{
+          flex: 1,
+        }}
+      >
+        <SafeAreaView style={{ flex: 1 }}>
+          <Form
+            style={{
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}
+          >
             <View
               style={{
                 ...styles[`content${variant}`],
@@ -72,8 +90,10 @@ const DynamicModal = ({
                   color={cssVar.cWhite}
                 />
               </View>
-              <ScrollView style={{padding: 12, flex: 1}}>{children}</ScrollView>
-              <View style={{padding: 12, flexDirection: 'row', gap: 8}}>
+              <ScrollView style={{ padding: 12, flex: 1 }}>
+                {children}
+              </ScrollView>
+              <View style={{ padding: 12, flexDirection: 'row', gap: 8 }}>
                 {buttonCancelText && (
                   <Button onPress={onClose} variant="secondary">
                     {buttonCancelText}
@@ -86,10 +106,10 @@ const DynamicModal = ({
                 )}
               </View>
             </View>
-          </View>
-          <Toast toast={toast} showToast={showToast} />
-        </Form>
-      </View>
+            <Toast toast={toast} showToast={showToast} />
+          </Form>
+        </SafeAreaView>
+      </SafeAreaProvider>
     </Modal>
   );
 };
@@ -97,11 +117,23 @@ const DynamicModal = ({
 export default DynamicModal;
 
 const styles: any = StyleSheet.create({
+  // overlay: {
+  //   flex: 1,
+  //   backgroundColor: '#161616E6',
+  //   justifyContent: 'flex-end',
+  // },
   overlay: {
     flex: 1,
     backgroundColor: '#161616E6',
-    justifyContent: 'flex-end',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+
   contentV1: {
     borderTopRightRadius: 16,
     borderTopLeftRadius: 16,
