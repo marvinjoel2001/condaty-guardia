@@ -1,37 +1,26 @@
 import React from 'react';
-import { View,  } from 'react-native';
+import { View } from 'react-native';
 import ItemFoot from './ItemFoot';
 import {
   IconAlertNotification,
   IconHistorial,
   IconHome,
   IconNovedades,
+  IconCalendar,
 } from '../../icons/IconLibrary';
-import {cssVar, ThemeType} from '../../../mk/styles/themes';
+import { cssVar, ThemeType } from '../../../mk/styles/themes';
 
 const Footer = () => {
   return (
-    <View 
-      style={{...theme.container}}>
-      <ItemFoot
-        path="Home"
-        text="Inicio"
-        icon={IconHome}
-      />
+    <View style={{ ...theme.container }}>
+      <ItemFoot path="Home" text="Inicio" icon={IconHome} />
 
-      <ItemFoot
-        path="Alerts"
-        text="Alertas"
-        icon={IconAlertNotification}
-      />
-      <ItemFoot
-        path="History"
-        text="Historial"
-        icon={IconHistorial}
-      />
+      <ItemFoot path="Alerts" text="Alertas" icon={IconAlertNotification} />
+      <ItemFoot path="History" text="Historial" icon={IconHistorial} />
+
+      <ItemFoot path="Reservations" text="Reservas" icon={IconCalendar} />
 
       <ItemFoot path="Binnacle" text="Bitácora" icon={IconNovedades} />
-
     </View>
   );
 };

@@ -6,12 +6,14 @@ import {
   IconHistorial,
   IconHome,
   IconNovedades,
+  IconCalendar,
 } from '../../icons/IconLibrary';
 import { useNavigationState } from '@react-navigation/native';
 import Home from '../../components/Home/Home';
 import Alerts from '../../components/Alerts/Alerts';
 import History from '../../components/History/History';
 import Binnacle from '../../components/Binnacle/Binnacle';
+import Reservations from '../../components/Reservations/Reservations';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,6 +28,8 @@ const onTabBarIcon = ({ focused, color, size, route }: any) => {
     // reverse = true;
   } else if (route.name === 'History') {
     iconName = IconHistorial;
+  } else if (route.name === 'Reservations') {
+    iconName = IconCalendar;
   } else if (route.name === 'Binnacle') {
     iconName = IconNovedades;
     // reverse = true;
@@ -88,6 +92,11 @@ const BottomTabs = () => {
           name="History"
           component={History}
           options={{ tabBarLabel: 'Historial' }}
+        />
+        <Tab.Screen
+          name="Reservations"
+          component={Reservations}
+          options={{ tabBarLabel: 'Reservas' }}
         />
         <Tab.Screen
           name="Binnacle"
