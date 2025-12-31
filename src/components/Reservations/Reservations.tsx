@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import Layout from '../../../mk/components/layout/Layout';
 import TabsButtons from '../../../mk/components/ui/TabsButton/TabsButton';
-import { FONTS } from '../../../mk/styles/themes';
+import { FONTS, cssVar } from '../../../mk/styles/themes';
 import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
@@ -145,7 +145,7 @@ const Reservations = () => {
       {!loaded ? (
         <ActivityIndicator
           size="large"
-          color="#000"
+          color={cssVar.cPrimary}
           style={{ marginTop: 20 }}
         />
       ) : (
