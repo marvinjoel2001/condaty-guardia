@@ -7,6 +7,7 @@ import Binnacle from '../components/Binnacle/Binnacle';
 import Documents from '../components/Documents/Documents';
 import Notifications from '../components/Notifications/Notifications';
 import History from '../components/History/History';
+import Reservations from '../components/Reservations/Reservations';
 import BottomTabs from './BottomTabs/BottomTabs';
 import PerformanceDashboard from '../components/PerformanceDashboard/PerformanceDashboard';
 
@@ -88,6 +89,13 @@ const Navigate = () => {
         name="History"
         component={History}
         // getComponent={() => require('../components/History/History').default}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Reservations"
+        component={Reservations}
         options={{
           headerShown: false,
         }}

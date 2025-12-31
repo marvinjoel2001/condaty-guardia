@@ -8,6 +8,7 @@ import {
   IconNotification,
   IconBitacora,
   IconUser,
+  IconCalendar,
 } from '../../../icons/IconLibrary';
 import { ItemMenuProps } from '../../../types/menu-item-types';
 
@@ -34,6 +35,12 @@ export const getMenuItems = ({
       screen: 'History',
       text: 'Historial',
       icon: IconHistorial,
+      reverse: true,
+    },
+    {
+      screen: 'Reservations',
+      text: 'Reservas',
+      icon: IconCalendar,
       reverse: true,
     },
     {
