@@ -27,6 +27,14 @@ const formatDate = (dateStr: string) => {
   return `${wDay} ${day} de ${mName}, ${year}`;
 };
 
+const StatusPill = React.memo(({ statusText, statusColor, statusBg }: any) => (
+  <View style={[styles.statusPill, { backgroundColor: statusBg }]}>
+    <Text style={[styles.statusText, { color: statusColor }]}>
+      {statusText}
+    </Text>
+  </View>
+));
+
 const Reservations = () => {
   const [tab, setTab] = useState('P');
   const [search, setSearch] = useState('');
@@ -71,14 +79,14 @@ const Reservations = () => {
     return responseData.data.map((item: any) => {
       const statusInfo = statusReserv[item.status] || {
         statusText: 'Desconocido',
-        statusColor: '#000',
-        statusBg: '#fff',
+        statusTextColor: '#000',
+        statusBgColor: '#fff',
       };
 
       let imageUrl = '';
       if (item.area?.images && item.area.images.length > 0) {
         imageUrl = getUrlImages(
-          `/AREA-${item.area.id}-${item.area.images[0].id}.${item.area.images[0].ext}?${item.area.updated_at}`,
+          `/AREA-${item.area.id}.${item.area.images[0].ext}?d=${item.area.updated_at}`,
         );
       }
 
@@ -91,8 +99,8 @@ const Reservations = () => {
         }`,
         status: statusInfo.statusText,
         statusCode: item.status,
-        statusColor: statusInfo.statusColor,
-        statusBg: statusInfo.statusBg,
+        statusColor: statusInfo.statusTextColor,
+        statusBg: statusInfo.statusBgColor,
         reserverName: `${item.owner?.name || ''} ${
           item.owner?.last_name || ''
         }`.trim(),
@@ -122,10 +130,6 @@ const Reservations = () => {
   const handleReservationPress = (reservation: any) => {
     setSelectedRes(reservation);
     setModalOpen(true);
-  };
-
-  const getStatus = (code: string) => {
-    return statusReserv[code] || statusReserv.UNKNOWN;
   };
 
   return (
@@ -161,13 +165,11 @@ const Reservations = () => {
           )}
 
           {filteredData.map((reservation: any) => {
-            const status = getStatus(reservation.statusCode);
             return (
               <ItemList
                 key={reservation.id}
                 title={reservation.title}
                 subtitle={reservation.date}
-                subtitle2={reservation.time}
                 left={
                   <Avatar
                     name={reservation.title}
@@ -176,23 +178,13 @@ const Reservations = () => {
                   />
                 }
                 right={
-                  <View
-                    style={[
-                      styles.statusPill,
-                      { backgroundColor: status.statusBgColor },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.statusText,
-                        { color: status.statusTextColor },
-                      ]}
-                    >
-                      {status.statusText}
-                    </Text>
-                  </View>
+                  <StatusPill
+                    statusText={reservation.status}
+                    statusColor={reservation.statusColor}
+                    statusBg={reservation.statusBg}
+                  />
                 }
-                onPress={() => handleReservationPress(reservation)}
+                onPress={() => handleReservationPress(reservation.original)}
               />
             );
           })}
