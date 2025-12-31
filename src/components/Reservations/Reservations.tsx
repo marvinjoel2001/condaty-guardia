@@ -145,7 +145,7 @@ const Reservations = () => {
       {!loaded ? (
         <ActivityIndicator
           size="large"
-          color={cssVar.cPrimary}
+          color={cssVar.cAccent}
           style={{ marginTop: 20 }}
         />
       ) : (
