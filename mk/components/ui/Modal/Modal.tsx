@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Animated,
   InteractionManager,
+  TouchableWithoutFeedback,
+  Pressable,
 } from 'react-native';
 import Icon from '../Icon/Icon';
 import { cssVar, FONTS, ThemeType, TypeStyles } from '../../../styles/themes';
@@ -14,7 +16,6 @@ import { AuthContext } from '../../../contexts/AuthContext';
 import { IconX } from '../../../../src/icons/IconLibrary';
 import Toast from '../Toast/Toast';
 import Button from '../../forms/Button/Button';
-import Form from '../../forms/Form/Form';
 import React from 'react';
 import ModalRN from 'react-native-modal';
 type PropsType = {
@@ -94,11 +95,25 @@ const Modal = ({
       onModalShow={() => setFocusTrapActive(true)}
       onModalHide={() => setFocusTrapActive(false)}
     >
-      <Form>
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{ ...theme.overlay }}
+      <View style={{ flex: 1 }}>
+        <Pressable
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            backgroundColor: '#161616E6',
+          }}
           onPress={_onOverlayPress}
+        />
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          pointerEvents="box-none"
         >
           <View
             style={{
@@ -124,19 +139,9 @@ const Modal = ({
               </View>
             )}
             <ScrollView
-              automaticallyAdjustContentInsets
-              automaticallyAdjustKeyboardInsets={true}
-              automaticallyAdjustsScrollIndicatorInsets
-              bounces
-              bouncesZoom
-              keyboardDismissMode="interactive"
-              canCancelContentTouches
-              disableIntervalMomentum={true}
               style={theme.body}
-              keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              scrollEventThrottle={16}
-              accessible={false}
+              keyboardShouldPersistTaps="handled"
             >
               {children}
             </ScrollView>
@@ -169,9 +174,9 @@ const Modal = ({
               </View>
             )}
           </View>
-        </TouchableOpacity>
+        </View>
         <Toast toast={toast} showToast={showToast} />
-      </Form>
+      </View>
     </ModalRN>
   );
 };
@@ -199,6 +204,7 @@ const theme: ThemeType = {
     shadowRadius: 2,
     elevation: 10,
     overflow: 'hidden',
+    maxHeight: '90%',
   },
   header: {
     flexGrow: 1,
@@ -221,6 +227,7 @@ const theme: ThemeType = {
     paddingHorizontal: cssVar.spM,
     paddingVertical: cssVar.spM,
     width: '100%',
+    paddingBottom: 40,
   },
   footer: {
     padding: cssVar.spS,

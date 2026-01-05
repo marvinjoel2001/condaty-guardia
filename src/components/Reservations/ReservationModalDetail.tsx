@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import Icon from '../../../mk/components/ui/Icon/Icon';
@@ -115,16 +115,32 @@ const ReservationModalDetail = ({ open, onClose, reservation }: Props) => {
         <View style={styles.content}>
           {/* Header Image */}
           <View style={styles.imageContainer}>
-            <Avatar
-              name={detailData.title}
-              hasImage={detailData.image ? 1 : 0}
-              src={detailData.image}
-              w={300}
-              h={180}
-              fontSize={40}
-              circle={false}
-              style={{ width: '100%', height: 180, borderRadius: 12 }}
-            />
+            {detailData.image ? (
+              <Image
+                source={{ uri: detailData.image }}
+                style={{ width: '100%', height: '100%' }}
+                resizeMode="cover"
+              />
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: cssVar.cBlackV2,
+                }}
+              >
+                <Text
+                  style={{
+                    color: cssVar.cWhite,
+                    fontFamily: FONTS.medium,
+                    fontSize: 16,
+                  }}
+                >
+                  Sin imagen
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Title & Description */}
@@ -245,9 +261,10 @@ const styles = StyleSheet.create({
     backgroundColor: cssVar.cBlackV2,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 0,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#333',
+
   },
   sectionLabel: {
     fontSize: cssVar.sM,
