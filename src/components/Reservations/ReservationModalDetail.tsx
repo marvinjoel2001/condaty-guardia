@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import Modal from '../../../mk/components/ui/Modal/Modal';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
@@ -28,8 +28,11 @@ const ReservationModalDetail = ({ open, onClose, reservation }: Props) => {
   } = useApi('/reservations', 'GET', params);
   const loading = !loaded;
 
+  const [imageError, setImageError] = useState(false);
+
   useEffect(() => {
     if (open && reservation?.id) {
+      setImageError(false);
       reload({ payload: params });
     }
   }, [open, reservation?.id]);
@@ -115,16 +118,18 @@ const ReservationModalDetail = ({ open, onClose, reservation }: Props) => {
         <View style={styles.content}>
           {/* Header Image */}
           <View style={styles.imageContainer}>
-            {detailData.image ? (
+            {detailData.image && !imageError ? (
               <Image
                 source={{ uri: detailData.image }}
                 style={{ width: '100%', height: '100%' }}
                 resizeMode="cover"
+                onError={() => setImageError(true)}
               />
             ) : (
               <View
                 style={{
-                  flex: 1,
+                  width: '100%',
+                  height: '100%',
                   justifyContent: 'center',
                   alignItems: 'center',
                   backgroundColor: cssVar.cBlackV2,
@@ -264,7 +269,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#333',
-
   },
   sectionLabel: {
     fontSize: cssVar.sM,
