@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import Input from '../../../../mk/components/forms/Input/Input';
 import useAuth from '../../../../mk/hooks/useAuth';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
-import {View} from 'react-native';
+import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
+import { View } from 'react-native';
 import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage';
 import DynamicModal from '../../../../mk/components/ui/DynamicModal/DynamicModal';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
@@ -33,40 +33,40 @@ export const AccompaniedAdd = ({
   extraOnClose = () => {},
 }: TypeProps) => {
   const [errors, setErrors]: any = useState({});
-  const {showToast} = useAuth();
+  const { showToast } = useAuth();
 
   const handleChange = (key: string, value: any) => {
-    setFormState((prevState: any) => ({...prevState, [key]: value}));
+    setFormState((prevState: any) => ({ ...prevState, [key]: value }));
   };
-  const validate = () => {
+  const validate = (values: any = formState) => {
     let errors: any = {};
 
     errors = checkRules({
-      value: formState.ci,
+      value: values.ci,
       rules: ['required', 'ci'],
       key: 'ci',
       errors,
     });
     errors = checkRules({
-      value: formState.name,
+      value: values.name,
       rules: ['required', 'alpha'],
       key: 'name',
       errors,
     });
     errors = checkRules({
-      value: formState.middle_name,
+      value: values.middle_name,
       rules: ['alpha'],
       key: 'middle_name',
       errors,
     });
     errors = checkRules({
-      value: formState.last_name,
+      value: values.last_name,
       rules: ['required', 'alpha'],
       key: 'last_name',
       errors,
     });
     errors = checkRules({
-      value: formState.mother_last_name,
+      value: values.mother_last_name,
       rules: ['alpha'],
       key: 'mother_last_name',
       errors,
@@ -76,19 +76,27 @@ export const AccompaniedAdd = ({
     return errors;
   };
   const onSave = async (force: boolean = false) => {
+    const values = {
+      ...formState,
+      name: formState.name?.trim(),
+      middle_name: formState.middle_name?.trim(),
+      last_name: formState.last_name?.trim(),
+      mother_last_name: formState.mother_last_name?.trim(),
+    };
+    setFormState(values);
     if (editItem) {
-      if (!force && hasErrors(validate())) {
+      if (!force && hasErrors(validate(values))) {
         return;
       }
       setItem({
         ...item,
-        ci: formState.ci,
-        name: formState.name,
-        middle_name: formState.middle_name,
-        last_name: formState.last_name,
-        mother_last_name: formState.mother_last_name,
-        ci_anverso: formState.ci_anverso,
-        ci_reverso: formState.ci_reverso,
+        ci: values.ci,
+        name: values.name,
+        middle_name: values.middle_name,
+        last_name: values.last_name,
+        mother_last_name: values.mother_last_name,
+        ci_anverso: values.ci_anverso,
+        ci_reverso: values.ci_reverso,
       });
       _onClose();
       return;
@@ -97,33 +105,33 @@ export const AccompaniedAdd = ({
     let acompanantes = item?.acompanantes || [];
     if (acompanantes?.length > 0) {
       const exist = acompanantes.find(
-        (acompanante: any) => acompanante.ci === formState.ci,
+        (acompanante: any) => acompanante.ci === values.ci,
       );
       if (exist) {
         showToast('El acompañante ya esta en la lista', 'error');
         return;
       }
     }
-    if (item?.ci === formState.ci || item?.ci_taxi === formState.ci) {
+    if (item?.ci === values.ci || item?.ci_taxi === values.ci) {
       showToast('El ci ya esta en la lista', 'error');
       return;
     }
 
-    if (!force && hasErrors(validate())) {
+    if (!force && hasErrors(validate(values))) {
       return;
     }
 
     acompanantes.push({
-      ci: formState.ci,
-      name: formState.name,
-      middle_name: formState.middle_name,
-      last_name: formState.last_name,
-      mother_last_name: formState.mother_last_name,
-      ci_anverso: formState.ci_anverso,
-      ci_reverso: formState.ci_reverso,
+      ci: values.ci,
+      name: values.name,
+      middle_name: values.middle_name,
+      last_name: values.last_name,
+      mother_last_name: values.mother_last_name,
+      ci_anverso: values.ci_anverso,
+      ci_reverso: values.ci_reverso,
     });
 
-    setItem({...item, acompanantes});
+    setItem({ ...item, acompanantes });
     _onClose();
   };
 
@@ -161,13 +169,14 @@ export const AccompaniedAdd = ({
       open={open}
       onClose={handleClose}
       height={468}
-      styleHeader={{borderBottomWidth: 0}}
+      styleHeader={{ borderBottomWidth: 0 }}
       buttonText="Registrar"
       subTitle="Agrega sus datos para registrarla"
       variant="V2"
       buttonCancelText=""
-      onSave={() => onSave(false)}>
-      <View style={{flexDirection: 'row', gap: 12}}>
+      onSave={() => onSave(false)}
+    >
+      <View style={{ flexDirection: 'row', gap: 12 }}>
         <UploadFileV2
           variant="V2"
           style={{

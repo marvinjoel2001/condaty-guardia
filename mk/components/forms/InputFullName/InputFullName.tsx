@@ -42,6 +42,9 @@ const InputFullName = ({
   const _onChange = useCallback(
     (name: string, value: any) => {
       // const cleanedValue = removeSpaces(value);
+      if (typeof value === 'string') {
+        value = value.trimStart();
+      }
       handleChangeInput(name + prefijo, value);
     },
     [handleChangeInput, prefijo],
