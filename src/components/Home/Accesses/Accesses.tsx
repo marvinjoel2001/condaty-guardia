@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {
   IconDelivery,
@@ -13,7 +13,7 @@ import {
 } from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
-import {buttonSecondary} from './shares/styles';
+import { buttonSecondary } from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
@@ -32,13 +32,13 @@ const statusText: any = {
   S: 'Dejar salir',
 };
 const statusColor: any = {
-  E: {color: cssVar.cWarning, background: cssVar.cHoverWarning},
-  A: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
-  N: {color: cssVar.cError, background: cssVar.cHoverError},
-  S: {color: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
+  E: { color: cssVar.cWarning, background: cssVar.cHoverWarning },
+  A: { color: cssVar.cSuccess, background: cssVar.cHoverSuccess },
+  N: { color: cssVar.cError, background: cssVar.cHoverError },
+  S: { color: cssVar.cAlertMedio, background: cssVar.cHoverOrange },
 };
 
-const NoResults = ({text, icon}: any) => (
+const NoResults = ({ text, icon }: any) => (
   <View style={styles.noResultsContainer}>
     <Icon name={icon} color={cssVar.cWhiteV1} size={60} />
     <Text style={styles.noResultsText}>{text}</Text>
@@ -71,14 +71,14 @@ const titleAccess = (item: any) => {
   return <Text>{getFullName(item?.visit || item?.owner)}</Text>;
 };
 
-const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
+const Accesses = ({ data, reload, typeSearch, isLoading }: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
-  const {dataAccesses, dataOrders} = useMemo(() => {
-    if (!data) return {dataAccesses: null, dataOrders: null};
+  const { dataAccesses, dataOrders } = useMemo(() => {
+    if (!data) return { dataAccesses: null, dataOrders: null };
 
     const filterByType = (items: any[], type: string) => {
       if (type === 'I') {
@@ -109,7 +109,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
     if (type == 'O') setOpenDetailOrders(true);
-    setFormState({id: item.id});
+    setFormState({ id: item.id });
   };
 
   const getStatus = (item: any) => {
@@ -139,7 +139,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
           padding: 4,
           borderRadius: 4,
           fontFamily: FONTS.regular,
-        }}>
+        }}
+      >
         {statusText[getStatus(item)]}
       </Text>
     );
@@ -153,7 +154,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             color: cssVar.cError,
             fontSize: 12,
             fontFamily: FONTS.regular,
-          }}>
+          }}
+        >
           Cancelado
         </Text>
       );
@@ -161,8 +163,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     if (item.access && !item.access.out_at) {
       return (
         <TouchableOpacity
-          style={{borderRadius: 10}}
-          onPress={() => onPressDetail(item, 'O')}>
+          style={{ borderRadius: 10 }}
+          onPress={() => onPressDetail(item, 'O')}
+        >
           <Text style={buttonSecondary}>Dejar salir</Text>
         </TouchableOpacity>
       );
@@ -171,8 +174,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     if (!item.access) {
       return (
         <TouchableOpacity
-          style={{borderRadius: 10}}
-          onPress={() => onPressDetail(item, 'O')}>
+          style={{ borderRadius: 10 }}
+          onPress={() => onPressDetail(item, 'O')}
+        >
           <Text
             style={{
               color: cssVar.cWarning,
@@ -181,7 +185,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
               padding: 4,
               fontSize: 10,
               fontFamily: FONTS.regular,
-            }}>
+            }}
+          >
             Registrar ingreso
           </Text>
         </TouchableOpacity>
@@ -314,8 +319,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     if (!searchTerm) return items;
 
     return items?.filter(item => {
-      const visitName = item?.visit ? getFullName(item.visit) : '';
-      const ownerName = item?.owner ? getFullName(item.owner) : '';
+      const visitName = item?.visit ? getFullName(item.visit, 'NSLM') : '';
+      const ownerName = item?.owner ? getFullName(item.owner, 'NSLM') : '';
       const visitCI = item?.visit?.ci || '';
       const otherTypeName = item?.other_type?.name || '';
 
@@ -377,12 +382,12 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             setSearch={setSearch}
             name="home"
             value={search}
-            style={{marginBottom: 8}}
+            style={{ marginBottom: 8 }}
           />
           <ListFlat
             data={combinedData}
             renderItem={renderCombinedItem}
-            style={{paddingBottom: 120}}
+            style={{ paddingBottom: 120 }}
             keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
             onRefresh={reload}
             refreshing={isLoading}
