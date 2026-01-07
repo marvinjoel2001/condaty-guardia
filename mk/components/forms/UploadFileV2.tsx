@@ -203,11 +203,6 @@ const UploadFile: React.FC<Props> = ({
         try {
           const originalBlob = await uriToBlob(asset.uri);
           originalSize = originalBlob.size;
-          console.log(
-            `📏 Tamaño ORIGINAL de "${filename}": ${(
-              originalSize / 1024
-            ).toFixed(2)} KB`,
-          );
         } catch (err) {
           console.warn('No se pudo obtener tamaño original', err);
         }
@@ -234,20 +229,6 @@ const UploadFile: React.FC<Props> = ({
           uploadType = format === 'WEBP' ? 'image/webp' : 'image/jpeg';
           uploadName =
             resized.name || `resized_${Date.now()}.${format.toLowerCase()}`;
-
-          console.log(
-            `📏 Tamaño COMPRIMIDO de "${filename}": ${(
-              resized.size / 1024
-            ).toFixed(2)} KB`,
-          );
-
-          if (originalSize > 0) {
-            const reduction = (
-              ((originalSize - resized.size) / originalSize) *
-              100
-            ).toFixed(2);
-            console.log(`📉 Reducción: ${reduction}%`);
-          }
         } catch (err) {
           console.warn('Fallo al comprimir imagen, se usa original', err);
           // Si falla la compresión, seguimos con la original
@@ -406,12 +387,13 @@ const UploadFile: React.FC<Props> = ({
             </TouchableOpacity>
           )}
         </View>
-
-        <ImageExpandableModal
-          visible={modalVisible}
-          imageUri={selectedImageUri}
-          onClose={() => setModalVisible(false)}
-        />
+        {modalVisible && (
+          <ImageExpandableModal
+            visible={modalVisible}
+            imageUri={selectedImageUri}
+            onClose={() => setModalVisible(false)}
+          />
+        )}
       </>
     );
   }
@@ -535,12 +517,13 @@ const UploadFile: React.FC<Props> = ({
           <Text style={{ color: 'red', marginTop: 6 }}>Campo obligatorio</Text>
         )}
       </View>
-
-      <ImageExpandableModal
-        visible={modalVisible}
-        imageUri={selectedImageUri}
-        onClose={() => setModalVisible(false)}
-      />
+      {modalVisible && (
+        <ImageExpandableModal
+          visible={modalVisible}
+          imageUri={selectedImageUri}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
     </>
   );
 };
