@@ -26,7 +26,6 @@ import {
 } from '../../../src/icons/IconLibrary';
 import { cssVar, FONTS } from '../../styles/themes';
 import ImageExpandableModal from '../../components/ui/ImageExpandableModal/ImageExpandableModal'; // ← Ya lo tenías importado
-
 interface Props {
   setFormState: (updater: any) => void;
   formState: any;
@@ -43,7 +42,6 @@ interface Props {
   variant?: 'V1' | 'V2';
   onUploadStateChange?: (isUploading: boolean) => void;
 }
-
 const UploadFile: React.FC<Props> = ({
   setFormState,
   formState,
@@ -82,7 +80,6 @@ const UploadFile: React.FC<Props> = ({
   } else if (type === 'A') {
     defaultExts = '*'; // Acepta todo
   }
-
   const allowedExts = ext
     ? ext
         .toLowerCase()
@@ -91,10 +88,8 @@ const UploadFile: React.FC<Props> = ({
     : defaultExts === '*'
     ? ['*']
     : defaultExts.split(',').map(e => e.trim().replace('.', ''));
-
   const folder = global ? 'global' : clientId || 'unknown';
   const pref = prefix ? `${prefix}/` : '';
-
   const getPath = useCallback(
     (filename: string) => {
       const clean = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -102,13 +97,11 @@ const UploadFile: React.FC<Props> = ({
     },
     [folder, pref],
   );
-
   const pickFile = useCallback(() => {
     if (currentValues.length >= cant) {
       Alert.alert('Límite alcanzado', `Máximo ${cant} archivo(s)`);
       return;
     }
-
     if (type === 'I') {
       Alert.alert('Seleccionar imagen', '', [
         { text: 'Cámara', onPress: openCamera },
@@ -126,7 +119,6 @@ const UploadFile: React.FC<Props> = ({
       pickDocument();
     }
   }, [currentValues.length, cant, type]);
-
   const openCamera = async () => {
     if (Platform.OS === 'android') {
       const p = await PermissionsAndroid.request(
@@ -157,7 +149,6 @@ const UploadFile: React.FC<Props> = ({
       handleResponse,
     );
   };
-
   const pickDocument = async () => {
     try {
       const [asset] = await pick();
@@ -174,19 +165,15 @@ const UploadFile: React.FC<Props> = ({
       console.error(err);
     }
   };
-
   const handleResponse = async (response: any) => {
     if (response.didCancel || !response.assets) return;
-
     setUploading(true);
     onUploadStateChange?.(true);
     setWaiting(1, 'upload-files');
     const newValues = [...currentValues];
-
     for (const asset of response.assets) {
       const filename = asset.fileName || `file_${Date.now()}`;
       const fileExt = filename.split('.').pop()?.toLowerCase();
-
       // Si allowedExts incluye '*', acepta cualquier archivo
       if (
         !allowedExts.includes('*') &&
@@ -195,9 +182,7 @@ const UploadFile: React.FC<Props> = ({
         Alert.alert('Error', `Formato no permitido: .${fileExt}`);
         continue;
       }
-
       const path = getPath(filename);
-
       try {
         // Para Cloudinary, pasamos el asset completo con URI
         // Para Bunny, convertimos a Blob
@@ -209,7 +194,6 @@ const UploadFile: React.FC<Props> = ({
                 name: filename,
               }
             : await uriToBlob(asset.uri);
-
         const uploaded = await storage.upload(fileToUpload, path);
         // Guardamos solo la URL para compatibilidad con el backend
         newValues.push(uploaded.url);
@@ -218,7 +202,6 @@ const UploadFile: React.FC<Props> = ({
         Alert.alert('Error', 'No se pudo subir el archivo');
       }
     }
-
     setFormState((prev: any) => ({
       ...prev,
       [name]: isSingle ? [newValues[0] || ''] : newValues,
@@ -227,11 +210,9 @@ const UploadFile: React.FC<Props> = ({
     onUploadStateChange?.(false);
     setWaiting(-1, 'upload-files');
   };
-
   const remove = (fullUrl: string) => {
     if (!fullUrl || typeof fullUrl !== 'string') return;
     let path = fullUrl;
-
     // Para URLs de Cloudinary, extraer el public_id correctamente
     // Formato: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{ext}
     if (fullUrl.includes('cloudinary.com')) {
@@ -357,13 +338,14 @@ const UploadFile: React.FC<Props> = ({
             </TouchableOpacity>
           )}
         </View>
-
         {/* Modal expandible */}
-        <ImageExpandableModal
-          visible={modalVisible}
-          imageUri={selectedImageUri}
-          onClose={() => setModalVisible(false)}
-        />
+        {modalVisible && (
+          <ImageExpandableModal
+            visible={modalVisible}
+            imageUri={selectedImageUri}
+            onClose={() => setModalVisible(false)}
+          />
+        )}
       </>
     );
   }
