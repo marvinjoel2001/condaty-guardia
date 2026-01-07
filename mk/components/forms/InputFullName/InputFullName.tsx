@@ -42,6 +42,14 @@ const InputFullName = ({
   const _onChange = useCallback(
     (name: string, value: any) => {
       // const cleanedValue = removeSpaces(value);
+      if (typeof value === 'string') {
+        // 1. Eliminar espacios al inicio
+        value = value.trimStart();
+        // 2. Reemplazar múltiples espacios por uno solo
+        value = value.replace(/\s\s+/g, ' ');
+        // 3. Capitalizar la primera letra de cada palabra
+        value = value.replace(/(?:^|\s)\S/g, (a: string) => a.toUpperCase());
+      }
       handleChangeInput(name + prefijo, value);
     },
     [handleChangeInput, prefijo],
