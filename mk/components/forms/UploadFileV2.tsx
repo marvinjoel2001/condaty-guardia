@@ -25,7 +25,9 @@ import {
   IconCamera,
 } from '../../../src/icons/IconLibrary';
 import { cssVar, FONTS } from '../../styles/themes';
-import ImageExpandableModal from '../../components/ui/ImageExpandableModal/ImageExpandableModal'; // ← Ya lo tenías importado
+import ImageExpandableModal from '../../components/ui/ImageExpandableModal/ImageExpandableModal';
+import ImageResizer from '@bam.tech/react-native-image-resizer';
+
 interface Props {
   setFormState: (updater: any) => void;
   formState: any;
@@ -42,6 +44,8 @@ interface Props {
   variant?: 'V1' | 'V2';
   onUploadStateChange?: (isUploading: boolean) => void;
 }
+const quality = 0.7;
+
 const UploadFile: React.FC<Props> = ({
   setFormState,
   formState,
@@ -126,15 +130,7 @@ const UploadFile: React.FC<Props> = ({
       );
       if (p !== PermissionsAndroid.RESULTS.GRANTED) return;
     }
-    launchCamera(
-      {
-        mediaType: 'photo',
-        quality: 0.6, // Reduce más la calidad
-        maxWidth: 1920, // Limita el ancho máximo
-        maxHeight: 1920, // Limita el alto máximo
-      },
-      handleResponse,
-    );
+    launchCamera({ mediaType: 'photo', quality }, handleResponse);
   };
 
   const openGallery = () => {
@@ -142,9 +138,7 @@ const UploadFile: React.FC<Props> = ({
       {
         mediaType: type === 'I' || type === 'A' ? 'photo' : 'mixed',
         selectionLimit: cant - currentValues.length,
-        quality: 0.6, // ← AGREGAR ESTO
-        maxWidth: 1920, // ← AGREGAR ESTO
-        maxHeight: 1920, // ← AGREGAR ESTO
+        quality, // ← Añadido para comprimir un poco desde el picker
       },
       handleResponse,
     );
@@ -159,7 +153,6 @@ const UploadFile: React.FC<Props> = ({
       }
     } catch (err: any) {
       if (err.code === 'DOCUMENT_PICKER_CANCELED') {
-        // User canceled, do nothing
         return;
       }
       console.error(err);
@@ -172,9 +165,10 @@ const UploadFile: React.FC<Props> = ({
     setWaiting(1, 'upload-files');
     const newValues = [...currentValues];
     for (const asset of response.assets) {
-      const filename = asset.fileName || `file_${Date.now()}`;
-      const fileExt = filename.split('.').pop()?.toLowerCase();
-      // Si allowedExts incluye '*', acepta cualquier archivo
+      let filename = asset.fileName || `file_${Date.now()}`;
+      let fileExt = filename.split('.').pop()?.toLowerCase();
+
+      // Validación de extensión
       if (
         !allowedExts.includes('*') &&
         (!fileExt || !allowedExts.includes(fileExt))
@@ -182,20 +176,97 @@ const UploadFile: React.FC<Props> = ({
         Alert.alert('Error', `Formato no permitido: .${fileExt}`);
         continue;
       }
-      const path = getPath(filename);
+
+      let uploadUri = asset.uri;
+      let uploadType = asset.type || 'image/jpeg';
+      let uploadName = filename;
+
+      // Detectar si es imagen
+      const imageExts = [
+        'jpg',
+        'jpeg',
+        'png',
+        'webp',
+        'gif',
+        'bmp',
+        'heic',
+        'heif',
+      ];
+      const isImageAsset =
+        asset.type?.startsWith('image/') ||
+        (fileExt && imageExts.includes(fileExt));
+
+      let originalSize = 0;
+
+      if (isImageAsset) {
+        // Tamaño original (para log)
+        try {
+          const originalBlob = await uriToBlob(asset.uri);
+          originalSize = originalBlob.size;
+          console.log(
+            `📏 Tamaño ORIGINAL de "${filename}": ${(
+              originalSize / 1024
+            ).toFixed(2)} KB`,
+          );
+        } catch (err) {
+          console.warn('No se pudo obtener tamaño original', err);
+        }
+
+        // Compresión y redimensión
+        try {
+          const format = Platform.OS === 'android' ? 'WEBP' : 'JPEG';
+          const resized = await ImageResizer.createResizedImage(
+            asset.uri,
+            1200, // ancho máximo
+            1200, // alto máximo
+            format,
+            quality * 100, // calidad (0-100)
+            0, // rotación
+            undefined, // carpeta de salida (cache temporal)
+            false, // mantener metadata
+            {
+              mode: 'contain',
+              onlyScaleDown: true,
+            },
+          );
+
+          uploadUri = resized.uri;
+          uploadType = format === 'WEBP' ? 'image/webp' : 'image/jpeg';
+          uploadName =
+            resized.name || `resized_${Date.now()}.${format.toLowerCase()}`;
+
+          console.log(
+            `📏 Tamaño COMPRIMIDO de "${filename}": ${(
+              resized.size / 1024
+            ).toFixed(2)} KB`,
+          );
+
+          if (originalSize > 0) {
+            const reduction = (
+              ((originalSize - resized.size) / originalSize) *
+              100
+            ).toFixed(2);
+            console.log(`📉 Reducción: ${reduction}%`);
+          }
+        } catch (err) {
+          console.warn('Fallo al comprimir imagen, se usa original', err);
+          // Si falla la compresión, seguimos con la original
+        }
+      }
+
+      const path = getPath(uploadName);
+
       try {
-        // Para Cloudinary, pasamos el asset completo con URI
-        // Para Bunny, convertimos a Blob
         const fileToUpload =
           (configApp as any).storageStrategy === 'cloudinary'
             ? {
-                uri: asset.uri,
-                type: asset.type || 'image/jpeg',
-                name: filename,
+                uri: uploadUri,
+                type: uploadType,
+                name: uploadName,
               }
-            : await uriToBlob(asset.uri);
+            : await uriToBlob(uploadUri);
+
         const uploaded = await storage.upload(fileToUpload, path);
-        // Guardamos solo la URL para compatibilidad con el backend
         newValues.push(uploaded.url);
       } catch (e) {
         console.error(e);
@@ -213,15 +284,13 @@ const UploadFile: React.FC<Props> = ({
   const remove = (fullUrl: string) => {
     if (!fullUrl || typeof fullUrl !== 'string') return;
     let path = fullUrl;
-    // Para URLs de Cloudinary, extraer el public_id correctamente
-    // Formato: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{ext}
+
     if (fullUrl.includes('cloudinary.com')) {
       const match = fullUrl.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.[^.]+)?$/);
       if (match && match[1]) {
-        path = match[1]; // Esto extrae el public_id sin la extensión
+        path = match[1];
       }
     } else {
-      // Para otras URLs (Bunny, etc.)
       try {
         const urlObj = new URL(fullUrl);
         path = decodeURIComponent(urlObj.pathname.slice(1));
@@ -242,7 +311,6 @@ const UploadFile: React.FC<Props> = ({
     }));
   };
 
-  // Abrir modal con la imagen
   const openImageModal = (fullUrl: string) => {
     setSelectedImageUri(fullUrl);
     setModalVisible(true);
@@ -338,23 +406,20 @@ const UploadFile: React.FC<Props> = ({
             </TouchableOpacity>
           )}
         </View>
-        {/* Modal expandible */}
-        {modalVisible && (
-          <ImageExpandableModal
-            visible={modalVisible}
-            imageUri={selectedImageUri}
-            onClose={() => setModalVisible(false)}
-          />
-        )}
+
+        <ImageExpandableModal
+          visible={modalVisible}
+          imageUri={selectedImageUri}
+          onClose={() => setModalVisible(false)}
+        />
       </>
     );
   }
 
   // MODO MÚLTIPLE
-  // Calculamos el tamaño de cada item basado en el ancho de pantalla
   const GAP = 12;
   const ITEMS_PER_ROW = 3;
-  const CONTAINER_PADDING = 32; // Padding horizontal del contenedor padre (16 * 2)
+  const CONTAINER_PADDING = 32;
   const containerWidth = screenWidth - CONTAINER_PADDING;
   const ITEM_SIZE =
     (containerWidth - GAP * (ITEMS_PER_ROW - 1)) / ITEMS_PER_ROW;
@@ -362,11 +427,8 @@ const UploadFile: React.FC<Props> = ({
   return (
     <>
       <View style={{ marginVertical: 12 }}>
-        {/* {label && <Text style={{ marginBottom: 8, fontWeight: '600' }}>{label}</Text>} */}
-
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: GAP }}>
           {currentValues.map((path: string, i: number) => {
-            // Determinar si es imagen por extensión o tipo
             const fileExt = path.split('.').pop()?.toLowerCase();
             const imageExts = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
             const isImage =
@@ -400,7 +462,6 @@ const UploadFile: React.FC<Props> = ({
                 </TouchableOpacity>
 
                 {isImage ? (
-                  // Tocamos la miniatura → abre modal
                   <TouchableOpacity
                     activeOpacity={0.9}
                     onPress={() => openImageModal(path)}
@@ -475,14 +536,11 @@ const UploadFile: React.FC<Props> = ({
         )}
       </View>
 
-      {/* Modal expandible */}
-      {modalVisible && (
-        <ImageExpandableModal
-          visible={modalVisible}
-          imageUri={selectedImageUri}
-          onClose={() => setModalVisible(false)}
-        />
-      )}
+      <ImageExpandableModal
+        visible={modalVisible}
+        imageUri={selectedImageUri}
+        onClose={() => setModalVisible(false)}
+      />
     </>
   );
 };
