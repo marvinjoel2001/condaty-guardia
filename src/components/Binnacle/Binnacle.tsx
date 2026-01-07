@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../../../mk/components/layout/Layout';
 import DataSearch from '../../../mk/components/ui/DataSearch';
 import ListFlat from '../../../mk/components/ui/List/ListFlat';
@@ -7,7 +7,7 @@ import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import IconFloat from '../../../mk/components/ui/IconFLoat/IconFloat';
 import BinnacleAdd from './BinnacleAdd';
 import BinnacleDetail from './BinnacleDetail';
-import {getDateTimeStrMes} from '../../../mk/utils/dates';
+import { getDateTimeStrMes } from '../../../mk/utils/dates';
 
 const Binnacle = () => {
   const paramsInitial = {
@@ -18,7 +18,7 @@ const Binnacle = () => {
   };
 
   const [openAdd, setOpenAdd] = useState(false);
-  const [openView, setOpenView] = useState({open: false, id: null});
+  const [openView, setOpenView] = useState({ open: false, id: null });
   const [search, setSearch] = useState('');
   const [params, setParams] = useState(paramsInitial);
   const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
@@ -26,7 +26,7 @@ const Binnacle = () => {
     data: binnacleData,
     reload: reloadBinnacle,
     loaded,
-  } = useApi('/guardnews', 'GET', params, 3);
+  } = useApi('/guardnews', 'GET', params);
 
   useEffect(() => {
     if (binnacleData?.data) {
@@ -50,7 +50,7 @@ const Binnacle = () => {
   const novedadList = (novedad: any) => {
     return (
       <ItemList
-        onPress={() => setOpenView({open: true, id: novedad.id})}
+        onPress={() => setOpenView({ open: true, id: novedad.id })}
         title={novedad.descrip}
         subtitle={getDateTimeStrMes(novedad?.created_at)}
       />
@@ -107,7 +107,7 @@ const Binnacle = () => {
         {openView.open && (
           <BinnacleDetail
             open={openView.open}
-            onClose={() => setOpenView({open: false, id: null})}
+            onClose={() => setOpenView({ open: false, id: null })}
             id={openView?.id}
           />
         )}
