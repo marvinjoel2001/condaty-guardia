@@ -134,7 +134,15 @@ const UploadFile: React.FC<Props> = ({
       );
       if (p !== PermissionsAndroid.RESULTS.GRANTED) return;
     }
-    launchCamera({ mediaType: 'photo', quality: 0.8 }, handleResponse);
+    launchCamera(
+      {
+        mediaType: 'photo',
+        quality: 0.6, // Reduce más la calidad
+        maxWidth: 1920, // Limita el ancho máximo
+        maxHeight: 1920, // Limita el alto máximo
+      },
+      handleResponse,
+    );
   };
 
   const openGallery = () => {
@@ -142,6 +150,9 @@ const UploadFile: React.FC<Props> = ({
       {
         mediaType: type === 'I' || type === 'A' ? 'photo' : 'mixed',
         selectionLimit: cant - currentValues.length,
+        quality: 0.6, // ← AGREGAR ESTO
+        maxWidth: 1920, // ← AGREGAR ESTO
+        maxHeight: 1920, // ← AGREGAR ESTO
       },
       handleResponse,
     );
@@ -483,11 +494,13 @@ const UploadFile: React.FC<Props> = ({
       </View>
 
       {/* Modal expandible */}
-      <ImageExpandableModal
-        visible={modalVisible}
-        imageUri={selectedImageUri}
-        onClose={() => setModalVisible(false)}
-      />
+      {modalVisible && (
+        <ImageExpandableModal
+          visible={modalVisible}
+          imageUri={selectedImageUri}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
     </>
   );
 };
