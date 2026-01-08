@@ -21,6 +21,8 @@ import Splash from '../Splash/Splash';
 import { checkRules, hasErrors } from '../../../mk/utils/validate/Rules';
 import VersionChecker from '../../../mk/utils/VersionChecker';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import VersionCheck from 'react-native-version-check';
+import DeviceInfo from 'react-native-device-info'; // ← Asegurado el import
 
 const Login = () => {
   const [formState, setFormState]: any = useState({});
@@ -89,31 +91,69 @@ const Login = () => {
     if (hasErrors(validate())) {
       return;
     }
-    login(formState)
-      .then((data: any) => {
-        setSplash(false);
-        if (!(user || data?.user)) {
-          if (data?.errors?.status == 500) {
-            setErrors({
-              ci: 'Problemas de conexion con el servidor... Intente más tarde.',
-            });
-          } else {
-            setErrors(
-              data?.errors == 'Acceso incorrecto'
-                ? { password: 'Credenciales incorrectas' }
-                : data?.errors,
-            );
-            console.log('entre!', data?.errors?.status);
-          }
+
+    try {
+      const appVersion = await VersionCheck.getCurrentVersion();
+
+      // === OBTENCIÓN DE INFORMACIÓN DEL DISPOSITIVO ===
+      const [
+        model,
+        systemName,
+        systemVersion,
+        brand,
+        totalMemory,
+        uniqueId,
+      ] = await Promise.all([
+        DeviceInfo.getModel(),
+        DeviceInfo.getSystemName(),         // "iOS" o "Android"
+        DeviceInfo.getSystemVersion(),
+        DeviceInfo.getBrand(),
+        DeviceInfo.getTotalMemory(),        // bytes
+        DeviceInfo.getUniqueId(),
+      ]);
+
+      const ramInGB = Math.round(totalMemory / (1024 * 1024 * 1024));
+
+      const deviceData = {
+        device_model: model,
+        device_os: systemName,
+        device_os_version: systemVersion,
+        device_brand: brand,
+        device_ram_gb: ramInGB,
+        device_id: uniqueId,
+      };
+
+      const credentials = {
+        ...formState,
+        app_version: appVersion,
+        ...deviceData,
+      };
+
+      // Login con los datos enriquecidos
+      const data: any = await login(credentials);
+      setSplash(false);
+
+      if (!(user || data?.user)) {
+        if (data?.errors?.status == 500) {
+          setErrors({
+            ci: 'Problemas de conexion con el servidor... Intente más tarde.',
+          });
+        } else {
+          setErrors(
+            data?.errors == 'Acceso incorrecto'
+              ? { password: 'Credenciales incorrectas' }
+              : data?.errors,
+          );
         }
-        return;
-      })
-      .catch((err: any) => {
-        setSplash(false);
-        console.log('====================================');
-        console.log('Error Login network', err, errors);
-        console.log('====================================');
+      }
+    } catch (err: any) {
+      console.log('Error obtaining version/device info or login:', err);
+      setSplash(false);
+      // En caso de error crítico, intentar login básico
+      await login(formState).catch(() => {
+        setErrors({ password: 'Error de conexión' });
       });
+    }
   };
 
   const passwordIcon = useMemo(() => {
@@ -265,6 +305,7 @@ const Login = () => {
     </View>
   );
 };
+
 const theme: ThemeType = {
   safeAreaView: {
     flex: 1,
