@@ -1,190 +1,158 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Linking, Platform, TouchableOpacity, Image, Dimensions } from 'react-native';
-import VersionCheck from 'react-native-version-check';
+// components/VersionChecker.tsx
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  Platform,
+  Linking,
+  AppState,
+} from 'react-native';
 import Modal from 'react-native-modal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import VersionCheck from 'react-native-version-check';
 import useApi from '../hooks/useApi';
 import { cssVar } from '../styles/themes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Storage keys
-const VERSION_CHECK_KEY = '@version_check_last_time';
-const VERSION_DATA_KEY = '@version_data';
+// ===================================================================
+// CONFIGURACIÓN
+// ===================================================================
+const CACHE_DURATION_MS = __DEV__ ? 1 * 1000 : 10 * 60 * 1000; // 10 seg dev | 1min prod
+const STORAGE_KEY_LAST_CHECK = '@version_check_last_time';
 
-// Duración de cache: 10 minutos para testing (sube a 60 * 60 * 1000 en prod)
-const CACHE_DURATION_MS = 30 * 60 * 1000;
-
-// Interface for cached data (partial para manejar incompletos)
-interface CachedVersionData {
-  guard: {
-    min_version: Partial<Record<'ios' | 'android', string>>;
-    update_url: Partial<Record<'ios' | 'android', string>>;
-  };
-  last_check: string; // ISO string
+interface GuardVersion {
+  min_version?: Record<'ios' | 'android', string>;
+  update_url?: Record<'ios' | 'android', string>;
 }
 
+interface VersionApiResponse {
+  guard: GuardVersion;
+}
+
+const images = {
+  ios: require('../../src/images/condy-app-store.png'),
+  android: require('../../src/images/condy-play-store.png'),
+} as const;
+
 const VersionChecker = ({ children }: { children: React.ReactNode }) => {
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updateUrl, setUpdateUrl] = useState('');
-  const [shouldFetch, setShouldFetch] = useState(false);
-  const [versionData, setVersionData] = useState<any>(null);
+  const [needsUpdate, setNeedsUpdate] = useState(false);
+  const [updateUrl, setUpdateUrl] = useState<string>('');
 
-  const { data, error: apiError, execute, reload } = useApi('/app-version', 'GET', {}, 0, shouldFetch);
+  const { data, error, reload } = useApi('/app-version', 'GET', {}, 0, true);
+  const versionData = data as VersionApiResponse | null;
 
-  const images = {
-    ios: require('../../src/images/condy-app-store.png'),
-    android: require('../../src/images/condy-play-store.png'),
-  } as const;
-  const selectedImage = Platform.OS === 'android' ? images.android : images.ios;
+  const appStateRef = useRef(AppState.currentState);
 
-  // Helper: Verifica si fetch necesario
-  const shouldCheckVersion = async (): Promise<boolean> => {
-    try {
-      const lastCheckTime = await AsyncStorage.getItem(VERSION_CHECK_KEY);
-      if (!lastCheckTime) return true;
-
-      const lastCheckDate = new Date(lastCheckTime);
-      const currentDate = new Date();
-      const timeDifference = currentDate.getTime() - lastCheckDate.getTime();
-      if (__DEV__) console.log('Cache time difference:', timeDifference, 'vs', CACHE_DURATION_MS);
-      return timeDifference >= CACHE_DURATION_MS;
-    } catch (error) {
-      if (__DEV__) console.error('Error checking cache time:', error);
-      return true;
-    }
-  };
-
-  // Helper: Carga cache (valida si válida)
-  const loadCachedData = async (): Promise<CachedVersionData | null> => {
-    try {
-      const stored = await AsyncStorage.getItem(VERSION_DATA_KEY);
-      if (stored) {
-        if (__DEV__) console.log('Loaded cache:', stored);
-        const parsed = JSON.parse(stored) as CachedVersionData;
-        // Invalida si guard vacío
-        if (!parsed.guard?.min_version || Object.keys(parsed.guard.min_version).length === 0) {
-          if (__DEV__) console.warn('Invalid cache: empty min_version, clearing');
-          await AsyncStorage.removeItem(VERSION_DATA_KEY);
-          return null;
-        }
-        return parsed;
-      }
-    } catch (error) {
-      if (__DEV__) console.error('Error loading cache:', error);
-    }
-    return null;
-  };
-
-  // Helper: Guarda solo si data válida (no vacía)
-  const saveVersionData = async (dataToSave: any) => {
-    try {
-      if (!dataToSave?.guard?.min_version || Object.keys(dataToSave.guard.min_version).length === 0) {
-        if (__DEV__) console.warn('Skipping save: empty/invalid guard data from API');
-        return; // No guarda bad data
-      }
-      const currentTime = new Date().toISOString();
-      await AsyncStorage.setItem(VERSION_CHECK_KEY, currentTime);
-
-      const cached: CachedVersionData = {
-        guard: dataToSave.guard,
-        last_check: currentTime,
-      };
-      await AsyncStorage.setItem(VERSION_DATA_KEY, JSON.stringify(cached));
-      if (__DEV__) console.log('Saved cache:', cached);
-    } catch (error) {
-      if (__DEV__) console.error('Error saving cache:', error);
-    }
-  };
-
-  // Core validation (fallback a store si min undefined)
-  const checkForUpdate = async (checkData: any) => {
+  const checkForUpdate = useCallback(async (apiData: VersionApiResponse | null) => {
     try {
       const currentVersion = VersionCheck.getCurrentVersion();
-      const platform = Platform.OS;
-      let minVersion = checkData?.guard?.min_version?.[platform];
+      const platform = Platform.OS as 'ios' | 'android';
 
-      if (__DEV__) {
-        console.log('Full versionData:', JSON.stringify(checkData));
-        console.log('Current version:', currentVersion, 'Min version:', minVersion);
-      }
-
+      let minVersion = apiData?.guard?.min_version?.[platform];
       if (!minVersion) {
-        if (__DEV__) console.warn('No min_version from API, falling back to store latest');
-        // Fallback: Chequea contra latest en store (async, no bloquea)
         minVersion = await VersionCheck.getLatestVersion();
-        if (!minVersion) {
-          if (__DEV__) console.log('No store latest available, skipping');
-          return; // No net/store? Skip para no bloquear
-        }
+        if (!minVersion) return;
       }
 
-      const needsUpdate = await VersionCheck.needUpdate({
+      const updateNeeded = await VersionCheck.needUpdate({
         currentVersion,
         latestVersion: minVersion,
       });
 
-      if (__DEV__) console.log('Needs update:', needsUpdate.isNeeded);
-
-      if (needsUpdate.isNeeded) {
-        const storeUrl = checkData?.guard?.update_url?.[platform] || (await VersionCheck.getStoreUrl());
-        setUpdateUrl(storeUrl);
-        if (__DEV__) console.log('Update URL:', storeUrl);
-        setShowUpdateModal(true);
-      }
-    } catch (error) {
-      if (__DEV__) console.error('Error checking version:', error);
-    }
-  };
-
-  // Init on mount
-  useEffect(() => {
-    const initializeVersionCheck = async () => {
-      const shouldCheck = await shouldCheckVersion();
-
-      if (shouldCheck) {
-        setShouldFetch(true);
+      if (updateNeeded.isNeeded) {
+        const url = apiData?.guard?.update_url?.[platform] ?? (await VersionCheck.getStoreUrl());
+        setUpdateUrl(url);
+        setNeedsUpdate(true);
       } else {
-        const cached = await loadCachedData();
-        if (cached) {
-          setVersionData({ guard: cached.guard });
-        } else {
-          setShouldFetch(true);
-        }
+        setNeedsUpdate(false);
       }
-    };
-
-    initializeVersionCheck();
+    } catch (err) {
+      if (__DEV__) console.error('[VersionChecker] Error verificando update:', err);
+      setNeedsUpdate(false);
+    }
   }, []);
 
-  // Handle data/error
-  useEffect(() => {
-    if (apiError) {
-      if (__DEV__) console.error('API error:', apiError);
-      loadCachedData().then(cached => {
-        if (cached) setVersionData({ guard: cached.guard });
-      });
-      return;
+  // Función que decide si debemos recargar o usar cache
+  const tryRefreshVersionCheck = useCallback(async () => {
+    try {
+      const lastCheckStr = await AsyncStorage.getItem(STORAGE_KEY_LAST_CHECK);
+      const now = Date.now();
+
+      if (lastCheckStr) {
+        const lastCheck = parseInt(lastCheckStr, 10);
+        if (now - lastCheck < CACHE_DURATION_MS) {
+          // Cache aún válido → usamos lo que ya tenemos
+          if (versionData) checkForUpdate(versionData);
+          return;
+        }
+      }
+
+      // Cache expirado o no existe → pedimos al backend
+      await reload();
+
+      // Si reload fue exitoso, versionData se actualizará y guardaremos timestamp en el effect de abajo
+    } catch (e) {
+      if (__DEV__) console.error('Error en version check refresh:', e);
+      await reload(); // En caso de error de storage, forzamos petición
     }
+  }, [reload, versionData, checkForUpdate]);
 
-    if (!data) return;
-
-    saveVersionData(data);
-    setVersionData(data);
-  }, [data, apiError]);
-
-  // Validate
+  // Primera carga
   useEffect(() => {
-    if (!versionData) return;
-    checkForUpdate(versionData);
-  }, [versionData]);
+    tryRefreshVersionCheck();
+  }, []); // Solo una vez al montar
 
-  if (showUpdateModal) {
-    const screenWidth = Dimensions.get('window').width;
-    return (
+  // Cuando llegan datos nuevos → verificamos y guardamos timestamp
+  useEffect(() => {
+    if (versionData) {
+      checkForUpdate(versionData);
+      AsyncStorage.setItem(STORAGE_KEY_LAST_CHECK, Date.now().toString());
+    }
+  }, [versionData, checkForUpdate]);
+
+  // Fallback si hay error y no tenemos data
+  useEffect(() => {
+    if (error && !versionData) {
+      checkForUpdate(null);
+    }
+  }, [error, versionData, checkForUpdate]);
+
+  // === LO MÁS IMPORTANTE: revisamos cada vez que la app vuelve a primer plano ===
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        tryRefreshVersionCheck();
+      }
+      appStateRef.current = nextAppState;
+    });
+
+    return () => subscription.remove();
+  }, [tryRefreshVersionCheck]);
+
+  const openStore = useCallback(() => {
+    if (updateUrl) Linking.openURL(updateUrl).catch(() => {});
+  }, [updateUrl]);
+
+  if (!needsUpdate) return <>{children}</>;
+
+  const screenWidth = Dimensions.get('window').width;
+  const selectedImage = Platform.OS === 'android' ? images.android : images.ios;
+
+  return (
+    <>
+      {children}
       <Modal
         isVisible={true}
         backdropOpacity={0.9}
         animationIn="fadeIn"
-        animationOut="fadeOut">
+        animationOut="fadeOut"
+        useNativeDriverForBackdrop
+        supportedOrientations={['portrait', 'landscape']}>
         <View
           style={{
             backgroundColor: cssVar.cPrimary,
@@ -196,62 +164,32 @@ const VersionChecker = ({ children }: { children: React.ReactNode }) => {
             borderWidth: 2,
             overflow: 'hidden',
           }}>
-          <Image
-            source={selectedImage}
-            style={{ width: '100%', height: 277 }}
-            resizeMode="cover"
-          />
-          <View
-            style={{
-              padding: 16,
-              alignItems: 'center',
-              width: '100%',
-            }}>
-            <Text
-              style={{
-                fontSize: cssVar.sXxl,
-                fontWeight: 'bold',
-                marginBottom: 10,
-                color: cssVar.cWhite,
-              }}>
+          <Image source={selectedImage} style={{ width: '100%', height: 277 }} resizeMode="cover" />
+          <View style={{ padding: 16, alignItems: 'center', width: '100%' }}>
+            <Text style={{ fontSize: cssVar.sXxl, fontWeight: 'bold', marginBottom: 10, color: cssVar.cWhite }}>
               Actualización Requerida ✨
             </Text>
-            <Text
-              style={{
-                textAlign: 'center',
-                marginBottom: 12,
-                color: cssVar.cWhiteV1,
-                fontSize: cssVar.sM,
-              }}>
+            <Text style={{ textAlign: 'center', marginBottom: 12, color: cssVar.cWhiteV1, fontSize: cssVar.sM }}>
               Tenemos una nueva actualización para mejorar tu experiencia, hazlo ahora para seguir usando la app.
             </Text>
             <TouchableOpacity
-              onPress={() => Linking.openURL(updateUrl)}
+              onPress={openStore}
               activeOpacity={0.85}
               style={{
                 backgroundColor: cssVar.cAccent,
-                margin: 0,
                 width: '100%',
                 paddingVertical: 12,
                 borderRadius: cssVar.bRadius,
               }}>
-              <Text
-                style={{
-                  color: cssVar.cPrimary,
-                  fontWeight: '600',
-                  fontSize: cssVar.spL,
-                  textAlign: 'center',
-                }}>
+              <Text style={{ color: cssVar.cPrimary, fontWeight: '600', fontSize: cssVar.spL, textAlign: 'center' }}>
                 Actualizar Ahora
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    );
-  }
-
-  return children;
+    </>
+  );
 };
 
 export default VersionChecker;
