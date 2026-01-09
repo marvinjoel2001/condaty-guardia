@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import AccessDetail from '../Accesses/AccessDetail';
@@ -9,20 +9,19 @@ import useApi from '../../../../mk/hooks/useApi';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
-const paramsInitial = {
-  perPage: 30,
-  page: 1,
-  fullType: 'Q',
-  section: 'ACT',
-  searchBy: '',
-};
-
 const QR = () => {
+  const paramsInitial = {
+    perPage: 30,
+    page: 1,
+    fullType: 'Q',
+    section: 'ACT',
+    searchBy: '',
+  };
   const [search, setSearch] = useState('');
-  const [openDetail, setOpenDetail] = useState({open: false, id: null});
+  const [openDetail, setOpenDetail] = useState({ open: false, id: null });
   const [params, setParams] = useState(paramsInitial);
   const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
-  const {data, reload, loaded} = useApi('/accesses', 'GET', params);
+  const { data, reload, loaded } = useApi('/accesses', 'GET', params);
   useEffect(() => {
     reload(params);
   }, [params]);
@@ -110,19 +109,20 @@ const QR = () => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           gap: 8,
           marginBottom: 8,
-        }}>
+        }}
+      >
         <DataSearch
           setSearch={(value: string) => onSearch(value)}
           name="qr"
           value={search}
-          style={{flex: 1}}
+          style={{ flex: 1 }}
         />
       </View>
 
@@ -141,7 +141,7 @@ const QR = () => {
       {openDetail?.open && (
         <AccessDetail
           open={openDetail?.open}
-          onClose={() => setOpenDetail({open: false, id: null})}
+          onClose={() => setOpenDetail({ open: false, id: null })}
           id={openDetail?.id}
         />
       )}

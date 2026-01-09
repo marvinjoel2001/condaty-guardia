@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {View, StyleSheet} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import OrdersDetail from './OrdersDetail';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
@@ -21,15 +21,14 @@ const getOrderTypeName = (typeId: number | string): string => {
   }
 };
 
-const paramsInitial = {
-  perPage: 30,
-  page: 1,
-  fullType: 'L',
-  section: 'ACT',
-  searchBy: '',
-};
-
 export const Orders = () => {
+  const paramsInitial = {
+    perPage: 30,
+    page: 1,
+    fullType: 'L',
+    section: 'ACT',
+    searchBy: '',
+  };
   const [openDetail, setOpenDetail] = useState({
     open: false,
     id: null as number | string | null,
@@ -37,7 +36,7 @@ export const Orders = () => {
   const [search, setSearch] = useState('');
   const [params, setParams] = useState(paramsInitial);
   const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
-  const {data, reload, loaded} = useApi('/others', 'GET', params, 3);
+  const { data, reload, loaded } = useApi('/others', 'GET', params, 3);
 
   useEffect(() => {
     reload(params);
@@ -64,7 +63,7 @@ export const Orders = () => {
 
     return (
       <ItemList
-        onPress={() => setOpenDetail({open: true, id: item.id})}
+        onPress={() => setOpenDetail({ open: true, id: item.id })}
         key={item.id}
         title={visitFullName}
         subtitle={orderTypeString}
@@ -109,7 +108,7 @@ export const Orders = () => {
         setSearch={onSearch}
         name="orders"
         value={search}
-        style={{marginBottom: 8}}
+        style={{ marginBottom: 8 }}
       />
       <ListFlat
         data={accumulatedData}
@@ -126,7 +125,7 @@ export const Orders = () => {
       {openDetail.open && (
         <OrdersDetail
           open={openDetail.open}
-          onClose={() => setOpenDetail({open: false, id: null})}
+          onClose={() => setOpenDetail({ open: false, id: null })}
           id={openDetail?.id as number | null}
         />
       )}
