@@ -529,81 +529,80 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
             />
           </>
         )}
-        {!data?.out_at && (
-          <>
-            {data?.confirm != 'N' && (
-              <KeyValue
-                keys="Tipo de visita"
-                value={typeInvitation[data?.type] || '-/-'}
-              />
-            )}
-            {data?.in_at && (
-              <KeyValue
-                keys="Fecha y hora de ingreso"
-                value={getDateTimeStrMes(data?.in_at) || '-/-'}
-              />
-            )}
+        <>
+          {data?.confirm != 'N' && (
+            <KeyValue
+              keys="Tipo de visita"
+              value={typeInvitation[data?.type] || '-/-'}
+            />
+          )}
+          {data?.in_at && (
+            <KeyValue
+              keys="Fecha y hora de ingreso"
+              value={getDateTimeStrMes(data?.in_at) || '-/-'}
+            />
+          )}
 
-            {getStatus() === 'S' || getStatus() === 'Y' ? (
+          {getStatus() === 'S' || getStatus() === 'Y' ? (
+            <KeyValue
+              keys={'Notificado por'}
+              value={getFullName(data?.guardia)}
+            />
+          ) : (
+            data?.guardia &&
+            data?.confirm != 'N' && (
               <KeyValue
-                keys={'Notificado por'}
+                keys={'Guardia de ingreso'}
                 value={getFullName(data?.guardia)}
               />
-            ) : (
-              data?.guardia &&
-              data?.confirm != 'N' && (
-                <KeyValue
-                  keys={'Guardia de ingreso'}
-                  value={getFullName(data?.guardia)}
-                />
-              )
-            )}
-            {data?.out_at && (
-              <KeyValue
-                keys={'Guardia de salida'}
-                value={getFullName(data?.out_guard || data?.guardia)}
-              />
-            )}
-            {data?.in_at && (
-              <KeyValue
-                keys="Observación de ingreso"
-                value={data?.obs_in || '-/-'}
-              />
-            )}
-            {data?.confirm_at && (
-              <KeyValue
-                keys={data?.confirm == 'Y' ? 'Aprobado por' : 'Rechazado por'}
-                value={
-                  <View
+            )
+          )}
+          {data?.out_at && (
+            <KeyValue
+              keys={'Guardia de salida'}
+              value={getFullName(data?.out_guard || data?.guardia)}
+            />
+          )}
+          {data?.in_at && (
+            <KeyValue
+              keys="Observación de ingreso"
+              value={data?.obs_in || '-/-'}
+            />
+          )}
+          {data?.obs_confirm && (
+            <KeyValue keys="Motivo del ingreso" value={data?.obs_confirm} />
+          )}
+          {data?.confirm_at && (
+            <KeyValue
+              keys={data?.confirm == 'Y' ? 'Aprobado por' : 'Rechazado por'}
+              value={
+                <View
+                  style={{
+                    backgroundColor:
+                      data?.rejected_guard_id !== null
+                        ? '#F37F3D33'
+                        : cssVar.cHoverSuccess,
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 999,
+                  }}
+                >
+                  <Text
                     style={{
-                      backgroundColor:
+                      color:
                         data?.rejected_guard_id !== null
-                          ? '#F37F3D33'
-                          : cssVar.cHoverSuccess,
-                      paddingHorizontal: 8,
-                      paddingVertical: 4,
-                      borderRadius: 999,
+                          ? cssVar.cAlertMedio
+                          : cssVar.cSuccess,
+                      fontSize: 12,
                     }}
                   >
-                    <Text
-                      style={{
-                        color:
-                          data?.rejected_guard_id !== null
-                            ? cssVar.cAlertMedio
-                            : cssVar.cSuccess,
-                        fontSize: 12,
-                      }}
-                    >
-                      {data?.rejected_guard_id !== null
-                        ? 'Guardia'
-                        : 'Residente'}
-                    </Text>
-                  </View>
-                }
-              />
-            )}
-          </>
-        )}
+                    {data?.rejected_guard_id !== null ? 'Guardia' : 'Residente'}
+                  </Text>
+                </View>
+              }
+            />
+          )}
+        </>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {data?.url_image_p && (
             <TouchableOpacity
