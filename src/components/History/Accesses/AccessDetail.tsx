@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -13,13 +13,13 @@ import {
   getDateTimeStrMes,
   parseWeekDays,
 } from '../../../../mk/utils/dates';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
 import useApi from '../../../../mk/hooks/useApi';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconExpand} from '../../../icons/IconLibrary';
+import { IconExpand } from '../../../icons/IconLibrary';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
@@ -52,7 +52,8 @@ const DetailRow = ({
     <View
       style={styles.detailRow}
       pointerEvents="none"
-      onStartShouldSetResponder={() => false}>
+      onStartShouldSetResponder={() => false}
+    >
       <Text style={styles.detailLabel}>{label}</Text>
       {typeof value === 'string' ? (
         <Text style={[styles.detailValue, valueStyle]}>{value}</Text>
@@ -81,7 +82,7 @@ interface CompanionItemProps {
   onPress: () => void;
 }
 
-const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
+const CompanionItem = ({ companionAccess, onPress }: CompanionItemProps) => {
   const person = companionAccess.visit || companionAccess;
   const companionFullName = getFullName(person) || 'N/A';
   const companionCi = person.ci ? `C.I. ${person.ci}` : 'CI no disponible';
@@ -111,9 +112,9 @@ const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
   );
 };
 
-const AccessDetail = ({open, onClose, id}: Props) => {
+const AccessDetail = ({ open, onClose, id }: Props) => {
   const [accessData, setAccessData] = useState<any>(null);
-  const {execute} = useApi();
+  const { execute } = useApi();
 
   const [modalPersonData, setModalPersonData] =
     useState<ModalPersonData | null>(null);
@@ -126,7 +127,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
   const getAccess = async () => {
     try {
-      const {data: apiResponse} = await execute(
+      const { data: apiResponse } = await execute(
         '/accesses',
         'GET',
         {
@@ -162,9 +163,10 @@ const AccessDetail = ({open, onClose, id}: Props) => {
   }, [open]);
 
   const getStatusForCompanionOrResident = (personData: any) => {
-    if (personData.out_at) return {text: 'Completado', color: cssVar.cSuccess};
-    if (personData.in_at) return {text: 'Por salir', color: cssVar.cSuccess};
-    return {text: 'Pendiente', color: cssVar.cWhite};
+    if (personData.out_at)
+      return { text: 'Completado', color: cssVar.cSuccess };
+    if (personData.in_at) return { text: 'Por salir', color: cssVar.cSuccess };
+    return { text: 'Pendiente', color: cssVar.cWhite };
   };
 
   const getStatusForTaxiDriver = (mainAccessItem: any) => {
@@ -188,7 +190,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       color = cssVar.cError;
     }
 
-    return {text, color};
+    return { text, color };
   };
 
   const handleOpenPersonDetailModal = (
@@ -202,7 +204,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       typeLabel === 'Acompañante' ? personData.visit || personData : personData;
 
     if (typeLabel === 'Acompañante' || typeLabel === 'Residente') {
-      const {text, color} = getStatusForCompanionOrResident(personData);
+      const { text, color } = getStatusForCompanionOrResident(personData);
 
       dataForModal = {
         person: personToShow,
@@ -215,7 +217,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         statusColor: color,
       };
     } else {
-      const {text, color} = getStatusForTaxiDriver(mainAccessItem);
+      const { text, color } = getStatusForTaxiDriver(mainAccessItem);
 
       dataForModal = {
         person: personToShow.visit,
@@ -313,8 +315,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           keyboardDismissMode="on-drag"
           nestedScrollEnabled
           showsVerticalScrollIndicator
-          style={{flex: 1}}
-          onStartShouldSetResponder={() => true}>
+          style={{ flex: 1 }}
+          onStartShouldSetResponder={() => true}
+        >
           <View style={styles.mainCard}>
             <View pointerEvents="none">
               <Text style={styles.sectionTitleNoBorder}>
@@ -347,7 +350,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow
                 label="Estado"
                 value={statusText}
-                valueStyle={{color: statusColor, fontFamily: FONTS.semiBold}}
+                valueStyle={{ color: statusColor, fontFamily: FONTS.semiBold }}
               />
               <DetailRow
                 label="Fecha y hora de ingreso"
@@ -383,7 +386,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       key={`companion-wrapper-${companionAccess.id || index}`}
                       style={
                         index > 0 ? styles.additionalCompanionWrapper : null
-                      }>
+                      }
+                    >
                       <CompanionItem
                         companionAccess={companionAccess}
                         onPress={() =>
@@ -499,8 +503,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         keyboardDismissMode="on-drag"
         nestedScrollEnabled
         showsVerticalScrollIndicator
-        style={{flex: 1}}
-        onStartShouldSetResponder={() => true}>
+        style={{ flex: 1 }}
+        onStartShouldSetResponder={() => true}
+      >
         <View style={styles.mainCard}>
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>
@@ -537,7 +542,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow
                 label="Estado"
                 value={statusText}
-                valueStyle={{color: statusColor, fontFamily: FONTS.semiBold}}
+                valueStyle={{ color: statusColor, fontFamily: FONTS.semiBold }}
               />
               {(item.type === 'G' || item.type === 'I') &&
                 item.invitation?.title && (
@@ -571,6 +576,12 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
+              {statusText !== 'Rechazado' && (
+                <DetailRow
+                  label="Motivo del ingreso"
+                  value={item.obs_confirm}
+                />
+              )}
               {!(item.type === 'I' || item.type === 'G') && (
                 <DetailRow
                   label={item.out_at ? 'Visitó a' : 'Visita a'}
@@ -620,14 +631,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                         paddingVertical: 4,
                         borderRadius: 999,
                       }}
-                      pointerEvents="none">
+                      pointerEvents="none"
+                    >
                       <Text
                         style={{
                           color:
                             item?.rejected_guard_id !== null
                               ? cssVar.cAlertMedio
                               : cssVar.cSuccess,
-                        }}>
+                        }}
+                      >
                         {item?.rejected_guard_id !== null
                           ? 'Guardia'
                           : 'Residente'}
@@ -637,7 +650,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 />
               )}
 
-              <View style={{flexDirection: 'row', gap: 8, marginTop: 12}}>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                 {item?.url_image_p && (
                   <TouchableOpacity
                     onPress={() =>
@@ -645,14 +658,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                         open: true,
                         imageUri: item?.url_image_p[0],
                       })
-                    }>
+                    }
+                  >
                     <Image
                       source={{
                         uri: item?.url_image_p[0],
                       }}
                       width={100}
                       height={100}
-                      style={{width: 100, height: 100, borderRadius: 8}}
+                      style={{ width: 100, height: 100, borderRadius: 8 }}
                     />
                   </TouchableOpacity>
                 )}
@@ -663,14 +677,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                         open: true,
                         imageUri: item?.visit?.url_image_a[0],
                       })
-                    }>
+                    }
+                  >
                     <Image
                       source={{
                         uri: item?.visit?.url_image_a[0],
                       }}
                       width={100}
                       height={100}
-                      style={{width: 100, height: 100, borderRadius: 8}}
+                      style={{ width: 100, height: 100, borderRadius: 8 }}
                     />
                   </TouchableOpacity>
                 )}
@@ -681,14 +696,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                         open: true,
                         imageUri: item?.visit?.url_image_r[0],
                       })
-                    }>
+                    }
+                  >
                     <Image
                       source={{
                         uri: item?.visit?.url_image_r[0],
                       }}
                       width={100}
                       height={100}
-                      style={{width: 100, height: 100, borderRadius: 8}}
+                      style={{ width: 100, height: 100, borderRadius: 8 }}
                     />
                   </TouchableOpacity>
                 )}
@@ -711,7 +727,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               {companions.map((companionAccess: any, index: number) => (
                 <View
                   key={`companion-wrapper-${companionAccess.id || index}`}
-                  style={index > 0 ? styles.additionalCompanionWrapper : null}>
+                  style={index > 0 ? styles.additionalCompanionWrapper : null}
+                >
                   <CompanionItem
                     companionAccess={companionAccess}
                     onPress={() =>
@@ -818,7 +835,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       open={open}
       onClose={onClose}
       // scrollViewHide
-      disableFormPress>
+      disableFormPress
+    >
       {renderBody()}
       {isPersonDetailModalVisible && modalPersonData && (
         <Modal
@@ -828,14 +846,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               : `Detalle del ${modalPersonData.typeLabel}`
           }
           open={isPersonDetailModalVisible}
-          onClose={handleClosePersonDetailModal}>
+          onClose={handleClosePersonDetailModal}
+        >
           <ScrollView
-            contentContainerStyle={styles.personDetailModalInnerContent}>
+            contentContainerStyle={styles.personDetailModalInnerContent}
+          >
             <View style={styles.personDetailModalCardContent}>
               {modalPersonData.typeLabel === 'Residente' && accessData ? (
                 <>
                   <ItemList
-                    style={{marginBottom: 12}}
+                    style={{ marginBottom: 12 }}
                     title={getFullName(modalPersonData.person)}
                     subtitle={[
                       `${
@@ -941,7 +961,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                             color: cssVar.cWhite,
                             fontFamily: FONTS.semiBold,
                             marginBottom: 12,
-                          }}>
+                          }}
+                        >
                           Configuración avanzada
                         </Text>
                         <DetailRow
@@ -980,7 +1001,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               ) : (
                 <>
                   <ItemList
-                    style={{marginBottom: 12}}
+                    style={{ marginBottom: 12 }}
                     title={getFullName(modalPersonData.person)}
                     subtitle={
                       (modalPersonData.person?.ci
@@ -1045,7 +1066,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       value={modalPersonData.accessObsOut}
                     />
                   </View>
-                  <View style={{flexDirection: 'row', gap: 8, marginTop: 12}}>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     {modalPersonData?.url_image_p && (
                       <TouchableOpacity
                         onPress={() =>
@@ -1053,14 +1074,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                             open: true,
                             imageUri: modalPersonData?.url_image_p[0],
                           })
-                        }>
+                        }
+                      >
                         <Image
                           source={{
                             uri: modalPersonData?.url_image_p[0],
                           }}
                           width={100}
                           height={100}
-                          style={{width: 100, height: 100, borderRadius: 8}}
+                          style={{ width: 100, height: 100, borderRadius: 8 }}
                         />
                       </TouchableOpacity>
                     )}
@@ -1071,14 +1093,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                             open: true,
                             imageUri: modalPersonData?.person?.url_image_a[0],
                           })
-                        }>
+                        }
+                      >
                         <Image
                           source={{
                             uri: modalPersonData?.person?.url_image_a[0],
                           }}
                           width={100}
                           height={100}
-                          style={{width: 100, height: 100, borderRadius: 8}}
+                          style={{ width: 100, height: 100, borderRadius: 8 }}
                         />
                       </TouchableOpacity>
                     )}
@@ -1089,14 +1112,15 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                             open: true,
                             imageUri: modalPersonData?.person?.url_image_r[0],
                           })
-                        }>
+                        }
+                      >
                         <Image
                           source={{
                             uri: modalPersonData?.person?.url_image_r[0],
                           }}
                           width={100}
                           height={100}
-                          style={{width: 100, height: 100, borderRadius: 8}}
+                          style={{ width: 100, height: 100, borderRadius: 8 }}
                         />
                       </TouchableOpacity>
                     )}
@@ -1111,7 +1135,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         <ImageExpandableModal
           visible={openExpandImg.open}
           imageUri={openExpandImg.imageUri}
-          onClose={() => setOpenExpandImg({open: false, imageUri: ''})}
+          onClose={() => setOpenExpandImg({ open: false, imageUri: '' })}
         />
       )}
     </ModalFull>
