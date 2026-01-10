@@ -109,6 +109,7 @@ const Accesses = () => {
   const handleReload = () => {
     setParams(paramsInitial);
     setAccumulatedData([]);
+    reload(paramsInitial);
   };
 
   return (
