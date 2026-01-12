@@ -255,9 +255,13 @@ const UploadFile: React.FC<Props> = ({
         Alert.alert('Error', 'No se pudo subir el archivo');
       }
     }
+    // setFormState((prev: any) => ({
+    //   ...prev,
+    //   [name]: isSingle ? [newValues[0] || ''] : newValues,
+    // }));
     setFormState((prev: any) => ({
       ...prev,
-      [name]: isSingle ? [newValues[0] || ''] : newValues,
+      [name]: isSingle ? newValues[0] ?? '' : newValues,
     }));
     setUploading(false);
     Keyboard.dismiss();
