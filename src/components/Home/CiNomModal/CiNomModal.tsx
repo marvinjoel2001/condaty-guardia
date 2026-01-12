@@ -293,22 +293,22 @@ const CiNomModal = ({ open, onClose, reload, data }: CiNomModalProps) => {
   };
   useEffect(() => {
     if (typeSearch === 'V') {
-      setFormState((prevState: any) => ({
-        ...prevState,
+      setFormState({
+        ...formState,
         ci_taxi: '',
         name_taxi: '',
         middle_name_taxi: '',
         last_name_taxi: '',
         mother_last_name_taxi: '',
         disbledTaxi: false,
-        plate: prevState?.plate || oldPlate || '',
+        plate: formState?.plate || oldPlate || '',
         ci_anverso_taxi: '',
         ci_reverso_taxi: '',
-      }));
+      });
     }
     if (typeSearch === 'P' || typeSearch == 'T') {
-      setFormState((prevState: any) => ({
-        ...prevState,
+      setFormState({
+        ...formState,
         ci_taxi: '',
         name_taxi: '',
         middle_name_taxi: '',
@@ -318,7 +318,7 @@ const CiNomModal = ({ open, onClose, reload, data }: CiNomModalProps) => {
         disbledTaxi: false,
         ci_anverso_taxi: '',
         ci_reverso_taxi: '',
-      }));
+      });
     }
   }, [typeSearch]);
 
