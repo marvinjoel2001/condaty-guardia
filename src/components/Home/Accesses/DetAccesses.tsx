@@ -35,6 +35,7 @@ import Button from '../../../../mk/components/forms/Button/Button';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
 import { useEvent } from '../../../../mk/hooks/useEvent';
+import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 
 const typeInvitation: any = {
   I: 'QR Individual',
@@ -74,6 +75,9 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
     imageUri: '',
   });
 
+  const [selectedReason, setSelectedReason] = useState<string | null>(null);
+  const [accessMsg, setAccessMsg] = useState<any>({ aprv: [], rej: [] });
+
   const getStatus = (acceso: any = null) => {
     const _data = acceso || data;
 
@@ -98,20 +102,35 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
           fullType: 'DET',
           searchBy: id,
         });
-        console.log('getData1', data);
-        if (data.success && data.data.length > 0) {
-          const accessData = data.data[0];
-          if (accessData.access_id) {
-            const { data: linkedData } = await execute('/accesses', 'GET', {
-              fullType: 'DET',
-              searchBy: accessData.access_id,
-            });
 
-            if (linkedData.success && linkedData.data.length > 0) {
-              setData(linkedData.data[0]);
+        if (data.success && data.data?.accessMsg) {
+          setAccessMsg(data.data.accessMsg);
+        }
+        if (data.success && data.data) {
+          // Handle both structure types:
+          // 1. data.data is an array (original behavior)
+          // 2. data.data is an object with 'access' property (new behavior)
+
+          let accessData;
+          if (Array.isArray(data.data)) {
+            if (data.data.length > 0) accessData = data.data[0];
+          } else if (data.data.access) {
+            accessData = data.data.access;
+          }
+
+          if (accessData) {
+            if (accessData.access_id) {
+              const { data: linkedData } = await execute('/accesses', 'GET', {
+                fullType: 'DET',
+                searchBy: accessData.access_id,
+              });
+
+              if (linkedData.success && linkedData.data.length > 0) {
+                setData(linkedData.data[0]);
+              }
+            } else {
+              setData(accessData);
             }
-          } else {
-            setData(accessData);
           }
         }
       } catch (error) {
@@ -884,21 +903,51 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
           open={openDecline !== null}
           buttonText="Enviar"
           onSave={() => onGuardRespond(openDecline)}
-          onClose={() => setOpenDecline(null)}
+          onClose={() => {
+            setOpenDecline(null);
+            setSelectedReason(null);
+            setFormState({ ...formState, obs_confirm: '' });
+          }}
         >
           <Text style={{ color: cssVar.cWhite, marginBottom: 12 }}>
-            Por favor indica el motivo
+            Por favor seleccione el motivo
           </Text>
-          <TextArea
-            required
-            lines={4}
-            name="obs_confirm"
-            onChange={value => handleInputChange('obs_confirm', value)}
-            label="Motivo"
-            value={formState?.obs_confirm}
-            error={errors}
-            expandable={true}
+
+          <TabsButtons
+            wrap
+            grow={false}
+            tabs={[
+              { value: 'Otro', text: 'Otro' },
+              ...((openDecline === 'Y' ? accessMsg?.aprv : accessMsg?.rej)?.map(
+                (msg: any) => ({
+                  value: msg.message,
+                  text: msg.message,
+                }),
+              ) || []),
+            ]}
+            sel={selectedReason || ''}
+            setSel={(val: string) => {
+              setSelectedReason(val);
+              if (val !== 'Otro') {
+                handleInputChange('obs_confirm', val);
+              } else {
+                handleInputChange('obs_confirm', '');
+              }
+            }}
           />
+
+          {selectedReason === 'Otro' && (
+            <TextArea
+              required
+              lines={4}
+              name="obs_confirm"
+              onChange={value => handleInputChange('obs_confirm', value)}
+              label="Motivo"
+              value={formState?.obs_confirm}
+              error={errors}
+              expandable={true}
+            />
+          )}
         </Modal>
       )}
       {openExpandImg.open && (
