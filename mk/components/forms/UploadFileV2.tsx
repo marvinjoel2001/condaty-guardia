@@ -164,7 +164,8 @@ const UploadFile: React.FC<Props> = ({
     setUploading(true);
     onUploadStateChange?.(true);
     setWaiting(1, 'upload-files');
-    const newValues = [...currentValues];
+    // const newValues = [...currentValues];
+    const uploadedValues: string[] = [];
     for (const asset of response.assets) {
       let filename = asset.fileName || `file_${Date.now()}`;
       let fileExt = filename.split('.').pop()?.toLowerCase();
@@ -249,7 +250,7 @@ const UploadFile: React.FC<Props> = ({
             : await uriToBlob(uploadUri);
 
         const uploaded = await storage.upload(fileToUpload, path);
-        newValues.push(uploaded.url);
+        uploadedValues.push(uploaded.url);
       } catch (e) {
         console.error(e);
         Alert.alert('Error', 'No se pudo subir el archivo');
@@ -259,10 +260,14 @@ const UploadFile: React.FC<Props> = ({
     //   ...prev,
     //   [name]: isSingle ? [newValues[0] || ''] : newValues,
     // }));
-    setFormState((prev: any) => ({
-      ...prev,
-      [name]: isSingle ? newValues[0] ?? '' : newValues,
-    }));
+    if (uploadedValues.length > 0) {
+      setFormState((prev: any) => ({
+        ...prev,
+        [name]: isSingle
+          ? [uploadedValues[0]]
+          : [...currentValues, ...uploadedValues],
+      }));
+    }
     setUploading(false);
     Keyboard.dismiss();
     onUploadStateChange?.(false);
