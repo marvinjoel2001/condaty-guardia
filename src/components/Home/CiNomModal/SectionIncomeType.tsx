@@ -1,6 +1,6 @@
 import React from 'react';
-import {Text, View} from 'react-native';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { Text, View } from 'react-native';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import Input from '../../../../mk/components/forms/Input/Input';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
@@ -26,8 +26,8 @@ const SectionIncomeType = ({
   setErrors,
   errors,
 }: SectionIncomeTypeProps) => {
-  const {execute} = useApi();
-  const {showToast} = useAuth();
+  const { execute } = useApi();
+  const { showToast } = useAuth();
 
   const onExistTaxi = async () => {
     if (formState?.ci_taxi === '') {
@@ -49,7 +49,7 @@ const SectionIncomeType = ({
     }
     if (
       formState?.acompanantes?.find(
-        (item: {ci: string}) => item.ci === formState?.ci_taxi,
+        (item: { ci: string }) => item.ci === formState?.ci_taxi,
       )
     ) {
       showToast('El ci del taxi ya está registrado como acompañante', 'error');
@@ -65,7 +65,7 @@ const SectionIncomeType = ({
       });
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', {
+    const { data: existData } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -99,61 +99,21 @@ const SectionIncomeType = ({
       }));
     }
   };
-
-  //   const onExistTaxi = async () => {
-  //     if (formState?.ci_taxi == formState?.ci) {
-  //       return setErrors({errors, ci_taxi: 'El ci ya fue añadido'});
-  //     }
-  //     const {data: exist} = await execute('/visits', 'GET', {
-  //       perPage: 1,
-  //       page: 1,
-  //       exist: '1',
-  //       fullType: 'L',
-  //       ci_visit: formState?.ci_taxi,
-  //     });
-  //     setErrors({errors, ci_taxi: ''});
-  //     if (exist?.data) {
-  //       setFormState({
-  //         ...formState,
-  //         ci_taxi: exist?.data.ci,
-  //         name_taxi: exist?.data.name,
-  //         middle_name_taxi: exist?.data.middle_name,
-  //         last_name_taxi: exist?.data.last_name,
-  //         mother_last_name_taxi: exist?.data.mother_last_name,
-  //         plate: exist?.data.plate,
-  //         disbledTaxi: true,
-  //         ci_anverso_taxi: exist?.data.url_image_a,
-  //         ci_reverso_taxi: exist?.data.url_image_r,
-  //       });,
-  //     } else {
-  //       setFormState({
-  //         ...formState,
-  //         name_taxi: '',
-  //         last_name_taxi: '',
-  //         middle_name_taxi: '',
-  //         mother_last_name_taxi: '',
-  //         ci_anverso_taxi: '',
-  //         ci_reverso_taxi: '',
-  //         plate: '',
-  //         disbledTaxi: false,
-  //       });
-  //     }
-  //   };
-
   return (
     <>
       <Text
         style={{
           fontFamily: FONTS.bold,
           color: cssVar.cWhite,
-        }}>
+        }}
+      >
         Tipo de ingreso
       </Text>
       <TabsButtons
         tabs={[
-          {value: 'P', text: 'A pie'},
-          {value: 'V', text: 'En vehículo'},
-          {value: 'T', text: 'En taxi'},
+          { value: 'P', text: 'A pie' },
+          { value: 'V', text: 'En vehículo' },
+          { value: 'T', text: 'En taxi' },
         ]}
         sel={tab}
         setSel={setTab}
@@ -194,7 +154,8 @@ const SectionIncomeType = ({
               marginBottom: 4,
               color: cssVar.cWhite,
               fontFamily: FONTS.medium,
-            }}>
+            }}
+          >
             Datos del conductor:
           </Text>
           <Input
@@ -209,7 +170,7 @@ const SectionIncomeType = ({
             onChange={(value: any) => handleChangeInput('ci_taxi', value)}
           />
 
-          <View style={{flexDirection: 'row', gap: 12}}>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
             <UploadFileV2
               variant="V2"
               style={{

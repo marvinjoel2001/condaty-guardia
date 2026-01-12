@@ -10,6 +10,7 @@ import {
   PermissionsAndroid,
   StyleSheet,
   useWindowDimensions,
+  Keyboard,
 } from 'react-native';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { pick } from '@react-native-documents/picker';
@@ -259,6 +260,7 @@ const UploadFile: React.FC<Props> = ({
       [name]: isSingle ? [newValues[0] || ''] : newValues,
     }));
     setUploading(false);
+    Keyboard.dismiss();
     onUploadStateChange?.(false);
     setWaiting(-1, 'upload-files');
   };
