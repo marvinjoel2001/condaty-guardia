@@ -118,7 +118,6 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
         showToast('Error al obtener los datos', 'error');
       }
     };
-    console.log('getData', id);
     if (id) {
       getData();
     }
