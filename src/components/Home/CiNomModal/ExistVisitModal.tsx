@@ -16,6 +16,7 @@ interface ExistVisitModalProps {
   onDismiss?: () => void;
   extraOnClose?: () => void;
   setIsMain?: (value: boolean) => void;
+  type?: 'acompanante' | 'taxi' | 'main';
 }
 
 const ExistVisitModal = ({
@@ -30,6 +31,7 @@ const ExistVisitModal = ({
   extraOnClose,
   onDismiss,
   setIsMain = () => {},
+  type = 'acompanante',
 }: ExistVisitModalProps) => {
   const {showToast} = useAuth();
   const {execute} = useApi();
@@ -91,6 +93,24 @@ const ExistVisitModal = ({
     );
 
     if (exist?.data) {
+      if (type === 'taxi') {
+        setItem((prev: any) => ({
+          ...prev,
+          ci_taxi: exist?.data?.ci,
+          name_taxi: exist?.data?.name,
+          middle_name_taxi: exist?.data?.middle_name,
+          last_name_taxi: exist?.data?.last_name,
+          mother_last_name_taxi: exist?.data?.mother_last_name,
+          plate: exist?.data?.plate || '',
+          disabledTaxi: true,
+          disabledCI: true,
+          ci_anverso_taxi: exist?.data?.url_image_a,
+          ci_reverso_taxi: exist?.data?.url_image_r,
+        }));
+        setFormState({});
+        onClose();
+        return;
+      }
       if (isMain) {
         setItem({...item, ...exist?.data});
         setIsMain(false);
@@ -111,6 +131,24 @@ const ExistVisitModal = ({
       setFormState({});
       onClose();
     } else {
+      if (type === 'taxi') {
+        setItem((prev: any) => ({
+          ...prev,
+          ci_taxi: formState.ci,
+          name_taxi: '',
+          last_name_taxi: '',
+          middle_name_taxi: '',
+          mother_last_name_taxi: '',
+          plate: '',
+          disabledTaxi: false,
+          disabledCI: true,
+          ci_anverso_taxi: '',
+          ci_reverso_taxi: '',
+        }));
+        setFormState({});
+        onClose();
+        return;
+      }
       if (!isMain) {
         setOpenNewAcomp(true);
       }
@@ -132,7 +170,13 @@ const ExistVisitModal = ({
   };
   return (
     <Modal
-      title={isMain ? 'Agregar visitante' : 'Agregar acompañante'}
+      title={
+        type === 'taxi'
+          ? 'Buscar conductor'
+          : isMain
+          ? 'Agregar visitante'
+          : 'Agregar acompañante'
+      }
       open={open}
       onClose={_onClose}
       buttonText="Buscar"

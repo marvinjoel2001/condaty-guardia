@@ -1,12 +1,15 @@
-import React from 'react';
-import { Text, View } from 'react-native';
-import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import React, { useState, useEffect } from 'react';
+import {Text, View, Keyboard, TouchableOpacity} from 'react-native';
+import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import Input from '../../../../mk/components/forms/Input/Input';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
+import ExistVisitModal from './ExistVisitModal';
+import Icon from '../../../../mk/components/ui/Icon/Icon';
+import { IconX } from '../../../icons/IconLibrary';
 interface SectionIncomeTypeProps {
   tab: any;
   handleChangeInput: any;
@@ -26,78 +29,32 @@ const SectionIncomeType = ({
   setErrors,
   errors,
 }: SectionIncomeTypeProps) => {
-  const { execute } = useApi();
-  const { showToast } = useAuth();
+  const {execute} = useApi();
+  const {showToast} = useAuth();
+  const [openTaxiModal, setOpenTaxiModal] = useState(false);
+  const [taxiFormState, setTaxiFormState] = useState({});
 
-  const onExistTaxi = async () => {
-    if (formState?.ci_taxi === '') {
-      return;
+  useEffect(() => {
+    if (tab === 'T' && !formState?.ci_taxi) {
+      setOpenTaxiModal(true);
     }
-    if (formState?.ci_taxi == formState?.ci) {
-      showToast('El ci del visitante y el taxi son iguales', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disabledTaxi: false,
-      });
-      return;
-    }
-    if (
-      formState?.acompanantes?.find(
-        (item: { ci: string }) => item.ci === formState?.ci_taxi,
-      )
-    ) {
-      showToast('El ci del taxi ya está registrado como acompañante', 'error');
-      setFormState({
-        ...formState,
-        ci_taxi: '',
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: '',
-        disabledTaxi: false,
-      });
-      return;
-    }
-    const { data: existData } = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci_taxi,
-    });
-    if (existData?.data) {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        ci_taxi: existData.data.ci,
-        name_taxi: existData.data.name,
-        middle_name_taxi: existData.data.middle_name,
-        last_name_taxi: existData.data.last_name,
-        mother_last_name_taxi: existData.data.mother_last_name,
-        plate: existData.data.plate || '',
-        disabledTaxi: true,
-        ci_anverso_taxi: existData?.data?.url_image_a,
-        ci_reverso_taxi: existData?.data?.url_image_r,
-      }));
-    } else {
-      setFormState((prevState: any) => ({
-        ...prevState,
-        name_taxi: '',
-        last_name_taxi: '',
-        middle_name_taxi: '',
-        mother_last_name_taxi: '',
-        plate: prevState.tab === 'T' ? '' : prevState.plate,
-        disabledTaxi: false,
-        ci_anverso_taxi: '',
-        ci_reverso_taxi: '',
-      }));
-    }
+  }, [tab, formState?.ci_taxi]);
+
+  const handleClearTaxi = () => {
+    setFormState((prev: any) => ({
+      ...prev,
+      ci_taxi: '',
+      name_taxi: '',
+      middle_name_taxi: '',
+      last_name_taxi: '',
+      mother_last_name_taxi: '',
+      plate: '',
+      ci_anverso_taxi: '',
+      ci_reverso_taxi: '',
+      disabledTaxi: false,
+      disabledCI: false,
+    }));
+    setOpenTaxiModal(true);
   };
   return (
     <>
@@ -145,7 +102,7 @@ const SectionIncomeType = ({
           />
         </>
       )}
-      {tab == 'T' && (
+      {tab == 'T' && formState?.ci_taxi && (
         <>
           <Text
             style={{
@@ -158,17 +115,24 @@ const SectionIncomeType = ({
           >
             Datos del conductor:
           </Text>
-          <Input
-            label="Carnet de identidad"
-            type="date"
-            name="ci_taxi"
-            required
-            maxLength={10}
-            error={errors}
-            value={formState['ci_taxi']}
-            onBlur={() => onExistTaxi()}
-            onChange={(value: any) => handleChangeInput('ci_taxi', value)}
-          />
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{flex: 1}}>
+              <Input
+                label="Carnet de identidad"
+                type="date"
+                name="ci_taxi"
+                required
+                maxLength={10}
+                error={errors}
+                value={formState['ci_taxi']}
+                disabled={formState?.disabledCI}
+                onChange={(value: any) => handleChangeInput('ci_taxi', value)}
+              />
+            </View>
+            <TouchableOpacity onPress={handleClearTaxi} style={{ paddingHorizontal: 5, marginTop: -10}}>
+              <Icon name={IconX} size={20} color={cssVar.cAccent} />
+            </TouchableOpacity>
+          </View>
 
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <UploadFileV2
@@ -181,6 +145,20 @@ const SectionIncomeType = ({
               label="Carnet anverso taxi"
               name="ci_anverso_taxi"
               global
+              onUploadStateChange={isUploading => {
+                // Si se sube un archivo, deshabilitar CI
+                if (!isUploading && formState.ci_anverso_taxi) {
+                  setFormState((prevState: any) => ({
+                    ...prevState,
+                    disabledCI: true,
+                  }));
+                } else if (!formState.ci_anverso_taxi) {
+                  setFormState((prevState: any) => ({
+                    ...prevState,
+                    disabledCI: false,
+                  }));
+                }
+              }}
             />
             <UploadFileV2
               variant="V2"
@@ -192,6 +170,20 @@ const SectionIncomeType = ({
               label="Carnet reverso taxi"
               name="ci_reverso_taxi"
               global
+              onUploadStateChange={isUploading => {
+                // Si se sube un archivo, deshabilitar CI
+                if (!isUploading && formState.ci_reverso_taxi) {
+                  setFormState((prevState: any) => ({
+                    ...prevState,
+                    disabledCI: true,
+                  }));
+                } else if (!formState.ci_reverso_taxi) {
+                  setFormState((prevState: any) => ({
+                    ...prevState,
+                    disabledCI: false,
+                  }));
+                }
+              }}
             />
           </View>
           <InputFullName
@@ -224,6 +216,18 @@ const SectionIncomeType = ({
             global
           />
         </>
+      )}
+      {openTaxiModal && (
+        <ExistVisitModal
+          open={openTaxiModal}
+          formState={taxiFormState}
+          setFormState={setTaxiFormState}
+          item={formState}
+          setItem={setFormState}
+          onClose={() => setOpenTaxiModal(false)}
+          setOpenNewAcomp={() => {}}
+          type="taxi"
+        />
       )}
     </>
   );
