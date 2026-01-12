@@ -139,7 +139,13 @@ const AccessDetail = ({ open, onClose, id }: Props) => {
         3,
       );
       if (apiResponse?.success) {
-        setAccessData(apiResponse.data?.[0] || null);
+        // Support both legacy array and new object response shapes
+        const respData = apiResponse?.data;
+        const accessItem =
+          (respData && (respData.access || respData[0])) || null;
+        setAccessData(accessItem);
+      } else {
+        setAccessData(null);
       }
     } catch (error) {
       setAccessData(null);
