@@ -119,7 +119,16 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
           }
 
           if (accessData) {
-            if (accessData.access_id) {
+            // If this access has a nested parent access object with owner/visit data, use the parent
+            if (
+              accessData.access &&
+              typeof accessData.access === 'object' &&
+              (accessData.access.owner || accessData.access.visit)
+            ) {
+              setData(accessData.access);
+            } 
+            // If this access references a parent by ID, fetch it
+            else if (accessData.access_id) {
               const { data: linkedData } = await execute('/accesses', 'GET', {
                 fullType: 'DET',
                 searchBy: accessData.access_id,
@@ -132,7 +141,9 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
                   setData(linkedData.data.access);
                 }
               }
-            } else {
+            } 
+            // Otherwise use the access data as is
+            else {
               setData(accessData);
             }
           }
@@ -514,8 +525,8 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
     let visit = data.visit ? data.visit : data.owner;
 
     const isSelected = acompanSelect[data?.id || '0'];
-    const acompData = data?.accesses.filter((item: any) => item.taxi != 'C');
-    const taxi = data?.accesses.filter((item: any) => item.taxi == 'C');
+    const acompData = (data?.accesses || []).filter((item: any) => item.taxi != 'C');
+    const taxi = (data?.accesses || []).filter((item: any) => item.taxi == 'C');
 
     return (
       <View>
@@ -920,7 +931,7 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
             wrap
             grow={false}
             tabs={[
-              { value: 'Otro', text: 'Otro' },
+              { value: 'Otro', text: 'Escribir mensaje manualmente', color: cssVar.cInfo, borderColor:  cssVar.cInfo },
               ...((openDecline === 'Y' ? accessMsg?.aprv : accessMsg?.rej)?.map(
                 (msg: any) => ({
                   value: msg.message,

@@ -6,6 +6,8 @@ interface Tab {
   value: string;
   text: string;
   isNew?: boolean;
+  color?: string;
+  borderColor?: string;
 }
 
 interface TabsButtonsProps {
@@ -37,14 +39,13 @@ const TabsButtons = ({
           borderRadius: 8,
           // paddingHorizontal: 18,
           padding: 8,
-          backgroundColor: cssVar.cHoverBlackV2,
+          backgroundColor: tab.color || cssVar.cHoverBlackV2,
           borderWidth: 0.5,
-          borderColor: cssVar.cWhiteV1,
+          borderColor: tab.borderColor || cssVar.cWhiteV1,
           ...(sel === tab.value
             ? {
-                backgroundColor: cssVar.cHoverSuccess,
-
-                borderColor: cssVar.cSidebar,
+                backgroundColor: tab.color || cssVar.cHoverSuccess,
+                borderColor: tab.borderColor || cssVar.cSidebar,
               }
             : {}),
         }}>
