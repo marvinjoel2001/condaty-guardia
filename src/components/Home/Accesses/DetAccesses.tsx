@@ -125,8 +125,12 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
                 searchBy: accessData.access_id,
               });
 
-              if (linkedData.success && linkedData.data.length > 0) {
-                setData(linkedData.data[0]);
+              if (linkedData.success) {
+                if (Array.isArray(linkedData.data)) {
+                  if (linkedData.data.length > 0) setData(linkedData.data[0]);
+                } else if (linkedData.data?.access) {
+                  setData(linkedData.data.access);
+                }
               }
             } else {
               setData(accessData);
