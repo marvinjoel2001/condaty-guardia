@@ -169,6 +169,8 @@ const AccessDetail = ({ open, onClose, id }: Props) => {
   }, [open]);
 
   const getStatusForCompanionOrResident = (personData: any) => {
+    if (personData.out_at == null && personData.in_at == null)
+      return { text: 'Rechazado', color: cssVar.cError };
     if (personData.out_at)
       return { text: 'Completado', color: cssVar.cSuccess };
     if (personData.in_at) return { text: 'Por salir', color: cssVar.cSuccess };
