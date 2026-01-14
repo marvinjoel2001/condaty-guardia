@@ -34,11 +34,11 @@ function AppContent() {
         <NetworkProvider>
           <AxiosProvider interceptors={axiosInterceptors}>
             {/* <KeyboardProvider> */}
-            {/* <StatusBar
+            <StatusBar
               animated={true}
               backgroundColor={cssVar.cBlack}
               barStyle={'light-content'}
-            /> */}
+            />
             <NavigationContainer ref={navigationRef}>
               <AuthProvider>
                 <OneSignalContextProvider>
