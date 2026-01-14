@@ -419,6 +419,7 @@ const DetOrders = ({ id, open, close, reload, handleChange }: any) => {
                       onChange={(value: any) =>
                         handleInputChange('plate', value)
                       }
+                      autoCapitalize="characters"
                     />
                     <UploadFileV2
                       variant="V2"
@@ -462,10 +463,10 @@ const DetOrders = ({ id, open, close, reload, handleChange }: any) => {
                     <Input
                       label="Placa del taxi"
                       type="text"
-                      name="plate" // Taxi usa 'plate' como en la versión antigua
-                      error={errors} // Error para 'plate'
+                      name="plate"
+                      error={errors}
                       required={tab === 'T'}
-                      value={formState?.plate || ''} // Valor de 'plate'
+                      value={formState?.plate || ''}
                       onChange={(value: string) =>
                         handleChange('plate', value.toUpperCase())
                       }
