@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import useApi from '../../../../mk/hooks/useApi';
-import {Image, Text, View} from 'react-native';
+import {Image, Text, View, TouchableOpacity} from 'react-native';
 import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
@@ -10,6 +10,7 @@ import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Br from '../../Profile/Br';
+import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
 interface PropsType {
   id: string | number | null;
   open: boolean;
@@ -34,10 +35,14 @@ const ModalAccessExpand = ({
   invitation,
 }: PropsType) => {
   const [data, setData]: any = useState([]);
-  const {loaded, execute} = useApi();
+  const { loaded, execute } = useApi();
+  const [openExpandImg, setOpenExpandImg] = useState({
+    open: false,
+    imageUri: '',
+  });
 
   const getAccess = async () => {
-    const {data} = await execute(
+    const { data } = await execute(
       '/accesses',
       'GET',
       {
@@ -50,7 +55,11 @@ const ModalAccessExpand = ({
       2,
     );
     if (data?.success) {
-      setData(data?.data?.[0]);
+      if (Array.isArray(data?.data)) {
+        setData(data?.data?.[0]);
+      } else if (data?.data?.access) {
+        setData(data?.data?.access);
+      }
     }
   };
   useEffect(() => {
@@ -99,36 +108,63 @@ const ModalAccessExpand = ({
         )}
         <KeyValue keys="Observación de ingreso" value={data?.obs_in || '-/-'} />
         <KeyValue keys="Observación de salida" value={data?.obs_out || '-/-'} />
-        <View style={{flexDirection: 'row', gap: 10}}>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
           {data?.visit?.url_image_a && (
-            <Image
-              source={{
-                uri: data?.visit?.url_image_a[0],
-              }}
-              width={100}
-              height={100}
-              style={{width: 100, height: 100, borderRadius: 8}}
-            />
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: data?.visit?.url_image_a[0],
+                })
+              }
+            >
+              <Image
+                source={{
+                  uri: data?.visit?.url_image_a[0],
+                }}
+                width={100}
+                height={100}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
+              />
+            </TouchableOpacity>
           )}
           {data?.visit?.url_image_r && (
-            <Image
-              source={{
-                uri: data?.visit?.url_image_r[0],
-              }}
-              width={100}
-              height={100}
-              style={{width: 100, height: 100, borderRadius: 8}}
-            />
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: data?.visit?.url_image_r[0],
+                })
+              }
+            >
+              <Image
+                source={{
+                  uri: data?.visit?.url_image_r[0],
+                }}
+                width={100}
+                height={100}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
+              />
+            </TouchableOpacity>
           )}
           {data?.url_image_p && (
-            <Image
-              source={{
-                uri: data?.url_image_p[0],
-              }}
-              width={100}
-              height={100}
-              style={{width: 100, height: 100, borderRadius: 8}}
-            />
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: data?.url_image_p[0],
+                })
+              }
+            >
+              <Image
+                source={{
+                  uri: data?.url_image_p[0],
+                }}
+                width={100}
+                height={100}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
+              />
+            </TouchableOpacity>
           )}
         </View>
       </>
@@ -171,7 +207,7 @@ const ModalAccessExpand = ({
               )}
             />
           }
-          style={{marginBottom: 8}}
+          style={{ marginBottom: 8 }}
         />
         {invitation.type == 'G' && (
           <KeyValue
@@ -310,6 +346,13 @@ const ModalAccessExpand = ({
   return (
     <Modal title={getModalTitle(type)} open={open} onClose={onClose}>
       {renderModalContent()}
+      {openExpandImg.open && (
+        <ImageExpandableModal
+          visible={openExpandImg.open}
+          imageUri={openExpandImg.imageUri}
+          onClose={() => setOpenExpandImg({ open: false, imageUri: '' })}
+        />
+      )}
     </Modal>
   );
 };

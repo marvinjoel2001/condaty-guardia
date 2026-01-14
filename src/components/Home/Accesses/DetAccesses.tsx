@@ -126,7 +126,7 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
               (accessData.access.owner || accessData.access.visit)
             ) {
               setData(accessData.access);
-            } 
+            }
             // If this access references a parent by ID, fetch it
             else if (accessData.access_id) {
               const { data: linkedData } = await execute('/accesses', 'GET', {
@@ -141,7 +141,7 @@ const DetAccesses = ({ id, open, close, reload }: DetAccessesProps) => {
                   setData(linkedData.data.access);
                 }
               }
-            } 
+            }
             // Otherwise use the access data as is
             else {
               setData(accessData);
