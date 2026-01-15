@@ -318,22 +318,40 @@ const Accesses = ({ data, reload, typeSearch, isLoading }: PropsType) => {
   const filterBySearch = (items: any[], searchTerm: string) => {
     if (!searchTerm) return items;
 
+    const normalizedSearch = removeAccents(searchTerm.toLowerCase());
+
     return items?.filter(item => {
       const visitName = item?.visit ? getFullName(item.visit, 'NSLM') : '';
       const ownerName = item?.owner ? getFullName(item.owner, 'NSLM') : '';
       const visitCI = item?.visit?.ci || '';
-      const otherTypeName = item?.other_type?.name || '';
+      const otherTypeName =
+        item?.other_type?.name || item?.other?.other_type?.name || '';
+      const plate = item?.plate || '';
+      const hasMatchingUnit =
+        item?.owner?.dpto?.some((dpto: any) => {
+          const unitNumber = dpto?.nro || '';
+          const unitDescription = dpto?.description || '';
+
+          return (
+            removeAccents(unitNumber.toLowerCase()).includes(
+              normalizedSearch,
+            ) ||
+            removeAccents(unitDescription.toLowerCase()).includes(
+              normalizedSearch,
+            )
+          );
+        }) || false;
 
       return (
-        removeAccents(visitName)?.includes(removeAccents(searchTerm)) ||
-        removeAccents(ownerName)?.includes(removeAccents(searchTerm)) ||
-        removeAccents(otherTypeName)?.includes(removeAccents(searchTerm)) ||
-        removeAccents(visitCI)?.includes(removeAccents(searchTerm)) ||
-        removeAccents(item?.plate)?.includes(removeAccents(searchTerm))
+        removeAccents(visitName.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(ownerName.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(otherTypeName.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(visitCI.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(plate.toLowerCase()).includes(normalizedSearch) ||
+        hasMatchingUnit
       );
     });
   };
-
   const filteredAccesses = useMemo(() => {
     const result = filterBySearch(dataAccesses || [], search);
     return result;

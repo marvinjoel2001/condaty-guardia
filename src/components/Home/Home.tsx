@@ -186,7 +186,7 @@ const Home = () => {
         searchBy: searchParam || '',
       },
       true,
-      1,
+      2,
     );
     setLoaded(false);
 
