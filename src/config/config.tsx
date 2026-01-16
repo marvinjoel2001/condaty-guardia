@@ -45,14 +45,14 @@ const configApp = {
       cdnUrl: 'https://condaty-prod.bunnycdn.com',
     },
     DEV: {
-      username: 'dev-condaty',
-      password: 'a6a983f7-ecc0-4f00-8c8de1ae77fb-4654-4816',
+      username: 'devdondaty',
+      password: 'f7e20cac-35e9-485f-bcf0f00cf366-9c68-4e88',
       hostname: 'br.storage.bunnycdn.com',
       port: 21,
       connectionType: 'Passive' as const,
-      storageZoneName: 'dev-condaty',
-      apiKey: 'a6a983f7-ecc0-4f00-8c8de1ae77fb-4654-4816',
-      cdnUrl: 'https://dev-condaty.b-cdn.net',
+      storageZoneName: 'devdondaty',
+      apiKey: 'f7e20cac-35e9-485f-bcf0f00cf366-9c68-4e88',
+      cdnUrl: 'https://devcondaty.b-cdn.net',
     },
     TEST: {
       username: 'condaty-test',
@@ -75,7 +75,7 @@ const configApp = {
       cdnUrl: 'https://condaty-demo.bunnycdn.com',
     },
   },
-  storageStrategy: 'cloudinary', // 'bunny' o 'cloudinary' según entorno
+  storageStrategy: 'bunny', // 'bunny' o 'cloudinary' según entorno
   cloudinary: {
     cloudName: 'djdo4zsfn',
     uploadPreset: 'condatyprod',
