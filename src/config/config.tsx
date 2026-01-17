@@ -75,7 +75,7 @@ const configApp = {
       cdnUrl: 'https://condaty-demo.bunnycdn.com/',
     },
   },
-  storageStrategy: 'bunny', // 'bunny' o 'cloudinary' según entorno
+  storageStrategy: 'cloudinary', // 'bunny' o 'cloudinary' según entorno
   cloudinary: {
     cloudName: 'djdo4zsfn',
     uploadPreset: 'condatyprod',
