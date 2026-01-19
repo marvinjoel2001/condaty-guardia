@@ -1,16 +1,16 @@
 //initProject
-import {OneSignal} from 'react-native-onesignal';
-import {useCallback, useEffect} from 'react';
+import { OneSignal } from 'react-native-onesignal';
+import { useCallback, useEffect } from 'react';
+import { Platform } from 'react-native';
 import useAuth from '../../mk/hooks/useAuth';
-import {useEvent} from '../../mk/hooks/useEvent';
+import { useEvent } from '../../mk/hooks/useEvent';
 import { navigationRef } from '../navigators/navigationRef';
 
 const InitProject = () => {
-  const {showToast, logout,user} = useAuth();
-  const {dispatch} = useEvent('onReload');
+  const { showToast, logout, user } = useAuth();
+  const { dispatch } = useEvent('onReload');
   // para rcibir notificaciones
   const onNotif = useCallback((data: any) => {
-
     if (data?.event === 'ping') {
       showToast('se recibio Ping');
     }
@@ -38,7 +38,6 @@ const InitProject = () => {
       if (info.user_id !== user?.id) {
         showToast(`¡Hay una nueva alerta!`, 'warning');
       }
-
     }
     // if (data?.event === 'in-visitG') {
     //   // QR grupal
@@ -66,13 +65,15 @@ const InitProject = () => {
   useEvent('onNotif', onNotif);
   /// hasat aqui notificaciones
   useEffect(() => {
+    if (Platform.OS === 'web') {
+      return;
+    }
     // register handlers and keep references so we can remove them
     const handleClick = (event: any) => {
       try {
-        
         const data: any = event.notification?.additionalData || null;
 
-        const params = {fromPush: true, pushData: data};
+        const params = { fromPush: true, pushData: data };
         if (navigationRef.isReady()) {
           navigationRef.navigate('Notifications', params);
         } else {
@@ -96,14 +97,20 @@ const InitProject = () => {
     };
 
     OneSignal.Notifications.addEventListener('click', handleClick);
-    OneSignal.Notifications.addEventListener('foregroundWillDisplay', handleForeground);
+    OneSignal.Notifications.addEventListener(
+      'foregroundWillDisplay',
+      handleForeground,
+    );
 
     return () => {
       try {
         OneSignal.Notifications.removeEventListener('click', handleClick);
       } catch (e) {}
       try {
-        OneSignal.Notifications.removeEventListener('foregroundWillDisplay', handleForeground);
+        OneSignal.Notifications.removeEventListener(
+          'foregroundWillDisplay',
+          handleForeground,
+        );
       } catch (e) {}
       try {
         OneSignal.Notifications.clearAll();

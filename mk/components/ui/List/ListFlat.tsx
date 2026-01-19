@@ -1,8 +1,8 @@
-import React, {memo, useCallback, useRef} from 'react';
-import {FlatList, RefreshControl, View, Text, StyleSheet} from 'react-native';
-import {cssVar, TypeStyles, FONTS} from '../../../styles/themes';
+import React, { memo, useCallback, useRef } from 'react';
+import { FlatList, RefreshControl, View, Text, StyleSheet } from 'react-native';
+import { cssVar, TypeStyles, FONTS } from '../../../styles/themes';
 import useAuth from '../../../hooks/useAuth';
-import Skeleton, {PropsTypeSkeleton} from '../Skeleton/Skeleton';
+import Skeleton, { PropsTypeSkeleton } from '../Skeleton/Skeleton';
 
 const RenderFooterComponent = memo(
   ({
@@ -14,7 +14,7 @@ const RenderFooterComponent = memo(
   }) => {
     if (!loading) return null;
     return (
-      <View style={{paddingVertical: 4}}>
+      <View style={{ paddingVertical: 4 }}>
         <Skeleton type={skeletonType} />
       </View>
     );
@@ -45,6 +45,7 @@ interface PropsType {
   stopPagination?: boolean;
   setParams?: (params: any) => void;
   enablePagination?: boolean;
+  contentContainerStyle?: TypeStyles;
 }
 
 const ListFlat = memo((props: PropsType) => {
@@ -68,18 +69,19 @@ const ListFlat = memo((props: PropsType) => {
     stopPagination = false,
     setParams,
     enablePagination = true,
+    contentContainerStyle,
     // getItemLayout,
   } = props;
 
-  const {setStore} = useAuth();
+  const { setStore } = useAuth();
   const scrollOffsetRef = useRef(0);
 
   // Memoiza el handler de scroll
   const handleScroll = useCallback(
-    ({nativeEvent}: any) => {
+    ({ nativeEvent }: any) => {
       const offset = nativeEvent.contentOffset.y;
       scrollOffsetRef.current = offset;
-      setStore({onScroll: offset});
+      setStore({ onScroll: offset });
     },
     [setStore],
   );
@@ -93,7 +95,7 @@ const ListFlat = memo((props: PropsType) => {
 
   // Memoiza el renderItem
   const renderItemMemo = useCallback(
-    ({item, index}: {item: any; index: number}) => {
+    ({ item, index }: { item: any; index: number }) => {
       const separator = sepList?.(item);
       const content = renderItem(item, index);
 
@@ -129,8 +131,10 @@ const ListFlat = memo((props: PropsType) => {
 
   // Permitir que el paddingBottom de style sobrescriba el valor por defecto
   const mergedContentContainerStyle = [
-    {paddingBottom: 24},
+    { paddingBottom: 24 },
     style && (typeof style === 'object' ? style : {}),
+    contentContainerStyle &&
+      (typeof contentContainerStyle === 'object' ? contentContainerStyle : {}),
   ];
   const onPagination = () => {
     if (loading || stopPagination) {

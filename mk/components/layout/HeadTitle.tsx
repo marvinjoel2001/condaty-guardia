@@ -90,18 +90,18 @@ const HeadTitle = ({
       {/* Lado izquierdo - 20% o 30% */}
       <View style={modalLayout ? theme.leftSectionModal : theme.leftSection}>
         {route.name === 'Home' && !onlyBack ? (
-          <View
+          <TouchableOpacity
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               padding: 8,
               backgroundColor: cssVar.cBlack,
-              borderRadius: '100%',
+              borderRadius: 100,
               alignSelf: 'flex-start',
             }}
-            onTouchEnd={() => togleDrawer()}>
+            onPress={() => togleDrawer()}>
             <Icon name={IconMenu} color={cssVar.cWhite} />
-          </View>
+          </TouchableOpacity>
         ) : iconClose ? (
           <TouchableOpacity
             onPress={goBack}

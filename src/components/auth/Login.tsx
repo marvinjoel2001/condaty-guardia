@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import {
   ImageBackground,
   Linking,
+  Platform,
   Text,
   TouchableOpacity,
   View,
@@ -54,6 +55,9 @@ const Login = () => {
 
   const signalInit = async () => {
     try {
+      if (Platform.OS === 'web') {
+        return;
+      }
       await OneSignal.initialize(configApp.APP_SIGNAL_KEY);
       OneSignal.User.addTags({ client_id: '', user_id: '' });
       OneSignal.logout();
@@ -96,21 +100,15 @@ const Login = () => {
       const appVersion = await VersionCheck.getCurrentVersion();
 
       // === OBTENCIÓN DE INFORMACIÓN DEL DISPOSITIVO ===
-      const [
-        model,
-        systemName,
-        systemVersion,
-        brand,
-        totalMemory,
-        uniqueId,
-      ] = await Promise.all([
-        DeviceInfo.getModel(),
-        DeviceInfo.getSystemName(),         // "iOS" o "Android"
-        DeviceInfo.getSystemVersion(),
-        DeviceInfo.getBrand(),
-        DeviceInfo.getTotalMemory(),        // bytes
-        DeviceInfo.getUniqueId(),
-      ]);
+      const [model, systemName, systemVersion, brand, totalMemory, uniqueId] =
+        await Promise.all([
+          DeviceInfo.getModel(),
+          DeviceInfo.getSystemName(), // "iOS" o "Android"
+          DeviceInfo.getSystemVersion(),
+          DeviceInfo.getBrand(),
+          DeviceInfo.getTotalMemory(), // bytes
+          DeviceInfo.getUniqueId(),
+        ]);
 
       const ramInGB = Math.round(totalMemory / (1024 * 1024 * 1024));
 
@@ -205,6 +203,7 @@ const Login = () => {
                 error={errors}
                 onChange={(value: any) => handleInputChange('email', value)}
               />
+              {Platform.OS === 'web' && <View style={{marginVertical: 10}} />}
               <Input
                 label="Contraseña"
                 name="password"

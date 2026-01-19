@@ -1,9 +1,9 @@
-import {useContext, useEffect, useState, createContext, useMemo} from 'react';
+import { useContext, useEffect, useState, createContext, useMemo } from 'react';
 import configApp from '../../src/config/config';
 import useAuth from '../hooks/useAuth';
-import {Platform} from 'react-native';
-import {LogLevel, OneSignal} from 'react-native-onesignal';
-import {throttle} from '../utils/utils';
+import { Platform } from 'react-native';
+import { LogLevel, OneSignal } from 'react-native-onesignal';
+import { throttle } from '../utils/utils';
 
 export interface OneSignalContextType {
   signalPermission: boolean;
@@ -19,8 +19,8 @@ export interface OneSignalContextType {
 
 export const OneSignalContext = createContext({} as OneSignalContextType);
 
-const OneSignalContextProvider = ({children}: any) => {
-  const {user} = useAuth();
+const OneSignalContextProvider = ({ children }: any) => {
+  const { user } = useAuth();
   const [signalPermission, setSignalPermission] = useState(false);
   const [signalToken, setSignalToken] = useState('');
   const [signalId, setSignalId] = useState('');
@@ -28,6 +28,9 @@ const OneSignalContextProvider = ({children}: any) => {
   const _verifyState = async () => {
     // const granted = await OneSignal.Notifications.canRequestPermission();
     let permission: any = false;
+    if (Platform.OS === 'web') {
+      return false;
+    }
     if (Platform.OS === 'ios') {
       permission = await OneSignal.Notifications.permissionNative();
       permission = permission > 1;
@@ -41,6 +44,9 @@ const OneSignalContextProvider = ({children}: any) => {
 
   const signalVerifyState = throttle(_verifyState, 1000);
   const signalInit = async () => {
+    if (Platform.OS === 'web') {
+      return;
+    }
     OneSignal.initialize(configApp.APP_SIGNAL_KEY);
     const permission = signalVerifyState();
     console.log('One signal initiate:', permission);
@@ -49,6 +55,9 @@ const OneSignalContextProvider = ({children}: any) => {
   const throttleInit = throttle(signalInit, 5000);
 
   const signalGetInfoSignal = async (msg: string = '', extra: any = null) => {
+    if (Platform.OS === 'web') {
+      return false;
+    }
     const permission = signalVerifyState();
     let optedIn: any = await OneSignal.User.pushSubscription.getOptedInAsync();
     const id: any = await OneSignal.User.pushSubscription.getIdAsync();
@@ -68,6 +77,9 @@ const OneSignalContextProvider = ({children}: any) => {
   }, [signalPermission]);
 
   useEffect(() => {
+    if (Platform.OS === 'web') {
+      return;
+    }
     if (process.env.NODE_ENV == 'development') {
       OneSignal.Debug.setLogLevel(LogLevel.Verbose);
       // OneSignal.Debug.setAlertLevel(LogLevel.Verbose);
@@ -133,16 +145,25 @@ const OneSignalContextProvider = ({children}: any) => {
   }, []);
 
   const signalGetTags = async () => {
+    if (Platform.OS === 'web') {
+      return {};
+    }
     const tags = await OneSignal.User.getTags();
     // console.log('Tags:', tags);
     return tags;
   };
 
   const signalSetTags = async (tags: any) => {
+    if (Platform.OS === 'web') {
+      return;
+    }
     console.log('onesignal tags', tags);
     OneSignal.User.addTags(tags);
   };
   const _signalGetUserPermissions = async () => {
+    if (Platform.OS === 'web') {
+      return;
+    }
     // await OneSignal.setConsentGiven(true);
     console.log('OneSignal: solicitando permisos');
     OneSignal.setConsentGiven(true);
@@ -153,6 +174,9 @@ const OneSignalContextProvider = ({children}: any) => {
 
   const signalGetUserPermissions = throttle(_signalGetUserPermissions, 1000);
   const logSignal = async (user: any) => {
+    if (Platform.OS === 'web') {
+      return;
+    }
     if (!signalPermission) {
       signalGetUserPermissions();
       return;
@@ -217,5 +241,5 @@ export default OneSignalContextProvider;
 
 export const useOneSignal = () => {
   const data: OneSignalContextType = useContext(OneSignalContext);
-  return {...data};
+  return { ...data };
 };

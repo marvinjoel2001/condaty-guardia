@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, RefreshControl, Keyboard, ScrollView, Text } from 'react-native';
-import Animated from 'react-native-reanimated';
 import HeadTitle from './HeadTitle';
 import { cssVar, ThemeType, TypeStyles } from '../../styles/themes';
 import { useRoute } from '@react-navigation/native';

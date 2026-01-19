@@ -320,5 +320,6 @@ const styles = StyleSheet.create({
   listContainer: {
     width: '100%',
     paddingBottom: 40,
+    flex: 1,
   },
 });

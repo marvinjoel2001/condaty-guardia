@@ -57,7 +57,7 @@ const Form = ({children, style, pressable = true}: FormProps) => {
     </KeyboardAvoidingView>
   );
 
-  return pressable ? (
+  return pressable && Platform.OS !== 'web' ? (
     <Pressable style={{flex: 1}} onPress={dismissKeyboard}>
       {content}
     </Pressable>

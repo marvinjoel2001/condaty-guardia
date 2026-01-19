@@ -405,7 +405,8 @@ const Accesses = ({ data, reload, typeSearch, isLoading }: PropsType) => {
           <ListFlat
             data={combinedData}
             renderItem={renderCombinedItem}
-            style={{ paddingBottom: 120 }}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 120 }}
             keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
             onRefresh={reload}
             refreshing={isLoading}
