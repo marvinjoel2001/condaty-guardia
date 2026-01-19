@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
-import {cssVar, FONTS, TypeStyles} from '../../../styles/themes';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { cssVar, FONTS, TypeStyles } from '../../../styles/themes';
 
 interface Tab {
   value: string;
@@ -33,12 +33,16 @@ const TabsButtons = ({
       onPress={() => setSel(tab.value)}
       style={{
         flex: grow ? 1 : 0,
-      }}>
+      }}
+    >
       <View
         style={{
           borderRadius: 8,
           // paddingHorizontal: 18,
           padding: 8,
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
           backgroundColor: tab.color || cssVar.cHoverBlackV2,
           borderWidth: 0.5,
           borderColor: tab.borderColor || cssVar.cWhiteV1,
@@ -48,7 +52,8 @@ const TabsButtons = ({
                 borderColor: tab.borderColor || cssVar.cSidebar,
               }
             : {}),
-        }}>
+        }}
+      >
         <Text
           style={{
             color: cssVar.cWhiteV1,
@@ -61,7 +66,8 @@ const TabsButtons = ({
                   fontFamily: FONTS.semiBold,
                 }
               : {}),
-          }}>
+          }}
+        >
           {tab.text}
         </Text>
         {tab.isNew && (
@@ -87,14 +93,16 @@ const TabsButtons = ({
         width: '100%',
         ...style,
         marginVertical: 12,
-      }}>
+      }}
+    >
       {wrap ? (
         <View
           style={{
             flexDirection: 'row',
             flexWrap: 'wrap',
             gap: 8,
-          }}>
+          }}
+        >
           {tabs.map(renderItem)}
         </View>
       ) : (
@@ -105,7 +113,8 @@ const TabsButtons = ({
             flexDirection: 'row',
             gap: 8,
             flexGrow: grow ? 1 : 0,
-          }}>
+          }}
+        >
           {tabs.map(renderItem)}
         </ScrollView>
       )}
