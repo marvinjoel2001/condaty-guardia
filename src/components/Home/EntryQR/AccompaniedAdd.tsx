@@ -3,7 +3,7 @@ import InputFullName from '../../../../mk/components/forms/InputFullName/InputFu
 import Input from '../../../../mk/components/forms/Input/Input';
 import useAuth from '../../../../mk/hooks/useAuth';
 import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
-import { View } from 'react-native';
+import { View, Platform, useWindowDimensions } from 'react-native';
 import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage';
 import DynamicModal from '../../../../mk/components/ui/DynamicModal/DynamicModal';
 import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
@@ -34,6 +34,7 @@ export const AccompaniedAdd = ({
 }: TypeProps) => {
   const [errors, setErrors]: any = useState({});
   const { showToast } = useAuth();
+  const { height } = useWindowDimensions();
 
   const handleChange = (key: string, value: any) => {
     setFormState((prevState: any) => ({ ...prevState, [key]: value }));
@@ -168,7 +169,7 @@ export const AccompaniedAdd = ({
       title={editItem ? 'Editar datos' : 'Persona no encontrada'}
       open={open}
       onClose={handleClose}
-      height={468}
+      height={Platform.OS === 'web' ? Math.min(468, height * 0.85) : 468}
       styleHeader={{ borderBottomWidth: 0 }}
       buttonText="Registrar"
       subTitle="Agrega sus datos para registrarla"
@@ -200,24 +201,26 @@ export const AccompaniedAdd = ({
           global
         />
       </View>
-      <Input
-        label="Carnet de identidad"
-        keyboardType="numeric"
-        maxLength={10}
-        name="ci"
-        value={formState?.ci}
-        error={errors}
-        required={true}
-        onChange={(value: any) => handleChange('ci', value)}
-        disabled={disabledCi}
-      />
+      <View style={{ gap: 12 }}>
+        <Input
+          label="Carnet de identidad"
+          keyboardType="numeric"
+          maxLength={10}
+          name="ci"
+          value={formState?.ci}
+          error={errors}
+          required={true}
+          onChange={(value: any) => handleChange('ci', value)}
+          disabled={disabledCi}
+        />
 
-      <InputFullName
-        formState={formState}
-        errors={errors}
-        handleChangeInput={handleChange}
-        inputGrid={true}
-      />
+        <InputFullName
+          formState={formState}
+          errors={errors}
+          handleChangeInput={handleChange}
+          inputGrid={true}
+        />
+      </View>
     </DynamicModal>
   );
 };

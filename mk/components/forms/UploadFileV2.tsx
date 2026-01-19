@@ -107,6 +107,12 @@ const UploadFile: React.FC<Props> = ({
       Alert.alert('Límite alcanzado', `Máximo ${cant} archivo(s)`);
       return;
     }
+
+    if (Platform.OS === 'web') {
+      openGallery();
+      return;
+    }
+
     if (type === 'I') {
       Alert.alert('Seleccionar imagen', '', [
         { text: 'Cámara', onPress: openCamera },
@@ -161,20 +167,20 @@ const UploadFile: React.FC<Props> = ({
   };
   const handleResponse = async (response: any) => {
     if (response.didCancel || !response.assets) return;
-    
+
     // Primero, agregar las URIs locales para previsualización inmediata
     const localUris = response.assets.map((asset: any) => asset.uri);
     setFormState((prev: any) => ({
       ...prev,
       [name]: isSingle ? localUris[0] : [...currentValues, ...localUris],
     }));
-    
+
     setUploading(true);
     onUploadStateChange?.(true);
     setWaiting(1, 'upload-files');
     const uploadedValues: string[] = [];
     const localToServerMap = new Map<string, string>(); // Mapeo de URI local a URL del servidor
-    
+
     for (let idx = 0; idx < response.assets.length; idx++) {
       const asset = response.assets[idx];
       let filename = asset.fileName || `file_${Date.now()}`;
@@ -208,7 +214,7 @@ const UploadFile: React.FC<Props> = ({
         asset.type?.startsWith('image/') ||
         (fileExt && imageExts.includes(fileExt));
 
-      if (isImageAsset) {
+      if (isImageAsset && Platform.OS !== 'web') {
         // Compresión y redimensión
         try {
           const format = Platform.OS === 'android' ? 'WEBP' : 'JPEG';
@@ -256,14 +262,18 @@ const UploadFile: React.FC<Props> = ({
         Alert.alert('Error', 'No se pudo subir el archivo');
       }
     }
-    
+
     // Reemplazar las URIs locales con las URLs del servidor
     if (uploadedValues.length > 0) {
       setFormState((prev: any) => {
-        const prevValues = isSingle 
-          ? (Array.isArray(prev[name]) ? prev[name][0] : prev[name])
-          : (Array.isArray(prev[name]) ? prev[name] : []);
-        
+        const prevValues = isSingle
+          ? Array.isArray(prev[name])
+            ? prev[name][0]
+            : prev[name]
+          : Array.isArray(prev[name])
+          ? prev[name]
+          : [];
+
         if (isSingle) {
           return {
             ...prev,
@@ -271,8 +281,9 @@ const UploadFile: React.FC<Props> = ({
           };
         } else {
           // En modo múltiple, reemplazar solo las URIs locales por sus URLs del servidor
-          const updated = (Array.isArray(prevValues) ? prevValues : []).map((uri: string) => 
-            localToServerMap.has(uri) ? localToServerMap.get(uri)! : uri
+          const updated = (Array.isArray(prevValues) ? prevValues : []).map(
+            (uri: string) =>
+              localToServerMap.has(uri) ? localToServerMap.get(uri)! : uri,
           );
           return {
             ...prev,
@@ -288,14 +299,15 @@ const UploadFile: React.FC<Props> = ({
   };
   const remove = (fullUrl: string) => {
     if (!fullUrl || typeof fullUrl !== 'string') return;
-    
+
     // Solo intentar eliminar del servidor si NO es una URI local
-    const isLocalUri = fullUrl.startsWith('file://') || 
-                      fullUrl.startsWith('content://') ||
-                      fullUrl.startsWith('ph://') ||
-                      fullUrl.includes('/cache/') ||
-                      fullUrl.includes('/tmp/');
-    
+    const isLocalUri =
+      fullUrl.startsWith('file://') ||
+      fullUrl.startsWith('content://') ||
+      fullUrl.startsWith('ph://') ||
+      fullUrl.includes('/cache/') ||
+      fullUrl.includes('/tmp/');
+
     if (!isLocalUri) {
       let path = fullUrl;
 
@@ -336,19 +348,20 @@ const UploadFile: React.FC<Props> = ({
     const singleValue = Array.isArray(formState[name])
       ? formState[name][0]
       : formState[name];
-    
+
     // Determinar si es una URI local (file://, content://, etc.) o una URL del servidor
-    const isLocalUri = singleValue && 
-      typeof singleValue === 'string' && 
-      (singleValue.startsWith('file://') || 
-       singleValue.startsWith('content://') ||
-       singleValue.startsWith('ph://') ||
-       singleValue.includes('/cache/') ||
-       singleValue.includes('/tmp/'));
-    
+    const isLocalUri =
+      singleValue &&
+      typeof singleValue === 'string' &&
+      (singleValue.startsWith('file://') ||
+        singleValue.startsWith('content://') ||
+        singleValue.startsWith('ph://') ||
+        singleValue.includes('/cache/') ||
+        singleValue.includes('/tmp/'));
+
     const imageUrl = singleValue
       ? isLocalUri
-        ? singleValue  // Usar URI local directamente
+        ? singleValue // Usar URI local directamente
         : typeof singleValue === 'string' && singleValue.startsWith('http')
         ? singleValue
         : storage.url(singleValue as string)

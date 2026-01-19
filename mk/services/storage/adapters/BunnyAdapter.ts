@@ -30,6 +30,10 @@ export class BunnyAdapter implements IStorageAdapter {
         bytes[i] = binaryString.charCodeAt(i);
       }
       body = bytes.buffer;
+    } else if (Platform.OS === 'web' && file.uri) {
+        // En Web, si tenemos una URI (blob: o data:), la convertimos a Blob
+        const res = await fetch(file.uri);
+        body = await res.blob();
     } else {
       // Usar el archivo directamente (Blob o similar)
       body = file;
