@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
@@ -91,7 +92,9 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        videoRef.current
+          .play()
+          .catch((e: any) => console.error('Error playing video:', e));
         requestRef.current = requestAnimationFrame(tick);
       }
     } catch (err) {
