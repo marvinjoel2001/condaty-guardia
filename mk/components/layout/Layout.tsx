@@ -1,11 +1,10 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View, RefreshControl, Keyboard, ScrollView} from 'react-native';
-import Animated from 'react-native-reanimated';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, RefreshControl, Keyboard, ScrollView, Text } from 'react-native';
 import HeadTitle from './HeadTitle';
-import {cssVar, ThemeType, TypeStyles} from '../../styles/themes';
-import {useRoute} from '@react-navigation/native';
+import { cssVar, ThemeType, TypeStyles } from '../../styles/themes';
+import { useRoute } from '@react-navigation/native';
 import useAuth from '../../hooks/useAuth';
-import {isAndroid} from '../../utils/utils';
+import { isAndroid } from '../../utils/utils';
 import Footer from '../../../src/navigators/Footer/Footer';
 import LockAlert from '../../../src/components/Alerts/LockAlert';
 import AlertDetail from '../../../src/components/Alerts/AlertDetail';
@@ -14,8 +13,9 @@ import {
   IconFlame,
   IconTheft,
 } from '../../../src/icons/IconLibrary';
-import {useEvent} from '../../hooks/useEvent';
+import { useEvent } from '../../hooks/useEvent';
 import ChooseClient from '../../../src/components/ChooseClient/ChooseClient';
+import { useNetwork } from '../../contexts/NetworkContext';
 
 type PropsType = {
   title?: string;
@@ -54,13 +54,25 @@ const Layout = (props: PropsType) => {
     bounces = true,
   } = props;
 
-  const {setStore, store, user} = useAuth();
+  const { setStore, store, user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const route = useRoute();
   const scrollViewRef: any = useRef(null);
-  const [openAlert, setOpenAlert]: any = useState({open: false, data: null});
-  const [openAlertDetail, setOpenAlertDetail]: any = useState({open: false, id: null});
+  const [openAlert, setOpenAlert]: any = useState({ open: false, data: null });
+  const [openAlertDetail, setOpenAlertDetail]: any = useState({
+    open: false,
+    id: null,
+  });
   const shouldDisableScroll = route.name === 'QrIndividual';
+  const { isInternetReachable, isConnecting, type } = useNetwork();
+
+  // useEffect(() => {
+  //   if (isConnecting) return;
+
+  //   if (!isInternetReachable) {
+  //     Alert.alert('Sin conexión', 'Verifica tu conexión a internet');
+  //   }
+  // }, [isInternetReachable, isConnecting]);
 
   const onNotif = useCallback((data: any) => {
     if (data?.event === 'alerts') {
@@ -70,10 +82,10 @@ const Layout = (props: PropsType) => {
       }
       if (data?.payload?.level == 4) {
         // Para alertas de pánico (nivel 4) usar LockAlert
-        setOpenAlert({open: true, data: data?.payload});
+        setOpenAlert({ open: true, data: data?.payload });
       } else {
         // Para otros niveles usar AlertDetail
-        setOpenAlertDetail({open: true, id: data?.payload?.id});
+        setOpenAlertDetail({ open: true, id: data?.payload?.id });
       }
     }
   }, []);
@@ -87,15 +99,15 @@ const Layout = (props: PropsType) => {
   };
 
   const scrollToTop = () => {
-    scrollViewRef.current?.scrollTo({y: 0, animated: true});
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     refresh();
-    setStore({nContents: 0, contentIds: []});
+    setStore({ nContents: 0, contentIds: [] });
   };
 
   useEffect(() => {
     if (store?.scrollTop) {
       scrollToTop();
-      setStore({scrollTop: false});
+      setStore({ scrollTop: false });
     }
   }, [store?.scrollTop]);
 
@@ -132,19 +144,35 @@ const Layout = (props: PropsType) => {
     };
   }, []);
   const onCloseAlert = () => {
-    setOpenAlert({open: false, data: null});
+    setOpenAlert({ open: false, data: null });
   };
 
   const onCloseAlertDetail = () => {
-    setOpenAlertDetail({open: false, id: null});
+    setOpenAlertDetail({ open: false, id: null });
   };
   useEffect(() => {
     if (!user?.client_id) {
-      setStore({...store, openClient: true});
+      setStore({ ...store, openClient: true });
     }
   }, []);
   return (
     <View style={[theme.layout]} onTouchEnd={onPress}>
+      {!isInternetReachable && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 10,
+            backgroundColor: 'red',
+          }}
+        >
+          <Text style={{ color: 'white', textAlign: 'center' }}>
+            Sin conexión
+          </Text>
+        </View>
+      )}
       <HeadTitle
         title={title}
         customTitle={customTitle}
@@ -154,7 +182,7 @@ const Layout = (props: PropsType) => {
         onBack={onBack}
         backUrl={backUrl}
       />
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         {scroll && !shouldDisableScroll ? (
           <ScrollView
             id="LayoutScrollview"
@@ -186,7 +214,8 @@ const Layout = (props: PropsType) => {
                 onRefresh={onRefresh}
                 tintColor={cssVar.cAccent}
               />
-            }>
+            }
+          >
             {children}
           </ScrollView>
         ) : (
@@ -196,13 +225,14 @@ const Layout = (props: PropsType) => {
               ...theme.scrollView,
               ...style,
               paddingBottom: isRoute() ? 60 : 0,
-            }}>
+            }}
+          >
             {children}
           </View>
         )}
       </View>
 
-      {isRoute() && <Footer />}
+      {/* {isRoute() && <Footer />} */}
 
       {/* LockAlert para alertas de pánico (nivel 4) */}
       {openAlert.open && (
@@ -225,7 +255,7 @@ const Layout = (props: PropsType) => {
       {store?.openClient && (
         <ChooseClient
           open={store?.openClient}
-          onClose={() => setStore({...store, openClient: false})}
+          onClose={() => setStore({ ...store, openClient: false })}
         />
       )}
     </View>

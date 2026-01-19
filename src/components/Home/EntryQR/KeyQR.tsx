@@ -1,23 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import ItemInfo, {
   ItemInfoType,
   TypeDetails,
 } from '../../../../mk/components/ui/ItemInfo/ItemInfo';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import Card from '../../../../mk/components/ui/Card/Card';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import useApi from '../../../../mk/hooks/useApi';
-import {AccompaniedAdd} from './AccompaniedAdd';
+import { AccompaniedAdd } from './AccompaniedAdd';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconSimpleAdd, IconX} from '../../../icons/IconLibrary';
+import { IconSimpleAdd, IconX } from '../../../icons/IconLibrary';
 import List from '../../../../mk/components/ui/List/List';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
+import ExistVisitModal from '../CiNomModal/ExistVisitModal';
+import SectionIncomeType from '../CiNomModal/SectionIncomeType';
 
 type PropsType = {
   formState: any;
@@ -26,6 +27,7 @@ type PropsType = {
   data: any;
   errors: any;
   setTab?: any;
+  setErrors: any;
   tab?: any;
 };
 const KeyQR = ({
@@ -35,14 +37,16 @@ const KeyQR = ({
   data,
   errors,
   setTab,
+  setErrors,
   tab,
 }: PropsType) => {
   const [details, setDetails] = useState<TypeDetails>({
     data: [],
   });
-  // const [tab, setTab] = useState('P');
-  const {execute} = useApi();
+  const [formStateA, setFormStateA] = useState({});
+  const { execute } = useApi();
   const [openAcom, setOpenAcom] = useState(false);
+  const [openExistVisit, setOpenExistVisit] = useState(false);
 
   const _onDetail = (item: any) => {
     const data: ItemInfoType[] = [];
@@ -78,11 +82,11 @@ const KeyQR = ({
         });
     }
 
-    setDetails({data: data});
+    setDetails({ data: data });
   };
 
   useEffect(() => {
-    _onDetail({...data});
+    _onDetail({ ...data });
   }, [data]);
   const onExistTaxi = async () => {
     if (!formState?.ci_taxi || formState.ci_taxi.length < 5) {
@@ -94,10 +98,12 @@ const KeyQR = ({
         mother_last_name_taxi: '',
         plate: prevState.tab === 'T' ? '' : prevState.plate,
         disbledTaxi: false,
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', {
+    const { data: existData } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -114,6 +120,8 @@ const KeyQR = ({
         mother_last_name_taxi: existData.data.mother_last_name,
         plate: existData.data.plate || '',
         disbledTaxi: true,
+        ci_anverso_taxi: existData.data.url_image_a,
+        ci_reverso_taxi: existData.data.url_image_r,
       }));
     } else {
       setFormState((prevState: any) => ({
@@ -124,15 +132,17 @@ const KeyQR = ({
         mother_last_name_taxi: '',
         plate: prevState.tab === 'T' ? '' : prevState.plate,
         disbledTaxi: false,
+        ci_anverso_taxi: '',
+        ci_reverso_taxi: '',
       }));
     }
   };
-  const onDelAcom = (acom: {ci: string}) => {
+  const onDelAcom = (acom: { ci: string }) => {
     const acomps = formState?.acompanantes || [];
     const newAcomps = acomps.filter(
-      (item: {ci: string}) => item.ci !== acom.ci,
+      (item: { ci: string }) => item.ci !== acom.ci,
     );
-    setFormState({...formState, acompanantes: newAcomps});
+    setFormState({ ...formState, acompanantes: newAcomps });
   };
   const acompanantesList = (acompanante: any) => {
     if (!acompanante) return null;
@@ -145,26 +155,24 @@ const KeyQR = ({
             ? 'Observaciones de entrada: ' + acompanante.obs_in
             : ''
         }
-        left={<Avatar name={getFullName(acompanante)} />}
+        left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
         right={
-          <Icon
-            name={IconX}
-            color={cssVar.cError}
-            size={20}
-            style={{
-              padding: 4,
-            }}
+          <Text
             onPress={() => onDelAcom(acompanante)}
-          />
+            style={{
+              color: cssVar.cAccent,
+              fontSize: 12,
+              fontFamily: FONTS.semiBold,
+            }}
+          >
+            Eliminar
+          </Text>
         }
-        // onPress={() => {
-        //   setOpenAcom(true);
-        // }}
       />
     );
   };
   return (
-    <View style={{marginTop: 20}}>
+    <View style={{ marginTop: 20 }}>
       {!data?.invitation || Object.keys(data?.invitation).length === 0 ? (
         <Text
           style={{
@@ -172,12 +180,14 @@ const KeyQR = ({
             color: cssVar.cError,
             fontSize: 16,
             fontWeight: 'bold',
-          }}>
+          }}
+        >
           Llave QR no encontrada o no válida.
         </Text>
       ) : (
         <>
           <Avatar
+            hasImage={data?.invitation?.has_image}
             h={180}
             fontSize={44}
             w={180}
@@ -189,8 +199,95 @@ const KeyQR = ({
                 data?.invitation?.updated_at,
             )}
           />
+          {data?.hasArrears && (
+            <View
+              style={{
+                backgroundColor: '#3a1c1c',
+                borderRadius: 8,
+                padding: 12,
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 20,
+                marginBottom: 10,
+                width: '100%',
+              }}
+            >
+              <View
+                style={{
+                  width: 24,
+                  height: 24,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 12,
+                  borderWidth: 2,
+                  borderColor: cssVar.cError,
+                  marginRight: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    color: cssVar.cError,
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}
+                >
+                  !
+                </Text>
+              </View>
+              <Text
+                style={{
+                  color: '#ff6666',
+                  fontSize: 16,
+                  fontFamily: FONTS.regular,
+                }}
+              >
+                Residente con Mora
+              </Text>
+            </View>
+          )}
           <ItemInfo type="C" details={details} />
 
+          <TouchableOpacity
+            style={styles.boxAcompanante}
+            onPress={() => setOpenExistVisit(true)}
+          >
+            <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+            <Text
+              style={{
+                color: cssVar.cAccent,
+                fontFamily: FONTS.semiBold,
+              }}
+            >
+              Agregar acompañante
+            </Text>
+          </TouchableOpacity>
+          {(formState?.acompanantes?.length || 0) > 0 && (
+            <>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: FONTS.semiBold,
+                  marginVertical: 4,
+                  color: cssVar.cWhite,
+                }}
+              >
+                Acompañantes:
+              </Text>
+              <List
+                style={{ marginBottom: 12 }}
+                data={formState?.acompanantes}
+                renderItem={acompanantesList}
+              />
+            </>
+          )}
+          {/* <Text
+            style={{
+              fontFamily: FONTS.bold,
+              color: cssVar.cWhite,
+            }}>
+            Tipo de ingreso
+          </Text>
           <TabsButtons
             tabs={[
               {value: 'P', text: 'A pie'},
@@ -251,45 +348,16 @@ const KeyQR = ({
                 />
               </>
             )}
-          </View>
-
-          <TouchableOpacity
-            style={{
-              alignSelf: 'flex-start',
-              marginBottom: 12,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-            onPress={() => setOpenAcom(true)}>
-            <Icon name={IconSimpleAdd} color={cssVar.cAccent} size={13} />
-            <Text
-              style={{
-                color: cssVar.cAccent,
-                textDecorationLine: 'underline',
-                marginLeft: 4,
-              }}>
-              Agregar acompañante
-            </Text>
-          </TouchableOpacity>
-          {(formState?.acompanantes?.length || 0) > 0 && (
-            <>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: FONTS.semiBold,
-                  marginVertical: 4,
-                  color: cssVar.cWhite,
-                }}>
-                Acompañantes:
-              </Text>
-              <List
-                style={{marginBottom: 12}}
-                data={formState?.acompanantes}
-                renderItem={acompanantesList}
-              />
-            </>
-          )}
-
+          </View> */}
+          <SectionIncomeType
+            tab={tab}
+            handleChangeInput={handleChange}
+            setTab={setTab}
+            formState={formState}
+            errors={errors}
+            setErrors={setErrors}
+            setFormState={setFormState}
+          />
           {!data?.invitation?.access && (
             <TextArea
               label="Observaciones de entrada"
@@ -301,15 +369,29 @@ const KeyQR = ({
           )}
         </>
       )}
-
-      <AccompaniedAdd
-        open={openAcom}
-        onClose={() => {
-          setOpenAcom(false);
-        }}
-        item={formState}
-        setItem={setFormState}
-      />
+      {openExistVisit && (
+        <ExistVisitModal
+          open={openExistVisit}
+          formState={formStateA}
+          setFormState={setFormStateA}
+          item={formState}
+          setItem={setFormState}
+          onClose={() => setOpenExistVisit(false)}
+          setOpenNewAcomp={setOpenAcom}
+        />
+      )}
+      {openAcom && (
+        <AccompaniedAdd
+          open={openAcom}
+          onClose={() => {
+            setOpenAcom(false);
+          }}
+          item={formState}
+          setItem={setFormState}
+          formState={formStateA}
+          setFormState={setFormStateA}
+        />
+      )}
     </View>
   );
 };
@@ -322,5 +404,19 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.semiBold,
     color: cssVar.cWhite,
     marginBottom: 12,
+  },
+  boxAcompanante: {
+    marginBottom: cssVar.sS,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
   },
 });

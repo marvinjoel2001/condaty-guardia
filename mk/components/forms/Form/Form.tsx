@@ -1,45 +1,68 @@
+// Form.tsx
+import React, {ReactNode, useCallback, useEffect, useState} from 'react';
 import {
-  KeyboardAvoidingView,
   View,
+  ScrollView,
+  KeyboardAvoidingView,
   Platform,
   Keyboard,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  ScrollView,
+  Pressable,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
-import {TypeStyles} from '../../../styles/themes';
 
-interface PropsType {
-  children: any;
-  style?: TypeStyles;
-  behaviorAndroid?: 'position' | 'height';
-  hideKeyboard?: boolean;
-  keyboardVerticalOffset?: number;
-  behaviorIos?: 'position' | 'padding';
-  contentContainerStyle?: TypeStyles;
+interface FormProps {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  pressable?: boolean;
 }
-const Form = ({
-  children,
-  style = {},
-  behaviorAndroid = undefined,
-  hideKeyboard = false,
-  behaviorIos = 'padding',
-  keyboardVerticalOffset = 0,
-  contentContainerStyle = {},
-}: PropsType) => {
-  const Wrapper: any = hideKeyboard ? TouchableWithoutFeedback : View;
 
-  return (
+const Form = ({children, style, pressable = true}: FormProps) => {
+  const dismissKeyboard = useCallback(() => Keyboard.dismiss(), []);
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setKeyboardVisible(true),
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setKeyboardVisible(false),
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  const content = (
     <KeyboardAvoidingView
-      keyboardVerticalOffset={keyboardVerticalOffset}
-      behavior={Platform.OS === 'ios' ? behaviorIos : behaviorAndroid}
-      style={[{flex: 1}, style]}>
-      <Wrapper
-        {...(hideKeyboard && {onPress: Keyboard.dismiss})}
-        style={{flex: 1}}>
-        <SafeAreaView style={{flex: 1}}>{children}</SafeAreaView>
-      </Wrapper>
+      style={{flex: 1}}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={
+        Platform.OS === 'ios' ? 60 : isKeyboardVisible ? 44 : 0
+      }>
+      <ScrollView
+        contentContainerStyle={{flex: 1}}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bounces={false}>
+        <View style={[{flex: 1, justifyContent: 'space-between'}, style]}>
+          {children}
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
+  );
+
+  return pressable && Platform.OS !== 'web' ? (
+    <Pressable style={{flex: 1}} onPress={dismissKeyboard}>
+      {content}
+    </Pressable>
+  ) : (
+    content
   );
 };
 

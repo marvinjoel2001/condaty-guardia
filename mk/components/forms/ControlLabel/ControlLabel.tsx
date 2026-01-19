@@ -1,5 +1,5 @@
-import {View, Text, KeyboardTypeOptions, SafeAreaView} from 'react-native';
-import {FONTS, ThemeType, TypeStyles, cssVar} from '../../../styles/themes';
+import { View, Text, KeyboardTypeOptions } from 'react-native';
+import { FONTS, ThemeType, TypeStyles, cssVar } from '../../../styles/themes';
 import React from 'react';
 
 export interface PropsTypeInputBase {
@@ -53,8 +53,8 @@ const ControlLabel = ({
 }: PropsType) => {
   const styleLabel = {
     ...theme.label,
-    ...(!isFocus && iconLeft && !value ? {paddingLeft: cssVar.spM} : {}),
-    ...(!isFocus && iconRight && !value ? {paddingRight: cssVar.spM} : {}),
+    ...(!isFocus && iconLeft && !value ? { paddingLeft: cssVar.spM } : {}),
+    ...(!isFocus && iconRight && !value ? { paddingRight: cssVar.spM } : {}),
     ...(isFocus || value || placeholder
       ? {
           ...theme.focus,
@@ -65,7 +65,7 @@ const ControlLabel = ({
               : cssVar.cAccent,
         }
       : {}),
-    ...(error?.[name] ? {color: cssVar.cError} : {}),
+    ...(error?.[name] ? { color: cssVar.cError } : {}),
     ...(disabled ? theme.disabled : {}),
   };
   const _label = label + (required ? ' *' : '');
@@ -73,7 +73,7 @@ const ControlLabel = ({
     <View style={theme.container}>
       {iconLeft && <View style={theme.iconLeft}>{iconLeft}</View>}
       {type !== 'hidden' && label && (
-        <View pointerEvents={'none'} style={{zIndex: 1}}>
+        <View pointerEvents={'none'} style={{ zIndex: 1 }}>
           <Text style={styleLabel}>{_label}</Text>
         </View>
       )}
@@ -85,7 +85,8 @@ const ControlLabel = ({
             <Text
               style={{
                 ...theme.textLength,
-              }}>
+              }}
+            >
               {(value + '').length} / {maxLength}
             </Text>
           )}

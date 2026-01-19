@@ -1,26 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState} from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {TextArea} from '../../../mk/components/forms/TextArea/TextArea';
-import Icon from '../../../mk/components/ui/Icon/Icon';
-import {uploadImage} from '../../../mk/utils/uploadFile';
 import useAuth from '../../../mk/hooks/useAuth';
-import {IconScreenShot} from '../../icons/IconLibrary';
-import {cssVar} from '../../../mk/styles/themes';
 import useApi from '../../../mk/hooks/useApi';
-import UploadImage from '../../../mk/components/forms/UploadImage/UploadImage';
+import UploadFile from '../../../mk/components/forms/UploadFileV2';
+import { View } from 'react-native';
 type PropsType = {
   open: boolean;
   onClose: () => void;
   reload: any;
 };
 
-const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
+const BinnacleAdd = ({ open, onClose, reload }: PropsType) => {
   const [errors, setErrors]: any = useState({});
-  const [formState, setFormState]: any = useState();
-  const {showToast} = useAuth();
-  const {execute} = useApi();
+  
+  const [formState, setFormState]: any = useState({
+    descrip: ''  });
 
+  const { showToast, user } = useAuth();
+  const { execute } = useApi();
+  const clientId = user?.client_id || user?.clientId || 'unknown';
   const handleInputChange = (name: string, value: any) => {
     const v = value?.target?.value ? value.target.value : value;
     setFormState({
@@ -34,17 +33,13 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
       return;
     }
 
-    const {data: novedad, error: err} = await execute('/guardnews', 'POST', {
-      descrip: formState.descrip,
-      imageNew: {file: encodeURIComponent(formState.avatar), ext: 'webp'},
-    });
-    if (novedad?.success == true) {
+    const {data: novedad} = await execute('/guardnews', 'POST', formState);
+    if (novedad?.success) {
       onClose();
       reload();
-      setFormState({});
+      setFormState({ descrip: '', image_path: '' });
       showToast('Novedad agregada', 'success');
     } else {
-      // showToast(err, 'error');
       showToast('Ocurrió un error', 'error');
     }
   };
@@ -52,30 +47,40 @@ const BinnacleAdd = ({open, onClose, reload}: PropsType) => {
   return (
     <ModalFull
       open={open}
-      title="Nueva bitácora"
+      title="Nuevo reporte"
       onSave={onSaveNovedades}
       onClose={onClose}
       buttonText="Enviar reporte"
-      buttonCancel="">
-      <TextArea
-        type="textArea"
-        label="Escribir reporte..."
-        name="descrip"
-        // placeholder="Escribir reporte..."
-        error={errors}
-        maxLength={250}
-        required={false}
-        value={formState?.descrip}
-        onChange={value => handleInputChange('descrip', value)}
-      />
-
-      <UploadImage
-        style={{marginTop: 0}}
-        setFormState={setFormState}
-        formState={formState}
-        label="Adjuntar imagen"
-        name="avatar"
-      />
+      buttonCancel=""
+      scrollViewHide={true}
+    >
+      <View style={{ flex: 1, padding: 12 }}>
+         <TextArea
+          type="textArea"
+          label="Escribir reporte..."
+          name="descrip"
+          error={errors}
+          maxLength={5000}
+          required={false}
+          value={formState?.descrip || ''}
+          onChange={(value) => handleInputChange('descrip', value)}
+          expandable={true}
+        />
+        <View style={{ flex: 1 }}>
+          <UploadFile
+            setFormState={setFormState}
+            formState={formState}
+            name="url_file"
+            label="Adjuntar imagen"
+            type="I"
+            cant={6}
+            clientId={clientId}
+            prefix="guards/novedades"
+            variant='V2'
+          />
+        </View>
+       
+      </View>
     </ModalFull>
   );
 };

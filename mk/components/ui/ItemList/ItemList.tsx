@@ -25,7 +25,7 @@ interface PropsType {
   variant?: 'V1' | 'V2';
 }
 
-export const ItemList = (props: PropsType) => {
+const ItemList = (props: PropsType) => {
   const {
     title,
     subtitle,
@@ -121,6 +121,8 @@ export const ItemList = (props: PropsType) => {
     </TouchableOpacity>
   );
 };
+
+export default React.memo(ItemList);
 
 const theme: ThemeType = {
   itemList: {

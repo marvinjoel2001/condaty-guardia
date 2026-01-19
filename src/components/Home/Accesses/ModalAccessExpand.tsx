@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
 import useApi from '../../../../mk/hooks/useApi';
-import {Text, View} from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import {Image, Text, View, TouchableOpacity} from 'react-native';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
@@ -10,6 +10,7 @@ import {getDateStrMes, getDateTimeStrMes} from '../../../../mk/utils/dates';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Br from '../../Profile/Br';
+import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
 interface PropsType {
   id: string | number | null;
   open: boolean;
@@ -34,17 +35,31 @@ const ModalAccessExpand = ({
   invitation,
 }: PropsType) => {
   const [data, setData]: any = useState([]);
-  const {loaded, execute} = useApi();
+  const { loaded, execute } = useApi();
+  const [openExpandImg, setOpenExpandImg] = useState({
+    open: false,
+    imageUri: '',
+  });
 
   const getAccess = async () => {
-    const {data} = await execute('/accesses', 'GET', {
-      perPage: -1,
-      page: 1,
-      fullType: 'DET',
-      searchBy: id,
-    });
+    const { data } = await execute(
+      '/accesses',
+      'GET',
+      {
+        perPage: -1,
+        page: 1,
+        fullType: 'DET',
+        searchBy: id,
+      },
+      false,
+      2,
+    );
     if (data?.success) {
-      setData(data?.data?.[0]);
+      if (Array.isArray(data?.data)) {
+        setData(data?.data?.[0]);
+      } else if (data?.data?.access) {
+        setData(data?.data?.access);
+      }
     }
   };
   useEffect(() => {
@@ -60,7 +75,12 @@ const ModalAccessExpand = ({
           key={data?.id}
           title={getFullName(data?.visit)}
           subtitle={'C.I:' + data?.visit?.ci}
-          left={<Avatar name={getFullName(data?.visit)} />}
+          left={
+            <Avatar
+              name={getFullName(data?.visit)}
+              hasImage={data?.visit?.has_image}
+            />
+          }
         />
         <KeyValue keys="Tipo de acceso" value={typeInvitation[data?.type]} />
         {data?.plate && type == 'T' && (
@@ -74,22 +94,79 @@ const ModalAccessExpand = ({
           keys="Fecha y hora de salida"
           value={getDateTimeStrMes(data?.out_at, true)}
         />
-        <KeyValue
-          keys={
-            data?.out_guard || !data?.out_at
-              ? 'Guardia de ingreso'
-              : 'Guardia de ingreso y salida'
-          }
-          value={getFullName(data?.guardia)}
-        />
-        {data?.out_guard && (
+        {data?.guardia && (
+          <KeyValue
+            keys="Guardia de ingreso"
+            value={getFullName(data?.guardia)}
+          />
+        )}
+        {data?.out_at && (
           <KeyValue
             keys="Guardia de salida"
-            value={getFullName(data?.out_guard)}
+            value={getFullName(data?.out_guard || data?.guardia)}
           />
         )}
         <KeyValue keys="Observación de ingreso" value={data?.obs_in || '-/-'} />
         <KeyValue keys="Observación de salida" value={data?.obs_out || '-/-'} />
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          {data?.visit?.url_image_a && (
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: data?.visit?.url_image_a[0],
+                })
+              }
+            >
+              <Image
+                source={{
+                  uri: data?.visit?.url_image_a[0],
+                }}
+                width={100}
+                height={100}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
+              />
+            </TouchableOpacity>
+          )}
+          {data?.visit?.url_image_r && (
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: data?.visit?.url_image_r[0],
+                })
+              }
+            >
+              <Image
+                source={{
+                  uri: data?.visit?.url_image_r[0],
+                }}
+                width={100}
+                height={100}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
+              />
+            </TouchableOpacity>
+          )}
+          {data?.url_image_p && (
+            <TouchableOpacity
+              onPress={() =>
+                setOpenExpandImg({
+                  open: true,
+                  imageUri: data?.url_image_p[0],
+                })
+              }
+            >
+              <Image
+                source={{
+                  uri: data?.url_image_p[0],
+                }}
+                width={100}
+                height={100}
+                style={{ width: 100, height: 100, borderRadius: 8 }}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </>
     );
   };
@@ -111,14 +188,16 @@ const ModalAccessExpand = ({
       <>
         <ItemList
           title={getFullName(invitation?.owner)}
-          subtitle={
-            'Unidad: ' +
-            invitation?.owner?.dpto?.[0]?.nro +
-            ', ' +
-            invitation?.owner?.dpto?.[0]?.description
-          }
+          subtitle={[
+            `Unidad: ${invitation?.owner?.dpto?.[0]?.nro || ''} ${
+              invitation?.owner?.dpto?.[0]?.description
+            }`,
+          ]
+            .filter(Boolean)
+            .join(', ')}
           left={
             <Avatar
+              hasImage={invitation?.owner?.has_image}
               name={getFullName(invitation?.owner)}
               src={getUrlImages(
                 '/OWNER-' +
@@ -128,7 +207,7 @@ const ModalAccessExpand = ({
               )}
             />
           }
-          style={{marginBottom: 8}}
+          style={{ marginBottom: 8 }}
         />
         {invitation.type == 'G' && (
           <KeyValue
@@ -206,14 +285,16 @@ const ModalAccessExpand = ({
       <>
         <ItemList
           title={getFullName(invitation?.owner)}
-          subtitle={
-            'Unidad: ' +
-            invitation?.owner?.dpto?.nro +
-            ', ' +
-            invitation?.owner?.dpto?.description
-          }
+          subtitle={[
+            `Unidad: ${invitation?.owner?.dpto?.[0]?.nro || ''}, ${
+              invitation?.owner?.dpto?.[0]?.description
+            }`,
+          ]
+            .filter(Boolean)
+            .join(', ')}
           left={
             <Avatar
+              hasImage={invitation?.owner?.has_image}
               name={getFullName(invitation?.owner)}
               src={getUrlImages(
                 '/OWNER-' +
@@ -265,6 +346,13 @@ const ModalAccessExpand = ({
   return (
     <Modal title={getModalTitle(type)} open={open} onClose={onClose}>
       {renderModalContent()}
+      {openExpandImg.open && (
+        <ImageExpandableModal
+          visible={openExpandImg.open}
+          imageUri={openExpandImg.imageUri}
+          onClose={() => setOpenExpandImg({ open: false, imageUri: '' })}
+        />
+      )}
     </Modal>
   );
 };

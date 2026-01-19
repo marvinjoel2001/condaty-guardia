@@ -1,46 +1,83 @@
-import React, {useEffect, useState} from 'react';
-import {TextInput, Text, View} from 'react-native';
+import React, {useState, useMemo, useCallback} from 'react';
+import {TextInput, Dimensions, Platform} from 'react-native';
 import ControlLabel, {PropsTypeInputBase} from '../ControlLabel/ControlLabel';
 import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
 
 interface PropsType extends PropsTypeInputBase {
   lines?: number;
   maxLength?: number;
+  maxAutoHeightRatio?: number; // 0..1 (ej. 0.5 = 50% de la pantalla) - Default: 0.4 (40%)
+  maxAutoHeight?: number;      // alto máximo en px
+  expandable?: boolean;        // Si es true, el textarea crece automáticamente - Default: false
 }
 
 export const TextArea = (props: PropsType) => {
-  const {value, maxLength, multiline} = props;
+  const {value, maxLength, expandable = false} = props;
   const [isFocused, setIsFocused] = useState(false);
-  // const [textLength, setTextLength] = useState(value?.length || 0);
-  const lineHeight = 20;
-  const lines = props?.lines || 4;
+  
+  // Calcular altura mínima basada en líneas y tamaño de fuente
+  const fontSize = props.style?.fontSize || theme.default?.fontSize || cssVar.sM;
+  const lineHeight = (typeof fontSize === 'number' ? fontSize : 14) * 1.5; // lineHeight es 1.5x el fontSize
+  const lines = props.lines || 3; // Default 3 líneas
+  const paddingTop = theme.default?.paddingTop || cssVar.spXl;
+  const paddingBottom = 8;
+  const paddingVertical = (typeof paddingTop === 'number' ? paddingTop : 24) + paddingBottom;
+  
+  const minHeight = (lines * lineHeight) + paddingVertical;
 
-  const styleInput = {
+  const windowHeight = Dimensions.get('window').height;
+  const {maxAutoHeightRatio = 0.28} = props; // Default: 40%
+  const maxHeight = props.maxAutoHeight || (windowHeight * maxAutoHeightRatio);
+
+  const [height, setHeight] = useState(minHeight);
+  // En iOS, scrollEnabled debe ser true siempre para que funcione el scroll interno
+  const [scrollEnabled, setScrollEnabled] = useState(Platform.OS === 'ios' ? true : !expandable);
+
+  const styleInput = useMemo(() => ({
     ...theme.default,
     ...(isFocused ? theme.focusInput : {}),
-    ...(props.error && props.error[props.name] && !props.value
-      ? theme.errorInput
-      : {}),
+    ...(props.error?.[props.name] && !props.value ? theme.errorInput : {}),
     ...props.style,
     ...(props.disabled ? theme.disabledInput : {}),
-    height: lineHeight * lines,
-  };
+    height: height,
+    textAlignVertical: 'top' as const,
+  }), [isFocused, props.error, props.name, props.value, props.style, props.disabled, height]);
 
-  const _onBlur = (e: any) => {
-    setIsFocused(false);
-    props.onBlur?.(e);
-  };
-
-  const handleTextChange = (text: string) => {
+  const handleTextChange = useCallback((text: string) => {
     if (maxLength === undefined || text?.length <= maxLength) {
-      // setTextLength(text?.length);
       props.onChange?.(text);
     }
-  };
+  }, [maxLength, props.onChange]);
 
-  // useEffect(() => {
-  //   setTextLength(value?.length || 0);
-  // }, [value]);
+  const onContentSizeChange = useCallback((e: any) => {
+    // Solo crece si expandable está en true
+    if (!expandable) {
+      return;
+    }
+
+    const contentHeight = e.nativeEvent.contentSize.height;
+    
+    if (maxHeight) {
+      // Con límite máximo
+      if (contentHeight <= maxHeight) {
+        setHeight(Math.max(minHeight, contentHeight));
+        // En iOS, mantener scrollEnabled siempre en true
+        if (Platform.OS !== 'ios') {
+          setScrollEnabled(false);
+        }
+      } else {
+        setHeight(maxHeight);
+        setScrollEnabled(true);
+      }
+    } else {
+      // Sin límite, crece libremente
+      setHeight(Math.max(minHeight, contentHeight));
+      // En iOS, mantener scrollEnabled siempre en true
+      if (Platform.OS !== 'ios') {
+        setScrollEnabled(false);
+      }
+    }
+  }, [expandable, minHeight, maxHeight]);
 
   return (
     <ControlLabel
@@ -48,32 +85,28 @@ export const TextArea = (props: PropsType) => {
       type="textArea"
       isFocus={isFocused}
       maxLength={maxLength}>
-      {/* <View> */}
       <TextInput
         testID={props.name}
         id={props.name}
         style={styleInput}
         onFocus={() => setIsFocused(true)}
-        onBlur={_onBlur}
+        onBlur={() => {
+          setIsFocused(false);
+          props.onBlur?.({});
+        }}
         returnKeyType="none"
         onChangeText={handleTextChange}
         value={value}
         placeholder={props.placeholder || ''}
         placeholderTextColor={cssVar.cWhiteV3}
         editable={!props?.disabled && !props.readOnly}
-        numberOfLines={lines}
         multiline={true}
         autoFocus={props.autoFocus}
         allowFontScaling={false}
-        textAlignVertical="top"
-        maxLength={maxLength ?? undefined} // Permite texto ilimitado si no se define maxLength
+        maxLength={maxLength ?? undefined}
+        onContentSizeChange={onContentSizeChange}
+        scrollEnabled={scrollEnabled}
       />
-      {/* {maxLength !== undefined && (
-          <Text style={theme.counter}>
-            {textLength}/{maxLength}
-          </Text>
-        )}
-      </View> */}
     </ControlLabel>
   );
 };

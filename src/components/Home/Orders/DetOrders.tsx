@@ -1,56 +1,45 @@
-// DetPedidos.tsx
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import useApi from '../../../../mk/hooks/useApi';
-import {getDateTimeStrMes, getUTCNow} from '../../../../mk/utils/dates';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
-import LineDetail from '../Accesses/shares/LineDetail';
-import {TextArea} from '../../../../mk/components/forms/TextArea/TextArea';
-import {getAccessStatus} from '../../../../mk/utils/utils';
+import { getDateTimeStrMes, getUTCNow } from '../../../../mk/utils/dates';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
+import { TextArea } from '../../../../mk/components/forms/TextArea/TextArea';
 import Input from '../../../../mk/components/forms/Input/Input';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import TabsButtons from '../../../../mk/components/ui/TabsButton/TabsButton';
 import List from '../../../../mk/components/ui/List/List';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import {
-  IconExpand,
-  IconX,
-  IconAdd,
-  IconAccess,
-  IconToastSuccess,
-  IconAddMore,
-} from '../../../icons/IconLibrary';
+import { IconX, IconSimpleAdd } from '../../../icons/IconLibrary';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {AccompaniedAdd} from '../EntryQR/AccompaniedAdd';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
 import ItemListDate from '../Accesses/shares/ItemListDate';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
-import Br from '../../Profile/Br';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
+import { AccompaniedAddV2 } from '../EntryQR/AccompaniedAddV2';
+import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
+import { useEvent } from '../../../../mk/hooks/useEvent';
 
-const DetOrders = ({id, open, close, reload, handleChange}: any) => {
-  const {execute} = useApi();
+const DetOrders = ({ id, open, close, reload, handleChange }: any) => {
+  const { execute } = useApi();
   const [data, setData]: any = useState(null);
   const [formState, setFormState]: any = useState({});
-  // const [acompanSelect, setAcompSelect]: any = useState([]); // Si en pedidos hay acompañantes
   const [openAcom, setOpenAcom] = useState(false);
   const [errors, setErrors] = useState({});
   const [tab, setTab] = useState('P');
-
+  const [visit, setVisit]: any = useState({});
+  const { dispatch: sendNotif } = useEvent('sendNotif');
   useEffect(() => {
     const getData = async (id: number) => {
-      // Suponiendo que para pedidos usas otro endpoint (o envías type "P")
-      const {data} = await execute('/others', 'GET', {
+      const { data } = await execute('/others', 'GET', {
         fullType: 'DET',
         searchBy: id,
         section: 'HOME',
       });
       if (data.success) {
-        // Si el pedido tiene algún atributo que lo redirija a otro registro, podrías hacer una recursión similar a accesses
         setData(data?.data?.length > 0 ? data?.data[0] : null);
       }
     };
@@ -90,7 +79,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
       }));
       return;
     }
-    const {data: existData} = await execute('/visits', 'GET', {
+    const { data: existData } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -121,7 +110,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
     }
   };
   const handleInputChange = (name: string, value: string) => {
-    setFormState({...formState, [name]: value});
+    setFormState((prevState: any) => ({ ...prevState, [name]: value }));
   };
 
   const validate = () => {
@@ -173,18 +162,14 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   const handleSave = async () => {
     const status = getStatus();
     if (status === 'I') {
-      // if (acompanSelect.length === 0) {
-      //   console.log(
-      //     'Debe seleccionar al menos un acompañante para dejar salir',
-      //   );
-      //   return;
-      // }
-      // const ids = acompanSelect.map((item: any) => item.id);
-      const {data: result, error} = await execute('/accesses/exit', 'POST', {
+      const { data: result, error } = await execute('/accesses/exit', 'POST', {
         ids: [data?.access_id],
         obs_out: formState?.obs_out || '',
       });
       if (result?.success) {
+        if (result.data?.info) {
+          sendNotif(result.data.info);
+        }
         if (reload) reload();
         close();
       } else {
@@ -195,7 +180,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         return;
       }
       // Acción: Dejar entrar
-      const {data: result, error} = await execute('/accesses', 'POST', {
+      const { data: result, error } = await execute('/accesses', 'POST', {
         begin_at: formState?.begin_at || getUTCNow(),
         pedido_id: data?.id,
         type: 'P',
@@ -207,8 +192,12 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         ci: formState?.ci,
         obs_in: formState?.obs_in,
         acompanantes: formState?.acompanantes,
+        plate_vehicle: formState?.plate_vehicle,
       });
       if (result?.success) {
+        if (result.data?.info) {
+          sendNotif(result.data.info);
+        }
         if (reload) reload();
         close();
       } else {
@@ -223,15 +212,15 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         <Text style={styles.labelAccess}>Notificado Por</Text>
         <ItemList
           title={getFullName(data?.owner)}
-          // subtitle={'C.I.' + data?.owner?.ci}
-          subtitle={
-            'Unidad: ' +
-            data?.owner?.dpto?.[0]?.nro +
-            ', ' +
-            data?.owner?.dpto?.[0]?.description
-          }
+          subtitle={[
+            `Unidad: ${data?.owner?.dpto?.[0]?.nro || ''}`,
+            data?.owner?.dpto?.[0]?.description,
+          ]
+            .filter(Boolean)
+            .join(', ')}
           left={
             <Avatar
+              hasImage={data?.owner?.has_image}
               name={getFullName(data?.owner)}
               src={getUrlImages(
                 '/OWNER-' +
@@ -241,35 +230,18 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
               )}
             />
           }
-          // right={
-          //   data?.type !== 'C' ? (
-          //     <Icon
-          //       name={IconExpand}
-          //       color={cssVar.cWhiteV1}
-          //       onPress={() =>
-          //         setOpenDet({
-          //           open: true,
-          //           id: data?.invitation_id,
-          //           invitation: {...data?.invitation, owner: data?.owner},
-          //           type: 'I',
-          //         })
-          //       }
-          //     />
-          //   ) : null
-          // }
         />
         <KeyValue
           keys="Fecha de notificación"
           value={getDateTimeStrMes(data?.created_at, true)}
         />
         <KeyValue keys="Descripión" value={data?.descrip} />
-        {/* {detailVisit(data)} */}
       </Card>
     );
   };
 
   const onExist = async () => {
-    const {data: exist} = await execute('/visits', 'GET', {
+    const { data: exist } = await execute('/visits', 'GET', {
       perPage: 1,
       page: 1,
       exist: '1',
@@ -277,6 +249,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
       ci_visit: formState?.ci,
     });
     if (exist?.data) {
+      setVisit(exist?.data);
       setFormState({
         ...formState,
         ci: exist?.data.ci,
@@ -284,10 +257,11 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
         middle_name: exist?.data.middle_name,
         last_name: exist?.data.last_name,
         mother_last_name: exist?.data.mother_last_name,
-        plate: exist?.data.plate,
+        plate: exist?.data.vehicle?.plate,
         disbled: true,
       });
     } else {
+      setVisit({});
       setFormState({
         ...formState,
         name: '',
@@ -303,13 +277,11 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
   const onDelAcom = (acom: any) => {
     const acomps = formState?.acompanantes;
     const newAcomps = acomps.filter((item: any) => item.ci !== acom.ci);
-    setFormState({...formState, acompanantes: newAcomps});
+    setFormState({ ...formState, acompanantes: newAcomps });
   };
   const acompanantesList = (acompanante: any) => {
     return (
-      <TouchableOpacity
-      // onPress={() => handleEditAcompanante(acompanante.ci)}
-      >
+      <TouchableOpacity>
         <ItemList
           title={getFullName(acompanante)}
           subtitle={'C.I. ' + acompanante.ci}
@@ -318,7 +290,7 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
               ? 'Observaciones de entrada: ' + acompanante.obs_in
               : ''
           }
-          left={<Avatar name={getFullName(acompanante)} />}
+          left={<Avatar name={getFullName(acompanante)} hasImage={0} />}
           right={
             <Icon
               name={IconX}
@@ -331,33 +303,49 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
     );
   };
   useEffect(() => {
-    setFormState({
-      ...formState,
-      tab: tab,
-      plate: '',
-      disbledTaxi: false,
-    });
+    if (tab === 'P') {
+      setFormState({
+        ...formState,
+        tab: tab,
+        plate: '',
+        disbledTaxi: false,
+      });
+    } else {
+      setFormState({
+        ...formState,
+        tab: tab,
+        plate: visit?.vehicle?.plate || '',
+        disbledTaxi: true,
+      });
+    }
   }, [tab]);
   // console.log(data);
   return (
     <ModalFull
       onClose={close}
       open={open}
-      title={'Pedido' + '/' + data?.other_type?.name}
+      title={!data ? 'Cargando...' : 'Pedido' + '/' + data?.other_type?.name}
       onSave={handleSave}
-      buttonText={getButtonText()}>
+      buttonText={getButtonText()}
+    >
       {!data ? (
         <Loading />
       ) : (
         <>
           {renderDetails()}
-          <View style={{marginTop: 12}}>
+          <View style={{ marginTop: 12 }}>
             {getStatus() === 'C' && (
               <>
                 <ItemList
                   title={getFullName(data?.access?.visit)}
                   subtitle={'C.I.' + data?.access?.visit?.ci}
-                  left={<Avatar name={getFullName(data?.access?.visit)} />}>
+                  left={
+                    <Avatar
+                      name={getFullName(data?.access?.visit)}
+                      hasImage={0}
+                    />
+                  }
+                >
                   <ItemListDate
                     inDate={data?.access?.in_at}
                     outDate={data?.access?.out_at}
@@ -385,17 +373,33 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                   disabled={formState?.disbled}
                   inputGrid={true}
                 />
-                {/* <TextArea
-                    label="Observaciones"
-                    name="obs_in"
-                    value={formState?.obs_in || ''}
-                    onChange={value => handleInputChange('obs_in', value)}
-                    placeholder='Ej: El visitante está ingresando con 2 mascotas'
-                  /> */}
+
+                <TouchableOpacity
+                  style={styles.boxAcompanante}
+                  onPress={() => setOpenAcom(true)}
+                >
+                  <Icon name={IconSimpleAdd} size={16} color={cssVar.cAccent} />
+                  <Text
+                    style={{
+                      color: cssVar.cAccent,
+                      fontFamily: FONTS.semiBold,
+                    }}
+                  >
+                    Agregar acompañante
+                  </Text>
+                </TouchableOpacity>
+                {formState?.acompanantes?.length > 0 && (
+                  <>
+                    <List
+                      data={formState?.acompanantes}
+                      renderItem={acompanantesList}
+                    />
+                  </>
+                )}
                 <TabsButtons
                   tabs={[
-                    {value: 'P', text: 'A pie'},
-                    {value: 'V', text: 'En vehículo'},
+                    { value: 'P', text: 'A pie' },
+                    { value: 'V', text: 'En vehículo' },
                     // {value: 'T', text: 'En Taxi'},
                   ]}
                   sel={tab}
@@ -403,16 +407,32 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                 />
 
                 {tab === 'V' && (
-                  <Input
-                    label="Placa"
-                    type="text"
-                    required
-                    name="plate"
-                    error={errors}
-                    // disabled={formState?.disbled}
-                    value={formState['plate']}
-                    onChange={(value: any) => handleInputChange('plate', value)}
-                  />
+                  <>
+                    <Input
+                      label="Placa"
+                      type="text"
+                      required
+                      name="plate"
+                      error={errors}
+                      // disabled={formState?.disbled}
+                      value={formState['plate']}
+                      onChange={(value: any) =>
+                        handleInputChange('plate', value)
+                      }
+                      autoCapitalize="characters"
+                    />
+                    <UploadFileV2
+                      variant="V2"
+                      style={{
+                        marginBottom: 12,
+                      }}
+                      setFormState={setFormState}
+                      formState={formState}
+                      label="Placa del vehículo"
+                      name="plate_vehicle"
+                      global
+                    />
+                  </>
                 )}
                 {tab === 'T' && (
                   <>
@@ -443,49 +463,14 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                     <Input
                       label="Placa del taxi"
                       type="text"
-                      name="plate" // Taxi usa 'plate' como en la versión antigua
-                      error={errors} // Error para 'plate'
+                      name="plate"
+                      error={errors}
                       required={tab === 'T'}
-                      value={formState?.plate || ''} // Valor de 'plate'
+                      value={formState?.plate || ''}
                       onChange={(value: string) =>
                         handleChange('plate', value.toUpperCase())
                       }
                       autoCapitalize="characters"
-                    />
-                  </>
-                )}
-                <TouchableOpacity
-                  style={{
-                    alignSelf: 'flex-start',
-                    marginVertical: 2,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingBottom: 5,
-                  }}
-                  onPress={() => setOpenAcom(true)}>
-                  <Icon
-                    style={{
-                      paddingVertical: 10,
-                      borderRadius: 50,
-                      // color:cssVar.cSidebar
-                    }}
-                    color={cssVar.cAccent}
-                    name={IconAddMore}
-                    size={16}
-                  />
-                  <Text
-                    style={{
-                      color: cssVar.cAccent,
-                      textDecorationLine: 'underline',
-                    }}>
-                    Agregar acompañante
-                  </Text>
-                </TouchableOpacity>
-                {formState?.acompanantes?.length > 0 && (
-                  <>
-                    <List
-                      data={formState?.acompanantes}
-                      renderItem={acompanantesList}
                     />
                   </>
                 )}
@@ -496,8 +481,17 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
                 <TextArea
                   label="Observaciones"
                   name="obs_out"
-                  value={formState?.obs_out || ''}
-                  onChange={e => handleInputChange('obs_out', e)}
+                  value={
+                    getStatus() === 'I'
+                      ? formState?.obs_out || ''
+                      : formState?.obs_in || ''
+                  }
+                  onChange={e =>
+                    handleInputChange(
+                      getStatus() === 'I' ? 'obs_out' : 'obs_in',
+                      e,
+                    )
+                  }
                   placeholder="Ej: El visitante está ingresando con 2 mascotas"
                 />
               </>
@@ -505,15 +499,19 @@ const DetOrders = ({id, open, close, reload, handleChange}: any) => {
           </View>
         </>
       )}
-      <AccompaniedAdd
-        open={openAcom}
-        onClose={() => setOpenAcom(false)}
-        item={formState}
-        setItem={setFormState}
-      />
+      {openAcom && (
+        <AccompaniedAddV2
+          open={openAcom}
+          onClose={() => setOpenAcom(false)}
+          item={formState}
+          setItem={setFormState}
+        />
+      )}
     </ModalFull>
   );
 };
+
+export default DetOrders;
 
 const styles = StyleSheet.create({
   label: {
@@ -533,6 +531,18 @@ const styles = StyleSheet.create({
     color: cssVar.cWhiteV1 || '#D0D0D0',
     marginBottom: 12,
   },
+  boxAcompanante: {
+    marginBottom: cssVar.sS,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    padding: 12,
+    borderColor: '#505050',
+    backgroundColor: 'rgba(51, 53, 54, 0.20)',
+  },
 });
-
-export default DetOrders;

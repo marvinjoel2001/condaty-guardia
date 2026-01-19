@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import Layout from '../../../mk/components/layout/Layout';
-import List from '../../../mk/components/ui/List/List';
 import useApi from '../../../mk/hooks/useApi';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {cssVar} from '../../../mk/styles/themes';
@@ -18,27 +17,56 @@ import {
 } from '../../icons/IconLibrary';
 import {Text} from 'react-native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
-import {getDateTimeAgo, getTimeAgoSimple} from '../../../mk/utils/dates';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
+import {getDateTimeAgo} from '../../../mk/utils/dates';
 import {useEvent} from '../../../mk/hooks/useEvent';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useRoute} from '@react-navigation/native';
 import DetOrders from '../Home/Orders/DetOrders';
 import DetAccesses from '../Home/Accesses/DetAccesses';
 import AlertDetail from '../Alerts/AlertDetail';
-
+import ListFlat from '../../../mk/components/ui/List/ListFlat';
+const paramsInitial = {
+  fullType: 'L',
+  perPage: 30,
+  page: 1,
+};
 const Notifications = () => {
   const [openDetail, setOpenDetail] = useState('');
   const [formState, setFormState]: any = useState({});
-  const [params, setParams]: any = useState({
-    perPage: -1,
-    page: 1,
-    fullType: 'L',
-  });
+  const route = useRoute();
+  const [params, setParams] = useState(paramsInitial);
+  const [accumulatedData, setAccumulatedData] = useState<any[]>([]);
   const {
     data: notifs,
     loaded,
     reload,
   } = useApi('/notifications', 'GET', params);
+  useEffect(() => {
+    if (notifs?.data) {
+      if (params.page === 1) {
+        setAccumulatedData(notifs.data);
+      } else {
+        setAccumulatedData(prev => [...prev, ...notifs.data]);
+      }
+    }
+  }, [notifs?.data]);
+  const executedFromPushRef = useRef(false);
+
+  // useEffect(() => {
+  //   console.log(
+  //     '[Notificaciones] params recibidos desde push:',
+  //     (route as any)?.params,
+  //   );
+  // }, [(route as any)?.params]);
+
+  useEffect(() => {
+    const params: any = (route as any)?.params;
+    if (!executedFromPushRef.current && params?.fromPush && params?.pushData) {
+      executedFromPushRef.current = true;
+      // Adaptamos pushData al formato esperado por goNotif
+      goNotif({info: params.pushData});
+    }
+  }, [(route as any)?.params]);
 
   const {dispatch}: any = useEvent('onResetNotif');
   useFocusEffect(
@@ -80,8 +108,8 @@ const Notifications = () => {
       if (data.info?.act == 'alerts') {
         switch (data.info?.level) {
           default:
-            return(
-              <Icon 
+            return (
+              <Icon
                 style={{
                   borderRadius: 50,
                   padding: 8,
@@ -96,37 +124,37 @@ const Notifications = () => {
               <Icon
                 style={{
                   borderRadius: 50,
-                padding: 8,
-                backgroundColor: cssVar.cError,
-              }}
-              color={cssVar.cWhite}
-              name={IconAlertNotification}
-            />
-          );
+                  padding: 8,
+                  backgroundColor: cssVar.cError,
+                }}
+                color={cssVar.cWhite}
+                name={IconAlertNotification}
+              />
+            );
           case 2:
             return (
               <Icon
                 style={{
                   borderRadius: 50,
-                padding: 8,
-                backgroundColor: cssVar.cWarning,
-              }}
-              color={cssVar.cWhite}
-              name={IconAlertNotification}
-            />
-          );
+                  padding: 8,
+                  backgroundColor: cssVar.cWarning,
+                }}
+                color={cssVar.cWhite}
+                name={IconAlertNotification}
+              />
+            );
           case 1:
             return (
               <Icon
                 style={{
                   borderRadius: 50,
-                padding: 8,
-                backgroundColor: cssVar.cInfo,
-              }}
-              color={cssVar.cWhite}
-              name={IconAlertNotification}
-            />
-          );
+                  padding: 8,
+                  backgroundColor: cssVar.cInfo,
+                }}
+                color={cssVar.cWhite}
+                name={IconAlertNotification}
+              />
+            );
         }
       }
       if (data.info?.act == 'in-pedido') {
@@ -260,7 +288,7 @@ const Notifications = () => {
         );
       }
 
-      return <Avatar src={image} name={name} />;
+      return <Avatar src={image} name={name} hasImage={0} />;
     };
     const msg = Array.isArray(data.msg) ? data.msg[0] : data.msg;
 
@@ -288,14 +316,26 @@ const Notifications = () => {
         left={left(data)}></ItemList>
     );
   };
-
+  const handleReload = () => {
+    setParams(paramsInitial);
+    setAccumulatedData([]);
+  };
+  useEffect(() => {
+    reload(params);
+  }, [params]);
   return (
-    <Layout title="Notificaciones" refresh={() => reload()}>
-      <List
-        data={notifs?.data}
+    <Layout title="Notificaciones" refresh={() => reload()} scroll={false}>
+      <ListFlat
+        data={accumulatedData}
         renderItem={NotifisList}
-        refreshing={!loaded}
-        skeletonType="list"
+        refreshing={params.page === 1 && !loaded}
+        emptyLabel="No hay datos"
+        onRefresh={handleReload}
+        loading={!loaded}
+        setParams={setParams}
+        stopPagination={
+          notifs?.message?.total == -1 && notifs?.data?.length < params.perPage
+        }
       />
 
       {openDetail == 'Pedidos' && (

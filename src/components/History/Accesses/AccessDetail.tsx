@@ -1,20 +1,28 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import {
   getDateStrMes,
   getDateTimeStrMes,
   parseWeekDays,
 } from '../../../../mk/utils/dates';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
 import useApi from '../../../../mk/hooks/useApi';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
-import {IconExpand} from '../../../icons/IconLibrary';
+import { IconExpand } from '../../../icons/IconLibrary';
 import Modal from '../../../../mk/components/ui/Modal/Modal';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
+import ImageExpandableModal from '../../../../mk/components/ui/ImageExpandableModal';
 
 type Props = {
   open: boolean;
@@ -31,15 +39,24 @@ const DetailRow = ({
   value: any;
   valueStyle?: object;
 }) => {
-  let displayValue = value;
-  if (value === undefined || value === null || value === '') {
-    displayValue = '-/-';
+  if (
+    value === undefined ||
+    value === null ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (typeof value === 'string' && value.trim().toLowerCase() === 'n/a')
+  ) {
+    return null;
   }
+
   return (
-    <View style={styles.detailRow}>
+    <View
+      style={styles.detailRow}
+      pointerEvents="none"
+      onStartShouldSetResponder={() => false}
+    >
       <Text style={styles.detailLabel}>{label}</Text>
-      {typeof displayValue === 'string' ? (
-        <Text style={[styles.detailValue, valueStyle]}>{displayValue}</Text>
+      {typeof value === 'string' ? (
+        <Text style={[styles.detailValue, valueStyle]}>{value}</Text>
       ) : (
         value
       )}
@@ -57,6 +74,7 @@ interface ModalPersonData {
   plate?: string | null;
   statusText?: string;
   statusColor?: string;
+  url_image_p?: string[] | any;
 }
 
 interface CompanionItemProps {
@@ -64,7 +82,7 @@ interface CompanionItemProps {
   onPress: () => void;
 }
 
-const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
+const CompanionItem = ({ companionAccess, onPress }: CompanionItemProps) => {
   const person = companionAccess.visit || companionAccess;
   const companionFullName = getFullName(person) || 'N/A';
   const companionCi = person.ci ? `C.I. ${person.ci}` : 'CI no disponible';
@@ -75,6 +93,7 @@ const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
       subtitle={companionCi}
       left={
         <Avatar
+          hasImage={person?.has_image}
           name={companionFullName}
           src={person.url_avatar ? getUrlImages(person.url_avatar) : undefined}
           w={40}
@@ -93,28 +112,42 @@ const CompanionItem = ({companionAccess, onPress}: CompanionItemProps) => {
   );
 };
 
-const AccessDetail = ({open, onClose, id}: Props) => {
+const AccessDetail = ({ open, onClose, id }: Props) => {
   const [accessData, setAccessData] = useState<any>(null);
-  const {execute} = useApi();
+  const { execute } = useApi();
 
   const [modalPersonData, setModalPersonData] =
     useState<ModalPersonData | null>(null);
   const [isPersonDetailModalVisible, setIsPersonDetailModalVisible] =
     useState(false);
+  const [openExpandImg, setOpenExpandImg] = useState({
+    open: false,
+    imageUri: '',
+  });
 
   const getAccess = async () => {
     try {
-      const {data: apiResponse} = await execute('/accesses', 'GET', {
-        fullType: 'DET',
-        section: 'ACT',
-        searchBy: id,
-      });
+      const { data: apiResponse } = await execute(
+        '/accesses',
+        'GET',
+        {
+          fullType: 'DET',
+          section: 'ACT',
+          searchBy: id,
+        },
+        false,
+        3,
+      );
       if (apiResponse?.success) {
-        setAccessData(apiResponse.data?.[0] || null);
+        // Support both legacy array and new object response shapes
+        const respData = apiResponse?.data;
+        const accessItem =
+          (respData && (respData.access || respData[0])) || null;
+        setAccessData(accessItem);
+      } else {
+        setAccessData(null);
       }
     } catch (error) {
-      console.error('Failed to fetch access details:', error);
-
       setAccessData(null);
     }
   };
@@ -136,13 +169,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
   }, [open]);
 
   const getStatusForCompanionOrResident = (personData: any) => {
-    if (personData.out_at) return {text: 'Completado', color: cssVar.cSuccess};
-    if (personData.in_at) return {text: 'Por salir', color: cssVar.cSuccess};
-    return {text: 'Pendiente', color: cssVar.cWhite};
+    if (personData.out_at == null && personData.in_at == null)
+      return { text: 'Rechazado', color: cssVar.cError };
+    if (personData.out_at)
+      return { text: 'Completado', color: cssVar.cSuccess };
+    if (personData.in_at) return { text: 'Por salir', color: cssVar.cSuccess };
+    return { text: 'Pendiente', color: cssVar.cWhite };
   };
 
   const getStatusForTaxiDriver = (mainAccessItem: any) => {
-    let text = 'Denegado';
+    let text = 'Rechazado';
     let color = cssVar.cError;
 
     if (mainAccessItem.out_at) {
@@ -162,7 +198,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       color = cssVar.cError;
     }
 
-    return {text, color};
+    return { text, color };
   };
 
   const handleOpenPersonDetailModal = (
@@ -176,7 +212,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       typeLabel === 'Acompañante' ? personData.visit || personData : personData;
 
     if (typeLabel === 'Acompañante' || typeLabel === 'Residente') {
-      const {text, color} = getStatusForCompanionOrResident(personData);
+      const { text, color } = getStatusForCompanionOrResident(personData);
 
       dataForModal = {
         person: personToShow,
@@ -189,7 +225,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         statusColor: color,
       };
     } else {
-      const {text, color} = getStatusForTaxiDriver(mainAccessItem);
+      const { text, color } = getStatusForTaxiDriver(mainAccessItem);
 
       dataForModal = {
         person: personToShow.visit,
@@ -201,6 +237,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         plate: personToShow.plate,
         statusText: text,
         statusColor: color,
+        url_image_p: personToShow.url_image_p,
       };
     }
 
@@ -242,7 +279,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       ? 'Por ingresar'
       : item.status === 'X'
       ? 'Anulado'
-      : 'Denegado';
+      : 'Rechazado';
 
     if (
       statusText === 'Completado' ||
@@ -250,7 +287,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
       statusText === 'Por ingresar'
     )
       statusColor = cssVar.cSuccess;
-    if (statusText === 'Anulado' || statusText === 'Denegado')
+    if (statusText === 'Anulado' || statusText === 'Rechazado')
       statusColor = cssVar.cError;
     if (statusText === 'Por confirmar') statusColor = cssVar.cWarning;
 
@@ -280,11 +317,21 @@ const AccessDetail = ({open, onClose, id}: Props) => {
 
     if (item.type === 'F') {
       return (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
+          nestedScrollEnabled
+          showsVerticalScrollIndicator
+          style={{ flex: 1 }}
+          onStartShouldSetResponder={() => true}
+        >
           <View style={styles.mainCard}>
-            <Text style={styles.sectionTitleNoBorder}>
-              Resumen de la visita
-            </Text>
+            <View pointerEvents="none">
+              <Text style={styles.sectionTitleNoBorder}>
+                Resumen de la visita
+              </Text>
+            </View>
             <ItemList
               title={mainUserFullName}
               subtitle={
@@ -294,6 +341,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               }
               left={
                 <Avatar
+                  hasImage={mainVisitor?.has_image}
                   name={mainUserFullName}
                   src={
                     mainVisitor?.url_avatar
@@ -310,7 +358,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow
                 label="Estado"
                 value={statusText}
-                valueStyle={{color: statusColor, fontFamily: FONTS.semiBold}}
+                valueStyle={{ color: statusColor, fontFamily: FONTS.semiBold }}
               />
               <DetailRow
                 label="Fecha y hora de ingreso"
@@ -326,21 +374,28 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
               <DetailRow
                 label="Guardia de salida"
-                value={getFullName(item.out_guard)}
+                value={
+                  item.out_at
+                    ? getFullName(item.out_guard || item.guardia)
+                    : null
+                }
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
               {companions && companions.length > 0 && (
                 <View style={styles.sectionContainer}>
-                  <Text style={styles.sectionTitle}>
-                    Acompañante{companions.length > 1 ? 's' : ''}
-                  </Text>
+                  <View pointerEvents="none">
+                    <Text style={styles.sectionTitle}>
+                      Acompañante{companions.length > 1 ? 's' : ''}
+                    </Text>
+                  </View>
                   {companions.map((companionAccess: any, index: number) => (
                     <View
                       key={`companion-wrapper-${companionAccess.id || index}`}
                       style={
                         index > 0 ? styles.additionalCompanionWrapper : null
-                      }>
+                      }
+                    >
                       <CompanionItem
                         companionAccess={companionAccess}
                         onPress={() =>
@@ -357,7 +412,9 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               )}
               {driver && (
                 <View style={styles.sectionContainer}>
-                  <Text style={styles.sectionTitle}>Taxista</Text>
+                  <View pointerEvents="none">
+                    <Text style={styles.sectionTitle}>Taxista</Text>
+                  </View>
                   <ItemList
                     title={getFullName(driver)}
                     subtitle={
@@ -367,6 +424,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     }
                     left={
                       <Avatar
+                        hasImage={driver?.has_image}
                         name={getFullName(driver)}
                         src={getUrlImages(
                           '/VISIT-' +
@@ -398,17 +456,28 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             </View>
           </View>
           <View style={styles.mainCardR}>
-            <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
+            <View pointerEvents="none">
+              <Text style={styles.sectionTitleNoBorder}>
+                Residente visitado
+              </Text>
+            </View>
             <ItemList
               title={getFullName(resident)}
               subtitle2={
-                'Unidad:' +
-                resident?.dpto?.[0]?.nro +
-                ', ' +
-                resident?.dpto?.[0]?.description
+                [
+                  resident?.dpto?.[0]?.nro &&
+                    `${resident?.dpto?.[0]?.type?.name || 'Unidad'}: ${
+                      resident?.dpto?.[0]?.nro
+                    }`,
+
+                  resident?.dpto?.[0]?.description?.trim(),
+                ]
+                  .filter(Boolean)
+                  .join(', ') || 'Sin unidad asignada'
               }
               left={
                 <Avatar
+                  hasImage={resident?.has_image}
                   name={getFullName(resident)}
                   src={getUrlImages(
                     '/OWNER-' +
@@ -435,9 +504,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
         </ScrollView>
       );
     }
-
     return (
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled
+        showsVerticalScrollIndicator
+        style={{ flex: 1 }}
+        onStartShouldSetResponder={() => true}
+      >
         <View style={styles.mainCard}>
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, styles.sectionTitleNoBorder]}>
@@ -446,9 +522,16 @@ const AccessDetail = ({open, onClose, id}: Props) => {
             {mainVisitor ? (
               <ItemList
                 title={mainUserFullName}
-                subtitle={mainUserCi ? `C.I. ${mainUserCi}` : ''}
+                subtitle={`C.I. ${
+                  (item?.type == 'O' ? item?.owner?.ci : item?.visit?.ci) ||
+                  '-/-'
+                } ${
+                  (item?.plate && !driverAccess && '- Placa: ' + item?.plate) ||
+                  ''
+                } `}
                 left={
                   <Avatar
+                    hasImage={mainVisitor?.has_image}
                     name={mainUserFullName}
                     src={getUrlImages(
                       '/VISIT-' +
@@ -467,7 +550,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               <DetailRow
                 label="Estado"
                 value={statusText}
-                valueStyle={{color: statusColor, fontFamily: FONTS.semiBold}}
+                valueStyle={{ color: statusColor, fontFamily: FONTS.semiBold }}
               />
               {(item.type === 'G' || item.type === 'I') &&
                 item.invitation?.title && (
@@ -482,16 +565,31 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 label="Fecha y hora de salida"
                 value={getDateTimeStrMes(item.out_at)}
               />
+
               <DetailRow
                 label="Guardia de ingreso"
-                value={getFullName(item.guardia)}
+                value={
+                  statusText === 'Rechazado' ? null : getFullName(item.guardia)
+                }
               />
               <DetailRow
                 label="Guardia de salida"
-                value={getFullName(item.out_guard)}
+                value={
+                  statusText === 'Rechazado'
+                    ? null
+                    : item.out_at
+                    ? getFullName(item.out_guard || item.guardia)
+                    : null
+                }
               />
               <DetailRow label="Observación de ingreso" value={item.obs_in} />
               <DetailRow label="Observación de salida" value={item.obs_out} />
+              {statusText !== 'Rechazado' && (
+                <DetailRow
+                  label="Motivo del ingreso"
+                  value={item.obs_confirm}
+                />
+              )}
               {!(item.type === 'I' || item.type === 'G') && (
                 <DetailRow
                   label={item.out_at ? 'Visitó a' : 'Visita a'}
@@ -512,7 +610,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     value={item.invitation.obs}
                   />
                 )}
-              {statusText === 'Denegado' && (
+              {statusText === 'Rechazado' && (
                 <>
                   <DetailRow
                     label="Fecha de denegación"
@@ -527,33 +625,105 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               />
               {item?.confirm_at && (
                 <DetailRow
-                  label="Tipo de aprobación"
+                  label={
+                    item?.confirm == 'Y' ? 'Aprobado por' : 'Rechazado por'
+                  }
                   value={
                     <View
                       style={{
                         backgroundColor:
-                          item?.confirm == 'G'
+                          item?.rejected_guard_id !== null
                             ? '#F37F3D33'
                             : cssVar.cHoverSuccess,
                         paddingHorizontal: 8,
                         paddingVertical: 4,
                         borderRadius: 999,
-                      }}>
+                      }}
+                      pointerEvents="none"
+                    >
                       <Text
                         style={{
                           color:
-                            item?.confirm == 'G'
+                            item?.rejected_guard_id !== null
                               ? cssVar.cAlertMedio
                               : cssVar.cSuccess,
-                        }}>
-                        {item?.confirm == 'G'
-                          ? 'Por el guardia'
-                          : 'Por el residente'}
+                        }}
+                      >
+                        {item?.rejected_guard_id !== null
+                          ? 'Guardia'
+                          : 'Residente'}
                       </Text>
                     </View>
                   }
                 />
               )}
+
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                {item?.url_image_p && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setOpenExpandImg({
+                        open: true,
+                        imageUri: item?.url_image_p[0],
+                      })
+                    }
+                  >
+                    <Image
+                      source={{
+                        uri: item?.url_image_p[0],
+                      }}
+                      width={100}
+                      height={100}
+                      style={{ width: 100, height: 100, borderRadius: 8 }}
+                    />
+                  </TouchableOpacity>
+                )}
+                {item?.visit?.url_image_a && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setOpenExpandImg({
+                        open: true,
+                        imageUri: item?.visit?.url_image_a[0],
+                      })
+                    }
+                  >
+                    <Image
+                      source={{
+                        uri: item?.visit?.url_image_a[0],
+                      }}
+                      width={100}
+                      height={100}
+                      style={{ width: 100, height: 100, borderRadius: 8 }}
+                    />
+                  </TouchableOpacity>
+                )}
+                {item?.visit?.url_image_r && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setOpenExpandImg({
+                        open: true,
+                        imageUri: item?.visit?.url_image_r[0],
+                      })
+                    }
+                  >
+                    <Image
+                      source={{
+                        uri: item?.visit?.url_image_r[0],
+                      }}
+                      width={100}
+                      height={100}
+                      style={{ width: 100, height: 100, borderRadius: 8 }}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* {item?.rejected_guard_id !== null && (
+                <DetailRow
+                  label="  Rechazado por: "
+                  value={getFullName(item.guardia)}
+                />
+              )} */}
             </View>
           </View>
 
@@ -565,7 +735,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               {companions.map((companionAccess: any, index: number) => (
                 <View
                   key={`companion-wrapper-${companionAccess.id || index}`}
-                  style={index > 0 ? styles.additionalCompanionWrapper : null}>
+                  style={index > 0 ? styles.additionalCompanionWrapper : null}
+                >
                   <CompanionItem
                     companionAccess={companionAccess}
                     onPress={() =>
@@ -592,6 +763,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                 }
                 left={
                   <Avatar
+                    hasImage={driver?.has_image}
                     name={getFullName(driver)}
                     src={getUrlImages(
                       '/VISIT-' + driver?.id + '.webp?d=' + driver?.updated_at,
@@ -618,14 +790,17 @@ const AccessDetail = ({open, onClose, id}: Props) => {
           <Text style={styles.sectionTitleNoBorder}>Residente visitado</Text>
           <ItemList
             title={getFullName(resident)}
-            subtitle={
-              'Unidad:' +
-              resident?.dpto?.[0]?.nro +
-              ', ' +
-              resident?.dpto?.[0]?.description
-            }
+            subtitle={[
+              `${resident?.dpto?.[0]?.type?.name || 'Unidad'}: ${
+                resident?.dpto?.[0]?.nro
+              }`,
+              resident?.dpto?.[0]?.description,
+            ]
+              .filter(Boolean)
+              .join(', ')}
             left={
               <Avatar
+                hasImage={resident?.has_image}
                 name={getFullName(resident)}
                 src={getUrlImages(
                   '/OWNER-' + resident?.id + '.webp?d=' + resident?.updated_at,
@@ -663,7 +838,13 @@ const AccessDetail = ({open, onClose, id}: Props) => {
     );
   };
   return (
-    <ModalFull title={'Detalle del acceso'} open={open} onClose={onClose}>
+    <ModalFull
+      title={'Detalle del acceso'}
+      open={open}
+      onClose={onClose}
+      // scrollViewHide
+      disableFormPress
+    >
       {renderBody()}
       {isPersonDetailModalVisible && modalPersonData && (
         <Modal
@@ -673,23 +854,29 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               : `Detalle del ${modalPersonData.typeLabel}`
           }
           open={isPersonDetailModalVisible}
-          onClose={handleClosePersonDetailModal}>
+          onClose={handleClosePersonDetailModal}
+        >
           <ScrollView
-            contentContainerStyle={styles.personDetailModalInnerContent}>
+            contentContainerStyle={styles.personDetailModalInnerContent}
+          >
             <View style={styles.personDetailModalCardContent}>
               {modalPersonData.typeLabel === 'Residente' && accessData ? (
                 <>
                   <ItemList
-                    style={{marginBottom: 12}}
+                    style={{ marginBottom: 12 }}
                     title={getFullName(modalPersonData.person)}
-                    subtitle={
-                      'Unidad:' +
-                      modalPersonData.person?.dpto?.[0]?.nro +
-                      ', ' +
-                      modalPersonData.person?.dpto?.[0]?.description
-                    }
+                    subtitle={[
+                      `${
+                        modalPersonData.person?.dpto?.[0]?.type?.name ||
+                        'Unidad'
+                      }: ${modalPersonData.person?.dpto?.[0]?.nro}`,
+                      modalPersonData.person?.dpto?.[0]?.description,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')}
                     left={
                       <Avatar
+                        hasImage={modalPersonData.person?.has_image}
                         name={getFullName(modalPersonData.person)}
                         src={getUrlImages(
                           '/OWNER-' +
@@ -782,7 +969,8 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                             color: cssVar.cWhite,
                             fontFamily: FONTS.semiBold,
                             marginBottom: 12,
-                          }}>
+                          }}
+                        >
                           Configuración avanzada
                         </Text>
                         <DetailRow
@@ -821,7 +1009,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
               ) : (
                 <>
                   <ItemList
-                    style={{marginBottom: 12}}
+                    style={{ marginBottom: 12 }}
                     title={getFullName(modalPersonData.person)}
                     subtitle={
                       (modalPersonData.person?.ci
@@ -839,6 +1027,7 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                     }
                     left={
                       <Avatar
+                        hasImage={modalPersonData.person?.has_image}
                         name={getFullName(modalPersonData.person)}
                         src={getUrlImages(
                           '/OWNER-' +
@@ -885,11 +1074,77 @@ const AccessDetail = ({open, onClose, id}: Props) => {
                       value={modalPersonData.accessObsOut}
                     />
                   </View>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                    {modalPersonData?.url_image_p && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenExpandImg({
+                            open: true,
+                            imageUri: modalPersonData?.url_image_p[0],
+                          })
+                        }
+                      >
+                        <Image
+                          source={{
+                            uri: modalPersonData?.url_image_p[0],
+                          }}
+                          width={100}
+                          height={100}
+                          style={{ width: 100, height: 100, borderRadius: 8 }}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {modalPersonData?.person?.url_image_a && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenExpandImg({
+                            open: true,
+                            imageUri: modalPersonData?.person?.url_image_a[0],
+                          })
+                        }
+                      >
+                        <Image
+                          source={{
+                            uri: modalPersonData?.person?.url_image_a[0],
+                          }}
+                          width={100}
+                          height={100}
+                          style={{ width: 100, height: 100, borderRadius: 8 }}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {modalPersonData?.person?.url_image_r && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setOpenExpandImg({
+                            open: true,
+                            imageUri: modalPersonData?.person?.url_image_r[0],
+                          })
+                        }
+                      >
+                        <Image
+                          source={{
+                            uri: modalPersonData?.person?.url_image_r[0],
+                          }}
+                          width={100}
+                          height={100}
+                          style={{ width: 100, height: 100, borderRadius: 8 }}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </>
               )}
             </View>
           </ScrollView>
         </Modal>
+      )}
+      {openExpandImg.open && (
+        <ImageExpandableModal
+          visible={openExpandImg.open}
+          imageUri={openExpandImg.imageUri}
+          onClose={() => setOpenExpandImg({ open: false, imageUri: '' })}
+        />
       )}
     </ModalFull>
   );

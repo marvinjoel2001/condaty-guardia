@@ -1,8 +1,8 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
-import {getFullName, getUrlImages} from '../../../../mk/utils/strings';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
+import { getFullName, getUrlImages } from '../../../../mk/utils/strings';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {
   IconDelivery,
@@ -13,10 +13,11 @@ import {
 } from '../../../icons/IconLibrary';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import DetAccesses from './DetAccesses';
-import {buttonSecondary} from './shares/styles';
+import { buttonSecondary } from './shares/styles';
 import DetOrders from '../Orders/DetOrders';
 import Skeleton from '../../../../mk/components/ui/Skeleton/Skeleton';
 import DataSearch from '../../../../mk/components/ui/DataSearch';
+import ListFlat from '../../../../mk/components/ui/List/ListFlat';
 
 interface PropsType {
   data: any;
@@ -31,13 +32,13 @@ const statusText: any = {
   S: 'Dejar salir',
 };
 const statusColor: any = {
-  E: {color: cssVar.cWarning, background: cssVar.cHoverWarning},
-  A: {color: cssVar.cSuccess, background: cssVar.cHoverSuccess},
-  N: {color: cssVar.cError, background: cssVar.cHoverError},
-  S: {color: cssVar.cAlertMedio, background: cssVar.cHoverOrange},
+  E: { color: cssVar.cWarning, background: cssVar.cHoverWarning },
+  A: { color: cssVar.cSuccess, background: cssVar.cHoverSuccess },
+  N: { color: cssVar.cError, background: cssVar.cHoverError },
+  S: { color: cssVar.cAlertMedio, background: cssVar.cHoverOrange },
 };
 
-const NoResults = ({text, icon}: any) => (
+const NoResults = ({ text, icon }: any) => (
   <View style={styles.noResultsContainer}>
     <Icon name={icon} color={cssVar.cWhiteV1} size={60} />
     <Text style={styles.noResultsText}>{text}</Text>
@@ -45,9 +46,6 @@ const NoResults = ({text, icon}: any) => (
 );
 
 const subtitleAccess = (item: any) => {
-  // if (item.type === 'O') {
-  //   return 'USO LLAVE VIRTUAL QR';
-  // }
   let prefix = 'Visitó a: ';
   if (item.type === 'P' && item.other?.otherType?.name === 'Taxi') {
     prefix = 'Recogió a: ';
@@ -70,18 +68,17 @@ const subtitleAccess = (item: any) => {
   return <Text>{prefix + getFullName(item.owner)}</Text>;
 };
 const titleAccess = (item: any) => {
-
   return <Text>{getFullName(item?.visit || item?.owner)}</Text>;
 };
 
-const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
+const Accesses = ({ data, reload, typeSearch, isLoading }: PropsType) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [formState, setFormState]: any = useState({});
   const [openDetailOrders, setOpenDetailOrders] = useState(false);
   const [search, setSearch] = useState('');
 
-  const {dataAccesses, dataOrders} = useMemo(() => {
-    if (!data) return {dataAccesses: null, dataOrders: null};
+  const { dataAccesses, dataOrders } = useMemo(() => {
+    if (!data) return { dataAccesses: null, dataOrders: null };
 
     const filterByType = (items: any[], type: string) => {
       if (type === 'I') {
@@ -97,10 +94,12 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       return [];
     };
 
-    return {
+    const result = {
       dataAccesses: filterByType(data?.accesses, typeSearch),
       dataOrders: filterByType(data?.others, typeSearch),
     };
+
+    return result;
   }, [data, typeSearch]);
 
   useEffect(() => {
@@ -110,7 +109,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const onPressDetail = (item: any, type: string) => {
     if (type == 'A') setOpenDetail(true);
     if (type == 'O') setOpenDetailOrders(true);
-    setFormState({id: item.id});
+    setFormState({ id: item.id });
   };
 
   const getStatus = (item: any) => {
@@ -140,7 +139,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
           padding: 4,
           borderRadius: 4,
           fontFamily: FONTS.regular,
-        }}>
+        }}
+      >
         {statusText[getStatus(item)]}
       </Text>
     );
@@ -154,7 +154,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             color: cssVar.cError,
             fontSize: 12,
             fontFamily: FONTS.regular,
-          }}>
+          }}
+        >
           Cancelado
         </Text>
       );
@@ -162,8 +163,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     if (item.access && !item.access.out_at) {
       return (
         <TouchableOpacity
-          style={{borderRadius: 10}}
-          onPress={() => onPressDetail(item, 'O')}>
+          style={{ borderRadius: 10 }}
+          onPress={() => onPressDetail(item, 'O')}
+        >
           <Text style={buttonSecondary}>Dejar salir</Text>
         </TouchableOpacity>
       );
@@ -172,8 +174,9 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     if (!item.access) {
       return (
         <TouchableOpacity
-          style={{borderRadius: 10}}
-          onPress={() => onPressDetail(item, 'O')}>
+          style={{ borderRadius: 10 }}
+          onPress={() => onPressDetail(item, 'O')}
+        >
           <Text
             style={{
               color: cssVar.cWarning,
@@ -182,7 +185,8 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
               padding: 4,
               fontSize: 10,
               fontFamily: FONTS.regular,
-            }}>
+            }}
+          >
             Registrar ingreso
           </Text>
         </TouchableOpacity>
@@ -227,15 +231,19 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
       );
     }
 
-    const avatarSrc = getUrlImages(
-      item.visit
-        ? `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`
-        : `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`,
-    );
+    // Quitando el avatar temporalmente por problemas de performance 07/11/2025
+    // const avatarSrc = getUrlImages(
+    //   item.visit
+    //     ? `/VISIT-${item.visit?.id}.png?d=${item.updated_at}`
+    //     : `/OWNER-${item.owner_id}.webp?d=${item.updated_at}`,
+    // );
 
     return (
       <Avatar
-        src={avatarSrc}
+        hasImage={0}
+        // Quitando el avatar temporalmente por problemas de performance 07/11/2025
+        //hasImage={item?.visit?.has_image || item?.owner?.has_image}
+        //src={avatarSrc}
         name={getFullName(item.visit) || getFullName(item.owner)}
       />
     );
@@ -270,7 +278,7 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   const renderItemAccess = (item: any) => {
     const status = getStatus(item);
     const hasColoredBorder = status === 'N' || status === 'A';
-   
+
     return (
       <ItemList
         key={item.id}
@@ -308,30 +316,80 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
   };
 
   const filterBySearch = (items: any[], searchTerm: string) => {
-  if (!searchTerm) return items;
+    if (!searchTerm) return items;
 
-  return items?.filter(item => {
-    const visitName = item?.visit ? getFullName(item.visit) : '';
-    const ownerName = item?.owner ? getFullName(item.owner) : '';
-    const otherTypeName = item?.other_type?.name || '';
+    const normalizedSearch = removeAccents(searchTerm.toLowerCase());
 
-    return (
-      removeAccents(visitName)?.includes(removeAccents(searchTerm)) ||
-      removeAccents(ownerName)?.includes(removeAccents(searchTerm)) ||
-      removeAccents(otherTypeName)?.includes(removeAccents(searchTerm))
-    );
-  });
-};
+    return items?.filter(item => {
+      const visitName = item?.visit ? getFullName(item.visit, 'NSLM') : '';
+      const ownerName = item?.owner ? getFullName(item.owner, 'NSLM') : '';
+      const visitCI = item?.visit?.ci || '';
+      const otherTypeName =
+        item?.other_type?.name || item?.other?.other_type?.name || '';
+      const plate = item?.plate || '';
+      const hasMatchingUnit =
+        item?.owner?.dpto?.some((dpto: any) => {
+          const unitNumber = dpto?.nro || '';
+          const unitDescription = dpto?.description || '';
 
-  const filteredAccesses = useMemo(
-    () => filterBySearch(dataAccesses || [], search),
-    [dataAccesses, search],
-  );
+          return (
+            removeAccents(unitNumber.toLowerCase()).includes(
+              normalizedSearch,
+            ) ||
+            removeAccents(unitDescription.toLowerCase()).includes(
+              normalizedSearch,
+            )
+          );
+        }) || false;
 
-  const filteredOrders = useMemo(
-    () => filterBySearch(dataOrders || [], search),
-    [dataOrders, search],
-  );
+      return (
+        removeAccents(visitName.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(ownerName.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(otherTypeName.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(visitCI.toLowerCase()).includes(normalizedSearch) ||
+        removeAccents(plate.toLowerCase()).includes(normalizedSearch) ||
+        hasMatchingUnit
+      );
+    });
+  };
+  const filteredAccesses = useMemo(() => {
+    const result = filterBySearch(dataAccesses || [], search);
+    return result;
+  }, [dataAccesses, search]);
+
+  const filteredOrders = useMemo(() => {
+    const result = filterBySearch(dataOrders || [], search);
+    return result;
+  }, [dataOrders, search]);
+
+  // Combinar ambos arreglos en uno solo para ListFlat
+  const combinedData = useMemo(() => {
+    const accesses = (filteredAccesses || []).map((item: any) => ({
+      ...item,
+      itemType: 'access',
+    }));
+    const orders = (filteredOrders || []).map((item: any) => ({
+      ...item,
+      itemType: 'order',
+    }));
+    const result = [...accesses, ...orders];
+
+    return result;
+  }, [filteredAccesses, filteredOrders]);
+
+  // Función de renderizado para ListFlat
+  const renderCombinedItem = useCallback((item: any) => {
+    let result;
+
+    if (item.itemType === 'access') {
+      result = renderItemAccess(item);
+    } else {
+      result = renderItemOrder(item);
+    }
+
+    return result;
+  }, []);
+
   return (
     <>
       {isLoading && !dataAccesses && !dataOrders ? (
@@ -342,26 +400,29 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
             setSearch={setSearch}
             name="home"
             value={search}
-            style={{marginBottom: 8}}
+            style={{ marginBottom: 8 }}
           />
-
-          {(filteredAccesses?.length > 0 || filteredOrders?.length > 0) && (
-            <>
-              {filteredAccesses?.map((item: any) => renderItemAccess(item))}
-              {filteredOrders?.map((item: any) => renderItemOrder(item))}
-            </>
-          )}
-
-          {filteredAccesses?.length === 0 && filteredOrders?.length === 0 && (
-            <NoResults
-              icon={search ? IconSearch : IconEmpty}
-              text={
-                search
-                  ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
-                  : 'No hay datos'
-              }
-            />
-          )}
+          <ListFlat
+            data={combinedData}
+            renderItem={renderCombinedItem}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 120 }}
+            keyExtractor={(item: any) => `${item.itemType}-${item.id}`}
+            onRefresh={reload}
+            refreshing={isLoading}
+            iconEmpty={
+              search ? (
+                <Icon name={IconSearch} color={cssVar.cWhiteV1} size={60} />
+              ) : (
+                <Icon name={IconEmpty} color={cssVar.cWhiteV1} size={60} />
+              )
+            }
+            emptyLabel={
+              search
+                ? 'No se encontraron coincidencias. Ajusta tus filtros o prueba en una búsqueda diferente'
+                : 'No hay datos'
+            }
+          />
         </>
       )}
 
@@ -384,13 +445,15 @@ const Accesses = ({data, reload, typeSearch, isLoading}: PropsType) => {
     </>
   );
 };
+export default React.memo(Accesses);
+
 const styles = StyleSheet.create({
   noResultsContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    marginTop: 80,
+    // padding: 40,
+    // marginTop: 80,
   },
   noResultsText: {
     marginTop: 8,
@@ -400,4 +463,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-export default Accesses;

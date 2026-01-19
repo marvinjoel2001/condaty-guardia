@@ -1,12 +1,7 @@
-import React, {useState} from 'react';
-import {Text, View, Dimensions, StyleSheet} from 'react-native';
-import {PanGestureHandler} from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
-import {cssVar, FONTS} from '../../../../mk/styles/themes';
+import React, { useState, useCallback } from 'react';
+import { Text, View, Dimensions, StyleSheet } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import { cssVar, FONTS } from '../../../../mk/styles/themes';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {
   IconArrowDown,
@@ -14,61 +9,54 @@ import {
   IconGenericQr,
   IconNoQr,
 } from '../../../icons/IconLibrary';
-import {isIos} from '../../../../mk/utils/utils';
+import { isIos } from '../../../../mk/utils/utils';
 
-const CLOSED_HEIGHT = 40;
-const OPEN_HEIGHT = 204;
+const CLOSED_HEIGHT = 0;
+const OPEN_HEIGHT = 244;
 
 type PropsType = {
   onPressQr: () => void;
   onPressCiNom: () => void;
 };
 
-const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
+const DropdawnAccess = ({ onPressQr, onPressCiNom }: PropsType) => {
   const [openDrop, setOpenDrop] = useState(false);
-  const translateY = useSharedValue(CLOSED_HEIGHT);
-  const [showButtons, setShowButtons] = useState(false);
+  // El dropdown se abre/cierra instantáneamente, sin animación ni delay
+  const height = openDrop ? OPEN_HEIGHT : CLOSED_HEIGHT;
+  const animatedStyle = { height };
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: translateY.value,
-  }));
+  // open y close ya no son necesarios, se usa toggleDropdown directamente
 
-  const toggleDropdown = () => {
-    const newHeight = openDrop ? CLOSED_HEIGHT : OPEN_HEIGHT;
-    translateY.value = withSpring(newHeight, {damping: 15, stiffness: 120});
-    setOpenDrop(!openDrop);
-    if (!openDrop) {
-      setTimeout(() => {
-        setShowButtons(true);
-      }, 300);
-    } else {
-      setShowButtons(false);
-    }
-  };
+  const toggleDropdown = useCallback(() => {
+    setOpenDrop(prev => !prev);
+  }, []);
 
-  const handlePanGesture = ({nativeEvent}: any) => {
-    if (nativeEvent.translationY < -10) {
-      translateY.value = withSpring(OPEN_HEIGHT, {
-        damping: 15,
-        stiffness: 120,
-      });
-      setOpenDrop(true);
-      setTimeout(() => {
-        setShowButtons(true);
-      }, 300);
-    } else if (nativeEvent.translationY > 10) {
-      translateY.value = withSpring(CLOSED_HEIGHT, {
-        damping: 15,
-        stiffness: 120,
-      });
-      setOpenDrop(false);
-      setShowButtons(false);
-    }
-  };
+  const handlePanGesture = useCallback(
+    ({ nativeEvent }: any) => {
+      if (nativeEvent.translationY < -10 && !openDrop) {
+        setOpenDrop(true);
+      } else if (nativeEvent.translationY > 10 && openDrop) {
+        setOpenDrop(false);
+      }
+    },
+    [openDrop],
+  );
 
   return (
     <PanGestureHandler onGestureEvent={handlePanGesture}>
-      <Animated.View style={[styles.container, animatedStyle]}>
+      <View
+        style={[
+          styles.container,
+          {
+            bottom: openDrop ? 32.4 : 68.5,
+            borderTopRightRadius: openDrop ? cssVar.bRadius : 0,
+            borderTopLeftRadius: openDrop ? cssVar.bRadius : 0,
+            borderWidth: openDrop ? 0.5 : 0,
+            borderBottomWidth: openDrop ? 0.5 : 0,
+          },
+          animatedStyle,
+        ]}
+      >
         <View
           onTouchEnd={toggleDropdown}
           style={{
@@ -87,82 +75,60 @@ const DropdawnAccess = ({onPressQr, onPressCiNom}: PropsType) => {
             position: 'absolute',
             top: -30,
             left: Dimensions.get('window').width / 2 - 47,
-          }}>
-          {openDrop ? (
-            <Icon
-              style={{marginTop: 2}}
-              name={IconArrowDown}
-              color={cssVar.cWhite}
-            />
-          ) : (
-            <Icon
-              style={{marginTop: 2}}
-              name={IconArrowUp}
-              color={cssVar.cWhite}
-            />
-          )}
+          }}
+        >
+          <Icon
+            style={{ marginTop: 2 }}
+            name={openDrop ? IconArrowDown : IconArrowUp}
+            color={cssVar.cWhite}
+          />
         </View>
-        {/* <View onTouchEnd={toggleDropdown} style={styles.containerLine}>
-          <View style={styles.line}></View>
-        </View> */}
-        {showButtons && (
+
+        {openDrop && (
           <>
-            <Text style={{...styles.text, marginTop: 20}}>
+            <Text style={{ ...styles.text, marginTop: 20 }}>
               Permitir ingreso
             </Text>
             <View
-              onTouchEnd={e => {
-                e.stopPropagation();
-              }}
-              style={styles.containerButtons}>
+              onTouchEnd={e => e.stopPropagation()}
+              style={styles.containerButtons}
+            >
               <View onTouchEnd={onPressCiNom} style={styles.buttons}>
                 <Icon
                   size={50}
+                  style={{ marginBottom: 8, marginTop: 2 }}
                   name={IconNoQr}
                   color={'transparent'}
                   fillStroke={cssVar.cWhite}
                 />
-                <Text style={{color: cssVar.cWhite}}>Sin QR</Text>
+                <Text style={{ color: cssVar.cWhite }}>Sin QR</Text>
               </View>
               <View onTouchEnd={onPressQr} style={styles.buttons}>
-                <Icon size={50} name={IconGenericQr} color={cssVar.cWhite} />
-                <Text style={{color: cssVar.cWhite}}>Leer QR</Text>
+                <Icon
+                  size={50}
+                  name={IconGenericQr}
+                  color={cssVar.cWhite}
+                  style={{ marginBottom: 8 }}
+                />
+                <Text style={{ color: cssVar.cWhite }}>Leer QR</Text>
               </View>
             </View>
           </>
         )}
-      </Animated.View>
+      </View>
     </PanGestureHandler>
   );
 };
 
-export default DropdawnAccess;
+export default React.memo(DropdawnAccess);
 
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     width: '100%',
     backgroundColor: cssVar.cBlack,
-    bottom: isIos() ? 68.5 : 72.5,
-    borderTopRightRadius: cssVar.bRadius,
-    borderTopLeftRadius: cssVar.bRadius,
-    // overflow: 'hidden',
-    borderWidth: 0.5,
-    borderBottomWidth: 0,
     borderTopColor: cssVar.cWhiteV1,
   },
-  // containerLine: {
-  //   alignItems: 'center',
-  //   width: '100%',
-  //   justifyContent: 'center',
-  //   height: 40,
-  // },
-  // line: {
-  //   backgroundColor: cssVar.cWhiteV1,
-  //   height: 6,
-  //   width: 54,
-  //   borderRadius: cssVar.bRadiusL,
-  // },
   text: {
     color: cssVar.cWhite,
     textAlign: 'center',
@@ -172,10 +138,8 @@ const styles = StyleSheet.create({
   },
   containerButtons: {
     flexDirection: 'row',
-    justifyContent:'center',
-    gap:32
-    // justifyContent: 'space-around',
-    // overflow: 'hidden',
+    justifyContent: 'center',
+    gap: 32,
   },
   buttons: {
     backgroundColor: cssVar.cBlackV2,
@@ -183,7 +147,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: cssVar.spXxl,
     justifyContent: 'center',
     alignItems: 'center',
-    // overflow: 'hidden',
     borderRadius: cssVar.bRadius,
   },
 });

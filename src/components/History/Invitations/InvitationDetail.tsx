@@ -3,7 +3,7 @@ import ModalFull from '../../../../mk/components/ui/ModalFull/ModalFull';
 import {Text, View} from 'react-native';
 import useApi from '../../../../mk/hooks/useApi';
 import {cssVar} from '../../../../mk/styles/themes';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import {getFullName} from '../../../../mk/utils/strings';
 import Avatar from '../../../../mk/components/ui/Avatar/Avatar';
 import {getDateStrMes} from '../../../../mk/utils/dates';
@@ -80,15 +80,15 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
         });
       }
       data.push({
-        l: item?.access[0]?.out_guard
-          ? 'Guardia de entrada:'
-          : 'Guardia de entrada y salida:',
+        l: 'Guardia de entrada:',
         v: getFullName(item?.access[0]?.guardia),
       });
-      if (item?.access[0]?.out_guard) {
+      if (item?.access[0]?.out_at) {
         data.push({
           l: 'Guardia de salida:',
-          v: getFullName(item?.access[0]?.out_guard),
+          v: getFullName(
+            item?.access[0]?.out_guard || item?.access[0]?.guardia,
+          ),
         });
       }
       if (item?.access[0]?.obs_in) {
@@ -128,7 +128,7 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
               {enteredGuests.map((guest: any, index: any) => (
                 <ItemList
                   key={index}
-                  left={<Avatar name={getFullName(guest.visit)} />}
+                  left={<Avatar name={getFullName(guest.visit)} hasImage={0} />}
                   title={getFullName(guest.visit)}
                   subtitle={`CI: ${guest.visit.ci}`}
                   children={<DateAccess access={guest?.access} />}
@@ -148,7 +148,7 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
               {notEnteredGuests.map((guest: any, index: any) => (
                 <ItemList
                   key={index}
-                  left={<Avatar name={getFullName(guest.visit)} />}
+                  left={<Avatar name={getFullName(guest.visit)} hasImage={0} />}
                   title={getFullName(guest.visit)}
                   subtitle={`CI: ${guest.visit.ci}`}
                   //   children={
@@ -173,7 +173,7 @@ const InvitationDetail = ({open, onClose, id}: Props) => {
                 Invitado que ingresó:
               </Text>
               <ItemList
-                left={<Avatar name={getFullName(data?.visit)} />}
+                left={<Avatar name={getFullName(data?.visit)} hasImage={0} />}
                 title={getFullName(data?.visit)}
                 subtitle={`CI: ${data?.visit?.ci}`}
                 children={<DateAccess access={data.access[0]} />}

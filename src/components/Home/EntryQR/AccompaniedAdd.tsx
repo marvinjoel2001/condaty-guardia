@@ -1,100 +1,72 @@
-import React, {useState, useEffect} from 'react';
-import Modal from '../../../../mk/components/ui/Modal/Modal';
+import React, { useState } from 'react';
 import InputFullName from '../../../../mk/components/forms/InputFullName/InputFullName';
 import Input from '../../../../mk/components/forms/Input/Input';
-import useApi from '../../../../mk/hooks/useApi';
 import useAuth from '../../../../mk/hooks/useAuth';
-import {checkRules, hasErrors} from '../../../../mk/utils/validate/Rules';
+import { checkRules, hasErrors } from '../../../../mk/utils/validate/Rules';
+import { View } from 'react-native';
+import UploadImage from '../../../../mk/components/forms/UploadImage/UploadImage';
+import DynamicModal from '../../../../mk/components/ui/DynamicModal/DynamicModal';
+import UploadFileV2 from '../../../../mk/components/forms/UploadFileV2';
 type TypeProps = {
   open: boolean;
   onClose: () => void;
   item: any;
   setItem: any;
   editItem?: any;
+  formState: any;
+  setFormState: any;
+  isMain?: boolean;
+  disabledCi?: boolean;
+  extraOnClose?: () => void;
 };
 
-export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypeProps) => {
-  const [formState, setFormState]: any = useState({});
+export const AccompaniedAdd = ({
+  open,
+  onClose,
+  item,
+  setItem,
+  formState,
+  setFormState,
+  editItem,
+  disabledCi = true,
+  isMain = false,
+  extraOnClose = () => {},
+}: TypeProps) => {
   const [errors, setErrors]: any = useState({});
-  const {execute} = useApi();
-  const {showToast} = useAuth();
-
-  useEffect(() => {
-    if (open && editItem) {
-      setFormState({
-        ci: editItem.ci,
-        name: editItem.name,
-        middle_name: editItem.middle_name,
-        last_name: editItem.last_name,
-        mother_last_name: editItem.mother_last_name,
-        ciDisabled: false,
-      });
-    } else if (open) {
-      setFormState({});
-    }
-  }, [open, editItem]);
+  const { showToast } = useAuth();
 
   const handleChange = (key: string, value: any) => {
-    setFormState({...formState, [key]: value});
+    setFormState((prevState: any) => ({ ...prevState, [key]: value }));
   };
-  const onExist = async () => {
-    const {data: exist} = await execute('/visits', 'GET', {
-      perPage: 1,
-      page: 1,
-      // searchBy: formState?.ci,
-      exist: '1',
-      fullType: 'L',
-      ci_visit: formState?.ci,
-    });
-    if (exist?.data) {
-      setFormState({
-        ...formState,
-        name: exist?.data?.name,
-        middle_name: exist?.data?.middle_name,
-        last_name: exist?.data?.last_name,
-        mother_last_name: exist?.data?.mother_last_name,
-        ciDisabled: true,
-      });
-    } else {
-      setFormState({
-        ...formState,
-        name: editItem ? formState.name : '',
-        middle_name: editItem ? formState.middle_name : '',
-        last_name: editItem ? formState.last_name : '',
-        mother_last_name: editItem ? formState.mother_last_name : '',
-        ciDisabled: false,
-      });
-    }
-  };
-  const validate = () => {
+  const validate = (values: any = formState) => {
     let errors: any = {};
 
     errors = checkRules({
-      value: formState.ci,
+      value: values.ci,
       rules: ['required', 'ci'],
       key: 'ci',
       errors,
     });
     errors = checkRules({
-      value: formState.name,
+      value: values.name,
       rules: ['required', 'alpha'],
       key: 'name',
       errors,
     });
     errors = checkRules({
-      value: formState.middle_name,
+      value: values.middle_name,
       rules: ['alpha'],
       key: 'middle_name',
       errors,
     });
     errors = checkRules({
-      value: formState.last_name,
+      value: values.last_name,
       rules: ['required', 'alpha'],
       key: 'last_name',
       errors,
     });
     errors = checkRules({
-      value: formState.mother_last_name,
+      value: values.mother_last_name,
       rules: ['alpha'],
       key: 'mother_last_name',
       errors,
@@ -103,74 +75,131 @@ export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypePro
     setErrors(errors);
     return errors;
   };
-  // console.log(formState,'fst aad')
-  // console.log(item,'item aad')
-  const onSave = async () => {
-    let acompanantes = item?.acompanantes || [];
+  const onSave = async (force: boolean = false) => {
+    const values = {
+      ...formState,
+      name: formState.name?.trim(),
+      middle_name: formState.middle_name?.trim(),
+      last_name: formState.last_name?.trim(),
+      mother_last_name: formState.mother_last_name?.trim(),
+    };
+    setFormState(values);
     if (editItem) {
-      acompanantes = acompanantes.map((acompanante: any) =>
-        acompanante.ci === editItem.ci
-          ? {
-              ci: formState.ci,
-              name: formState.name,
-              middle_name: formState.middle_name,
-              last_name: formState.last_name,
-              mother_last_name: formState.mother_last_name,
-            }
-          : acompanante
-      );
-      setItem({...item, acompanantes});
+      if (!force && hasErrors(validate(values))) {
+        return;
+      }
+      setItem({
+        ...item,
+        ci: values.ci,
+        name: values.name,
+        middle_name: values.middle_name,
+        last_name: values.last_name,
+        mother_last_name: values.mother_last_name,
+        ci_anverso: values.ci_anverso,
+        ci_reverso: values.ci_reverso,
+      });
       _onClose();
-      setFormState({});
-      showToast('Acompañante editado');
       return;
     }
+
+    let acompanantes = item?.acompanantes || [];
     if (acompanantes?.length > 0) {
       const exist = acompanantes.find(
-        (acompanante: any) => acompanante.ci === formState.ci,
+        (acompanante: any) => acompanante.ci === values.ci,
       );
       if (exist) {
         showToast('El acompañante ya esta en la lista', 'error');
         return;
       }
     }
-    if (item?.ci === formState.ci || item?.ci_taxi === formState.ci) {
+    if (item?.ci === values.ci || item?.ci_taxi === values.ci) {
       showToast('El ci ya esta en la lista', 'error');
       return;
     }
 
-    if (hasErrors(validate())) {
+    if (!force && hasErrors(validate(values))) {
       return;
     }
 
     acompanantes.push({
-      ci: formState.ci,
-      name: formState.name,
-      middle_name: formState.middle_name,
-      last_name: formState.last_name,
-      mother_last_name: formState.mother_last_name,
-      // obs_in: formState.obs_in,
-      // nameDisabled: formState.nameDisabled,
+      ci: values.ci,
+      name: values.name,
+      middle_name: values.middle_name,
+      last_name: values.last_name,
+      mother_last_name: values.mother_last_name,
+      ci_anverso: values.ci_anverso,
+      ci_reverso: values.ci_reverso,
     });
 
-    setItem({...item, acompanantes});
+    setItem({ ...item, acompanantes });
     _onClose();
-    setFormState({});
-    showToast('Acompañante agregado');
   };
 
   const _onClose = () => {
-    setFormState({});
     onClose();
+    setFormState({});
+    if (
+      isMain &&
+      !formState?.name &&
+      !formState?.middle_name &&
+      !formState?.last_name &&
+      !formState?.mother_last_name
+    ) {
+      extraOnClose?.();
+    }
   };
+
+  const handleClose = () => {
+    const hasData =
+      formState?.name ||
+      formState?.last_name ||
+      formState?.middle_name ||
+      formState?.mother_last_name;
+
+    if (hasData) {
+      onSave(true);
+    } else {
+      _onClose();
+    }
+  };
+
   return (
-    <Modal
-      title={editItem ? 'Editar acompañante' : 'Agregar acompañante'}
+    <DynamicModal
+      title={editItem ? 'Editar datos' : 'Persona no encontrada'}
       open={open}
-      onClose={_onClose}
-      buttonText="Guardar"
-      disabled={!formState.ci}
-      onSave={onSave}>
+      onClose={handleClose}
+      height={468}
+      styleHeader={{ borderBottomWidth: 0 }}
+      buttonText="Registrar"
+      subTitle="Agrega sus datos para registrarla"
+      variant="V2"
+      buttonCancelText=""
+      onSave={() => onSave(false)}
+    >
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <UploadFileV2
+          variant="V2"
+          style={{
+            marginBottom: 12,
+          }}
+          setFormState={setFormState}
+          formState={formState}
+          label="Carnet anverso"
+          name="ci_anverso"
+          global
+        />
+        <UploadFileV2
+          variant="V2"
+          style={{
+            marginBottom: 12,
+          }}
+          setFormState={setFormState}
+          formState={formState}
+          label="Carnet reverso"
+          name="ci_reverso"
+          global
+        />
+      </View>
       <Input
         label="Carnet de identidad"
         keyboardType="numeric"
@@ -180,17 +209,15 @@ export const AccompaniedAdd = ({open, onClose, item, setItem, editItem}: TypePro
         error={errors}
         required={true}
         onChange={(value: any) => handleChange('ci', value)}
-        onBlur={() => onExist()}
-        disabled={formState?.ciDisabled}
+        disabled={disabledCi}
       />
+
       <InputFullName
         formState={formState}
         errors={errors}
-        // name_prefijo="_a"
         handleChangeInput={handleChange}
-        disabled={false}
-        inputGrid={false}
+        inputGrid={true}
       />
-    </Modal>
+    </DynamicModal>
   );
 };

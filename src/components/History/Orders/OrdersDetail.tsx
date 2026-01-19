@@ -9,7 +9,7 @@ import {cssVar, FONTS} from '../../../../mk/styles/themes';
 import Loading from '../../../../mk/components/ui/Loading/Loading';
 import Icon from '../../../../mk/components/ui/Icon/Icon';
 import {IconExpand} from '../../../icons/IconLibrary';
-import {ItemList} from '../../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../../mk/components/ui/ItemList/ItemList';
 import ModalAccessExpand from '../../Home/Accesses/ModalAccessExpand';
 import Card from '../../../../mk/components/ui/Card/Card';
 import KeyValue from '../../../../mk/components/ui/KeyValue';
@@ -104,6 +104,7 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
             }
             left={
               <Avatar
+                hasImage={accessInfo?.visit?.has_image}
                 name={getFullName(accessInfo?.visit)}
                 src={getUrlImages(
                   '/VISIT-' +
@@ -159,6 +160,7 @@ const OrdersDetail = ({open, onClose, id}: Props) => {
             subtitle={item?.owner?.ci}
             left={
               <Avatar
+                hasImage={item?.owner?.has_image}
                 name={getFullName(item?.owner)}
                 src={getUrlImages(
                   '/OWNER-' +

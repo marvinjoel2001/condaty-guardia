@@ -1,83 +1,16 @@
-import {useState} from 'react';
-import {Platform, StyleSheetProperties, TextInput} from 'react-native';
+import React, {useState, useMemo, useCallback} from 'react';
+import {Platform, TextInput} from 'react-native';
 import ControlLabel, {PropsTypeInputBase} from '../ControlLabel/ControlLabel';
 import {cssVar, FONTS, ThemeType} from '../../../styles/themes';
-import React from 'react';
+
 interface PropsType extends PropsTypeInputBase {
   passwordMaxLength?: number;
   ciMaxLength?: number;
   iconLeft?: any;
   iconRight?: any;
 }
-const Input = (props: PropsType) => {
-  const [isFocused, setIsFocused] = useState(false);
 
-  const handleTextChange = (text: string) => {
-    if (props.onChange) {
-      props.onChange(text);
-    }
-  };
-
-  const styleInput = {
-    ...{...theme.default, paddingLeft: props.iconLeft ? 30 : cssVar.spS},
-    ...{paddingRight: props.iconRight ? 30 : cssVar.spM},
-    ...(isFocused ? theme.focusInput : {}),
-    ...(props.error && props.error[props.name] ? {...theme.errorInput} : {}),
-    ...props.style,
-    ...(props.disabled ? theme.disabled : {}),
-  };
-
-  const _onBlur = (e: any) => {
-    setIsFocused(false);
-    if (props.onBlur) {
-      props.onBlur(e);
-    }
-  };
-
-  return (
-    <ControlLabel {...props} isFocus={isFocused}>
-      <TextInput
-        testID={props.name}
-        id={props.name}
-        onFocus={e => {
-          setIsFocused(true), props.onFocus && props.onFocus(e);
-        }}
-        onBlur={_onBlur}
-        onSubmitEditing={props.onSearch}
-        style={{
-          color: props.disabled
-            ? theme.disabledInput?.color
-            : theme.default?.color,
-          ...styleInput,
-        }}
-        keyboardType={
-          props.keyboardType
-            ? props.keyboardType
-            : props.type === 'date'
-            ? 'numeric'
-            : props.type === 'email-address'
-            ? 'email-address'
-            : 'default'
-        }
-        maxLength={props.maxLength}
-        onChangeText={handleTextChange}
-        value={props.value}
-        returnKeyType={props.search}
-        placeholder={isFocused ? '' : props.placeholder || ''}
-        placeholderTextColor={cssVar.cWhiteV3}
-        editable={!props.disabled && !props.readOnly}
-        secureTextEntry={props.password || false}
-        autoFocus={props.autoFocus || false}
-        autoComplete={props.autoComplete || 'off'}
-        autoCapitalize={props.autoCapitalize || 'none'}
-        allowFontScaling={false}
-      />
-    </ControlLabel>
-  );
-};
-
-export default Input;
-
+// Definir theme ANTES de usarlo en el componente
 const theme: ThemeType = {
   form: {
     color: cssVar.cWhiteV3,
@@ -93,9 +26,119 @@ const theme: ThemeType = {
     paddingBottom: cssVar.spS,
     paddingHorizontal: cssVar.spS,
     paddingTop: 24,
-    // paddingVertical: cssVar.spL,
   },
   errorInput: {borderColor: cssVar.cError},
   disabled: {color: cssVar.cWhiteV1},
+  disabledInput: {color: cssVar.cWhiteV1},
   focusInput: {borderColor: cssVar.cAccent},
 };
+
+const Input = React.memo((props: PropsType) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleTextChange = useCallback((text: string) => {
+    if (props.onChange) {
+      props.onChange(text);
+    }
+  }, [props.onChange]);
+
+  const styleInput = useMemo(() => ({
+    ...{...theme.default, paddingLeft: props.iconLeft ? 30 : cssVar.spS},
+    ...{paddingRight: props.iconRight ? 30 : cssVar.spM},
+    ...(isFocused ? theme.focusInput : {}),
+    ...(props.error?.[props.name] ? {...theme.errorInput} : {}),
+    ...props.style,
+    ...(props.disabled ? theme.disabled : {}),
+  }), [isFocused, props.error, props.name, props.style, props.disabled, props.iconLeft, props.iconRight]);
+
+  const _onBlur = useCallback((e: any) => {
+    setIsFocused(false);
+    if (props.onBlur) {
+      props.onBlur(e);
+    }
+  }, [props.onBlur]);
+
+  const _onFocus = useCallback((e: any) => {
+    setIsFocused(true);
+    if (props.onFocus) {
+      props.onFocus(e);
+    }
+  }, [props.onFocus]);
+
+  const textColor = useMemo(() => 
+    props.disabled ? theme.disabledInput?.color : theme.default?.color,
+    [props.disabled]
+  );
+
+  const keyboardType = useMemo(() => {
+    if (props.keyboardType) {
+      // Para Android, 'number-pad' es más rápido que 'numeric'
+      if (props.keyboardType === 'numeric' && Platform.OS === 'android') {
+        return 'number-pad';
+      }
+      return props.keyboardType;
+    }
+    if (props.type === 'date') {
+      return Platform.OS === 'android' ? 'number-pad' : 'numeric';
+    }
+    if (props.type === 'email-address') {
+      return 'email-address';
+    }
+    return 'default';
+  }, [props.keyboardType, props.type]);
+
+  return (
+    <ControlLabel {...props} isFocus={isFocused}>
+      <TextInput
+        testID={props.name}
+        id={props.name}
+        onFocus={_onFocus}
+        onBlur={_onBlur}
+        onSubmitEditing={props.onSearch}
+        style={{
+          color: textColor,
+          ...styleInput,
+        }}
+        keyboardType={keyboardType}
+        maxLength={props.maxLength}
+        onChangeText={handleTextChange}
+        value={props.value}
+        returnKeyType={props.search}
+        placeholder={isFocused ? '' : props.placeholder || ''}
+        placeholderTextColor={cssVar.cWhiteV3}
+        editable={!props.disabled && !props.readOnly}
+        secureTextEntry={props.password || false}
+        autoFocus={props.autoFocus || false}
+        autoComplete={props.autoComplete || 'off'}
+        autoCapitalize={props.autoCapitalize || 'none'}
+        allowFontScaling={false}
+      />
+    </ControlLabel>
+  );
+}, (prevProps, nextProps) => {
+  // Retorna TRUE si las props son IGUALES (NO re-renderizar)
+  // Retorna FALSE si las props son DIFERENTES (SÍ re-renderizar)
+  
+  // IMPORTANTE: name debe ser diferente entre inputs
+  if (prevProps.name !== nextProps.name) {
+    return false; // Son inputs diferentes, DEBE re-renderizar
+  }
+  
+  // Comparar todas las props relevantes
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.error === nextProps.error &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.maxLength === nextProps.maxLength &&
+    prevProps.keyboardType === nextProps.keyboardType &&
+    prevProps.password === nextProps.password &&
+    prevProps.label === nextProps.label &&
+    prevProps.type === nextProps.type &&
+    prevProps.onChange === nextProps.onChange
+  );
+});
+
+Input.displayName = 'Input';
+
+export default Input;

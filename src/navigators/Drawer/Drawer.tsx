@@ -1,40 +1,27 @@
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import Navigate from '../Navigate';
 import MainMenu from './MainMenu';
-import {SafeAreaView} from 'react-native';
-import {cssVar} from '../../../mk/styles/themes';
+import { cssVar } from '../../../mk/styles/themes';
 import React from 'react';
+import { View } from 'react-native';
 
 const Drawer = createDrawerNavigator();
 
 const MyDrawer = () => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: cssVar.cBlack}}>
+    <View style={{ flex: 1, backgroundColor: cssVar.cBlack }}>
       <Drawer.Navigator
         initialRouteName="navigate"
-        screenOptions={({navigation}) => ({
-          // headerLeft: () => <Hamburguer onPress={navigation.toggleDrawer} />,
-          drawerStyle: {backgroundColor: cssVar.cBlack},
-          // headerTransparent: true,
-          swipeEnabled: true,
-          // headerStyle: theme.layout?.header,
-          // headerBackgroundContainerStyle: theme.layout?.header,
+        screenOptions={({}) => ({
+          drawerStyle: { backgroundColor: cssVar.cBlack },
+          swipeEnabled: false,
           headerShown: false,
         })}
-        drawerContent={props => <MainMenu {...props} />}>
-        <Drawer.Screen
-          name="navigate"
-          // options={
-          //   {
-          //       headerTitleStyle: {
-          //         color: pallete[theme.currentTheme]?.light?.color,
-          //       },
-          //   }
-          // }
-          component={Navigate}
-        />
+        drawerContent={props => <MainMenu {...props} />}
+      >
+        <Drawer.Screen name="navigate" component={Navigate} />
       </Drawer.Navigator>
-    </SafeAreaView>
+    </View>
   );
 };
 export default MyDrawer;

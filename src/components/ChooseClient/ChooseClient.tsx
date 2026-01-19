@@ -1,13 +1,13 @@
 import React from 'react';
 import ModalFull from '../../../mk/components/ui/ModalFull/ModalFull';
-import {ItemList} from '../../../mk/components/ui/ItemList/ItemList';
+import ItemList from '../../../mk/components/ui/ItemList/ItemList';
 import useAuth from '../../../mk/hooks/useAuth';
-import List from '../../../mk/components/ui/List/List';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
 import {getUrlImages} from '../../../mk/utils/strings';
 import {Text} from 'react-native';
 import {cssVar, FONTS} from '../../../mk/styles/themes';
 import {useNavigation} from '@react-navigation/native';
+import List from '../../../mk/components/ui/List/List';
 interface PropsType {
   open: boolean;
   onClose: () => void;
@@ -33,6 +33,7 @@ const ChooseClient = ({open, onClose}: PropsType) => {
         }}
         left={
           <Avatar
+            hasImage={1}
             name={item?.name}
             src={getUrlImages(
               '/CLIENT-' + item?.id + '.webp?d=' + item?.updated_at,
@@ -67,6 +68,7 @@ const ChooseClient = ({open, onClose}: PropsType) => {
         // }}
         left={
           <Avatar
+            hasImage={1}
             name={item?.name}
             src={getUrlImages(
               '/CLIENT-' + item?.id + '.webp?d=' + item?.updated_at,
@@ -111,7 +113,6 @@ const ChooseClient = ({open, onClose}: PropsType) => {
     );
     return pendingClients;
   };
-  console.log(user);
   return (
     <ModalFull title="Cambiar Condominio" open={open} onClose={onClose}>
       <List data={getActiveClients()} renderItem={renderItemActive} />

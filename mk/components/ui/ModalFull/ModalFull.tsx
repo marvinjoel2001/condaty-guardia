@@ -1,232 +1,229 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  memo,
+} from 'react';
 import {
-  Modal as ModalRN,
   View,
   ScrollView,
-  SafeAreaView,
-  Animated,
-  Easing,
   RefreshControl,
-  Keyboard,
+  StyleSheet,
+  TouchableOpacity,
+  AccessibilityInfo,
+  InteractionManager,
 } from 'react-native';
 import Button from '../../forms/Button/Button';
-import {AuthContext} from '../../../contexts/AuthContext';
+import { AuthContext } from '../../../contexts/AuthContext';
 import Toast from '../Toast/Toast';
-import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
+import { cssVar, TypeStyles } from '../../../styles/themes';
 import Form from '../../forms/Form/Form';
 import HeadTitle from '../../layout/HeadTitle';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import Modal from 'react-native-modal';
 
 type PropsType = {
-  children: any;
+  children: React.ReactNode;
   onClose: (e: any) => void;
   open: boolean;
   onSave?: (e: any) => void;
-  title?: any;
+  onShow?: () => void;
+  title?: string;
   style?: TypeStyles;
   buttonText?: string;
   buttonCancel?: string;
-  buttonExtra?: any;
+  buttonExtra?: React.ReactNode;
   id?: string;
+  styleFooter?: TypeStyles;
   iconClose?: boolean;
-  rightIcon?: boolean;
+  right?: React.ReactNode;
   disabled?: boolean;
   enScroll?: boolean;
-  reload?: any;
-  typeAnimation?: 'slide' | 'fade' | 'book'; // Añadimos 'book' como nuevo tipo de animación
+  reload?: () => Promise<void>;
   scrollViewHide?: boolean;
   onBack?: () => void;
   headerHide?: boolean;
+  disableFormPress?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 };
 
-const ModalFull = ({
-  children,
-  onClose,
-  open,
-  onSave = () => {},
-  title = '',
-  style = {},
-  buttonText = '',
-  buttonCancel = '',
-  buttonExtra = null,
-  id = '',
-  iconClose = true,
-  disabled = false,
-  enScroll = false,
-  reload = false,
-  typeAnimation = 'fade', // El valor predeterminado es 'slide'
-  scrollViewHide = false,
-  headerHide = false,
-  rightIcon = false,
-  onBack,
-}: PropsType) => {
-  const {toast, showToast}: any = useContext(AuthContext);
-  const scrollViewRef: any = useRef(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const translateX = useRef(new Animated.Value(500)).current; // Valor inicial fuera de la pantalla (derecha)
+const ModalFull = memo(
+  ({
+    children,
+    onClose,
+    open,
+    onSave = () => {},
+    title = '',
+    style = {},
+    buttonText = '',
+    buttonCancel = '',
+    buttonExtra = null,
+    id = '',
+    styleFooter = {},
+    iconClose = true,
+    disabled = false,
+    enScroll = false,
+    reload,
+    scrollViewHide = false,
+    headerHide = false,
+    onShow,
+    right,
+    onBack,
+    disableFormPress = false,
+    accessibilityLabel,
+    accessibilityHint,
+  }: PropsType) => {
+    const { toast, showToast }: any = useContext(AuthContext);
+    const scrollViewRef = useRef<ScrollView | null>(null);
+    const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    if (open) {
-      if (enScroll) {
-        setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({animated: false});
+    useEffect(() => {
+      if (open && enScroll) {
+        const timeout = setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: false });
         }, 100);
+        return () => clearTimeout(timeout);
       }
-      // Animación de apertura
-      Animated.timing(translateX, {
-        toValue: 0,
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }).start();
-    } else {
-      // Animación de cierre
-      Animated.timing(translateX, {
-        toValue: 500,
-        duration: 300,
-        easing: Easing.in(Easing.ease),
-        useNativeDriver: true,
-      }).start(() => {
-        onClose('x');
-      });
-    }
-  }, [open, children]);
+    }, [open, children, enScroll]);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await reload();
-    setRefreshing(false);
-  };
+    const onRefresh = useCallback(async () => {
+      if (!reload) return;
+      setRefreshing(true);
+      await reload();
+      setRefreshing(false);
+    }, [reload]);
 
-  return (
-    <ModalRN
-      animationType={typeAnimation === 'book' ? 'none' : typeAnimation}
-      transparent={true}
-      visible={open}
-      presentationStyle="overFullScreen"
-      onRequestClose={() => {
-        iconClose ? null : onClose('x');
-      }}>
-      <SafeAreaView style={{flex: 1}}>
-        <Form>
-          <Animated.View
-            style={{
-              ...theme.container,
-              transform: typeAnimation === 'book' ? [{translateX}] : [], // Aplicamos la animación de deslizamiento
-            }}>
-            {!headerHide && (
-              <HeadTitle
-                title={title}
-                onBack={onBack ? onBack : () => onClose('x')}
-                onlyBack={open}
-                right={rightIcon}
-              />
-            )}
-            {scrollViewHide ? (
-              children
-            ) : (
-              <ScrollView
-                ref={scrollViewRef}
-                contentContainerStyle={{paddingBottom: 12}}
-                // automaticallyAdjustContentInsets
-                // automaticallyAdjustKeyboardInsets={true}
-                // automaticallyAdjustsScrollIndicatorInsets
-                refreshControl={
-                  reload ? (
-                    <RefreshControl
-                      progressBackgroundColor={cssVar.cBlack}
-                      colors={[cssVar.cAccent]}
-                      refreshing={refreshing}
-                      onRefresh={onRefresh}
-                      tintColor={cssVar.cAccent}
-                    />
-                  ) : undefined
-                }
-                style={{
-                  ...theme.body,
-                  ...style,
-                }}>
-                {children}
-              </ScrollView>
-            )}
-            {(buttonText || buttonCancel || buttonExtra) && (
+    if (!open) return null;
+
+    return (
+      <Modal
+        style={{ margin: 0 }}
+        coverScreen
+        isVisible={open}
+        onBackdropPress={() => !iconClose && onClose('x')}
+        onBackButtonPress={() => !iconClose && onClose('x')}
+        onShow={onShow}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        useNativeDriver={true}
+        hideModalContentWhileAnimating={true}
+        // supportedOrientations={['portrait', 'landscape']}
+        statusBarTranslucent
+        accessibilityViewIsModal
+        accessibilityLabel={accessibilityLabel || title || 'Full screen modal'}
+        accessibilityHint={
+          accessibilityHint || 'Full screen dialog with content'
+        }
+        // onModalShow={() => setFocusTrapActive(true)}
+        // onModalHide={() => setFocusTrapActive(false)}
+      >
+        <SafeAreaProvider
+          style={{
+            flex: 1,
+            backgroundColor: cssVar.cBlack,
+          }}
+        >
+          <SafeAreaView style={{ flex: 1 }}>
+            <Form pressable={!disableFormPress}>
               <View
-                style={{
-                  ...theme.footer,
-                  borderTopWidth: cssVar.bWidth,
-                }}>
-                {buttonText && (
-                  // <View style={{paddingHorizontal: cssVar.spM}}>
-                  <Button
-                    variant="primary"
-                    disabled={disabled}
-                    style={{flexGrow: 1, flexBasis: 0}}
-                    onPress={() => {
-                      Keyboard.dismiss();
-                      onSave(id);
-                    }}>
-                    {buttonText}
-                  </Button>
-                  // </View>
+                style={theme.container}
+                accessibilityLabel={
+                  accessibilityLabel || title || 'Full screen modal content'
+                }
+              >
+                {!headerHide && (
+                  <HeadTitle
+                    title={title}
+                    onBack={onBack ?? (() => onClose('x'))}
+                    onlyBack={open}
+                    right={right}
+                    iconClose={iconClose}
+                    modalLayout
+                  />
                 )}
-                {buttonCancel && (
-                  // <View style={{paddingHorizontal: cssVar.spM}}>
-                  <Button
-                    variant="secondary"
-                    style={{flexGrow: 1, flexBasis: 0}}
-                    onPress={(e: any) => {
-                      e.stopPropagation();
-                      Keyboard.dismiss();
-                      onClose('cancel');
-                    }}>
-                    {buttonCancel}
-                  </Button>
-                  // </View>
+                {scrollViewHide ? (
+                  children
+                ) : (
+                  <ScrollView
+                    ref={scrollViewRef}
+                    refreshControl={
+                      reload ? (
+                        <RefreshControl
+                          progressBackgroundColor={cssVar.cBlack}
+                          colors={[cssVar.cAccent]}
+                          refreshing={refreshing}
+                          onRefresh={onRefresh}
+                          tintColor={cssVar.cAccent}
+                        />
+                      ) : undefined
+                    }
+                    style={[theme.body, style]}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode="interactive"
+                    showsVerticalScrollIndicator={false}
+                    scrollEventThrottle={16}
+                  >
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      style={{ flex: 1 }}
+                      accessible={false}
+                    >
+                      {children}
+                    </TouchableOpacity>
+                  </ScrollView>
                 )}
-                {buttonExtra && (
-                  // <View style={{paddingHorizontal: cssVar.spM}}>
-                  <View style={{flexGrow: 1, flexBasis: 0}}>{buttonExtra}</View>
+
+                {(buttonText || buttonCancel || buttonExtra) && (
+                  <View style={[theme.footer, styleFooter]}>
+                    {buttonText && (
+                      <Button
+                        variant="primary"
+                        disabled={disabled}
+                        onPress={(e: any) => {
+                          onSave(id);
+                        }}
+                      >
+                        {buttonText}
+                      </Button>
+                    )}
+                    {buttonCancel && (
+                      <Button
+                        variant="secondary"
+                        onPress={(e: any) => {
+                          onClose('cancel');
+                        }}
+                      >
+                        {buttonCancel}
+                      </Button>
+                    )}
+                    {buttonExtra}
+                  </View>
                 )}
               </View>
-            )}
-          </Animated.View>
-        </Form>
-        <Toast toast={toast} showToast={showToast} />
-      </SafeAreaView>
-    </ModalRN>
-  );
-};
+            </Form>
+            <Toast toast={toast} showToast={showToast} />
+          </SafeAreaView>
+        </SafeAreaProvider>
+        {/* </Animated.View> */}
+      </Modal>
+    );
+  },
+);
 
-const theme: ThemeType = {
+const theme = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
     backgroundColor: cssVar.cBlack,
-    // shadowOffset: {width: 0, height: 2},
-    // shadowOpacity: 0.1,
-    // shadowRadius: 2,
-    // elevation: 10,
     overflow: 'hidden',
-    // alignItems: 'center',
     width: '100%',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: cssVar.cBlack,
-    borderBottomWidth: cssVar.bWidth,
-    borderBottomColor: cssVar.cBlackV3,
-  },
-  headerText: {
-    color: cssVar.cWhite,
-    fontSize: cssVar.sL,
-    fontFamily: FONTS.bold,
-    flexGrow: 1,
-  },
   body: {
-    flexGrow: 1,
     padding: cssVar.spM,
-    color: cssVar.cWhiteV3,
     width: '100%',
   },
   footer: {
@@ -234,10 +231,11 @@ const theme: ThemeType = {
     gap: cssVar.spS,
     marginBottom: cssVar.spM,
     paddingTop: cssVar.spS,
-    borderTopColor: cssVar.cBlackV3,
     flexDirection: 'row-reverse',
     paddingHorizontal: cssVar.spM,
+    borderTopWidth: 0.5,
+    borderTopColor: cssVar.cWhiteV1,
   },
-};
+});
 
 export default ModalFull;

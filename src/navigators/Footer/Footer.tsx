@@ -1,81 +1,32 @@
 import React from 'react';
-import {Animated, ImageBackground, View} from 'react-native';
+import { View } from 'react-native';
 import ItemFoot from './ItemFoot';
 import {
-  IconAlert,
   IconAlertNotification,
-  IconContactos,
-  IconFeedBack,
   IconHistorial,
-  // IconActivities,
-  // IconEvent,
   IconHome,
-  IconKey,
   IconNovedades,
-  IconPending,
-  // IconRed,
-  // IconSurveys,
-  IconUser,
+  IconCalendar,
 } from '../../icons/IconLibrary';
-import {cssVar, ThemeType} from '../../../mk/styles/themes';
-import useAuth from '../../../mk/hooks/useAuth';
-import {usePusher} from '../../../mk/contexts/PusherContext';
+import { cssVar, ThemeType } from '../../../mk/styles/themes';
 
-const Footer = ({styles}: any) => {
-  const {store} = useAuth();
-  // const {pusher, socketNew, socketEvent} = usePusher();
-  const Render = ({children}: any) => {
-    return (
-      // <ImageBackground
-      //   source={require('../../images/ImageFooter.png')}
-      //   resizeMode="contain"
-      //   style={{
-      //     ...theme.container,
-      //     ...styles,
-      //   }}>
-      <View
-        style={{
-          ...theme.container,
-          ...styles,
-        }}>
-        {children}
-      </View>
-      // </ImageBackground>
-    );
-  };
-
+const Footer = () => {
   return (
-    <Render>
-      <ItemFoot
-        path="Home"
-        text="Inicio"
-        icon={IconHome}
-        isActived={(store?.nContents || 0) > 0}
-      />
+    <View style={{ ...theme.container }}>
+      <ItemFoot path="Home" text="Inicio" icon={IconHome} />
 
-      <ItemFoot
-        path="Alerts"
-        text="Alertas"
-        icon={IconAlertNotification}
-        isActived={(store?.nEvents || 0) > 0}
-      />
-      <ItemFoot
-        path="History"
-        text="Historial"
-        icon={IconHistorial}
-        isActived={(store?.nSurveys || 0) > 0}
-      />
+      <ItemFoot path="Alerts" text="Alertas" icon={IconAlertNotification} />
+      <ItemFoot path="History" text="Historial" icon={IconHistorial} />
+
+      <ItemFoot path="Reservations" text="Reservas" icon={IconCalendar} />
 
       <ItemFoot path="Binnacle" text="Bitácora" icon={IconNovedades} />
-      {/* <ItemFoot
-        path="activity"
-        text="Actividades"
-        icon={IconActivities}
-        isActived={(store?.nActivity || 0) > 0}
-      /> */}
-    </Render>
+    </View>
   );
 };
+
+export default Footer;
+
 const theme: ThemeType = {
   container: {
     flexDirection: 'row',
@@ -91,5 +42,3 @@ const theme: ThemeType = {
     bottom: 0,
   },
 };
-
-export default Footer;

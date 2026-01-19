@@ -89,6 +89,7 @@ const AlertAdd = ({open, onClose, reload}: PropsType) => {
         <TextArea
           label="Descripción"
           name="descrip"
+          maxLength={140}
           required
           error={errors}
           value={formState.descrip}

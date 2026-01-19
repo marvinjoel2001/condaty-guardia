@@ -1,227 +1,176 @@
-import {useCallback, useEffect, useRef, useState, useContext} from 'react';
+import React from 'react';
 import {
   View,
   Text,
   Dimensions,
   ScrollView,
   TouchableOpacity,
-  Modal as ModalRN,
-  Animated,
-  BackHandler,
+  StyleSheet,
+  Pressable,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
+import ModalRN from 'react-native-modal';
+
 import Icon from '../Icon/Icon';
-import {cssVar, FONTS, ThemeType, TypeStyles} from '../../../styles/themes';
-import {AuthContext} from '../../../contexts/AuthContext';
-import {IconX} from '../../../../src/icons/IconLibrary';
-import Toast from '../Toast/Toast';
+import { cssVar, FONTS } from '../../../styles/themes';
+import { IconX } from '../../../../src/icons/IconLibrary';
 import Button from '../../forms/Button/Button';
-import Form from '../../forms/Form/Form';
-import React from 'react';
-type PropsType = {
-  children: any;
-  onClose: (e: any) => void;
+
+type Props = {
+  children: React.ReactNode;
+  onClose: (reason: 'x' | 'overlay' | 'cancel') => void;
   open: boolean;
-  onSave?: (e: any) => void;
+  onSave?: (id?: string) => void;
   title?: string;
-  style?: TypeStyles;
   buttonText?: string;
   buttonCancel?: string;
-  buttonExtra?: any;
+  buttonExtra?: React.ReactNode;
   id?: string;
-  duration?: number;
-  fullScreen?: boolean;
   iconClose?: boolean;
   disabled?: boolean;
-  recursive?: boolean;
-  headerStyles?: TypeStyles;
-  containerStyles?: TypeStyles;
-  overlayClose?: boolean;
+  headerStyles?: object;
+  containerStyles?: object;
+  overlayClose?: boolean; // permite cerrar tocando fuera
 };
 
-const Modal = ({
-  children,
-  onClose,
-  open,
-  onSave = () => {},
-  title = '',
-  buttonText = '',
-  buttonCancel = '',
-  buttonExtra = null,
-  id = '',
-  fullScreen = false,
-  iconClose = true,
-  overlayClose = false,
-  disabled = false,
-  headerStyles = {},
-  containerStyles = {},
-}: PropsType) => {
-  const screen = Dimensions.get('window');
-  const {toast, showToast}: any = useContext(AuthContext);
-  const [_open, setOpen] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(200)).current;
+const Modal = React.memo(
+  ({
+    children,
+    onClose,
+    open,
+    onSave = () => {},
+    title = '',
+    buttonText = '',
+    buttonCancel = '',
+    buttonExtra = null,
+    id = '',
+    iconClose = true,
+    disabled = false,
+    headerStyles = {},
+    containerStyles = {},
+    overlayClose = false,
+  }: Props) => {
+    const screenWidth = Dimensions.get('window').width;
 
-  // BackHandler logic
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const onBackPress = () => {
-  //       if (open && fullScreen) {
-  //         _onClose('back');
-  //         return true; // Prevent default back behavior
-  //       }
-  //       return false; // Allow default back behavior if modal isn't open or fullscreen
-  //     };
+    const handleBackdropPress = () => {
+      if (overlayClose) onClose('overlay');
+    };
 
-  //     BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    const handleClose = (reason: 'x' | 'cancel') => {
+      onClose(reason);
+    };
 
-  //     return () =>
-  //       BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  //   }, [open, fullScreen]), // Dependencies ensure the effect is applied when these change
-  // );
-
-  useEffect(() => {
-    if (open) {
-      fadeAnim.setValue(0);
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: false,
-      }).start();
-    } else {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 1000,
-        useNativeDriver: false,
-      }).start();
-    }
-  }, [open, fadeAnim]);
-
-  useEffect(() => {
-    setOpen(open);
-  }, [open]);
-
-  const _onClose = (e: any) => {
-    onClose(e);
-  };
-
-  const _onOverlayPress = () => {
-    if (!iconClose || !overlayClose) return;
-    onClose('overlay');
-  };
-
-  return (
-    <ModalRN
-      animationType="fade"
-      transparent={true}
-      visible={open}
-      onRequestClose={() => {}}>
-      <Form>
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{...theme.overlay, opacity: fadeAnim}}
-          onPress={_onOverlayPress}>
-          <Animated.View
-            style={{
-              ...theme.container,
-              ...containerStyles,
-              width: screen.width - 12,
-              opacity: fadeAnim,
-            }}>
-            {(iconClose || title) && (
-              <View style={{...theme.header, ...headerStyles}}>
-                {title && (
-                  <Text style={{...theme.headerText, ...headerStyles}}>
-                    {title}
-                  </Text>
-                )}
-                {iconClose && (
-                  <View style={{alignItems: 'flex-end'}}>
-                    <TouchableOpacity onPress={() => _onClose('x')}>
+    return (
+      <ModalRN
+        isVisible={open}
+        onBackdropPress={handleBackdropPress}
+        onBackButtonPress={() => handleClose('x')}
+        backdropOpacity={0.65}
+        backdropColor="#161616"
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        style={styles.modal}
+        propagateSwipe // permite swipe en ScrollView interno
+      >
+        {open && (
+          <View style={styles.contentWrapper}>
+            <View
+              style={[
+                styles.container,
+                containerStyles,
+                { width: screenWidth - 24 },
+              ]}
+            >
+              {(iconClose || title) && (
+                <View style={[styles.header, headerStyles]}>
+                  {title && (
+                    <View style={styles.titleContainer}>
+                      <Text style={styles.headerText} numberOfLines={1}>
+                        {title}
+                      </Text>
+                    </View>
+                  )}
+                  {iconClose && (
+                    <TouchableOpacity onPress={() => handleClose('x')}>
                       <Icon name={IconX} color={cssVar.cWhite} />
                     </TouchableOpacity>
+                  )}
+                </View>
+              )}
+
+              <ScrollView
+                style={styles.body}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                {children}
+              </ScrollView>
+
+              {(buttonText || buttonCancel || buttonExtra) && (
+                <View style={styles.footer}>
+                  <View style={styles.footerButtons}>
+                    {buttonText && (
+                      <Button
+                        variant="primary"
+                        disabled={disabled}
+                        onPress={() => onSave(id)}
+                      >
+                        {buttonText}
+                      </Button>
+                    )}
+                    {buttonCancel && (
+                      <Button
+                        variant="secondary"
+                        onPress={() => handleClose('cancel')}
+                      >
+                        {buttonCancel}
+                      </Button>
+                    )}
                   </View>
-                )}
-              </View>
-            )}
-            <ScrollView
-              automaticallyAdjustContentInsets
-              automaticallyAdjustKeyboardInsets={true}
-              automaticallyAdjustsScrollIndicatorInsets
-              bounces
-              bouncesZoom
-              keyboardDismissMode="interactive"
-              canCancelContentTouches
-              disableIntervalMomentum={true}
-              style={theme.body}>
-              {children}
-            </ScrollView>
-            {(buttonText || buttonCancel || buttonExtra) && (
-              <View style={theme.footer}>
-                {buttonText && (
-                  // <View style={{flexGrow: 1}}>
-                  <Button
-                    variant="primary"
-                    disabled={disabled}
-                    onPress={() => onSave(id)}>
-                    {buttonText}
-                  </Button>
-                  // </View>
-                )}
-                {buttonCancel && (
-                  // <View style={{flexGrow: 1, flexBasis: 0}}>
-                  <Button
-                    variant="secondary"
-                    onPress={() => _onClose('cancel')}>
-                    {buttonCancel}
-                  </Button>
-                  // </View>
-                )}
-                {buttonExtra && (
-                  <View style={{flexGrow: 1}}>{buttonExtra}</View>
-                )}
-              </View>
-            )}
-          </Animated.View>
-        </TouchableOpacity>
-        <Toast toast={toast} showToast={showToast} />
-      </Form>
-    </ModalRN>
-  );
-};
+                  {buttonExtra && buttonExtra}
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+      </ModalRN>
+    );
+  },
+);
 
 export default Modal;
 
-const theme: ThemeType = {
-  overlay: {
+// Estilos con StyleSheet para referencias estables
+const styles = StyleSheet.create({
+  modal: {
+    margin: 0,
+  },
+  contentWrapper: {
     flex: 1,
-    backgroundColor: '#2E2E2ECC',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
   container: {
-    justifyContent: 'space-between',
     backgroundColor: cssVar.cBlack,
     borderRadius: cssVar.bRadiusS,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 10,
     overflow: 'hidden',
+    maxHeight: '90%',
   },
   header: {
-    flexGrow: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    flexDirection: 'row',
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderBottomColor: cssVar.cWhiteV1,
     borderBottomWidth: 0.5,
+  },
+  titleContainer: {
+    flex: 1,
+    paddingRight: 12,
   },
   headerText: {
     color: cssVar.cWhite,
@@ -229,20 +178,17 @@ const theme: ThemeType = {
     fontFamily: FONTS.semiBold,
   },
   body: {
-    flexGrow: 1,
-    // marginBottom: cssVar.spM,
     paddingHorizontal: cssVar.spM,
     paddingVertical: cssVar.spM,
-    width: '100%',
   },
   footer: {
     padding: cssVar.spS,
-    gap: cssVar.spS,
     borderTopColor: cssVar.cWhiteV1,
     borderTopWidth: 0.5,
   },
-  buttonExtra: {
-    paddingHorizontal: 12,
-    paddingBottom: cssVar.spS,
+  footerButtons: {
+    flexDirection: 'row-reverse',
+    gap: cssVar.spS,
+    justifyContent: 'flex-end',
   },
-};
+});

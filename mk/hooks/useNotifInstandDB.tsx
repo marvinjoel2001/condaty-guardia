@@ -1,8 +1,8 @@
 // hooks/useNotifInstandDB.ts
-import {useEffect, useMemo, useState} from 'react';
-import {id, init} from '@instantdb/react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { id, init } from '@instantdb/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useEvent} from './useEvent';
+import { useEvent } from './useEvent';
 import useAuth from './useAuth';
 import configApp from '../../src/config/config';
 
@@ -33,29 +33,44 @@ export type NotifType = {
 
 const channelGral: string = configApp.APP_PUSHER_BEAMS_INTEREST_PREFIX;
 
-const useNotifInstandDB = (channels: {channel: string}[] = []): NotifType => {
-  const {user, showToast} = useAuth();
+const useNotifInstandDB = (channels: { channel: string }[] = []): NotifType => {
+  const { user, showToast } = useAuth();
   const chiam =
-    channelGral + '-' + configApp.APP_AUTH_IAM.replace('/', '') + user?.id;
+    channelGral +
+    user?.client_id +
+    '-' +
+    configApp.APP_AUTH_IAM.replace('/', '') +
+    user?.id;
 
   const [lastNotif, setLastNotif] = useState<number | null>(null);
-  const {dispatch} = useEvent('onNotif');
+
+  const onSendNotif = useCallback((data: any) => {
+    // console.log('onSendNotif', data);
+    if (data && data.length) {
+      data.forEach((item: any) => {
+        if (item.to && item.act) sendNotif(item.to, item.act, item);
+      });
+    }
+  }, []);
+
+  useEvent('sendNotif', onSendNotif);
+  const { dispatch } = useEvent('onNotif');
 
   const query = {
     notif: {
       $: {
         where: {
           and: [
-            {client_id: user?.client_id},
+            { client_id: user?.client_id },
             {
               or: [
-                {channel: channelGral},
-                {channel: channelGral + user?.client_id},
-                {channel: chiam},
-                {channel: channelGral + user?.client_id + '-guards'},
-                {channel: channelGral + user?.client_id + '-alerts-1'},
-                {channel: channelGral + user?.client_id + '-alerts-2'},
-                {channel: channelGral + user?.client_id + '-alerts-3'},
+                { channel: channelGral },
+                { channel: channelGral + user?.client_id },
+                { channel: chiam },
+                { channel: channelGral + user?.client_id + '-guards' },
+                { channel: channelGral + user?.client_id + '-alerts-1' },
+                { channel: channelGral + user?.client_id + '-alerts-2' },
+                { channel: channelGral + user?.client_id + '-alerts-3' },
                 ...channels,
               ],
             },
@@ -70,7 +85,7 @@ const useNotifInstandDB = (channels: {channel: string}[] = []): NotifType => {
     },
   };
   // console.log('query', user && user.id ? query : 'nada', user, channelGral);
-  const {data} = db.useQuery(user && user.id ? query : null);
+  const { data } = db.useQuery(user && user.id ? query : null);
   // const {data} = db.useQuery(query);
 
   // Load last notif timestamp from AsyncStorage
@@ -111,14 +126,23 @@ const useNotifInstandDB = (channels: {channel: string}[] = []): NotifType => {
   }, [data?.notif]);
 
   const sendNotif = async (channel: string, event: string, payload: any) => {
+    // console.log('sendNotif2', channel, event, payload);
+    const channelSend = channelGral + user?.client_id + '-' + channel;
     await db.transact(
       db.tx.notif[id()].update({
-        from: user.id,
+        from: channelGral,
         payload,
-        channel,
+        channel: channelSend,
         event,
         created_at: Date.now(),
+        client_id: user?.client_id,
       }),
+      //  from: _id,
+      //   payload,
+      //   channel,
+      //   event,
+      //   created_at: Date.now(),
+      //   client_id: client_id,
     );
   };
 

@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../../../mk/components/layout/Layout';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Avatar from '../../../mk/components/ui/Avatar/Avatar';
-import {getFullName, getUrlImages} from '../../../mk/utils/strings';
+import { getFullName, getUrlImages } from '../../../mk/utils/strings';
 import useAuth from '../../../mk/hooks/useAuth';
 import Button from '../../../mk/components/forms/Button/Button';
 import {
@@ -12,6 +12,8 @@ import {
   View,
   BackHandler,
   Alert,
+  TouchableOpacity,
+  Platform,
 } from 'react-native';
 import Icon from '../../../mk/components/ui/Icon/Icon';
 import {
@@ -20,14 +22,14 @@ import {
   IconEmail,
   IconPassword,
 } from '../../icons/IconLibrary';
-import {cssVar, FONTS} from '../../../mk/styles/themes';
-import {uploadImage} from '../../../mk/utils/uploadFile';
+import { cssVar, FONTS } from '../../../mk/styles/themes';
+import { uploadImage } from '../../../mk/utils/uploadFile';
 import Form from '../../../mk/components/forms/Form/Form';
 import InputFullName from '../../../mk/components/forms/InputFullName/InputFullName';
 import Input from '../../../mk/components/forms/Input/Input';
 import useApi from '../../../mk/hooks/useApi';
 import AccessEdit from './AccessEdit';
-import {checkRules, hasErrors} from '../../../mk/utils/validate/Rules';
+import { checkRules, hasErrors } from '../../../mk/utils/validate/Rules';
 import AvatarPreview from './AvatarPreview';
 import configApp from '../../config/config';
 import Br from './Br';
@@ -35,15 +37,15 @@ import Br from './Br';
 const Profile = () => {
   const navigation: any = useNavigation();
   const [isEdit, setIsEdit] = useState(false);
-  const [imagePreview, setImagePreview] = useState(false);;
-  const {user, getUser, showToast, logout}: any = useAuth();
+  const [imagePreview, setImagePreview] = useState(false);
+  const { user, getUser, showToast, logout }: any = useAuth();
   const [formState, setFormState]: any = useState({});
   const [type, setType] = useState({}); // Para el modal AccessEdit
   const [openModal, setOpenModal] = useState(false);
   const [errors, setErrors]: any = useState({});
-  const {execute} = useApi();
+  const { execute } = useApi();
 
-  const lCondo: any = {C: 'Condominio', E: 'Edificio', U: 'Urbanización'};
+  const lCondo: any = { C: 'Condominio', E: 'Edificio', U: 'Urbanización' };
 
   const client: any = user?.clients?.find((e: any) => e.id == user.client_id);
 
@@ -61,7 +63,6 @@ const Profile = () => {
       }
       const onBackPress = () => {
         if (isEdit) {
-
           setIsEdit(false);
           return true;
         }
@@ -83,7 +84,9 @@ const Profile = () => {
           ...prevState,
           ...(userData ?? {}),
           avatar:
-            prevState?.avatar && typeof prevState.avatar === 'string' && prevState.avatar.startsWith('data:image')
+            prevState?.avatar &&
+            typeof prevState.avatar === 'string' &&
+            prevState.avatar.startsWith('data:image')
               ? prevState.avatar
               : userData?.avatar || null,
         }));
@@ -104,19 +107,20 @@ const Profile = () => {
       setFormState((prevState: any) => ({
         ...user,
         avatar:
-          prevState?.avatar && typeof prevState.avatar === 'string' && prevState.avatar.startsWith('data:image')
-          ? prevState.avatar
-          : user?.avatar || null,
+          prevState?.avatar &&
+          typeof prevState.avatar === 'string' &&
+          prevState.avatar.startsWith('data:image')
+            ? prevState.avatar
+            : user?.avatar || null,
       }));
     }
   }, [user, isEdit]);
 
-
   const handleInputChange = (name: string, value: string) => {
-    setFormState({
-      ...formState,
+    setFormState((prevState: any) => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
   };
 
   const validate = () => {
@@ -159,9 +163,13 @@ const Profile = () => {
     if (hasErrors(validate())) return;
 
     let avatarPayload;
-    if (formState.avatar && typeof formState.avatar === 'string' && formState.avatar.startsWith('data:image')) {
+    if (
+      formState.avatar &&
+      typeof formState.avatar === 'string' &&
+      formState.avatar.startsWith('data:image')
+    ) {
       const base64Data = formState.avatar.split(',')[1] || formState.avatar;
-      avatarPayload = {ext: 'webp', file: encodeURIComponent(base64Data)};
+      avatarPayload = { ext: 'webp', file: encodeURIComponent(base64Data) };
     }
 
     const newUserPayload: any = {
@@ -175,7 +183,7 @@ const Profile = () => {
       newUserPayload.avatar = avatarPayload;
     }
 
-    const {data, error: err} = await execute(
+    const { data, error: err } = await execute(
       configApp.APP_USER + user?.id,
       'PUT',
       newUserPayload,
@@ -212,7 +220,6 @@ const Profile = () => {
     setOpenModal(true);
   };
 
-
   const getAvatarSource = () => {
     if (isEdit && formState?.avatar?.startsWith('data:image')) {
       return formState.avatar;
@@ -228,25 +235,28 @@ const Profile = () => {
       }}
       title={'Mi perfil'}
       scroll={!isEdit}
-      >
-
+    >
       {/* Contenedor del Avatar y botón de cámara */}
       <View style={styles.avatarContainer}>
         <Avatar
-          onClick={() =>  setImagePreview(true)}
+          hasImage={user?.has_image}
+          onClick={() => setImagePreview(true)}
           src={getAvatarSource()}
           w={116}
           h={116}
           name={getFullName(user)}
-          style={{width: 116, height: 116}}
+          style={{ width: 116, height: 116 }}
         />
         {isEdit && (
           <View
             style={styles.cameraButton}
             onTouchEnd={() => {
-              uploadImage({formState, setFormState, showToast});
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+              uploadImage({ formState, setFormState, showToast });
+            }}
+          >
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
               <Icon
                 name={IconCamera}
                 fillStroke={cssVar.cWhiteV1}
@@ -257,7 +267,8 @@ const Profile = () => {
                   color: cssVar.cWhiteV1,
                   fontFamily: FONTS.semiBold,
                   fontSize: 12,
-                }}>
+                }}
+              >
                 Agregar
               </Text>
             </View>
@@ -271,12 +282,13 @@ const Profile = () => {
       </Text>
 
       {isEdit ? (
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <ScrollView
-            style={{flex: 1}}
+            style={{ flex: 1 }}
             contentContainerStyle={styles.editScrollContent}
-            keyboardShouldPersistTaps="handled">
-            <Form behaviorIos="position" keyboardVerticalOffset={100}>
+            keyboardShouldPersistTaps="handled"
+          >
+            <Form>
               <InputFullName
                 formState={formState}
                 errors={errors}
@@ -331,7 +343,6 @@ const Profile = () => {
                 Los datos bloqueados son delicados, solo pueden ser modificados
                 con permiso de administración de Condaty.
               </Text>
-
             </Form>
           </ScrollView>
           {/* Contenedor para los botones de acción, fijo abajo */}
@@ -340,16 +351,18 @@ const Profile = () => {
               onPress={() => {
                 setIsEdit(false);
                 setErrors({});
-                setFormState({...user, avatar: user?.avatar || null});
+                setFormState({ ...user, avatar: user?.avatar || null });
               }}
-              style={{...styles.buttonBase, ...styles.cancelButton}}>
+              style={{ ...styles.buttonBase, ...styles.cancelButton }}
+            >
               <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
                 Cancelar
               </Text>
             </Button>
             <Button
               onPress={onSave}
-              style={{...styles.buttonBase, ...styles.saveButton}}>
+              style={{ ...styles.buttonBase, ...styles.saveButton }}
+            >
               <Text style={[styles.actionButtonText, styles.saveButtonText]}>
                 Guardar cambios
               </Text>
@@ -365,18 +378,24 @@ const Profile = () => {
             </View>
             <Br />
             <View>
-            <Text style={styles.label}>Carnet de identidad</Text>
-              <Text style={styles.textValue}>{user?.ci || 'Sin registrar'}</Text>
+              <Text style={styles.label}>Carnet de identidad</Text>
+              <Text style={styles.textValue}>
+                {user?.ci || 'Sin registrar'}
+              </Text>
             </View>
             <Br />
             <View>
               <Text style={styles.label}>Teléfono</Text>
-              <Text style={styles.textValue}>{user?.phone || 'Sin teléfono'}</Text>
+              <Text style={styles.textValue}>
+                {user?.phone || 'Sin teléfono'}
+              </Text>
             </View>
             <Br />
             <View>
               <Text style={styles.label}>{lCondo[client?.type]}</Text>
-              <Text style={styles.textValue}>{client?.name || 'No asignado'}</Text>
+              <Text style={styles.textValue}>
+                {client?.name || 'No asignado'}
+              </Text>
             </View>
             <Br />
 
@@ -397,11 +416,12 @@ const Profile = () => {
 
           <Text style={styles.sectionTitle}>Datos de acceso</Text>
           <View style={styles.card}>
-            <View
+            <TouchableOpacity
               style={styles.accessRow}
-              onTouchEnd={() => {
+              onPress={() => {
                 onOpenModal('M');
-              }}>
+              }}
+            >
               <Icon
                 name={IconEmail}
                 fillStroke={cssVar.cWhiteV1}
@@ -410,13 +430,14 @@ const Profile = () => {
               />
               <Text style={styles.accessText}>Cambiar correo electrónico</Text>
               <Icon name={IconArrowRight} color={cssVar.cWhiteV1} size={18} />
-            </View>
+            </TouchableOpacity>
             <Br />
-            <View
-              style={[styles.accessRow, {borderBottomWidth: 0}]}
-              onTouchEnd={() => {
+            <TouchableOpacity
+              style={[styles.accessRow, { borderBottomWidth: 0 }]}
+              onPress={() => {
                 onOpenModal('P');
-              }}>
+              }}
+            >
               <Icon
                 name={IconPassword}
                 fillStroke={cssVar.cWhiteV1}
@@ -425,7 +446,7 @@ const Profile = () => {
               />
               <Text style={styles.accessText}>Cambiar contraseña</Text>
               <Icon name={IconArrowRight} color={cssVar.cWhiteV1} size={18} />
-            </View>
+            </TouchableOpacity>
           </View>
 
           {/* Botón de Cerrar Sesión, se muestra al final del contenido scrolleable */}
@@ -433,11 +454,19 @@ const Profile = () => {
             <Text
               style={styles.logoutText}
               onPress={() => {
-                Alert.alert('', '¿Cerrar la sesión de tu cuenta?', [
-                  {text: 'Cancelar', style: 'cancel'},
-                  {text: 'Salir', style: 'destructive', onPress: logout},
-                ]);
-              }}>
+                if (Platform.OS === 'web') {
+                  // @ts-ignore
+                  if (window.confirm('¿Cerrar la sesión de tu cuenta?')) {
+                    logout();
+                  }
+                } else {
+                  Alert.alert('', '¿Cerrar la sesión de tu cuenta?', [
+                    { text: 'Cancelar', style: 'cancel' },
+                    { text: 'Salir', style: 'destructive', onPress: logout },
+                  ]);
+                }
+              }}
+            >
               Cerrar sesión
             </Text>
           </View>
@@ -447,6 +476,7 @@ const Profile = () => {
       {/* Modales (AvatarPreview y AccessEdit) */}
       {imagePreview && (
         <AvatarPreview
+          hasImage={user?.has_image}
           open={imagePreview}
           onClose={() => setImagePreview(false)}
           id={user.id}
@@ -499,10 +529,8 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
     padding: 12,
-    gap: 8,
+
     backgroundColor: cssVar.cBlackV2, // Color de fondo de la tarjeta
-
-
   },
 
   label: {
@@ -611,4 +639,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-

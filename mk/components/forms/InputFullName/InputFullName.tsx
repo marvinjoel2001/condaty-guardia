@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Input from '../Input/Input';
-import {StyleSheet, View} from 'react-native';
-import {TypeStyles} from '../../../styles/themes';
+import { StyleSheet, View } from 'react-native';
+import { TypeStyles } from '../../../styles/themes';
 
 type PropsType = {
   formState: any;
@@ -28,11 +28,46 @@ const InputFullName = ({
   inputGrid = false,
   onBlur = (e: any) => {},
 }: PropsType) => {
-  const _onChange = (name: string, value: any) => {
-    // Eliminar todos los espacios del valor ingresado
-    value = value.replace(/\s+/g, '');
-    handleChangeInput(name, value);
-  };
+  // se esta dejando los comentarios por si piden volver a la version anterior donde no se permitía dejar espacios en blanco 6/10/2025
+  // const removeSpaces = (text: string) => {
+  //   return text.replaceAll(' ', '');
+  // };
+  // const onChangeName = useCallback(
+  //   (value: any) => {
+  //     // const cleanedValue = removeSpaces(value);
+  //     handleChangeInput('name' + prefijo, value);
+  //   },
+  //   [handleChangeInput, prefijo],
+  // );
+  const _onChange = useCallback(
+    (name: string, value: any) => {
+      // const cleanedValue = removeSpaces(value);
+      if (typeof value === 'string') {
+        // 1. Eliminar espacios al inicio
+        value = value.trimStart();
+        // 2. Reemplazar múltiples espacios por uno solo
+        value = value.replace(/\s\s+/g, ' ');
+        // 3. Capitalizar la primera letra de cada palabra
+        value = value.replace(/(?:^|\s)\S/g, (a: string) => a.toUpperCase());
+      }
+      handleChangeInput(name + prefijo, value);
+    },
+    [handleChangeInput, prefijo],
+  );
+
+  const _onBlur = useCallback(
+    (name: string) => {
+      const key = name + prefijo;
+      const value = formState[key];
+
+      if (typeof value === 'string') {
+        handleChangeInput(key, value.trim());
+      }
+
+      onBlur(key);
+    },
+    [onBlur, prefijo, formState, handleChangeInput],
+  );
 
   const container = inputGrid ? styles.container : {};
   const input1 = inputGrid ? styles.input1 : {};
@@ -49,11 +84,11 @@ const InputFullName = ({
             name={'name' + (name_prefijo || prefijo)}
             error={errors}
             autoCapitalize="words"
-            onBlur={() => onBlur('name' + prefijo)}
+            onBlur={() => _onBlur('name')}
             required={true}
             disabled={disabled}
             value={formState['name' + prefijo]}
-            onChange={(value: any) => _onChange('name' + prefijo, value)}
+            onChange={value => _onChange('name', value)}
           />
         </View>
         <View style={input2}>
@@ -66,43 +101,43 @@ const InputFullName = ({
             required={false}
             autoCapitalize="words"
             disabled={disabled}
-            onBlur={() => onBlur('middle_name' + prefijo)}
+            onBlur={() => _onBlur('middle_name')}
             value={formState['middle_name' + prefijo]}
-            onChange={(value: any) => _onChange('middle_name' + prefijo, value)}
+            onChange={value => _onChange('middle_name', value)}
           />
         </View>
       </View>
       <View style={container}>
-          <View style={input1}>
-              <Input
-                label="Apellido paterno"
-                type="text"
-                style={styleInputs}
-                name={'last_name' + (name_prefijo || prefijo)}
-                error={errors}
-                required={true}
-                autoCapitalize="words"
-                onBlur={() => onBlur('last_name' + prefijo)}
-                disabled={disabled}
-                value={formState['last_name' + prefijo]}
-                onChange={(value: any) => _onChange('last_name' + prefijo, value)}
-              />
-              </View>
-  <View style={input2}>
-      <Input
-        label="Apellido materno"
-        type="text"
-        style={styleInputs}
-        name={'mother_last_name' + (name_prefijo || prefijo)}
-        required={false}
-        error={errors}
-        autoCapitalize="words"
-        onBlur={() => onBlur('mother_last_name' + prefijo)}
-        disabled={disabled}
-        value={formState['mother_last_name' + prefijo]}
-        onChange={(value: any) => _onChange('mother_last_name' + prefijo, value)}
-      />
-      </View>
+        <View style={input1}>
+          <Input
+            label="Apellido paterno"
+            type="text"
+            style={styleInputs}
+            name={'last_name' + (name_prefijo || prefijo)}
+            error={errors}
+            required={true}
+            autoCapitalize="words"
+            onBlur={() => _onBlur('last_name')}
+            disabled={disabled}
+            value={formState['last_name' + prefijo]}
+            onChange={value => _onChange('last_name', value)}
+          />
+        </View>
+        <View style={input2}>
+          <Input
+            label="Apellido materno"
+            type="text"
+            style={styleInputs}
+            name={'mother_last_name' + (name_prefijo || prefijo)}
+            required={false}
+            error={errors}
+            autoCapitalize="words"
+            onBlur={() => _onBlur('mother_last_name')}
+            disabled={disabled}
+            value={formState['mother_last_name' + prefijo]}
+            onChange={value => _onChange('mother_last_name', value)}
+          />
+        </View>
       </View>
     </>
   );
