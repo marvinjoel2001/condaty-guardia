@@ -83,7 +83,7 @@ ios/Podfile.lock
 !.yarn/sdks
 !.yarn/versions
 
-package-lock.json
+# package-lock.json
 
 # Scripts
 /scripts/
