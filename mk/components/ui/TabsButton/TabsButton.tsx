@@ -55,6 +55,7 @@ const TabsButtons = ({
         }}
       >
         <Text
+          numberOfLines={1}
           style={{
             color: cssVar.cWhiteV1,
             fontSize: 14,
