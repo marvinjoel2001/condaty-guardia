@@ -31,16 +31,15 @@ const TabsButtons = ({
     <TouchableOpacity
       key={tab.value}
       onPress={() => setSel(tab.value)}
-      style={{
-        flex: grow ? 1 : 0,
-      }}
+      style={grow ? { flex: 1 } : {}}
     >
       <View
         style={{
           borderRadius: 8,
           // paddingHorizontal: 18,
           padding: 8,
-          height: '100%',
+          minHeight: 36,
+          // height: '100%',
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: tab.color || cssVar.cHoverBlackV2,
