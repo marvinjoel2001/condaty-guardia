@@ -70,6 +70,9 @@ const DynamicModal = ({
               style={{
                 ...styles[`content${variant}`],
                 height: height,
+                width: '100%',
+                maxWidth: 600,
+                alignSelf: 'center',
                 ...style,
               }}
             >

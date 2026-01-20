@@ -177,7 +177,7 @@ export const AccompaniedAdd = ({
       buttonCancelText=""
       onSave={() => onSave(false)}
     >
-      <View style={{ flexDirection: 'row', gap: 12 }}>
+      <View style={{ flexDirection: 'row', gap: 12, width: '100%' }}>
         <UploadFileV2
           variant="V2"
           style={{
@@ -201,7 +201,7 @@ export const AccompaniedAdd = ({
           global
         />
       </View>
-      <View style={{ gap: 12 }}>
+      <View style={{ gap: 12, width: '100%' }}>
         <Input
           label="Carnet de identidad"
           keyboardType="numeric"

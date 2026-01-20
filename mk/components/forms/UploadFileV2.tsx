@@ -109,7 +109,7 @@ const UploadFile: React.FC<Props> = ({
     }
 
     if (Platform.OS === 'web') {
-      openGallery();
+      pickDocument();
       return;
     }
 
@@ -152,10 +152,18 @@ const UploadFile: React.FC<Props> = ({
   };
   const pickDocument = async () => {
     try {
-      const [asset] = await pick();
-      if (asset) {
+      const options: any = {};
+      if (cant > 1) options.allowMultiSelection = true;
+      if (type === 'I') options.type = ['image/*'];
+
+      const assets = await pick(options);
+      if (assets && assets.length > 0) {
         handleResponse({
-          assets: [{ uri: asset.uri, fileName: asset.name || 'documento' }],
+          assets: assets.map((a: any) => ({
+            uri: a.uri,
+            fileName: a.name || 'file',
+            type: a.type || a.mimeType,
+          })),
         });
       }
     } catch (err: any) {
