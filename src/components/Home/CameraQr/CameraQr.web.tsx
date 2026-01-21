@@ -84,7 +84,15 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
   }, [handleCodeFound]);
 
   const startCamera = useCallback(async () => {
+    setLoading(true);
+    setPermissionError(false);
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error(
+          'Camera API not available. Check HTTPS or device capabilities.',
+        );
+      }
+
       // @ts-ignore
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment' },
@@ -97,15 +105,33 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
           .catch((e: any) => console.error('Error playing video:', e));
         requestRef.current = requestAnimationFrame(tick);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error accessing camera:', err);
       setPermissionError(true);
-      if (onMsg)
-        onMsg(
-          'Error',
-          'No se pudo acceder a la cámara. Verifique los permisos.',
-          'error',
-        );
+      setLoading(false);
+
+      let msg = 'No se pudo acceder a la cámara.';
+      if (
+        err.name === 'NotAllowedError' ||
+        err.name === 'PermissionDeniedError'
+      ) {
+        msg =
+          'Permiso de cámara denegado. Por favor, habilítelo en la configuración del navegador.';
+      } else if (
+        err.name === 'NotFoundError' ||
+        err.name === 'DevicesNotFoundError'
+      ) {
+        msg = 'No se encontró ninguna cámara en este dispositivo.';
+      } else if (
+        err.name === 'NotReadableError' ||
+        err.name === 'TrackStartError'
+      ) {
+        msg = 'La cámara está siendo usada por otra aplicación.';
+      } else if (err.message.includes('HTTPS')) {
+        msg = 'El acceso a la cámara requiere una conexión segura (HTTPS).';
+      }
+
+      if (onMsg) onMsg('Error de Cámara', msg, 'error');
     }
   }, [tick, onMsg]);
 
@@ -180,8 +206,14 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
               No se pudo acceder a la cámara.
             </Text>
             <Text style={styles.errorSubText}>
-              Por favor, verifique los permisos o use la opción de subir imagen.
+              Por favor, verifique los permisos en el navegador o use la opción
+              de subir imagen.
+              {'\n'}
+              Asegúrese de estar usando HTTPS.
             </Text>
+            <View style={{ marginTop: 20 }}>
+              <Button onPress={startCamera}>Intentar de nuevo</Button>
+            </View>
           </View>
         ) : (
           <View style={styles.cameraContainer}>

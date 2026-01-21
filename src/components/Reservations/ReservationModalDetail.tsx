@@ -25,7 +25,7 @@ const ReservationModalDetail = ({ open, onClose, reservation }: Props) => {
     data: responseData,
     loaded,
     reload,
-  } = useApi('/reservations', 'GET', params);
+  } = useApi('/reservations', 'GET', params, 0, open && !!reservation?.id);
   const loading = !loaded;
 
   const [imageError, setImageError] = useState(false);
@@ -104,7 +104,7 @@ const ReservationModalDetail = ({ open, onClose, reservation }: Props) => {
       headerStyles={{ borderBottomWidth: 0 }}
       containerStyles={{ backgroundColor: cssVar.cBlack }}
     >
-      {loading || !detailData ? (
+      {loading ? (
         <View
           style={{
             height: 300,
@@ -112,7 +112,19 @@ const ReservationModalDetail = ({ open, onClose, reservation }: Props) => {
             alignItems: 'center',
           }}
         >
-          <ActivityIndicator size="large" color={cssVar.cPrimary} />
+          <ActivityIndicator size="large" color={cssVar.cAccent} />
+        </View>
+      ) : !detailData ? (
+        <View
+          style={{
+            height: 300,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ color: cssVar.cWhite, fontFamily: FONTS.regular }}>
+            No se encontraron detalles de la reserva.
+          </Text>
         </View>
       ) : (
         <View style={styles.content}>
