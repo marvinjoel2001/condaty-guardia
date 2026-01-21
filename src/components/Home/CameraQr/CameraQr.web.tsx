@@ -21,6 +21,7 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
   const [permissionError, setPermissionError] = useState(false);
   const requestRef = useRef<any>();
   const streamRef = useRef<any>(null);
+  const lastScanRef = useRef<number>(0); // Cooldown para evitar lecturas múltiples rápidas
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -34,10 +35,14 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
 
   const handleCodeFound = useCallback(
     (code: string) => {
-      stopCamera();
+      const now = Date.now();
+      // Evitar lecturas repetidas muy seguidas (3 segundos de cooldown si hay error)
+      if (now - lastScanRef.current < 3000) return;
+      lastScanRef.current = now;
 
       const data = (code + '||').split('|');
       if (data[0] === 'condaty' && data[1] === 'qr') {
+        stopCamera(); // Detener cámara solo si es válido
         const time = Number(data[3].slice(-10));
         if (time > 2024 + 10 + 27 + 9 + 27) {
           data[3] = data[3].slice(0, -10);
@@ -45,10 +50,12 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
         if (setCode) setCode(data);
         onClose();
       } else {
+        // Si es inválido, mostramos error pero NO cerramos el modal
         if (onMsg) onMsg('QR Inválido', 'El código QR no es válido', 'error');
         // @ts-ignore
         else window.alert('QR Inválido');
-        onClose();
+        
+        // No llamamos a onClose() para permitir reintentar
       }
     },
     [setCode, onClose, onMsg, stopCamera],
@@ -75,7 +82,7 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
 
           if (code) {
             handleCodeFound(code.data);
-            return; // Stop loop
+            // No detenemos el loop aquí inmediatamente, handleCodeFound decide si cerrar o seguir
           }
         }
       }
@@ -225,25 +232,88 @@ const CameraQr = ({ open, onClose, setCode, onMsg }: CameraQrProps) => {
                 position: 'relative',
                 overflow: 'hidden',
                 backgroundColor: 'black',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
               <video
                 ref={videoRef}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'cover',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0
+                }}
                 playsInline
                 muted
               />
               <canvas ref={canvasRef} style={{ display: 'none' }} />
+              
+              {/* Overlay Visual para Escaneo QR */}
+              {!loading && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  zIndex: 10
+                }}>
+                  {/* Parte Superior Oscura */}
+                  <div style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.6)'}} />
+                  
+                  {/* Parte Central con Ventana */}
+                  <div style={{display: 'flex', height: '280px', width: '100%'}}>
+                    <div style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.6)'}} />
+                    
+                    {/* Cuadro de Enfoque */}
+                    <div style={{
+                      width: '280px',
+                      height: '280px',
+                      border: '2px solid rgba(255,255,255,0.8)',
+                      borderRadius: '16px',
+                      position: 'relative',
+                      boxShadow: '0 0 0 9999px rgba(0,0,0,0.6)', // Alternativa para oscurecer todo alrededor
+                      backgroundColor: 'transparent'
+                    }}>
+                      {/* Esquinas para darle estilo de scanner */}
+                      <div style={{position: 'absolute', top: -2, left: -2, width: 30, height: 30, borderTop: '4px solid #00E096', borderLeft: '4px solid #00E096', borderTopLeftRadius: 16}} />
+                      <div style={{position: 'absolute', top: -2, right: -2, width: 30, height: 30, borderTop: '4px solid #00E096', borderRight: '4px solid #00E096', borderTopRightRadius: 16}} />
+                      <div style={{position: 'absolute', bottom: -2, left: -2, width: 30, height: 30, borderBottom: '4px solid #00E096', borderLeft: '4px solid #00E096', borderBottomLeftRadius: 16}} />
+                      <div style={{position: 'absolute', bottom: -2, right: -2, width: 30, height: 30, borderBottom: '4px solid #00E096', borderRight: '4px solid #00E096', borderBottomRightRadius: 16}} />
+                      
+                      {/* Línea de escaneo animada (opcional, simple css animation could be added here) */}
+                    </div>
+                    
+                    <div style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.6)'}} />
+                  </div>
+                  
+                  {/* Parte Inferior Oscura */}
+                  <div style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', paddingTop: '20px'}}>
+                    <span style={{color: 'white', fontFamily: 'sans-serif', backgroundColor: 'rgba(0,0,0,0.5)', padding: '8px 16px', borderRadius: '20px', fontSize: '14px'}}>
+                      Centra el código QR en el cuadro
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {loading && (
                 <Text
                   style={{
                     position: 'absolute',
-                    top: '50%',
-                    left: '50%',
+                    zIndex: 20,
                     color: 'white',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: 10,
+                    borderRadius: 8
                   }}
                 >
-                  Cargando cámara...
+                  Iniciando cámara...
                 </Text>
               )}
             </div>
